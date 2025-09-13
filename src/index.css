@@ -2,95 +2,118 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Professional Financial Platform Design System */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    /* Core Financial Brand Colors */
+    --background: 240 30% 99%;
+    --foreground: 216 25% 15%;
+    
+    /* Financial Trust Colors */
+    --primary: 216 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 216 100% 85%;
+    
+    /* Success & Growth */
+    --success: 142 69% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 69% 85%;
+    
+    /* Warning & Attention */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --warning-light: 38 92% 85%;
+    
+    /* Error & Negative */
+    --destructive: 0 84% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-light: 0 84% 85%;
+    
+    /* Neutral Palette */
+    --neutral: 216 15% 95%;
+    --neutral-foreground: 216 25% 25%;
+    --muted: 216 15% 97%;
+    --muted-foreground: 216 15% 45%;
+    
+    /* Card & Surface Colors */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 216 25% 15%;
+    --card-border: 216 20% 90%;
+    
+    /* Secondary Surfaces */
+    --secondary: 216 15% 97%;
+    --secondary-foreground: 216 25% 25%;
+    
+    /* Accent Colors */
+    --accent: 216 100% 97%;
+    --accent-foreground: 216 100% 30%;
+    
+    /* Input & Form Elements */
+    --input: 216 20% 92%;
+    --border: 216 20% 88%;
+    --ring: 216 100% 50%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(216 100% 50%), hsl(216 100% 60%));
+    --gradient-success: linear-gradient(135deg, hsl(142 69% 45%), hsl(142 69% 55%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(216 15% 98%));
+    
+    /* Shadows */
+    --shadow-card: 0 4px 6px -1px hsl(216 25% 15% / 0.1), 0 2px 4px -1px hsl(216 25% 15% / 0.06);
+    --shadow-elevated: 0 20px 25px -5px hsl(216 25% 15% / 0.1), 0 10px 10px -5px hsl(216 25% 15% / 0.04);
+    
+    /* Layout */
+    --radius: 0.75rem;
+    --header-height: 4rem;
+    
+    /* Popover */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --popover-foreground: 216 25% 15%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background: 216 25% 8%;
+    --foreground: 216 15% 92%;
+    
+    --primary: 216 100% 60%;
+    --primary-foreground: 216 25% 8%;
+    --primary-light: 216 100% 40%;
+    
+    --success: 142 69% 55%;
+    --success-foreground: 216 25% 8%;
+    --success-light: 142 69% 35%;
+    
+    --warning: 38 92% 60%;
+    --warning-foreground: 216 25% 8%;
+    --warning-light: 38 92% 40%;
+    
+    --destructive: 0 84% 65%;
+    --destructive-foreground: 216 25% 8%;
+    --destructive-light: 0 84% 45%;
+    
+    --card: 216 25% 12%;
+    --card-foreground: 216 15% 92%;
+    --card-border: 216 20% 20%;
+    
+    --secondary: 216 20% 15%;
+    --secondary-foreground: 216 15% 85%;
+    
+    --accent: 216 20% 18%;
+    --accent-foreground: 216 15% 90%;
+    
+    --muted: 216 20% 15%;
+    --muted-foreground: 216 15% 65%;
+    
+    --input: 216 20% 18%;
+    --border: 216 20% 22%;
+    --ring: 216 100% 60%;
+    
+    --popover: 216 25% 12%;
+    --popover-foreground: 216 15% 92%;
+    
+    --gradient-card: linear-gradient(145deg, hsl(216 25% 12%), hsl(216 25% 10%));
+    --shadow-card: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -1px hsl(0 0% 0% / 0.2);
   }
 }
 
@@ -98,8 +121,56 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  /* Financial Data Typography */
+  .financial-amount {
+    @apply font-mono font-semibold tracking-tight;
+  }
+  
+  /* Gradient Backgrounds */
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-success {
+    background: var(--gradient-success);
+  }
+  
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+}
+
+@layer components {
+  /* Financial Card Styles */
+  .financial-card {
+    @apply rounded-xl border bg-card/50 backdrop-blur-sm p-6 shadow-sm;
+    box-shadow: var(--shadow-card);
+  }
+  
+  .financial-card-elevated {
+    @apply financial-card;
+    box-shadow: var(--shadow-elevated);
+  }
+  
+  /* Split Section Styles */
+  .split-section {
+    @apply rounded-lg border p-4 transition-all duration-200 hover:shadow-md;
+  }
+  
+  .split-section-needs {
+    @apply bg-gradient-to-br from-destructive-light/10 to-destructive-light/5 border-destructive-light/20;
+  }
+  
+  .split-section-wants {
+    @apply bg-gradient-to-br from-warning-light/10 to-warning-light/5 border-warning-light/20;
+  }
+  
+  .split-section-savings {
+    @apply bg-gradient-to-br from-success-light/10 to-success-light/5 border-success-light/20;
   }
 }
