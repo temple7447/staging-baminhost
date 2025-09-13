@@ -1,14 +1,44 @@
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { LoginPage } from "@/components/auth/LoginPage";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { OwnerDashboard } from "@/components/dashboard/OwnerDashboard";
+import { Big7Dashboard } from "@/components/dashboard/Big7Dashboard";
+import { ManagerDashboard } from "@/components/dashboard/ManagerDashboard";
+import { VendorDashboard } from "@/components/dashboard/VendorDashboard";
+import { CustomerDashboard } from "@/components/dashboard/CustomerDashboard";
 
 const Index = () => {
+  const { isAuthenticated, user } = useAuth();
   const [currentView, setCurrentView] = useState("overview");
+
+  // Show login page if not authenticated
+  if (!isAuthenticated || !user) {
+    return <LoginPage />;
+  }
+
+  // Render different dashboards based on user role
+  const renderDashboard = () => {
+    switch (user.role) {
+      case 'owner':
+        return <OwnerDashboard />;
+      case 'big7':
+        return <Big7Dashboard />;
+      case 'manager':
+        return <ManagerDashboard />;
+      case 'vendor':
+        return <VendorDashboard />;
+      case 'customer':
+        return <CustomerDashboard />;
+      default:
+        return <OwnerDashboard />;
+    }
+  };
 
   const renderCurrentView = () => {
     switch (currentView) {
       case "overview":
-        return <OwnerDashboard />;
+        return renderDashboard();
       case "wallet":
         return (
           <div className="space-y-6">
@@ -66,7 +96,7 @@ const Index = () => {
           </div>
         );
       default:
-        return <OwnerDashboard />;
+        return renderDashboard();
     }
   };
 

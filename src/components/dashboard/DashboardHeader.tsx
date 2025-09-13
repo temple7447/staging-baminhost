@@ -1,8 +1,10 @@
-import { Bell, Search, Settings, User } from "lucide-react";
+import { Bell, Search, Settings, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const DashboardHeader = () => {
+  const { user, logout } = useAuth();
   return (
     <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="flex items-center justify-between h-full px-6">
@@ -12,6 +14,11 @@ export const DashboardHeader = () => {
               <span className="text-primary-foreground font-bold text-sm">FP</span>
             </div>
             <span className="font-bold text-xl text-foreground">FinancePro</span>
+            {user && (
+              <span className="text-sm text-muted-foreground ml-2">
+                {user.role.charAt(0).toUpperCase() + user.role.slice(1)} Dashboard
+              </span>
+            )}
           </div>
         </div>
         
@@ -32,8 +39,17 @@ export const DashboardHeader = () => {
             <Settings className="w-4 h-4" />
           </Button>
           
-          <Button variant="ghost" size="sm">
-            <User className="w-4 h-4" />
+          <div className="flex items-center space-x-2">
+            {user && (
+              <span className="text-sm font-medium">{user.name}</span>
+            )}
+            <Button variant="ghost" size="sm">
+              <User className="w-4 h-4" />
+            </Button>
+          </div>
+          
+          <Button variant="ghost" size="sm" onClick={logout}>
+            <LogOut className="w-4 h-4" />
           </Button>
         </div>
       </div>
