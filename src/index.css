@@ -7,13 +7,18 @@
 @layer base {
   :root {
     /* Core Financial Brand Colors */
-    --background: 240 30% 99%;
-    --foreground: 216 25% 15%;
+    --background: 0 0% 100%; /* Pure White */
+    --foreground: 0 0% 20%; /* Dark Grey #333333 */
     
-    /* Financial Trust Colors */
-    --primary: 216 100% 50%;
+    /* Professional Green Primary */
+    --primary: 152 75% 20%; /* Deep Forest Green #006644 */
     --primary-foreground: 0 0% 100%;
-    --primary-light: 216 100% 85%;
+    --primary-light: 152 75% 85%;
+    
+    /* Success Green (Teal Green for highlights) */
+    --success: 169 67% 36%; /* Teal Green #00B894 */
+    --success-foreground: 0 0% 100%;
+    --success-light: 169 67% 85%;
     
     /* Success & Growth */
     --success: 142 69% 45%;
@@ -30,34 +35,35 @@
     --destructive-foreground: 0 0% 100%;
     --destructive-light: 0 84% 85%;
     
-    /* Neutral Palette */
-    --neutral: 216 15% 95%;
-    --neutral-foreground: 216 25% 25%;
-    --muted: 216 15% 97%;
-    --muted-foreground: 216 15% 45%;
+    /* Professional Grey Neutral Palette */
+    --neutral: 0 0% 96%; /* Light Grey #F5F5F5 */
+    --neutral-foreground: 0 0% 29%; /* Medium Grey #4A4A4A */
+    --muted: 0 0% 96%; /* Light Grey Background #F5F5F5 */
+    --muted-foreground: 0 0% 62%; /* Secondary Text Grey #9E9E9E */
     
     /* Card & Surface Colors */
-    --card: 0 0% 100%;
-    --card-foreground: 216 25% 15%;
-    --card-border: 216 20% 90%;
+    --card: 0 0% 100%; /* Pure White */
+    --card-foreground: 0 0% 20%; /* Dark Grey #333333 */
+    --card-border: 0 0% 88%; /* Light Border Grey #E0E0E0 */
     
     /* Secondary Surfaces */
-    --secondary: 216 15% 97%;
-    --secondary-foreground: 216 25% 25%;
+    --secondary: 0 0% 96%; /* Light Grey #F5F5F5 */
+    --secondary-foreground: 0 0% 20%; /* Dark Grey #333333 */
     
-    /* Accent Colors */
-    --accent: 216 100% 97%;
-    --accent-foreground: 216 100% 30%;
+    /* Green Accent Colors */
+    --accent: 152 75% 96%; /* Very Light Green */
+    --accent-foreground: 152 75% 20%; /* Deep Forest Green */
     
     /* Input & Form Elements */
-    --input: 216 20% 92%;
-    --border: 216 20% 88%;
-    --ring: 216 100% 50%;
+    --input: 0 0% 94%; /* Light Input Background */
+    --border: 0 0% 88%; /* Light Border Grey #E0E0E0 */
+    --ring: 152 75% 20%; /* Green Focus Ring */
     
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(216 100% 50%), hsl(216 100% 60%));
-    --gradient-success: linear-gradient(135deg, hsl(142 69% 45%), hsl(142 69% 55%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(216 15% 98%));
+    /* Professional Green Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(152 75% 20%), hsl(152 75% 25%)); /* Deep Forest Green */
+    --gradient-success: linear-gradient(135deg, hsl(169 67% 36%), hsl(169 67% 41%)); /* Teal Green */
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 98%)); /* Pure White to Light Grey */
+    --gradient-green-accent: linear-gradient(135deg, hsl(152 75% 96%), hsl(169 67% 96%)); /* Light Green Gradient */
     
     /* Shadows */
     --shadow-card: 0 4px 6px -1px hsl(216 25% 15% / 0.1), 0 2px 4px -1px hsl(216 25% 15% / 0.06);
@@ -73,16 +79,16 @@
   }
 
   .dark {
-    --background: 216 25% 8%;
-    --foreground: 216 15% 92%;
+    --background: 0 0% 8%; /* Dark Background */
+    --foreground: 0 0% 92%; /* Light Text */
     
-    --primary: 216 100% 60%;
-    --primary-foreground: 216 25% 8%;
-    --primary-light: 216 100% 40%;
+    --primary: 152 75% 35%; /* Lighter Green for Dark Mode */
+    --primary-foreground: 0 0% 8%;
+    --primary-light: 152 75% 25%;
     
-    --success: 142 69% 55%;
-    --success-foreground: 216 25% 8%;
-    --success-light: 142 69% 35%;
+    --success: 169 67% 45%; /* Brighter Teal Green for Dark Mode */
+    --success-foreground: 0 0% 8%;
+    --success-light: 169 67% 30%;
     
     --warning: 38 92% 60%;
     --warning-foreground: 216 25% 8%;
@@ -143,6 +149,23 @@
   .gradient-card {
     background: var(--gradient-card);
   }
+  
+  .gradient-green-accent {
+    background: var(--gradient-green-accent);
+  }
+  
+  /* Professional Green Utilities */
+  .text-green-primary {
+    color: hsl(152 75% 20%); /* Deep Forest Green #006644 */
+  }
+  
+  .text-green-accent {
+    color: hsl(169 67% 36%); /* Teal Green #00B894 */
+  }
+  
+  .bg-green-light {
+    background-color: hsl(0 0% 96%); /* Light Grey #F5F5F5 */
+  }
 }
 
 @layer components {
@@ -155,6 +178,17 @@
   .financial-card-elevated {
     @apply financial-card;
     box-shadow: var(--shadow-elevated);
+  }
+  
+  /* Professional Green Cards */
+  .green-accent-card {
+    @apply financial-card border-green-100 bg-gradient-to-br from-green-50/50 to-white;
+  }
+  
+  .green-primary-card {
+    @apply financial-card bg-gradient-to-br;
+    background: linear-gradient(135deg, hsl(152 75% 20%), hsl(152 75% 25%));
+    color: white;
   }
   
   /* Split Section Styles */

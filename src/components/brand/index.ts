@@ -1,0 +1,1 @@
+export { BamiHustleLogo } from './BamiHustleLogo';
