@@ -178,10 +178,10 @@ export const SettingsPage = () => {
         backgroundAttachment: 'fixed'
       }}
     >
-      <div className="flex">
+      <div className="flex flex-col md:flex-row min-h-screen overflow-hidden">
         {/* Sidebar */}
         {showSidebar && (
-          <div className="w-80 border-r backdrop-blur-md bg-white/80 p-6 shadow-lg">
+          <div className="w-full md:w-72 lg:w-80 xl:w-96 min-w-0 border-r backdrop-blur-md bg-white/80 p-4 md:p-6 shadow-lg overflow-hidden">
             <div className="space-y-6">
               {/* Header */}
               <div>
@@ -223,15 +223,15 @@ export const SettingsPage = () => {
                   <Button
                     key={section.id}
                     variant={activeSection === section.id ? "secondary" : "ghost"}
-                    className="w-full justify-start h-auto p-3"
+                    className="w-full justify-start h-auto p-3 min-w-0"
                     onClick={() => setActiveSection(section.id)}
                   >
-                    <section.icon className="h-4 w-4 mr-3" />
-                    <div className="flex-1 text-left">
-                      <div className="font-medium text-sm">{section.name}</div>
-                      <div className="text-xs text-muted-foreground">{section.description}</div>
+                    <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
+                    <div className="flex-1 text-left min-w-0 pr-1">
+                      <div className="font-medium text-sm truncate">{section.name}</div>
+                      <div className="text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
                     </div>
-                    <ChevronRight className="h-4 w-4 ml-2" />
+                    <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
                   </Button>
                 ))}
               </div>
@@ -245,15 +245,15 @@ export const SettingsPage = () => {
                   <Button
                     key={section.id}
                     variant={activeSection === section.id ? "secondary" : "ghost"}
-                    className="w-full justify-start h-auto p-3"
+                    className="w-full justify-start h-auto p-3 min-w-0"
                     onClick={() => setActiveSection(section.id)}
                   >
-                    <section.icon className="h-4 w-4 mr-3" />
-                    <div className="flex-1 text-left">
-                      <div className="font-medium text-sm">{section.name}</div>
-                      <div className="text-xs text-muted-foreground">{section.description}</div>
+                    <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
+                    <div className="flex-1 text-left min-w-0 pr-1">
+                      <div className="font-medium text-sm truncate">{section.name}</div>
+                      <div className="text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
                     </div>
-                    <ChevronRight className="h-4 w-4 ml-2" />
+                    <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
                   </Button>
                 ))}
               </div>
@@ -267,15 +267,15 @@ export const SettingsPage = () => {
                   <Button
                     key={section.id}
                     variant={activeSection === section.id ? "secondary" : "ghost"}
-                    className="w-full justify-start h-auto p-3"
+                    className="w-full justify-start h-auto p-3 min-w-0"
                     onClick={() => setActiveSection(section.id)}
                   >
-                    <section.icon className="h-4 w-4 mr-3" />
-                    <div className="flex-1 text-left">
-                      <div className="font-medium text-sm">{section.name}</div>
-                      <div className="text-xs text-muted-foreground">{section.description}</div>
+                    <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
+                    <div className="flex-1 text-left min-w-0 pr-1">
+                      <div className="font-medium text-sm truncate">{section.name}</div>
+                      <div className="text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
                     </div>
-                    <ChevronRight className="h-4 w-4 ml-2" />
+                    <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
                   </Button>
                 ))}
               </div>
@@ -284,7 +284,7 @@ export const SettingsPage = () => {
         )}
 
         {/* Main Content */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-4 md:p-6 overflow-auto">
           {renderContent()}
         </div>
       </div>

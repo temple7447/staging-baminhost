@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   CreditCard, 
   Calendar, 
@@ -16,7 +16,15 @@ import {
   Camera,
   Video,
   Image,
-  Play
+  Play,
+  Wallet,
+  ExternalLink,
+  MessageCircle,
+  Star,
+  TrendingUp,
+  Shield,
+  Bell,
+  Settings
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,7 +34,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { BamiHustleLogo } from "@/components/brand";
 
 // Enhanced Customer Demo Data
 const customerData = {
@@ -312,6 +327,31 @@ const customerData = {
 };
 
 export const CustomerDashboard = () => {
+  const { user } = useAuth();
+  const [selectedContract, setSelectedContract] = useState<string | null>(null);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [paymentType, setPaymentType] = useState<'installment' | 'full' | 'stage'>('installment');
+  const [paymentAmount, setPaymentAmount] = useState('');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('wallet');
+  const [localCustomerData, setCustomerData] = useState(customerData as any);
+  const [loading, setLoading] = useState(false);
+  
+  // Simulate real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Simulate penalty updates
+      setCustomerData((prev: any) => ({
+        ...prev,
+        penalties: {
+          ...prev.penalties,
+          activePenalties: prev.penalties.activePenalties + (Math.random() > 0.8 ? 300 : 0)
+        }
+      }));
+    }, 30000); // Update every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, []);
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-NG', {
       minimumFractionDigits: 0,
@@ -335,15 +375,19 @@ export const CustomerDashboard = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge variant="default">Active</Badge>;
+        return <Badge className="bg-blue-500 hover:bg-blue-600">Active</Badge>;
       case 'completed':
-        return <Badge variant="outline">Completed</Badge>;
+        return <Badge className="bg-green-500 hover:bg-green-600">Completed</Badge>;
       case 'paid':
-        return <Badge variant="default">Paid</Badge>;
+        return <Badge className="bg-green-500 hover:bg-green-600">Paid</Badge>;
       case 'late':
         return <Badge variant="destructive">Late</Badge>;
       case 'overdue':
         return <Badge variant="destructive">Overdue</Badge>;
+      case 'in_progress':
+        return <Badge className="bg-yellow-500 hover:bg-yellow-600">In Progress</Badge>;
+      case 'pending':
+        return <Badge variant="outline">Pending</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -353,28 +397,126 @@ export const CustomerDashboard = () => {
     switch (status) {
       case 'completed':
       case 'paid':
-        return <CheckCircle className="w-4 h-4 text-success" />;
+        return <CheckCircle className="w-4 h-4 text-green-600" />;
       case 'late':
       case 'overdue':
-        return <AlertCircle className="w-4 h-4 text-destructive" />;
+        return <AlertCircle className="w-4 h-4 text-red-600" />;
+      case 'in_progress':
+        return <Clock className="w-4 h-4 text-yellow-600" />;
+      case 'pending':
+        return <Clock className="w-4 h-4 text-gray-600" />;
       default:
         return <Calendar className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
-  const creditUtilization = (customerData.customer.totalBalance / customerData.customer.creditLimit) * 100;
+  const handlePayment = async () => {
+    setLoading(true);
+    
+    try {
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const amount = parseFloat(paymentAmount);
+      if (amount > 0) {
+        // Update customer data
+        setCustomerData((prev: any) => ({
+          ...prev,
+          customer: {
+            ...prev.customer,
+            currentDue: Math.max(0, prev.customer.currentDue - amount),
+            walletBalance: prev.customer.walletBalance - amount
+          },
+          paymentHistory: [
+            {
+              id: `pay_${Date.now()}`,
+              contractId: selectedContract || 'general',
+              date: new Date().toISOString().split('T')[0],
+              description: `${paymentType === 'installment' ? 'Installment' : paymentType === 'full' ? 'Full' : 'Stage'} Payment`,
+              amount: amount,
+              type: paymentType,
+              status: 'completed',
+              method: selectedPaymentMethod,
+              penalty: 0
+            },
+            ...prev.paymentHistory
+          ]
+        }));
+        
+        toast.success(`Payment of ${formatNaira(amount)} processed successfully!`);
+        setPaymentModalOpen(false);
+        setPaymentAmount('');
+      }
+    } catch (error) {
+      toast.error('Payment processing failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const acknowledgeStage = async (contractId: string, stageIndex: number) => {
+    setLoading(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      setCustomerData((prev: any) => ({
+        ...prev,
+        contracts: prev.contracts.map((contract: any) => 
+          contract.id === contractId 
+            ? {
+                ...contract,
+                deliveryStages: contract.deliveryStages.map((stage: any, index: number) => 
+                  index === stageIndex
+                    ? {
+                        ...stage,
+                        customerAcknowledged: true,
+                        acknowledgedDate: new Date().toISOString().split('T')[0],
+                        customerNotes: 'Work approved and acknowledged by customer',
+                        paymentReleased: true,
+                        paymentReleaseDate: new Date().toISOString().split('T')[0]
+                      }
+                    : stage
+                )
+              }
+            : contract
+        )
+      }));
+      
+      toast.success('Stage acknowledged successfully! Payment released to vendor.');
+    } catch (error) {
+      toast.error('Failed to acknowledge stage. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const downloadStatement = () => {
+    toast.success('Statement download started. Check your downloads folder.');
+  };
+  
+  const creditUtilization = (localCustomerData.customer.totalBalance / localCustomerData.customer.creditLimit) * 100;
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Customer Dashboard</h1>
-          <p className="text-muted-foreground">Account overview and payment management</p>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <BamiHustleLogo variant="compact" showTagline={false} />
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Customer Portal</h1>
+            <p className="text-muted-foreground">Welcome back, {user?.name || 'Customer'}</p>
+          </div>
         </div>
-        <div className="text-right">
-          <div className="text-sm text-muted-foreground">Account Number</div>
-          <div className="text-lg font-bold text-primary">{customerData.customer.accountNumber}</div>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <div className="text-sm text-muted-foreground">Account Number</div>
+            <div className="text-lg font-bold text-green-600">{localCustomerData.customer.accountNumber}</div>
+          </div>
+          <Badge className="bg-green-500 hover:bg-green-600 text-white">
+            <Star className="w-3 h-3 mr-1" />
+            Premium
+          </Badge>
         </div>
       </div>
 
@@ -387,7 +529,7 @@ export const CustomerDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="financial-amount text-2xl font-bold">
-              {formatNaira(customerData.customer.totalBalance)}
+              {formatNaira(localCustomerData.customer.totalBalance)}
             </div>
             <p className="text-xs text-muted-foreground">
               Outstanding amount
@@ -402,10 +544,10 @@ export const CustomerDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="financial-amount text-2xl font-bold text-warning">
-              {formatNaira(customerData.customer.currentDue)}
+              {formatNaira(localCustomerData.customer.currentDue)}
             </div>
             <p className="text-xs text-muted-foreground">
-              Due by {formatDate(customerData.customer.nextPaymentDate)}
+              Due by {formatDate(localCustomerData.customer.nextPaymentDate)}
             </p>
           </CardContent>
         </Card>
@@ -417,7 +559,7 @@ export const CustomerDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="financial-amount text-2xl font-bold text-success">
-              {formatNaira(customerData.customer.creditLimit)}
+              {formatNaira(localCustomerData.customer.creditLimit)}
             </div>
             <p className="text-xs text-muted-foreground">
               {creditUtilization.toFixed(1)}% utilized
@@ -432,7 +574,7 @@ export const CustomerDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="financial-amount text-2xl font-bold text-destructive">
-              {formatNaira(customerData.penalties.activePenalties)}
+              {formatNaira(localCustomerData.penalties.activePenalties)}
             </div>
             <p className="text-xs text-muted-foreground">
               Late payment fees
@@ -444,24 +586,43 @@ export const CustomerDashboard = () => {
       {/* Quick Actions */}
       <Card className="financial-card">
         <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-green-600" />
+            Quick Actions
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-            <Button className="gap-2 h-auto p-3 md:p-4 flex-col text-xs md:text-sm">
-              <CreditCard className="w-6 h-6" />
-              <span>Make Payment</span>
-              <span className="text-xs opacity-75">Pay current due amount</span>
-            </Button>
-            <Button variant="outline" className="gap-2 h-auto p-3 md:p-4 flex-col text-xs md:text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+            <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2 h-auto p-3 md:p-4 flex-col text-xs md:text-sm bg-green-600 hover:bg-green-700">
+                  <CreditCard className="w-6 h-6" />
+                  <span>Make Payment</span>
+                  <span className="text-xs opacity-75">Pay current due amount</span>
+                </Button>
+              </DialogTrigger>
+            </Dialog>
+            
+            <Button variant="outline" className="gap-2 h-auto p-3 md:p-4 flex-col text-xs md:text-sm hover:bg-blue-50">
               <Calendar className="w-5 h-5 md:w-6 md:h-6" />
               <span>Schedule Payment</span>
               <span className="text-xs opacity-75 hidden md:block">Set up auto-pay</span>
             </Button>
-            <Button variant="outline" className="gap-2 h-auto p-3 md:p-4 flex-col text-xs md:text-sm">
+            
+            <Button 
+              variant="outline" 
+              className="gap-2 h-auto p-3 md:p-4 flex-col text-xs md:text-sm hover:bg-gray-50"
+              onClick={downloadStatement}
+            >
               <Receipt className="w-5 h-5 md:w-6 md:h-6" />
               <span>Download Statement</span>
               <span className="text-xs opacity-75 hidden md:block">Get monthly report</span>
+            </Button>
+            
+            <Button variant="outline" className="gap-2 h-auto p-3 md:p-4 flex-col text-xs md:text-sm hover:bg-purple-50">
+              <MessageCircle className="w-5 h-5 md:w-6 md:h-6" />
+              <span>Contact Support</span>
+              <span className="text-xs opacity-75 hidden md:block">Get help & support</span>
             </Button>
           </div>
         </CardContent>
@@ -474,7 +635,7 @@ export const CustomerDashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {customerData.installmentPlans.map((plan) => (
+            {localCustomerData.installmentPlans.map((plan) => (
               <div key={plan.id} className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors">
                 <div className="flex flex-col sm:flex-row items-start justify-between mb-3 gap-3">
                   <div className="flex items-start space-x-3 flex-1">
@@ -538,7 +699,7 @@ export const CustomerDashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {customerData.paymentHistory.map((payment, index) => (
+            {localCustomerData.paymentHistory.map((payment, index) => (
               <div key={index} className="flex flex-col sm:flex-row items-start justify-between p-3 rounded-lg border border-border gap-3">
                 <div className="flex items-start space-x-3 flex-1">
                   {getStatusIcon(payment.status)}
@@ -566,6 +727,216 @@ export const CustomerDashboard = () => {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Active Contracts with Delivery Tracking */}
+      <Card className="financial-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-blue-600" />
+            Active Contracts & Delivery Tracking
+          </CardTitle>
+          <CardDescription>Track your project progress and acknowledge completed stages</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {localCustomerData.contracts.map((contract: any) => (
+              <div key={contract.id} className="border border-border rounded-lg p-4 space-y-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                  <div>
+                    <h3 className="font-semibold text-lg">{contract.projectName}</h3>
+                    <p className="text-sm text-muted-foreground">Vendor: {contract.vendorName}</p>
+                    <div className="flex items-center gap-4 mt-2">
+                      <div className="text-sm">
+                        <span className="font-medium">Total: </span>{formatNaira(contract.totalAmount)}
+                      </div>
+                      <div className="text-sm">
+                        <span className="font-medium">Payment: </span>
+                        {contract.paymentOption === 'installment' ? 'Installments' : 'One-time'}
+                      </div>
+                      <div className="text-sm">
+                        <span className="font-medium">Due: </span>{formatDate(contract.expectedCompletionDate)}
+                      </div>
+                    </div>
+                  </div>
+                  {getStatusBadge(contract.status)}
+                </div>
+                
+                {/* Delivery Stages */}
+                <div className="space-y-3">
+                  <h4 className="font-medium text-sm">Delivery Stages</h4>
+                  {contract.deliveryStages.map((stage: any, stageIndex: number) => (
+                    <div key={stageIndex} className="border border-gray-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          {getStatusIcon(stage.status)}
+                          <span className="font-medium">{stage.name}</span>
+                          <span className="text-sm text-muted-foreground">({formatNaira(stage.amount)})</span>
+                        </div>
+                        {getStatusBadge(stage.status)}
+                      </div>
+                      
+                      {/* Vendor Proof Uploads */}
+                      {stage.vendorProofUploads.length > 0 && (
+                        <div className="mt-3">
+                          <h5 className="text-sm font-medium mb-2">Vendor Submissions:</h5>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {stage.vendorProofUploads.map((proof: any) => (
+                              <div key={proof.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                                {proof.type === 'photo' && <Camera className="w-4 h-4" />}
+                                {proof.type === 'video' && <Video className="w-4 h-4" />}
+                                {proof.type === 'document' && <FileText className="w-4 h-4" />}
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate">{proof.fileName}</p>
+                                  <p className="text-xs text-muted-foreground">{formatDate(proof.uploadDate)}</p>
+                                </div>
+                                <Button size="sm" variant="outline">
+                                  <Eye className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Customer Acknowledgment */}
+                      {stage.status === 'in_progress' && stage.vendorProofUploads.length > 0 && !stage.customerAcknowledged && (
+                        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
+                          <p className="text-sm mb-2">Please review the vendor submissions and acknowledge if the work is completed satisfactorily.</p>
+                          <Button 
+                            size="sm" 
+                            className="bg-green-600 hover:bg-green-700"
+                            onClick={() => acknowledgeStage(contract.id, stageIndex)}
+                            disabled={loading}
+                          >
+                            {loading ? 'Processing...' : 'Acknowledge & Release Payment'}
+                          </Button>
+                        </div>
+                      )}
+                      
+                      {/* Acknowledgment Status */}
+                      {stage.customerAcknowledged && (
+                        <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded">
+                          <div className="flex items-center gap-2 text-green-700">
+                            <CheckCircle className="w-4 h-4" />
+                            <span className="text-sm font-medium">Acknowledged on {formatDate(stage.acknowledgedDate)}</span>
+                          </div>
+                          {stage.customerNotes && (
+                            <p className="text-sm text-green-600 mt-1">{stage.customerNotes}</p>
+                          )}
+                          {stage.paymentReleased && (
+                            <p className="text-xs text-green-500 mt-1">Payment released to vendor on {formatDate(stage.paymentReleaseDate)}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payment Modal */}
+      <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <div className="flex items-center gap-2">
+              <BamiHustleLogo variant="icon-only" />
+              <div>
+                <DialogTitle>Make Payment</DialogTitle>
+                <DialogDescription>
+                  Process your payment securely through Bami Hustle
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Payment Type */}
+            <div className="space-y-2">
+              <Label>Payment Type</Label>
+              <Select value={paymentType} onValueChange={setPaymentType as any}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="installment">Monthly Installment</SelectItem>
+                  <SelectItem value="full">Full Payment</SelectItem>
+                  <SelectItem value="stage">Stage Payment</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Amount */}
+            <div className="space-y-2">
+              <Label>Amount</Label>
+              <Input
+                type="number"
+                placeholder="Enter amount"
+                value={paymentAmount}
+                onChange={(e) => setPaymentAmount(e.target.value)}
+              />
+              <div className="text-sm text-muted-foreground">
+                Current due: {formatNaira(localCustomerData.customer.currentDue)}
+              </div>
+            </div>
+            
+            {/* Payment Method */}
+            <div className="space-y-2">
+              <Label>Payment Method</Label>
+              <Select value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="wallet">Wallet Balance ({formatNaira(localCustomerData.customer.walletBalance)})</SelectItem>
+                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                  <SelectItem value="card">Credit/Debit Card</SelectItem>
+                  <SelectItem value="ussd">USSD</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Payment Summary */}
+            <div className="p-4 bg-gray-50 rounded-lg space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Payment Amount:</span>
+                <span className="font-medium">{paymentAmount ? formatNaira(parseFloat(paymentAmount)) : '₦0'}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>Processing Fee:</span>
+                <span className="font-medium">₦0</span>
+              </div>
+              <Separator />
+              <div className="flex justify-between font-medium">
+                <span>Total:</span>
+                <span className="text-green-600">{paymentAmount ? formatNaira(parseFloat(paymentAmount)) : '₦0'}</span>
+              </div>
+            </div>
+            
+            <Alert>
+              <Shield className="w-4 h-4" />
+              <AlertDescription>
+                Your payment is secured with bank-level encryption. Funds will be processed immediately.
+              </AlertDescription>
+            </Alert>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPaymentModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              className="bg-green-600 hover:bg-green-700" 
+              onClick={handlePayment}
+              disabled={loading || !paymentAmount || parseFloat(paymentAmount) <= 0}
+            >
+              {loading ? 'Processing...' : 'Process Payment'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
