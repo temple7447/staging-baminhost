@@ -12,13 +12,15 @@ import {
   Crown,
   Lock,
   Eye,
-  X
+  X,
+  LogOut
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { usePermissions, useFilteredNavigation } from "@/hooks/usePermissions";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface DashboardSidebarProps {
   currentView: string;
@@ -149,6 +151,7 @@ const sidebarItems: SidebarItem[] = [
 
 export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onClose }: DashboardSidebarProps) => {
   const { userRole, hasPermission, canAccessNavigation, rolePriority } = usePermissions();
+  const { user, logout } = useAuth();
   
   // Filter sidebar items based on user permissions
   const filteredItems = useFilteredNavigation(sidebarItems);
@@ -171,10 +174,10 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
         key={item.id}
         variant="ghost"
         className={cn(
-          "w-full justify-start gap-3 text-left relative transition-all duration-200 group mb-1",
-          "hover:bg-slate-700/50 hover:text-slate-100 hover:border-l-2 hover:border-l-blue-500",
-          isActive && "bg-gradient-to-r from-blue-600/30 to-purple-600/20 text-white border-l-2 border-l-blue-400 shadow-md",
-          !hasAccess && "opacity-60 cursor-not-allowed hover:bg-transparent",
+          "w-full justify-start gap-3 text-left relative transition-all duration-200 group h-10 px-3 rounded-lg mx-1",
+          "hover:bg-slate-700/70 hover:text-slate-100",
+          isActive && "bg-gradient-to-r from-blue-600/40 to-purple-600/20 text-white shadow-lg border border-blue-500/30",
+          !hasAccess && "opacity-50 cursor-not-allowed hover:bg-transparent",
           hasAccess && !isActive && "text-slate-300 hover:text-white"
         )}
         onClick={() => hasAccess && onViewChange(item.id)}
@@ -230,15 +233,13 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
     if (items.length === 0) return null;
     
     return (
-      <div className="space-y-3 mb-6">
-        <div className="px-3 py-2 flex items-center gap-2">
-          <div className="h-px bg-gradient-to-r from-slate-600 to-transparent flex-1" />
-          <div className="text-xs font-bold text-slate-300 uppercase tracking-widest px-2">
+      <div className="mb-6">
+        <div className="px-2 py-2 mb-3">
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-2">
             {title}
-          </div>
-          <div className="h-px bg-gradient-to-l from-slate-600 to-transparent flex-1" />
+          </h3>
         </div>
-        <div className="space-y-1 px-2">
+        <div className="space-y-1">
           {items.map(renderSidebarItem)}
         </div>
       </div>
@@ -257,19 +258,19 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
       
       {/* Sidebar */}
       <aside className={cn(
-        "w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/50 overflow-y-auto transition-transform duration-300 ease-in-out z-50",
-        "md:relative md:translate-x-0 shadow-xl",
-        "fixed left-0 top-16 h-[calc(100vh-4rem)]",
+        "w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/50 overflow-y-auto transition-transform duration-300 ease-in-out",
+        "md:relative md:translate-x-0 shadow-xl h-full",
+        "fixed left-0 top-16 h-[calc(100vh-4rem)] z-50 md:top-0 md:h-full md:z-auto",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="p-4">
+        <div className="p-4 h-full flex flex-col">
         {/* Mobile Close Button */}
         <div className="md:hidden mb-4 flex justify-end">
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="p-2"
+            className="p-2 hover:bg-slate-700/50"
           >
             <X className="w-4 h-4" />
           </Button>
@@ -286,15 +287,44 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
           </Badge>
         </div>
 
-        <nav className="space-y-4">
+        <nav className="flex-1 space-y-4 overflow-y-auto">
           {renderSection("Dashboard", groupedItems.core)}
           {renderSection("Financial Management", groupedItems.financial)}
           {renderSection("Business Operations", groupedItems.business)}
           {renderSection("System Tools", groupedItems.system)}
         </nav>
 
+        {/* Mobile User Info & Logout */}
+        <div className="md:hidden mt-6 p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-xl border border-slate-600/30 flex-shrink-0">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
+                <span className="text-white text-sm font-medium">
+                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                </span>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-slate-100">{user?.name}</div>
+                <div className="text-xs text-slate-400">{userRole} Account</div>
+              </div>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              logout();
+              onClose?.();
+            }}
+            className="w-full justify-start gap-2 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out</span>
+          </Button>
+        </div>
+
         {/* Access Summary */}
-        <div className="mt-6 p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-xl border border-slate-600/30">
+        <div className="mt-6 p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-xl border border-slate-600/30 flex-shrink-0">
           <div className="flex justify-between items-center text-xs">
             <span className="text-slate-300 font-medium">Available Features</span>
             <div className="flex items-center gap-2">

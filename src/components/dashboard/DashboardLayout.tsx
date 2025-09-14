@@ -12,12 +12,12 @@ export const DashboardLayout = ({ children, currentView, onViewChange }: Dashboa
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <DashboardHeader 
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
         sidebarOpen={sidebarOpen}
       />
-      <div className="flex h-[calc(100vh-4rem)]">
+      <div className="flex flex-1 overflow-hidden">
         <DashboardSidebar 
           currentView={currentView} 
           onViewChange={(view) => {
@@ -30,8 +30,8 @@ export const DashboardLayout = ({ children, currentView, onViewChange }: Dashboa
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
         />
-        <main className="flex-1 overflow-auto">
-          <div className="p-4 md:p-6 max-w-7xl mx-auto">
+        <main className="flex-1 overflow-auto bg-background">
+          <div className="p-4 md:p-6 max-w-7xl mx-auto h-full">
             {children}
           </div>
         </main>
