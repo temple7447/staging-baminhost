@@ -1,0 +1,91 @@
+/* Dashboard responsive fixes */
+
+/* Ensure cards don't overflow */
+.financial-card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.financial-card-elevated {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Handle text overflow in financial amounts */
+.financial-amount {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.2;
+}
+
+/* Responsive grid fixes */
+@media (max-width: 640px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+  
+  .financial-amount {
+    font-size: 1.25rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .financial-amount {
+    font-size: 1.5rem !important;
+  }
+}
+
+/* Prevent horizontal scroll */
+.dashboard-wrapper {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Grid layout improvements */
+.responsive-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+@media (min-width: 640px) {
+  .responsive-grid {
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+/* Card content improvements */
+.card-content-responsive {
+  padding: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .card-content-responsive {
+    padding: 1rem;
+  }
+}
+
+/* Text truncation helpers */
+.truncate-responsive {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .truncate-responsive {
+    max-width: 200px;
+  }
+}
+
+/* Flexible spacing */
+.space-responsive {
+  gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .space-responsive {
+    gap: 1rem;
+  }
+}

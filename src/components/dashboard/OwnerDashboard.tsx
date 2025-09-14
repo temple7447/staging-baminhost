@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { NET_WORTH_DATA, WALLET_DATA, RECENT_TRANSACTIONS, BUSINESSES, PERSONAL_PORTFOLIOS } from "@/data/demoData";
 import { Building, Fuel, Truck, Clock, TrendingUp } from "lucide-react";
+import "./dashboard-fixes.css";
 
 export const OwnerDashboard = () => {
   const netWorthData = NET_WORTH_DATA;
@@ -39,31 +40,32 @@ export const OwnerDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="dashboard-wrapper">
+      <div className="dashboard-container space-y-4 sm:space-y-6 max-w-full">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Owner Dashboard</h1>
-          <p className="text-muted-foreground">Master control of your ₦52.75M portfolio - 1/3rd active time rule</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground truncate">Owner Dashboard</h1>
+          <p className="text-sm sm:text-base text-muted-foreground truncate">Master control of your ₦52.75M portfolio - 1/3rd active time rule</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-shrink-0">
           <Badge variant="outline" className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
-            Active: 3/8 hours
+            <span className="text-xs sm:text-sm">Active: 3/8 hours</span>
           </Badge>
         </div>
       </div>
 
       {/* Net Worth Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-1">
           <NetWorthCard 
             totalNetWorth={netWorthData.total}
             monthlyChange={netWorthData.monthlyChange}
             changePercentage={netWorthData.changePercentage}
           />
         </div>
-        <div className="lg:col-span-2">
+        <div className="xl:col-span-2 min-w-0">
           <WalletOverview walletData={walletData} />
         </div>
       </div>
@@ -78,91 +80,91 @@ export const OwnerDashboard = () => {
           <CardDescription>Your three main business units performance</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Estate Business */}
-            <Card>
+            <Card className="financial-card">
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Building className="h-4 w-4" />
-                    Real Estate
+                <div className="flex items-center justify-between gap-2">
+                  <CardTitle className="text-base sm:text-lg flex items-center gap-2 min-w-0">
+                    <Building className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">Real Estate</span>
                   </CardTitle>
-                  <Badge variant="default">₦18M/year</Badge>
+                  <Badge variant="default" className="flex-shrink-0 text-xs">₦18M/year</Badge>
                 </div>
-                <CardDescription>38 units across 3 locations</CardDescription>
+                <CardDescription className="text-xs sm:text-sm truncate">38 units across 3 locations</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Monthly Revenue</span>
-                  <span className="font-semibold">₦{businesses[0]?.monthlyRevenue.toLocaleString()}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Monthly Revenue</span>
+                  <span className="font-semibold text-sm">₦{businesses[0]?.monthlyRevenue.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Net Profit</span>
-                  <span className="font-semibold text-green-600">₦{businesses[0]?.netProfit.toLocaleString()}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Net Profit</span>
+                  <span className="font-semibold text-green-600 text-sm">₦{businesses[0]?.netProfit.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>ROI</span>
-                  <span className="font-semibold">{businesses[0]?.performance.roi}%</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">ROI</span>
+                  <span className="font-semibold text-sm">{businesses[0]?.performance.roi}%</span>
                 </div>
-                <Button variant="outline" size="sm" className="w-full mt-2">View Details</Button>
+                <Button variant="outline" size="sm" className="w-full mt-2 text-xs">View Details</Button>
               </CardContent>
             </Card>
 
             {/* Filling Station */}
-            <Card>
+            <Card className="financial-card">
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Fuel className="h-4 w-4" />
-                    Filling Station
+                <div className="flex items-center justify-between gap-2">
+                  <CardTitle className="text-base sm:text-lg flex items-center gap-2 min-w-0">
+                    <Fuel className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">Filling Station</span>
                   </CardTitle>
-                  <Badge variant="secondary">4 Tanks</Badge>
+                  <Badge variant="secondary" className="flex-shrink-0 text-xs">4 Tanks</Badge>
                 </div>
-                <CardDescription>Fuel, offices, carwash, gas</CardDescription>
+                <CardDescription className="text-xs sm:text-sm truncate">Fuel, offices, carwash, gas</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Monthly Revenue</span>
-                  <span className="font-semibold">₦{businesses[1]?.monthlyRevenue.toLocaleString()}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Monthly Revenue</span>
+                  <span className="font-semibold text-sm">₦{businesses[1]?.monthlyRevenue.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Net Profit</span>
-                  <span className="font-semibold text-green-600">₦{businesses[1]?.netProfit.toLocaleString()}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Net Profit</span>
+                  <span className="font-semibold text-green-600 text-sm">₦{businesses[1]?.netProfit.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>ROI</span>
-                  <span className="font-semibold">{businesses[1]?.performance.roi}%</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">ROI</span>
+                  <span className="font-semibold text-sm">{businesses[1]?.performance.roi}%</span>
                 </div>
-                <Button variant="outline" size="sm" className="w-full mt-2">View Details</Button>
+                <Button variant="outline" size="sm" className="w-full mt-2 text-xs">View Details</Button>
               </CardContent>
             </Card>
 
             {/* Equipment Rental */}
-            <Card>
+            <Card className="financial-card">
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Truck className="h-4 w-4" />
-                    Equipment
+                <div className="flex items-center justify-between gap-2">
+                  <CardTitle className="text-base sm:text-lg flex items-center gap-2 min-w-0">
+                    <Truck className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">Equipment</span>
                   </CardTitle>
-                  <Badge variant="outline">3 Units</Badge>
+                  <Badge variant="outline" className="flex-shrink-0 text-xs">3 Units</Badge>
                 </div>
-                <CardDescription>Tipper, excavator, loader</CardDescription>
+                <CardDescription className="text-xs sm:text-sm truncate">Tipper, excavator, loader</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Monthly Revenue</span>
-                  <span className="font-semibold">₦{businesses[2]?.monthlyRevenue.toLocaleString()}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Monthly Revenue</span>
+                  <span className="font-semibold text-sm">₦{businesses[2]?.monthlyRevenue.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Net Profit</span>
-                  <span className="font-semibold text-green-600">₦{businesses[2]?.netProfit.toLocaleString()}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Net Profit</span>
+                  <span className="font-semibold text-green-600 text-sm">₦{businesses[2]?.netProfit.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>ROI</span>
-                  <span className="font-semibold">{businesses[2]?.performance.roi}%</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">ROI</span>
+                  <span className="font-semibold text-sm">{businesses[2]?.performance.roi}%</span>
                 </div>
-                <Button variant="outline" size="sm" className="w-full mt-2">View Details</Button>
+                <Button variant="outline" size="sm" className="w-full mt-2 text-xs">View Details</Button>
               </CardContent>
             </Card>
           </div>
@@ -170,7 +172,7 @@ export const OwnerDashboard = () => {
       </Card>
 
       {/* Personal vs Business Split */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Business vs Personal Life</CardTitle>
@@ -238,6 +240,7 @@ export const OwnerDashboard = () => {
 
       {/* Recent Transactions */}
       <RecentTransactions transactions={transactions} />
+      </div>
     </div>
   );
 };
