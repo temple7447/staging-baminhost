@@ -1,3 +1,6 @@
+# Bami Hustle - Personal Growth & Financial Management Platform
+# Allow all legitimate search engines and social media crawlers
+
 User-agent: Googlebot
 Allow: /
 
@@ -10,5 +13,30 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: LinkedInBot
+Allow: /
+
 User-agent: *
 Allow: /
+
+# Sitemap location
+Sitemap: https://bamihustle.com/sitemap.xml
+
+# Block access to sensitive areas
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /*.json$
+Disallow: /config/
+Disallow: /.env
+
+# Allow important public pages
+Allow: /dashboard
+Allow: /portfolio
+Allow: /wallet
+Allow: /goals
+Allow: /personal-portfolios
+Allow: /settings
+
+# Crawl responsibly
+Crawl-delay: 1

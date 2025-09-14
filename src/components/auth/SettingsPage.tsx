@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { SecuritySettings } from "../settings/SecuritySettings";
 import { NotificationSettings } from "../settings/NotificationSettings";
 import { AppearanceSettings } from "../settings/AppearanceSettings";
+import "./settings-responsive.css";
 import {
   Settings,
   User,
@@ -20,7 +21,9 @@ import {
   Database,
   Zap,
   ChevronRight,
-  ArrowLeft
+  ArrowLeft,
+  Menu,
+  X
 } from "lucide-react";
 
 type SettingSection = 
@@ -38,7 +41,7 @@ type SettingSection =
 export const SettingsPage = () => {
   const { user } = useAuth();
   const [activeSection, setActiveSection] = useState<SettingSection>('profile');
-  const [showSidebar, setShowSidebar] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(false); // Start with false on mobile
 
   const settingsSections = [
     {
@@ -179,9 +182,38 @@ export const SettingsPage = () => {
       }}
     >
       <div className="flex flex-col md:flex-row min-h-screen overflow-hidden">
-        {/* Sidebar */}
+        {/* Mobile Header with Menu Toggle */}
+        <div className="md:hidden flex items-center justify-between p-4 bg-white/90 border-b">
+          <div className="flex items-center gap-3">
+            <Settings className="h-6 w-6" />
+            <h1 className="text-xl font-bold">Settings</h1>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowSidebar(!showSidebar)}
+            className="p-2"
+          >
+            {showSidebar ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
+        
+        {/* Mobile Overlay */}
         {showSidebar && (
-          <div className="w-full md:w-72 lg:w-80 xl:w-96 min-w-0 border-r backdrop-blur-md bg-white/80 p-4 md:p-6 shadow-lg overflow-hidden">
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 md:hidden" 
+            onClick={() => setShowSidebar(false)}
+          />
+        )}
+        
+        {/* Sidebar */}
+        <div className={`
+          settings-sidebar mobile-sidebar
+          w-full md:w-72 lg:w-80 xl:w-96 min-w-0 border-r backdrop-blur-md bg-white/90 p-4 md:p-6 shadow-lg overflow-auto
+          md:relative md:translate-x-0 md:z-auto
+          fixed top-0 left-0 z-50 h-full transition-transform duration-300 ease-in-out
+          ${showSidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        `}>
             <div className="space-y-6">
               {/* Header */}
               <div>
@@ -223,13 +255,19 @@ export const SettingsPage = () => {
                   <Button
                     key={section.id}
                     variant={activeSection === section.id ? "secondary" : "ghost"}
-                    className="w-full justify-start h-auto p-3 min-w-0"
-                    onClick={() => setActiveSection(section.id)}
+                    className="settings-button w-full justify-start h-auto p-3 min-w-0"
+                    onClick={() => {
+                      setActiveSection(section.id);
+                      // Close sidebar on mobile after selection
+                      if (window.innerWidth < 768) {
+                        setShowSidebar(false);
+                      }
+                    }}
                   >
                     <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
-                    <div className="flex-1 text-left min-w-0 pr-1">
-                      <div className="font-medium text-sm truncate">{section.name}</div>
-                      <div className="text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
+                    <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
+                      <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
+                      <div className="settings-description text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
                     </div>
                     <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
                   </Button>
@@ -245,13 +283,19 @@ export const SettingsPage = () => {
                   <Button
                     key={section.id}
                     variant={activeSection === section.id ? "secondary" : "ghost"}
-                    className="w-full justify-start h-auto p-3 min-w-0"
-                    onClick={() => setActiveSection(section.id)}
+                    className="settings-button w-full justify-start h-auto p-3 min-w-0"
+                    onClick={() => {
+                      setActiveSection(section.id);
+                      // Close sidebar on mobile after selection
+                      if (window.innerWidth < 768) {
+                        setShowSidebar(false);
+                      }
+                    }}
                   >
                     <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
-                    <div className="flex-1 text-left min-w-0 pr-1">
-                      <div className="font-medium text-sm truncate">{section.name}</div>
-                      <div className="text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
+                    <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
+                      <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
+                      <div className="settings-description text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
                     </div>
                     <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
                   </Button>
@@ -267,13 +311,19 @@ export const SettingsPage = () => {
                   <Button
                     key={section.id}
                     variant={activeSection === section.id ? "secondary" : "ghost"}
-                    className="w-full justify-start h-auto p-3 min-w-0"
-                    onClick={() => setActiveSection(section.id)}
+                    className="settings-button w-full justify-start h-auto p-3 min-w-0"
+                    onClick={() => {
+                      setActiveSection(section.id);
+                      // Close sidebar on mobile after selection
+                      if (window.innerWidth < 768) {
+                        setShowSidebar(false);
+                      }
+                    }}
                   >
                     <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
-                    <div className="flex-1 text-left min-w-0 pr-1">
-                      <div className="font-medium text-sm truncate">{section.name}</div>
-                      <div className="text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
+                    <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
+                      <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
+                      <div className="settings-description text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
                     </div>
                     <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
                   </Button>
@@ -281,7 +331,6 @@ export const SettingsPage = () => {
               </div>
             </div>
           </div>
-        )}
 
         {/* Main Content */}
         <div className="flex-1 p-4 md:p-6 overflow-auto">

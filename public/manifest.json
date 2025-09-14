@@ -1,0 +1,124 @@
+{
+  "name": "Bami Hustle - Personal Growth & Financial Management Platform",
+  "short_name": "Bami Hustle",
+  "description": "Comprehensive personal life and financial management platform tracking 7 key life categories for optimal personal growth",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "finance",
+    "productivity",
+    "lifestyle",
+    "health",
+    "education"
+  ],
+  "screenshots": [
+    {
+      "src": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=540&h=720&fit=crop&crop=center",
+      "sizes": "540x720",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Bami Hustle Dashboard"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1024&h=768&fit=crop&crop=center",
+      "sizes": "1024x768",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Bami Hustle Desktop View"
+    }
+  ],
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=72&h=72&fit=crop&crop=center",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=96&h=96&fit=crop&crop=center",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=128&h=128&fit=crop&crop=center",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=144&h=144&fit=crop&crop=center",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=152&h=152&fit=crop&crop=center",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=192&h=192&fit=crop&crop=center",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=384&h=384&fit=crop&crop=center",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=512&h=512&fit=crop&crop=center",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Personal Portfolios",
+      "short_name": "Life Portfolios",
+      "description": "Track your 7 life categories",
+      "url": "/personal-portfolios",
+      "icons": [
+        {
+          "src": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=96&h=96&fit=crop&crop=center",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Investment Portfolio",
+      "short_name": "Investments",
+      "description": "View your investment portfolio",
+      "url": "/portfolio",
+      "icons": [
+        {
+          "src": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=96&h=96&fit=crop&crop=center",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Wallet",
+      "short_name": "Wallet",
+      "description": "Manage your finances",
+      "url": "/wallet",
+      "icons": [
+        {
+          "src": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=96&h=96&fit=crop&crop=center",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

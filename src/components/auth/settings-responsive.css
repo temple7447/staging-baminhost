@@ -1,0 +1,80 @@
+/* Settings Page Responsive Utilities */
+
+/* Line clamp utility for text truncation */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Settings button improvements */
+.settings-button {
+  min-width: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.settings-button-content {
+  min-width: 0;
+  flex: 1;
+  text-align: left;
+  word-break: break-word;
+}
+
+/* Mobile sidebar improvements */
+@media (max-width: 767px) {
+  .mobile-sidebar {
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .settings-section-title {
+    font-size: 0.8rem;
+    line-height: 1.2;
+  }
+  
+  .settings-description {
+    font-size: 0.7rem;
+    line-height: 1.3;
+    max-width: 100%;
+  }
+}
+
+/* Ensure proper text wrapping */
+.break-words {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Settings page layout fixes */
+.settings-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+}
+
+.settings-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.settings-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.settings-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(155, 155, 155, 0.5);
+  border-radius: 2px;
+}
+
+.settings-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(155, 155, 155, 0.7);
+}
