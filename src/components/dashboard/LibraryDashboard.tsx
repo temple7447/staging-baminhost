@@ -24,7 +24,10 @@ import {
   Shield
 } from "lucide-react";
 import { useDeleteCategoryMutation, useUpdateCategoryMutation } from "@/services/categoriesApi";
+import { useGetMaterialsQuery } from "@/services/materialsApi";
 import { useToast } from "@/hooks/use-toast";
+import { AddMaterialModal } from "../library/AddMaterialModal";
+import { MaterialsManagementDashboard } from "../materials/MaterialsManagementDashboard";
 
 export const LibraryDashboard = () => {
   const { user } = useAuth();
@@ -32,11 +35,15 @@ export const LibraryDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
 
   const [updateCategory, { isLoading: isUpdating }] = useUpdateCategoryMutation();
   const [deleteCategory, { isLoading: isDeleting }] = useDeleteCategoryMutation();
+  const { data: materialsResponse, refetch: refetchMaterials } = useGetMaterialsQuery();
 
   const library = LIBRARY_CONTENT;
+
+  console.log('User in LibraryDashboard:', materialsResponse);
 
   // Filter content based on user role and access
   const getAccessibleContent = () => {
@@ -120,13 +127,22 @@ export const LibraryDashboard = () => {
     }
   };
 
-  // Statistics
-  const totalContent = accessibleContent.length;
+  const handleMaterialSuccess = () => {
+    refetchMaterials();
+    toast({
+      title: "Material added",
+      description: "The material has been added successfully.",
+    });
+  };
+
+  // Statistics - combine demo data with real materials
+  const realMaterials = materialsResponse?.data || [];
+  const totalContent = accessibleContent.length + realMaterials.length;
   const contentByType = {
-    text: accessibleContent.filter(c => c.type === 'text').length,
-    audio: accessibleContent.filter(c => c.type === 'audio').length,
-    video: accessibleContent.filter(c => c.type === 'video').length,
-    diagram: accessibleContent.filter(c => c.type === 'diagram').length,
+    text: accessibleContent.filter(c => c.type === 'text').length + realMaterials.filter(m => m.materialType === 'text').length,
+    audio: accessibleContent.filter(c => c.type === 'audio').length + realMaterials.filter(m => m.materialType === 'audio').length,
+    video: accessibleContent.filter(c => c.type === 'video').length + realMaterials.filter(m => m.materialType === 'video').length,
+    diagram: accessibleContent.filter(c => c.type === 'diagram').length + realMaterials.filter(m => m.materialType === 'image').length,
   };
 
   return (
@@ -140,7 +156,12 @@ export const LibraryDashboard = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">Add Content</Button>
+          <Button 
+            variant="outline"
+            onClick={() => setShowAddMaterialModal(true)}
+          >
+            Add Content
+          </Button>
           <Button>Manage Categories</Button>
         </div>
       </div>
@@ -402,6 +423,7 @@ export const LibraryDashboard = () => {
           <Tabs defaultValue="browse" className="space-y-4">
             <TabsList>
               <TabsTrigger value="browse">Browse Content</TabsTrigger>
+              <TabsTrigger value="materials">All Materials</TabsTrigger>
               <TabsTrigger value="categories">Categories</TabsTrigger>
               <TabsTrigger value="cross-references">Cross References</TabsTrigger>
               <TabsTrigger value="contradictions">Contradictions</TabsTrigger>
@@ -518,6 +540,10 @@ export const LibraryDashboard = () => {
               </div>
             </TabsContent>
 
+            <TabsContent value="materials" className="space-y-4">
+              <MaterialsManagementDashboard />
+            </TabsContent>
+
             <TabsContent value="categories" className="space-y-4">
               <CategoryManager 
                 onUpdateCategory={handleUpdateCategory}
@@ -606,6 +632,13 @@ export const LibraryDashboard = () => {
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Add Material Modal */}
+      <AddMaterialModal 
+        open={showAddMaterialModal}
+        onOpenChange={setShowAddMaterialModal}
+        onSuccess={handleMaterialSuccess}
+      />
     </div>
   );
 };

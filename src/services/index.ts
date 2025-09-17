@@ -7,3 +7,16 @@ export {
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
 } from './categoriesApi';
+export {
+  materialsApi,
+  useGetMaterialsQuery,
+  useGetMaterialQuery,
+  useCreateMaterialMutation,
+  useUpdateMaterialMutation,
+  useDeleteMaterialMutation,
+  useGetMaterialsByCategoryQuery,
+  useSearchMaterialsQuery,
+  useGetMyMaterialsQuery,
+  useUpdateMaterialViewMutation,
+  useDownloadMaterialMutation,
+} from './materialsApi';
