@@ -208,21 +208,21 @@ export const PERMISSIONS: Record<string, Permission> = {
 
 // Define role configurations
 export const ROLE_CONFIGS: Record<string, RoleConfig> = {
-  owner: {
-    id: 'owner',
-    name: 'System Owner',
+  super_admin: {
+    id: 'super_admin',
+    name: 'Super Admin',
     description: 'Full system access with master control',
     priority: 100,
     permissions: [
-      // All permissions - owner has access to everything
+      // All permissions - super admin has access to everything
       ...Object.keys(PERMISSIONS)
     ]
   },
 
-  big7: {
-    id: 'big7',
-    name: 'Big 7 Member',
-    description: 'Profit sharing and allocation oversight',
+  admin: {
+    id: 'admin',
+    name: 'Administrator',
+    description: 'System administration and oversight',
     priority: 80,
     permissions: [
       'view_overview',
@@ -240,8 +240,9 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
       'view_filling_station',
       'view_equipment',
       'view_payment_history',
-      'manage_reports', // Big 7 can generate custom reports
-      'view_all_data' // Can view all financial data
+      'manage_reports',
+      'view_all_data',
+      'manage_users'
     ]
   },
 
@@ -349,5 +350,7 @@ export const NAVIGATION_PERMISSIONS: Record<string, string[]> = {
   'equipment': ['view_equipment'],
   'personal-portfolios': ['view_personal_portfolios'],
   'reports': ['view_reports'],
-  'theme-showcase': ['view_overview'] // Available to everyone who can view overview
+  'theme-showcase': ['view_overview'], // Available to everyone who can view overview
+  'admin': ['manage_users', 'manage_system'],
+  'system': ['manage_system', 'view_all_data']
 };

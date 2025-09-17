@@ -35,10 +35,11 @@ const Index = () => {
 
   // Render different dashboards based on user role
   const renderDashboard = () => {
+    console.log('Rendering dashboard for user:', user);
     switch (user.role) {
-      case 'owner':
+      case 'super_admin':
         return <OwnerDashboard />;
-      case 'big7':
+      case 'admin':
         return <Big7Dashboard />;
       case 'manager':
         return <ManagerDashboard />;
@@ -47,7 +48,7 @@ const Index = () => {
       case 'customer':
         return <CustomerDashboard />;
       default:
-        return <OwnerDashboard />;
+        return <CustomerDashboard />;
     }
   };
 
@@ -60,7 +61,10 @@ const Index = () => {
           showUpgradePrompt={true}
           className="max-w-2xl mx-auto mt-8"
         >
-          <div>This content should not be visible</div>
+          <div className="text-center p-4">
+            <h2 className="text-lg font-semibold text-destructive">Access Restricted</h2>
+            <p className="text-muted-foreground">You don't have permission to access this feature.</p>
+          </div>
         </ProtectedComponent>
       );
     }

@@ -31,8 +31,8 @@ interface PermissionAwareHeaderProps {
 
 const getRoleIcon = (role: string) => {
   switch (role) {
-    case 'owner': return Crown;
-    case 'big7': return Building;
+    case 'super_admin': return Crown;
+    case 'admin': return Shield;
     case 'manager': return Users;
     case 'vendor': return UserCheck;
     case 'customer': return User;
@@ -42,8 +42,8 @@ const getRoleIcon = (role: string) => {
 
 const getRoleColor = (role: string) => {
   switch (role) {
-    case 'owner': return 'bg-red-50 text-red-700 border-red-200';
-    case 'big7': return 'bg-purple-50 text-purple-700 border-purple-200';
+    case 'super_admin': return 'bg-red-50 text-red-700 border-red-200';
+    case 'admin': return 'bg-purple-50 text-purple-700 border-purple-200';
     case 'manager': return 'bg-blue-50 text-blue-700 border-blue-200';
     case 'vendor': return 'bg-green-50 text-green-700 border-green-200';
     case 'customer': return 'bg-gray-50 text-gray-700 border-gray-200';
@@ -181,11 +181,11 @@ export const PermissionAwareHeader: React.FC<PermissionAwareHeaderProps> = ({
         </Alert>
       </RoleGate>
 
-      <RoleGate allowedRoles={['big7', 'owner']}>
+      <RoleGate allowedRoles={['admin', 'super_admin']}>
         <Alert className="border-purple-200 bg-purple-50/50">
           <Crown className="h-4 w-4 text-purple-600" />
           <AlertDescription className="text-purple-800">
-            <strong>Executive Access:</strong> You have full access to financial data and profit sharing oversight.
+            <strong>Executive Access:</strong> You have full access to all system features and administration.
           </AlertDescription>
         </Alert>
       </RoleGate>

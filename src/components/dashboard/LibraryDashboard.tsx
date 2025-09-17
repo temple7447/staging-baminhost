@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LIBRARY_CONTENT } from "@/data/demoData";
 import { useAuth } from "@/contexts/AuthContext";
+import { CategoryManager } from "../library/CategoryManager";
 import { 
   BookOpen, 
   FileText, 
@@ -19,14 +20,21 @@ import {
   Star,
   Clock,
   Users,
-  Target
+  Target,
+  Shield
 } from "lucide-react";
+import { useDeleteCategoryMutation, useUpdateCategoryMutation } from "@/services/categoriesApi";
+import { useToast } from "@/hooks/use-toast";
 
 export const LibraryDashboard = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
+
+  const [updateCategory, { isLoading: isUpdating }] = useUpdateCategoryMutation();
+  const [deleteCategory, { isLoading: isDeleting }] = useDeleteCategoryMutation();
 
   const library = LIBRARY_CONTENT;
 
@@ -71,11 +79,44 @@ export const LibraryDashboard = () => {
 
   const getAudienceColor = (audience: string) => {
     switch (audience) {
-      case 'owner': return 'bg-red-100 text-red-800';
+      case 'super_admin': return 'bg-red-100 text-red-800';
+      case 'admin': return 'bg-purple-100 text-purple-800';
       case 'manager': return 'bg-blue-100 text-blue-800';
       case 'vendor': return 'bg-green-100 text-green-800';
       case 'customer': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleUpdateCategory = async (id: string, updates: any) => {
+    try {
+      await updateCategory({ id, ...updates }).unwrap();
+      toast({
+        title: "Category updated",
+        description: "The category has been updated successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "Failed to update category. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    try {
+      await deleteCategory(id).unwrap();
+      toast({
+        title: "Category deleted",
+        description: "The category has been deleted successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Delete failed",
+        description: "Failed to delete category. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -98,7 +139,10 @@ export const LibraryDashboard = () => {
             Central knowledge hub with cross-referencing - {user?.role} access level
           </p>
         </div>
-        <Button>Add Content</Button>
+        <div className="flex gap-2">
+          <Button variant="outline">Add Content</Button>
+          <Button>Manage Categories</Button>
+        </div>
       </div>
 
       {/* Library Overview */}
@@ -188,13 +232,14 @@ export const LibraryDashboard = () => {
           <CardDescription>Content availability by user role</CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Role-Based Content Access */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Owner Content */}
+            {/* Super Admin Content */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Star className="h-4 w-4" />
-                  Owner Level
+                  Super Admin Level
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -202,7 +247,7 @@ export const LibraryDashboard = () => {
                   <div className="flex justify-between text-sm">
                     <span>Strategic Guides</span>
                     <span className="font-medium">
-                      {library.filter(c => c.targetAudience.includes('owner') && c.category === 'strategic').length}
+                      {library.filter(c => c.targetAudience.includes('super_admin') && c.category === 'strategic').length}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
@@ -216,6 +261,37 @@ export const LibraryDashboard = () => {
                 </div>
                 <div className="pt-2 border-t text-xs text-muted-foreground">
                   4% Rule, 1/3rd Rule, Strategic Decision Making
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Admin Content */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  Admin Level
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>System Management</span>
+                    <span className="font-medium">
+                      {library.filter(c => c.targetAudience.includes('admin') && c.category === 'system').length}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Audit Logs</span>
+                    <span className="font-medium">1</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Settings</span>
+                    <span className="font-medium">3</span>
+                  </div>
+                </div>
+                <div className="pt-2 border-t text-xs text-muted-foreground">
+                  User management, system settings, audit trails
                 </div>
               </CardContent>
             </Card>
@@ -326,6 +402,7 @@ export const LibraryDashboard = () => {
           <Tabs defaultValue="browse" className="space-y-4">
             <TabsList>
               <TabsTrigger value="browse">Browse Content</TabsTrigger>
+              <TabsTrigger value="categories">Categories</TabsTrigger>
               <TabsTrigger value="cross-references">Cross References</TabsTrigger>
               <TabsTrigger value="contradictions">Contradictions</TabsTrigger>
               <TabsTrigger value="management">Content Management</TabsTrigger>
@@ -439,6 +516,15 @@ export const LibraryDashboard = () => {
                   </Card>
                 ))}
               </div>
+            </TabsContent>
+
+            <TabsContent value="categories" className="space-y-4">
+              <CategoryManager 
+                onUpdateCategory={handleUpdateCategory}
+                onDeleteCategory={handleDeleteCategory}
+                isUpdating={isUpdating}
+                isDeleting={isDeleting}
+              />
             </TabsContent>
 
             <TabsContent value="cross-references" className="space-y-4">

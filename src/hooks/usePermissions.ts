@@ -66,8 +66,8 @@ export const usePermissions = () => {
       getPermissionsByCategory: getPermissionsByCat,
       
       // Convenience computed values
-      isOwner: userRole === 'owner',
-      isBig7: userRole === 'big7',
+      isSuperAdmin: userRole === 'super_admin',
+      isAdmin: userRole === 'admin',
       isManager: userRole === 'manager',
       isVendor: userRole === 'vendor',
       isCustomer: userRole === 'customer',
@@ -142,8 +142,9 @@ export const useRoleBasedAccess = () => {
     },
     
     // Access level helpers
-    hasFullAccess: permissions.isOwner,
+    hasFullAccess: permissions.isSuperAdmin,
+    hasAdminAccess: permissions.isSuperAdmin || permissions.isAdmin,
     hasViewOnlyAccess: permissions.isCustomer || permissions.isVendor,
-    hasManagementAccess: permissions.isOwner || permissions.isBig7 || permissions.isManager
+    hasManagementAccess: permissions.isSuperAdmin || permissions.isAdmin || permissions.isManager
   };
 };

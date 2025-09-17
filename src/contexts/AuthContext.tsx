@@ -1,73 +1,109 @@
-import { ReactNode, createContext, useContext, useState } from "react";
-import { DEMO_USERS } from "@/data/demoData";
+import { ReactNode, createContext, useContext, useState, useEffect } from "react";
 
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'owner' | 'big7' | 'manager' | 'vendor' | 'customer';
-  avatar?: string;
-  permissions?: string[];
-  department?: string;
-  hourlyRate?: number;
-  profitShare?: number;
-  workHours?: { total: number; active: number };
-  // Vendor specific properties
-  commissionRate?: number;
-  totalEarnings?: number;
-  // Customer specific properties
-  customerType?: 'premium' | 'regular';
-  totalSpent?: number;
-  activeContracts?: number;
-  phone?: string;
+  role: 'super_admin' | 'admin' | 'manager' | 'vendor' | 'customer';
+  isActive: boolean;
+  emailVerified: boolean;
+  lastLogin: string;
+  createdAt: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  token: string | null;
+  login: (token: string, user: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
+
+// Token management utilities
+const getStoredToken = (): string | null => {
+  try {
+    return localStorage.getItem('token');
+  } catch (error) {
+    console.error('Error accessing token:', error);
+    return null;
+  }
+};
+
+const setStoredToken = (token: string | null): void => {
+  try {
+    if (token) {
+      localStorage.setItem('token', token);
+    } else {
+      localStorage.removeItem('token');
+    }
+  } catch (error) {
+    console.error('Error storing token:', error);
+  }
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(() => getStoredToken());
 
-  const login = async (email: string, password: string) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+  // Initialize auth state from localStorage
+  useEffect(() => {
+    const storedToken = getStoredToken();
+    const storedUser = localStorage.getItem('user');
     
-    const foundUser = DEMO_USERS.find(u => u.email === email);
-    
-    if (foundUser && password === 'demo123') {
-      setUser(foundUser as User);
-      return { success: true };
+    if (storedToken && storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser) as User;
+        if (parsedUser.id && parsedUser.role) {
+          setToken(storedToken);
+          setUser(parsedUser);
+        } else {
+          // Invalid user data, clear storage
+          logout();
+        }
+      } catch (error) {
+        // Invalid JSON, clear storage
+        logout();
+      }
     }
-    
-    return { success: false, error: 'Invalid credentials' };
+  }, []);
+
+  const login = (token: string, user: User) => {
+    setToken(token);
+    setUser(user);
+    setStoredToken(token);
+    localStorage.setItem('user', JSON.stringify(user));
   };
 
   const logout = () => {
     setUser(null);
+    setToken(null);
+    setStoredToken(null);
+    localStorage.removeItem('user');
   };
 
   return (
     <AuthContext.Provider value={{
       user,
+      token,
       login,
       logout,
-      isAuthenticated: !!user
+      isAuthenticated: !!user && !!token
     }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
+// Add token getter to useAuth hook
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
-  return context;
+  return {
+    ...context,
+    getToken: () => getStoredToken()
+  };
 };
