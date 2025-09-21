@@ -120,7 +120,7 @@ const Landing = () => {
                 <a href="#faq" className="block text-sm text-slate-200 hover:text-white">FAQ</a>
                 <Separator className="my-4 bg-white/10" />
                 <div className="flex flex-col gap-2">
-                  <Link to="/login"><Button variant="outline" className="border-white/20 text-white hover:bg-white/10 w-full">Log in</Button></Link>
+                  <Link to="/login"><Button variant="outline" className="bg-white text-slate-900 hover:bg-slate-100 border-slate-200 w-full">Log in</Button></Link>
                   <Link to="/register"><Button className="bg-blue-600 hover:bg-blue-500 w-full">Create account</Button></Link>
                 </div>
               </div>
