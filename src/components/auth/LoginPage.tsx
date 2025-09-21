@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { ForgotPassword, ResetPasswordForm, PasswordResetSuccess } from "./PasswordReset";
 import { useLoginMutation } from "@/services";
+import { useNavigate } from "react-router-dom";
 
 type AuthView = 'login' | 'forgot-password' | 'reset-password' | 'reset-success';
 
@@ -20,6 +21,7 @@ export const LoginPage = () => {
   const [authView, setAuthView] = useState<AuthView>('login');
   const { login: authLogin } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,8 +37,12 @@ export const LoginPage = () => {
           title: "Login successful",
           description: `Welcome back, ${result.user.name}!`,
         });
+
+        // Navigate to the authenticated app
+        navigate('/app', { replace: true });
       }
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         title: "Login failed",
         description: error?.data?.message || "An error occurred during login.",

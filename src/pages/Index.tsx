@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/hooks/usePermissions";
-import { LoginPage } from "@/components/auth/LoginPage";
+import { Navigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { OwnerDashboard } from "@/components/dashboard/OwnerDashboard";
 import { Big7Dashboard } from "@/components/dashboard/Big7Dashboard";
@@ -28,9 +28,9 @@ const Index = () => {
   const { canAccessNavigation, hasPermission } = usePermissions();
   const [currentView, setCurrentView] = useState("overview");
 
-  // Show login page if not authenticated
+  // Redirect to login if not authenticated
   if (!isAuthenticated || !user) {
-    return <LoginPage />;
+    return <Navigate to="/login" replace />;
   }
 
   // Render different dashboards based on user role
