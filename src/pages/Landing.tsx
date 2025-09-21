@@ -7,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Building2,
   ShieldCheck,
@@ -23,6 +24,7 @@ import {
   Github,
   Linkedin,
   Mail,
+  Menu,
 } from "lucide-react";
 
 const features = [
@@ -96,9 +98,34 @@ const Landing = () => {
           <a href="#testimonials" className="hover:text-white/90">Testimonials</a>
           <a href="#faq" className="hover:text-white/90">FAQ</a>
         </nav>
-        <div className="flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-3">
           <Link to="/login"><Button variant="outline" className="border-white/20 text-white hover:bg-white/10">Log in</Button></Link>
           <Link to="/register"><Button className="bg-blue-600 hover:bg-blue-500">Create account</Button></Link>
+        </div>
+        {/* Mobile menu */}
+        <div className="md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="border-white/20 text-white bg-white/5 hover:bg-white/10">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="bg-slate-950 text-white border-l border-white/10">
+              <div className="mt-10 space-y-4">
+                <a href="#features" className="block text-sm text-slate-200 hover:text-white">Features</a>
+                <a href="#product" className="block text-sm text-slate-200 hover:text-white">Product</a>
+                <a href="#how-it-works" className="block text-sm text-slate-200 hover:text-white">How it works</a>
+                <a href="#testimonials" className="block text-sm text-slate-200 hover:text-white">Testimonials</a>
+                <a href="#faq" className="block text-sm text-slate-200 hover:text-white">FAQ</a>
+                <Separator className="my-4 bg-white/10" />
+                <div className="flex flex-col gap-2">
+                  <Link to="/login"><Button variant="outline" className="border-white/20 text-white hover:bg-white/10 w-full">Log in</Button></Link>
+                  <Link to="/register"><Button className="bg-blue-600 hover:bg-blue-500 w-full">Create account</Button></Link>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </header>
 
@@ -125,7 +152,7 @@ const Landing = () => {
                 </Button>
               </Link>
               <Link to="/login">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto bg-white text-slate-900 hover:bg-slate-100 border-slate-200">
                   I already have an account
                 </Button>
               </Link>
@@ -162,7 +189,7 @@ const Landing = () => {
               <div className="p-3">
                 <AspectRatio ratio={16/10}>
                   <img
-                    src="https://images.unsplash.com/photo-1551281044-8c3f1e82b6df?auto=format&fit=crop&w=1920&q=80"
+                    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1920&q=80"
                     alt="Portfolio dashboards overview"
                     className="h-full w-full object-cover rounded-lg border border-white/10"
                     loading="lazy"
@@ -236,9 +263,16 @@ const Landing = () => {
           <h2 className="text-2xl md:text-3xl font-bold">See the product in action</h2>
           <p className="mt-2 text-slate-300/80">A glimpse of dashboards and workflows</p>
         </div>
-        <Carousel className="mx-auto max-w-5xl">
+        <Carousel 
+          className="mx-auto max-w-5xl"
+          opts={{
+            align: "start",
+            loop: true,
+            
+          }}
+        >
           <CarouselContent>
-            {productShots.map((src, i) => (
+            {productShots?.map((src: any, i: number) => (
               <CarouselItem key={i}>
                 <Card className="bg-white/5 border-white/10 backdrop-blur">
                   <CardContent className="p-4">
@@ -320,10 +354,10 @@ const Landing = () => {
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <Link to="/register" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full bg-white text-slate-900 hover:bg-slate-100">Create account</Button>
+                <Button size="lg" className="w-full bg-blue-600 text-white hover:bg-blue-500 font-semibold">Create account</Button>
               </Link>
               <Link to="/login" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="w-full border-white/30 text-white hover:bg-white/10">Log in</Button>
+                <Button size="lg" variant="outline" className="w-full bg-white text-slate-900 hover:bg-slate-100 border-slate-200">Log in</Button>
               </Link>
             </div>
           </div>
