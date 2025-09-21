@@ -23,6 +23,8 @@ import { PortfolioDashboard, PersonalLifePortfolios } from "@/components/portfol
 import { SplitTracker } from "@/components/budget/SplitTracker";
 import { GoalsDashboard } from "@/components/goals/GoalsDashboard";
 import { Big5Dashboard } from "@/components/big5/Big5Dashboard";
+import { AdminPeople } from "@/components/dashboard/AdminPeople";
+import { SuperAdminTransactions } from "@/components/dashboard/SuperAdminTransactions";
 
 const Index = () => {
   const { isAuthenticated, user } = useAuth();
@@ -200,6 +202,16 @@ const Index = () => {
             <ReportsDashboard />
           </ProtectedComponent>
         );
+      case "transactions":
+        return (
+          <ProtectedComponent 
+            requiredPermissions={['view_all_data']}
+            feature="Transactions"
+            showUpgradePrompt={false}
+          >
+            <SuperAdminTransactions />
+          </ProtectedComponent>
+        );
       case "settings":
         return (
           <ProtectedComponent 
@@ -211,6 +223,8 @@ const Index = () => {
         );
       case "theme-showcase":
         return <GreenThemeShowcase />;
+      case "people":
+        return <AdminPeople />;
       default:
         return renderDashboard();
     }

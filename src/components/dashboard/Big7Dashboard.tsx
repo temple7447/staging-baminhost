@@ -1,6 +1,7 @@
 import { TrendingUp, Users, DollarSign, PieChart } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { AdminPeople } from "./AdminPeople";
 
 // Mock data for Big 7 member
 const big7Data = {
@@ -219,6 +220,9 @@ export const Big7Dashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Managers and Vendors */}
+      <AdminPeople />
     </div>
   );
 };

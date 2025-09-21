@@ -360,7 +360,8 @@ export const NAVIGATION_PERMISSIONS: Record<string, string[]> = {
   'filling-station': ['view_filling_station'],
   'equipment': ['view_equipment'],
   'personal-portfolios': ['view_personal_portfolios'],
-  'reports': ['view_reports'],
+'reports': ['view_reports'],
+  'transactions': ['view_all_data'],
   'theme-showcase': ['view_overview'], // Available to everyone who can view overview
   'admin': ['manage_users', 'manage_system'],
   'system': ['manage_system', 'view_all_data']

@@ -97,10 +97,14 @@ const Landing = () => {
           <a href="#how-it-works" className="hover:text-white/90">How it works</a>
           <a href="#testimonials" className="hover:text-white/90">Testimonials</a>
           <a href="#faq" className="hover:text-white/90">FAQ</a>
+          <Link to="/projects" className="hover:text-white/90">Projects</Link>
+          <Link to="/about" className="hover:text-white/90">About Us</Link>
         </nav>
         <div className="hidden md:flex items-center gap-3">
           <Link to="/login"><Button variant="outline" className="border-white/20 text-white hover:bg-white/10">Log in</Button></Link>
-          <Link to="/register"><Button className="bg-blue-600 hover:bg-blue-500">Create account</Button></Link>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
+            <Button className="bg-blue-600 hover:bg-blue-500">Create account</Button>
+          </a>
         </div>
         {/* Mobile menu */}
         <div className="md:hidden">
@@ -119,9 +123,14 @@ const Landing = () => {
                 <a href="#testimonials" className="block text-sm text-slate-200 hover:text-white">Testimonials</a>
                 <a href="#faq" className="block text-sm text-slate-200 hover:text-white">FAQ</a>
                 <Separator className="my-4 bg-white/10" />
+                <Link to="/projects" className="block text-sm text-slate-200 hover:text-white">Projects</Link>
+                <Link to="/about" className="block text-sm text-slate-200 hover:text-white">About Us</Link>
+                <Separator className="my-4 bg-white/10" />
                 <div className="flex flex-col gap-2">
                   <Link to="/login"><Button variant="outline" className="bg-white text-slate-900 hover:bg-slate-100 border-slate-200 w-full">Log in</Button></Link>
-                  <Link to="/register"><Button className="bg-blue-600 hover:bg-blue-500 w-full">Create account</Button></Link>
+                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" className="w-full">
+                    <Button className="bg-blue-600 hover:bg-blue-500 w-full">Create account</Button>
+                  </a>
                 </div>
               </div>
             </SheetContent>
@@ -145,12 +154,12 @@ const Landing = () => {
               Built for clarity, control and momentum.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Link to="/register">
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
                 <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 transition-transform hover:translate-y-[-1px] active:translate-y-[0]">
                   Get started free
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-              </Link>
+              </a>
               <Link to="/login">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto bg-white text-slate-900 hover:bg-slate-100 border-slate-200">
                   I already have an account
@@ -353,9 +362,9 @@ const Landing = () => {
               <p className="mt-2 text-slate-200/80">Start free today and upgrade anytime. No credit card required.</p>
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto">
-              <Link to="/register" className="w-full sm:w-auto">
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full bg-blue-600 text-white hover:bg-blue-500 font-semibold">Create account</Button>
-              </Link>
+              </a>
               <Link to="/login" className="w-full sm:w-auto">
                 <Button size="lg" variant="outline" className="w-full bg-white text-slate-900 hover:bg-slate-100 border-slate-200">Log in</Button>
               </Link>
@@ -409,7 +418,7 @@ const Landing = () => {
             <div>
               <div className="text-sm font-semibold mb-3">Company</div>
               <ul className="space-y-2 text-sm text-slate-300/80">
-                <li><a href="#" className="hover:text-white/90">About</a></li>
+                <li><a href="/about" className="hover:text-white/90">About</a></li>
                 <li><a href="#" className="hover:text-white/90">Careers</a></li>
                 <li><a href="mailto:hello@bamihustle.com" className="hover:text-white/90">Support</a></li>
                 <li><a href="#" className="hover:text-white/90">Blog</a></li>

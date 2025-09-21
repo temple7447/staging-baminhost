@@ -34,6 +34,7 @@ import {
   Activity,
   Wallet
 } from "lucide-react";
+import { BusinessPortfolioOverview } from "@/components/dashboard/BusinessPortfolioOverview";
 
 interface Investment {
   id: string;
@@ -192,6 +193,9 @@ export const PortfolioDashboard = () => {
 
   return (
     <div className="space-y-6">
+      {/* Business Portfolio (moved from Owner overview) */}
+      <BusinessPortfolioOverview />
+
       {/* Header */}
       <div className="flex flex-col gap-4">
         <div className="text-center sm:text-left">

@@ -7,6 +7,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
+import About from "./pages/About";
+import Projects from "./pages/Projects";
 import { LoginPage } from "@/components/auth/LoginPage";
 import { RegistrationPage } from "@/components/auth/RegistrationPage";
 
@@ -24,6 +26,8 @@ const App = () => (
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegistrationPage />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/projects" element={<Projects />} />
 
             {/* Authenticated app */}
             <Route path="/app" element={<Index />} />

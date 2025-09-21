@@ -14,7 +14,8 @@ import {
   Eye,
   X,
   LogOut,
-  ListChecks
+  ListChecks,
+  DollarSign
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -93,6 +94,12 @@ const sidebarItems: SidebarItem[] = [
     category: 'system',
     requiredPermissions: ['view_contacts']
   },
+  {
+    id: "people",
+    label: "People",
+    icon: Users,
+    category: 'system'
+  },
   { 
     id: "library", 
     label: "Library", 
@@ -154,6 +161,13 @@ const sidebarItems: SidebarItem[] = [
     category: 'financial',
     requiredPermissions: ['view_reports'],
     isPremium: true
+  },
+  {
+    id: "transactions",
+    label: "Transactions",
+    icon: DollarSign,
+    category: 'financial',
+    requiredPermissions: ['view_all_data']
   }
 ];
 

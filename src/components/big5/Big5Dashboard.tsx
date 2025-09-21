@@ -5,23 +5,29 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Save, RefreshCw } from "lucide-react";
+import { Save, RefreshCw, Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 
-interface Big5Item {
-  id: number;
+interface BigItem {
+  id: string;
   title: string;
   description?: string;
 }
 
-const STORAGE_KEY = "big5_items_v1";
+const STORAGE_KEY = "big5_items_v2";
+
+const createItem = (): BigItem => ({
+  id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+  title: "",
+  description: "",
+});
 
 export const Big5Dashboard: React.FC = () => {
-  const [items, setItems] = useState<Big5Item[]>([
-    { id: 1, title: "", description: "" },
-    { id: 2, title: "", description: "" },
-    { id: 3, title: "", description: "" },
-    { id: 4, title: "", description: "" },
-    { id: 5, title: "", description: "" },
+  const [items, setItems] = useState<BigItem[]>([
+    createItem(),
+    createItem(),
+    createItem(),
+    createItem(),
+    createItem(),
   ]);
 
   // Load from localStorage once
@@ -30,7 +36,7 @@ export const Big5Dashboard: React.FC = () => {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length === 5) {
+        if (Array.isArray(parsed)) {
           setItems(parsed);
         }
       }
@@ -39,6 +45,7 @@ export const Big5Dashboard: React.FC = () => {
     }
   }, []);
 
+  const itemsCount = items.length;
   const filledCount = useMemo(() => items.filter(i => i.title?.trim()).length, [items]);
 
   const save = () => {
@@ -46,9 +53,21 @@ export const Big5Dashboard: React.FC = () => {
   };
 
   const reset = () => {
-    const cleared: Big5Item[] = items.map(i => ({ ...i, title: "", description: "" }));
-    setItems(cleared);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(cleared));
+    setItems([]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+  };
+
+  const addItem = () => setItems(prev => [...prev, createItem()]);
+  const removeItem = (id: string) => setItems(prev => prev.filter(i => i.id !== id));
+  const moveItem = (index: number, dir: -1 | 1) => {
+    setItems(prev => {
+      const next = [...prev];
+      const newIndex = index + dir;
+      if (newIndex < 0 || newIndex >= next.length) return prev;
+      const [spliced] = next.splice(index, 1);
+      next.splice(newIndex, 0, spliced);
+      return next;
+    });
   };
 
   return (
@@ -56,42 +75,73 @@ export const Big5Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">My Big 5</h1>
-          <p className="text-sm text-muted-foreground">Capture the five most important responsibilities or outcomes you own right now.</p>
+          <h1 className="text-2xl font-bold tracking-tight">My Big 5+</h1>
+          <p className="text-sm text-muted-foreground">Capture and prioritize the outcomes you own. Start with five and add more as needed.</p>
         </div>
-        <Badge variant="secondary">{filledCount}/5 filled</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">{filledCount}/{itemsCount} filled</Badge>
+          <Button size="sm" onClick={addItem} className="gap-2">
+            <Plus className="w-4 h-4" /> Add item
+          </Button>
+        </div>
       </div>
 
       {/* Display grid similar to the image */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Example of Your Big 5</CardTitle>
-          <CardDescription>Keep it short and action oriented. You can edit anytime.</CardDescription>
+          <CardTitle className="text-base">Your Big Items</CardTitle>
+          <CardDescription>Keep each item crisp and action-oriented.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-3 gap-4">
-            {items.map((item) => (
-              <div key={item.id} className="rounded-lg border bg-card p-4">
-                <div className="text-sm font-medium mb-2">{item.id}. {item.title?.trim() || "Add a title"}</div>
-                <div className="text-xs text-muted-foreground whitespace-pre-wrap">
-                  {item.description?.trim() || "Optional description"}
+          {items.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No items yet. Click "Add item" to get started.</div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-4">
+              {items.map((item, i) => (
+                <div key={item.id} className="rounded-lg border bg-card p-4">
+                  <div className="text-sm font-medium mb-2">{i + 1}. {item.title?.trim() || "Add a title"}</div>
+                  <div className="text-xs text-muted-foreground whitespace-pre-wrap">
+                    {item.description?.trim() || "Optional description"}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
       {/* Editor */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Edit your Big 5</CardTitle>
-          <CardDescription>Write what you own and will focus on. These are your primary outcomes.</CardDescription>
+          <CardTitle className="text-base">Edit your list</CardTitle>
+          <CardDescription>Write what you own and will focus on. Add, remove, and reorder freely.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          {items.length === 0 && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              Your list is empty.
+              <Button size="sm" variant="outline" onClick={addItem} className="gap-2">
+                <Plus className="w-4 h-4" /> Add first item
+              </Button>
+            </div>
+          )}
+
           {items.map((item, idx) => (
             <div key={item.id} className="space-y-2">
-              <div className="text-sm font-semibold">{item.id}. Title</div>
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-semibold">{idx + 1}. Title</div>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="icon" onClick={() => moveItem(idx, -1)} disabled={idx === 0} title="Move up">
+                    <ArrowUp className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => moveItem(idx, 1)} disabled={idx === items.length - 1} title="Move down">
+                    <ArrowDown className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => removeItem(item.id)} title="Remove">
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
               <Input
                 placeholder="e.g. Create and publish content & be the face of the business"
                 value={item.title}
@@ -117,10 +167,13 @@ export const Big5Dashboard: React.FC = () => {
 
           <div className="flex flex-wrap gap-2">
             <Button onClick={save} className="gap-2">
-              <Save className="w-4 h-4" /> Save Big 5
+              <Save className="w-4 h-4" /> Save
             </Button>
             <Button variant="outline" onClick={reset} className="gap-2">
-              <RefreshCw className="w-4 h-4" /> Reset
+              <RefreshCw className="w-4 h-4" /> Clear all
+            </Button>
+            <Button variant="outline" onClick={addItem} className="gap-2">
+              <Plus className="w-4 h-4" /> Add another
             </Button>
           </div>
         </CardContent>
