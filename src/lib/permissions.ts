@@ -22,6 +22,12 @@ export const PERMISSIONS: Record<string, Permission> = {
     description: 'Access to the main dashboard overview',
     category: 'dashboard'
   },
+  'view_big5': {
+    id: 'view_big5',
+    name: 'View Big 5',
+    description: 'Access to personal Big 5 priorities page',
+    category: 'dashboard'
+  },
   'view_wallet': {
     id: 'view_wallet',
     name: 'View Wallet',
@@ -225,7 +231,8 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
     description: 'System administration and oversight',
     priority: 80,
     permissions: [
-      'view_overview',
+'view_overview',
+      'view_big5',
       'view_wallet',
       'view_portfolio',
       'view_split_tracker',
@@ -251,8 +258,9 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
     name: 'Manager',
     description: 'Departmental management and operations',
     priority: 60,
-    permissions: [
+permissions: [
       'view_overview',
+      'view_big5',
       'view_wallet',
       'view_contacts',
       'view_library',
@@ -277,7 +285,8 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
     description: 'Service delivery and proof submission',
     priority: 40,
     permissions: [
-      'view_overview', // Limited overview showing only relevant info
+'view_overview', // Limited overview showing only relevant info
+      'view_big5',
       'view_contacts', // Can see contact info for coordination
       'view_settings', // Can manage their own account settings
       'upload_work_proof',
@@ -293,7 +302,8 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
     description: 'Service consumption and payment management',
     priority: 20,
     permissions: [
-      'view_overview', // Limited overview showing account summary
+'view_overview', // Limited overview showing account summary
+      'view_big5',
       'view_settings', // Can manage their own account settings
       'manage_payment_plans',
       'track_projects',
@@ -336,7 +346,8 @@ export const getPermissionsByCategory = (userRole: string, category: Permission[
 
 // Navigation items with their required permissions
 export const NAVIGATION_PERMISSIONS: Record<string, string[]> = {
-  'overview': ['view_overview'],
+'overview': ['view_overview'],
+  'big5': ['view_big5'],
   'wallet': ['view_wallet'],
   'portfolio': ['view_portfolio'],
   'split-tracker': ['view_split_tracker'],

@@ -22,6 +22,7 @@ import { SettingsPage } from "@/components/auth/SettingsPage";
 import { PortfolioDashboard, PersonalLifePortfolios } from "@/components/portfolio";
 import { SplitTracker } from "@/components/budget/SplitTracker";
 import { GoalsDashboard } from "@/components/goals/GoalsDashboard";
+import { Big5Dashboard } from "@/components/big5/Big5Dashboard";
 
 const Index = () => {
   const { isAuthenticated, user } = useAuth();
@@ -150,6 +151,16 @@ const Index = () => {
             showUpgradePrompt={true}
           >
             <GoalsDashboard />
+          </ProtectedComponent>
+        );
+      case "big5":
+        return (
+          <ProtectedComponent 
+            requiredPermissions={['view_big5']}
+            feature="My Big 5"
+            showUpgradePrompt={false}
+          >
+            <Big5Dashboard />
           </ProtectedComponent>
         );
       case "contacts":

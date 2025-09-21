@@ -13,7 +13,8 @@ import {
   Lock,
   Eye,
   X,
-  LogOut
+  LogOut,
+  ListChecks
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -45,6 +46,13 @@ const sidebarItems: SidebarItem[] = [
     icon: LayoutDashboard,
     category: 'core',
     requiredPermissions: ['view_overview']
+  },
+  { 
+    id: "big5", 
+    label: "My Big 5", 
+    icon: ListChecks,
+    category: 'core',
+    requiredPermissions: ['view_big5']
   },
   { 
     id: "wallet", 
