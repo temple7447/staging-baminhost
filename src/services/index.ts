@@ -14,7 +14,7 @@ export {
   useCreateMaterialMutation,
   useUpdateMaterialMutation,
   useDeleteMaterialMutation,
-  useGetMaterialsByCategoryQuery,
+  useGetMaterialsByFolderQuery,
   useSearchMaterialsQuery,
   useGetMyMaterialsQuery,
   useUpdateMaterialViewMutation,

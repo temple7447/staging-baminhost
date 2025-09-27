@@ -36,13 +36,14 @@ import {
 } from 'lucide-react';
 import { MaterialFormData, MaterialType } from '@/types/materials';
 import { useCreateMaterialMutation } from '@/services/materialsApi';
-import { useGetCategoriesQuery } from '@/services/categoriesApi';
 import { useAuth } from '@/contexts/AuthContext';
+import { useGetRootFoldersQuery } from '@/services/foldersApi';
 
 interface AddMaterialModalProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   onSuccess?: () => void;
+  folderId?: string; // Optional pre-selected folder ID
 }
 
 const MATERIAL_TYPE_OPTIONS = [
@@ -116,20 +117,50 @@ const TARGET_AUDIENCE_OPTIONS = [
 export const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
   open,
   onOpenChange,
-  onSuccess
+  onSuccess,
+  folderId
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [createMaterial, { isLoading }] = useCreateMaterialMutation();
-  const { data: categoriesResponse } = useGetCategoriesQuery();
+  const { data: rootFoldersResponse } = useGetRootFoldersQuery();
   
-  const [formData, setFormData] = useState<MaterialFormData>({
+  const rootFolders = rootFoldersResponse?.data || [];
+  
+  // Get all grandchild folders (level 2) for material upload
+  const getGrandchildFolders = () => {
+    const grandchildFolders: any[] = [];
+    rootFolders.forEach(rootFolder => {
+      if (rootFolder.subfolders) {
+        rootFolder.subfolders.forEach((childFolder: any) => {
+          if (childFolder.subfolders) {
+            childFolder.subfolders.forEach((grandchildFolder: any) => {
+              if (grandchildFolder.level === 2) {
+                grandchildFolders.push({
+                  ...grandchildFolder,
+                  fullPath: `${rootFolder.name}/${childFolder.name}/${grandchildFolder.name}`
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+    return grandchildFolders;
+  };
+  
+  const grandchildFolders = getGrandchildFolders();
+
+  console.log('Available grandchild folders:', grandchildFolders, folderId);
+
+
+  const [formData, setFormData] = useState<any>({
     title: '',
     description: '',
     materialType: 'document',
-    category: '',
-    relatedPortfolio: 'personal',
-    relatedManagerRole: 'general',
+    folder: folderId || '', // Use provided folderId or empty string
+    relatedPortfolio: 'business',
+    relatedManagerRole: 'operations',
     expectedROI: 'medium',
     timeRequirement: 'medium',
     tags: '',
@@ -142,27 +173,33 @@ export const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
   const [dragActive, setDragActive] = useState(false);
   const [tagsArray, setTagsArray] = useState<string[]>([]);
 
-  const categories = categoriesResponse?.data || [];
-
   // Reset form when modal opens/closes
   useEffect(() => {
     if (!open) {
       setFormData({
         title: '',
         description: '',
-        materialType: MaterialType.DOCUMENT,
-        category: '',
+        materialType: 'document',
+        folder: folderId || '',
         tags: '',
+        keywords: '',
         videoUrl: '',
-        content: '',
-        relatedPortfolio: 'personal',
-        relatedManagerRole: 'general',
-        targetAudience: user?.role || 'manager',
+        relatedPortfolio: 'business',
+        relatedManagerRole: 'operations',
+        expectedROI: 'medium',
+        timeRequirement: 'medium',
+        visibility: 'public',
+        priority: '0',
       });
       setSelectedFile(null);
       setTagsArray([]);
+    } else {
+      // When opening, set folder if provided
+      if (folderId) {
+        setFormData(prev => ({ ...prev, folder: folderId }));
+      }
     }
-  }, [open, user?.role]);
+  }, [open, folderId]);
 
   const handleInputChange = (field: keyof MaterialFormData, value: string) => {
     setFormData(prev => ({
@@ -228,10 +265,21 @@ export const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
       return false;
     }
 
-    if (!formData.category) {
+    if (!formData.folder?.trim()) {
       toast({
         title: "Validation Error",
-        description: "Please select a category",
+        description: "Please select a folder for this material",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    // Validate that selected folder is a grandchild folder (level 2)
+    const selectedFolder = grandchildFolders.find(f => f._id === formData.folder);
+    if (!selectedFolder) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a valid grandchild folder (level 2) for materials",
         variant: "destructive",
       });
       return false;
@@ -305,33 +353,18 @@ export const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
-                  placeholder="Enter material title"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="category">Category *</Label>
-                <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category._id} value={category._id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="title">Title *</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => handleInputChange('title', e.target.value)}
+                placeholder="Enter material title"
+                required
+              />
             </div>
+            
+            {/* Remove category selection */}
 
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
@@ -342,6 +375,38 @@ export const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
                 placeholder="Enter material description"
                 rows={3}
               />
+            </div>
+
+            {/* Folder Selection */}
+            <div className="space-y-2">
+              <Label htmlFor="folder">Target Folder *</Label>
+              {grandchildFolders.length > 0 ? (
+                <Select 
+                  value={formData.folder} 
+                  onValueChange={(value) => handleInputChange('folder', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a folder for this material" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {grandchildFolders.map((folder) => (
+                      <SelectItem key={folder._id} value={folder._id}>
+                        {folder.fullPath}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <p className="text-sm text-yellow-800">
+                    No grandchild folders available. Materials can only be uploaded to level 2 folders. 
+                    Please create the folder structure: Parent → Child → Grandchild first.
+                  </p>
+                </div>
+              )}
+              <p className="text-xs text-gray-500">
+                Materials can only be uploaded to level 2 folders (grandchild folders)
+              </p>
             </div>
           </div>
 

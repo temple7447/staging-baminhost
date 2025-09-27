@@ -63,7 +63,7 @@ export const materialsApi = createApi({
           formData.append('description', materialData.description);
         }
         formData.append('materialType', materialData.materialType);
-        formData.append('category', materialData.category);
+        formData.append('folder', materialData.folder);
         formData.append('relatedPortfolio', materialData.relatedPortfolio);
         formData.append('relatedManagerRole', materialData.relatedManagerRole);
         
@@ -165,9 +165,9 @@ export const materialsApi = createApi({
       invalidatesTags: ['Material'],
     }),
 
-    // Get materials by category
-    getMaterialsByCategory: builder.query<MaterialsResponse, string>({
-      query: (categoryId) => `/api/materials?category=${categoryId}`,
+    // Get materials by folder
+    getMaterialsByFolder: builder.query<MaterialsResponse, string>({
+      query: (folderId) => `/api/materials?folder=${folderId}`,
       providesTags: ['Material'],
     }),
 
@@ -224,7 +224,7 @@ export const {
   useCreateMaterialMutation,
   useUpdateMaterialMutation,
   useDeleteMaterialMutation,
-  useGetMaterialsByCategoryQuery,
+  useGetMaterialsByFolderQuery,
   useSearchMaterialsQuery,
   useGetMyMaterialsQuery,
   useUpdateMaterialViewMutation,

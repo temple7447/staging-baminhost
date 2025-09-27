@@ -36,7 +36,7 @@ export interface Material {
   fileUrl?: string;
   cloudinaryId?: string;
   cloudinaryResourceType?: string;
-  category: string; // Reference to Category ID
+  folder: string; // Reference to Folder ID
   relatedPortfolio: string;
   relatedManagerRole: string;
   materialType: string; // 'document', 'video', 'audio', 'image', 'text'
@@ -75,7 +75,7 @@ export interface CreateMaterialRequest {
   title: string;
   description?: string;
   materialType: string; // 'document', 'video', 'audio', 'image', 'text'
-  category: string;
+  folder: string;
   relatedPortfolio: string;
   relatedManagerRole: string;
   expectedROI?: string;
@@ -116,7 +116,7 @@ export interface MaterialsResponse {
 export interface MaterialsQueryParams {
   page?: number;
   limit?: number;
-  category?: string;
+  folder?: string;
   materialType?: string;
   tags?: string[];
   search?: string;
@@ -136,7 +136,7 @@ export interface MaterialFormData {
   title: string;
   description?: string;
   materialType: string;
-  category: string;
+  folder: string;
   relatedPortfolio: string;
   relatedManagerRole: string;
   expectedROI?: string;

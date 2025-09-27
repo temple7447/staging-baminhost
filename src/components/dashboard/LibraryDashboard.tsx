@@ -21,13 +21,60 @@ import {
   Clock,
   Users,
   Target,
-  Shield
+  Shield,
+  Database,
+  FolderPlus,
+  Folder,
+  Briefcase,
+  BookA
 } from "lucide-react";
 import { useDeleteCategoryMutation, useUpdateCategoryMutation } from "@/services/categoriesApi";
 import { useGetMaterialsQuery } from "@/services/materialsApi";
 import { useToast } from "@/hooks/use-toast";
 import { AddMaterialModal } from "../library/AddMaterialModal";
 import { MaterialsManagementDashboard } from "../materials/MaterialsManagementDashboard";
+import { FolderView } from "../library/FolderView";
+import { FoldersTableView } from "../library/FoldersTableView";
+import { FolderCard } from "../library/FolderCard";
+import { CreateFolderModal } from "../library/CreateFolderModal";
+import { FolderNavigationDebug } from "../debug/FolderNavigationDebug";
+import { MaterialCard } from "../library/MaterialCard";
+import { 
+  useCreateFolderMutation,
+  useDeleteFolderMutation,
+  useGetRootFoldersQuery,
+  useGetChildFoldersQuery,
+  useGetFolderWithMaterialsQuery,
+} from '@/services/foldersApi';
+// import type { Folder } from "@/types/folders";
+import type { Material } from "@/types/materials";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { format } from "date-fns";
+
+const iconComponents: Record<string, React.ElementType> = {
+  folder: Folder,
+  briefcase: Briefcase,
+  book: BookA,
+  users: Users,
+  settings: Shield,
+  heart: Star,
+  star: Star,
+  home: Database,
+  building: FolderPlus,
+  video: Video,
+  image: Image,
+  fileText: FileText,
+  target: Target,
+  shield: Shield,
+  database: Database
+};
 
 export const LibraryDashboard = () => {
   const { user } = useAuth();
@@ -36,12 +83,33 @@ export const LibraryDashboard = () => {
   const [selectedType, setSelectedType] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
+  const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("browse");
+  const [currentView, setCurrentView] = useState<'root' | 'children' | 'materials'>('root');
+  const [currentParentFolder, setCurrentParentFolder] = useState<any>(null);
+  const [folderType, setFolderType] = useState<'parent' | 'child' | 'grandchild'>('parent');
+  const [selectedGrandchildFolder, setSelectedGrandchildFolder] = useState<any>(null);
 
   const [updateCategory, { isLoading: isUpdating }] = useUpdateCategoryMutation();
   const [deleteCategory, { isLoading: isDeleting }] = useDeleteCategoryMutation();
+  const [deleteFolder] = useDeleteFolderMutation();
   const { data: materialsResponse, refetch: refetchMaterials } = useGetMaterialsQuery();
-
+  const { data: rootFoldersResponse, refetch: refetchFolders } = useGetRootFoldersQuery();
+  const { data: childFoldersResponse, refetch: refetchChildFolders } = useGetChildFoldersQuery(
+    currentFolderId!, 
+    { skip: !currentFolderId }
+  );
+  const { data: folderMaterialsResponse, refetch: refetchFolderMaterials } = useGetFolderWithMaterialsQuery(
+    selectedGrandchildFolder?._id || '',
+    { skip: !selectedGrandchildFolder?._id }
+  );
+  
   const library = LIBRARY_CONTENT;
+  const rootFolders = rootFoldersResponse?.data || [];
+  const childFolders = childFoldersResponse?.data || [];
+  const folderWithMaterials = folderMaterialsResponse?.data;
+  const folderMaterials = folderWithMaterials?.materials || [];
 
   console.log('User in LibraryDashboard:', materialsResponse);
 
@@ -129,10 +197,156 @@ export const LibraryDashboard = () => {
 
   const handleMaterialSuccess = () => {
     refetchMaterials();
+    if (selectedGrandchildFolder) {
+      refetchFolderMaterials();
+    }
     toast({
       title: "Material added",
       description: "The material has been added successfully.",
     });
+  };
+
+  const handleAddMaterial = () => {
+    if (!currentParentFolder) return;
+    setShowAddMaterialModal(true);
+  };
+
+  // Folder navigation functions
+  const handleFolderClick = (folder: any | null) => {
+    if (folder === null) {
+      setCurrentFolderId(null);
+      setCurrentView('root');
+      setCurrentParentFolder(null);
+      setSelectedGrandchildFolder(null);
+    } else {
+      const folderId = folder._id || folder.id;
+      
+      // If it's a grandchild folder (level 2), show materials
+      if (folder.level === 2 || folder.folderType === 'grandchild') {
+        setSelectedGrandchildFolder(folder);
+        setCurrentView('materials');
+        toast({
+          title: `Viewing Materials in ${folder.name}`,
+          description: `Loading materials from ${folder.fullPath}`,
+        });
+      } else {
+        // For parent and child folders, show subfolders
+        setCurrentFolderId(folderId);
+        setCurrentView('children');
+        setCurrentParentFolder(folder);
+        setSelectedGrandchildFolder(null);
+        
+        toast({
+          title: `Opened ${folder.name}`,
+          description: `Viewing contents of ${folder.folderType || 'Level ' + folder.level} folder`,
+        });
+      }
+    }
+  };
+
+  const handleFolderDelete = async (folder: any) => {
+    try {
+      const folderId = folder._id || folder.id;
+      await deleteFolder(folderId).unwrap();
+      toast({
+        title: "Folder deleted",
+        description: "The folder has been deleted successfully.",
+      });
+      refetchFolders();
+    } catch (error) {
+      toast({
+        title: "Delete failed",
+        description: "Failed to delete folder. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCreateChildFolder = () => {
+    if (!currentParentFolder) return;
+    
+    const newFolderType = currentParentFolder.level === 0 ? 'child' : 'grandchild';
+    
+    if (currentParentFolder.level >= 2) {
+      toast({
+        title: "Cannot create folder",
+        description: "Maximum folder depth reached",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setFolderType(newFolderType);
+    setShowCreateFolderModal(true);
+  };
+
+  const handleFolderCreationSuccess = () => {
+    if (currentView === 'children') {
+      refetchChildFolders();
+    } else {
+      refetchFolders();
+    }
+    setFolderType('parent');
+    toast({
+      title: "Folder created",
+      description: "The folder has been created successfully.",
+    });
+  };
+
+  // Back to root navigation
+  const handleBackToRoot = () => {
+    setCurrentFolderId(null);
+    toast({
+      title: "Back to Library",
+      description: "Returned to root level",
+    });
+  };
+
+  // Folder edit handler
+  const handleFolderEdit = (folder: any) => {
+    // For now, just show a toast. You can implement edit functionality here
+    toast({
+      title: "Edit Folder",
+      description: `Editing functionality for "${folder.name}" will be implemented here.`,
+    });
+    console.log('Folder edit requested:', folder);
+  };
+
+  // Material click handler
+  const handleMaterialClick = (material: Material) => {
+    // For now, we can show a toast or open the material
+    // You can implement file viewing/downloading logic here
+    toast({
+      title: "Material Selected",
+      description: `Opening ${material.title}`,
+    });
+    
+    // If the material has a file URL, open it
+    if (material.fileUrl) {
+      window.open(material.fileUrl, '_blank');
+    }
+    
+    console.log('Material clicked:', material);
+  };
+
+  // Handle material view
+  const handleMaterialView = (material: any) => {
+    toast({
+      title: "Viewing Material",
+      description: `Opening ${material.title}`,
+    });
+    // Add logic to view material details
+    console.log('Viewing material:', material);
+  };
+
+  // Handle material download
+  const handleMaterialDownload = (material: any) => {
+    toast({
+      title: "Download Started",
+      description: `Downloading ${material.title}`,
+    });
+    // Add logic to download material
+    console.log('Downloading material:', material);
   };
 
   // Statistics - combine demo data with real materials
@@ -143,6 +357,75 @@ export const LibraryDashboard = () => {
     audio: accessibleContent.filter(c => c.type === 'audio').length + realMaterials.filter(m => m.materialType === 'audio').length,
     video: accessibleContent.filter(c => c.type === 'video').length + realMaterials.filter(m => m.materialType === 'video').length,
     diagram: accessibleContent.filter(c => c.type === 'diagram').length + realMaterials.filter(m => m.materialType === 'image').length,
+  };
+
+  const renderFolderRow = (folder: any) => {
+    // Remove the level check since we want to show all folders in the current view
+    const IconComponent = iconComponents[folder.icon as keyof typeof iconComponents];
+    
+    return (
+      <TableRow key={folder._id}>
+        <TableCell>
+          <div className="flex items-center gap-2">
+            <div 
+              className="p-1.5 rounded"
+              style={{ backgroundColor: folder.color + '20' }}
+            >
+              {IconComponent && (
+                <IconComponent
+                  className="h-4 w-4"
+                  style={{ color: folder.color }}
+                />
+              )}
+            </div>
+            <span>{folder.name}</span>
+          </div>
+        </TableCell>
+        <TableCell>
+          <Badge variant="outline" className="text-xs">
+            Level {folder.level}
+          </Badge>
+        </TableCell>
+        <TableCell>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs">
+              {folder.materialCount} materials
+            </Badge>
+            <Badge variant="secondary" className="text-xs">
+              {folder.subfolderCount} subfolders
+            </Badge>
+          </div>
+        </TableCell>
+        <TableCell>{folder.createdBy.name}</TableCell>
+        <TableCell>{format(new Date(folder.createdAt), 'MMM d, yyyy')}</TableCell>
+        <TableCell>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleFolderClick(folder)}
+            >
+              Open
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleFolderEdit(folder)}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-red-600 hover:text-red-700"
+              onClick={() => handleFolderDelete(folder)}
+            >
+              Delete
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    );
   };
 
   return (
@@ -166,479 +449,169 @@ export const LibraryDashboard = () => {
         </div>
       </div>
 
-      {/* Library Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Content</CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalContent}</div>
-            <div className="text-xs text-muted-foreground">Available to you</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cross References</CardTitle>
-            <Link2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {accessibleContent.reduce((sum, c) => sum + c.crossReferences.length, 0)}
-            </div>
-            <div className="text-xs text-muted-foreground">Content connections</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Contradictions</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {accessibleContent.reduce((sum, c) => sum + c.contradictions.length, 0)}
-            </div>
-            <div className="text-xs text-red-600">Flagged for review</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Content Types</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">4</div>
-            <div className="text-xs text-muted-foreground">Text, Audio, Video, Diagrams</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Content Type Breakdown */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" />
-            Content Distribution
-          </CardTitle>
-          <CardDescription>Content breakdown by type and category</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {Object.entries(contentByType).map(([type, count]) => (
-              <Card key={type}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    {getContentTypeIcon(type)}
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{count}</div>
-                  <div className="text-xs text-muted-foreground">items</div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Role-Based Content Access */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Role-Based Content Access</CardTitle>
-          <CardDescription>Content availability by user role</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {/* Role-Based Content Access */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Super Admin Content */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Star className="h-4 w-4" />
-                  Super Admin Level
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Strategic Guides</span>
-                    <span className="font-medium">
-                      {library.filter(c => c.targetAudience.includes('super_admin') && c.category === 'strategic').length}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Time Management</span>
-                    <span className="font-medium">2</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Decision Frameworks</span>
-                    <span className="font-medium">3</span>
-                  </div>
-                </div>
-                <div className="pt-2 border-t text-xs text-muted-foreground">
-                  4% Rule, 1/3rd Rule, Strategic Decision Making
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Admin Content */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Shield className="h-4 w-4" />
-                  Admin Level
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>System Management</span>
-                    <span className="font-medium">
-                      {library.filter(c => c.targetAudience.includes('admin') && c.category === 'system').length}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Audit Logs</span>
-                    <span className="font-medium">1</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Settings</span>
-                    <span className="font-medium">3</span>
-                  </div>
-                </div>
-                <div className="pt-2 border-t text-xs text-muted-foreground">
-                  User management, system settings, audit trails
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Manager Content */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Manager Level
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Operational Systems</span>
-                    <span className="font-medium">
-                      {library.filter(c => c.targetAudience.includes('manager') && c.category === 'operational').length}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Leadership Guides</span>
-                    <span className="font-medium">4</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Process Documentation</span>
-                    <span className="font-medium">8</span>
-                  </div>
-                </div>
-                <div className="pt-2 border-t text-xs text-muted-foreground">
-                  Hire Like a Boss, Sell Like Crazy, MLAB Leadership
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Vendor Content */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  Vendor Level
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Technical Guides</span>
-                    <span className="font-medium">
-                      {library.filter(c => c.targetAudience.includes('vendor') && c.category === 'technical').length}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Proof of Work</span>
-                    <span className="font-medium">12</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Tutorials</span>
-                    <span className="font-medium">15</span>
-                  </div>
-                </div>
-                <div className="pt-2 border-t text-xs text-muted-foreground">
-                  Upload templates, quality standards, delivery guides
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Customer Content */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  Customer Level
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Self-Diagnosis</span>
-                    <span className="font-medium">
-                      {library.filter(c => c.targetAudience.includes('customer')).length}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>How-to Guides</span>
-                    <span className="font-medium">6</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>FAQs</span>
-                    <span className="font-medium">25</span>
-                  </div>
-                </div>
-                <div className="pt-2 border-t text-xs text-muted-foreground">
-                  System walkthroughs, troubleshooting, support docs
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Content Library */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Content Library</CardTitle>
-          <CardDescription>Browse and manage knowledge base content</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="browse" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="browse">Browse Content</TabsTrigger>
-              <TabsTrigger value="materials">All Materials</TabsTrigger>
-              <TabsTrigger value="categories">Categories</TabsTrigger>
-              <TabsTrigger value="cross-references">Cross References</TabsTrigger>
-              <TabsTrigger value="contradictions">Contradictions</TabsTrigger>
-              <TabsTrigger value="management">Content Management</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="browse" className="space-y-4">
-              {/* Search and Filters */}
-              <div className="flex gap-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search content..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <select
-                  value={selectedType}
-                  onChange={(e) => setSelectedType(e.target.value)}
-                  className="px-3 py-2 border border-input rounded-md"
-                >
-                  <option value="all">All Types</option>
-                  <option value="text">Text</option>
-                  <option value="audio">Audio</option>
-                  <option value="video">Video</option>
-                  <option value="diagram">Diagram</option>
-                </select>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-3 py-2 border border-input rounded-md"
-                >
-                  <option value="all">All Categories</option>
-                  <option value="strategic">Strategic</option>
-                  <option value="operational">Operational</option>
-                  <option value="technical">Technical</option>
-                  <option value="training">Training</option>
-                </select>
-              </div>
-
-              {/* Content Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredContent.map((content) => (
-                  <Card key={content.id}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <CardTitle className="text-lg flex items-center gap-2">
-                          {getContentTypeIcon(content.type)}
-                          {content.title}
-                        </CardTitle>
-                        <Badge className={getCategoryColor(content.category)}>
-                          {content.category}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-sm text-muted-foreground line-clamp-3">
-                        {content.content}
-                      </p>
-                      
-                      {/* Tags */}
-                      <div className="flex flex-wrap gap-1">
-                        {content.tags.slice(0, 3).map((tag) => (
-                          <Badge key={tag} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      {/* Target Audience */}
-                      <div className="space-y-2">
-                        <div className="text-sm font-medium">Target Audience:</div>
-                        <div className="flex flex-wrap gap-1">
-                          {content.targetAudience.map((audience) => (
-                            <Badge key={audience} className={getAudienceColor(audience)}>
-                              {audience}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Cross References */}
-                      {content.crossReferences.length > 0 && (
-                        <div className="space-y-2">
-                          <div className="text-sm font-medium flex items-center gap-1">
-                            <Link2 className="h-3 w-3" />
-                            References ({content.crossReferences.length})
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Contradictions */}
-                      {content.contradictions.length > 0 && (
-                        <div className="space-y-2">
-                          <div className="text-sm font-medium flex items-center gap-1 text-red-600">
-                            <AlertTriangle className="h-3 w-3" />
-                            Contradictions ({content.contradictions.length})
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="flex items-center justify-between pt-2 border-t">
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Clock className="h-3 w-3" />
-                          Updated {content.lastUpdated}
-                        </div>
-                        <Button variant="outline" size="sm">View</Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="materials" className="space-y-4">
-              <MaterialsManagementDashboard />
-            </TabsContent>
-
-            <TabsContent value="categories" className="space-y-4">
-              <CategoryManager 
-                onUpdateCategory={handleUpdateCategory}
-                onDeleteCategory={handleDeleteCategory}
-                isUpdating={isUpdating}
-                isDeleting={isDeleting}
-              />
-            </TabsContent>
-
-            <TabsContent value="cross-references" className="space-y-4">
-              <div className="text-center py-8">
-                <Link2 className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 text-lg font-semibold">Cross-Reference System</h3>
-                <p className="text-muted-foreground">
-                  Automatic content linking and relationship mapping
-                </p>
-                <Button className="mt-4">View Connections</Button>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="contradictions" className="space-y-4">
-              <div className="text-center py-8">
-                <AlertTriangle className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 text-lg font-semibold">Content Contradictions</h3>
-                <p className="text-muted-foreground">
-                  System-detected conflicts between content pieces
-                </p>
-                <Button className="mt-4">Review Contradictions</Button>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="management" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Content Upload</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Content Type</label>
-                      <select className="w-full px-3 py-2 border border-input rounded-md">
-                        <option value="">Select type...</option>
-                        <option value="text">Text Document</option>
-                        <option value="audio">Audio File</option>
-                        <option value="video">Video Content</option>
-                        <option value="diagram">Diagram/Image</option>
-                      </select>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Category</label>
-                      <select className="w-full px-3 py-2 border border-input rounded-md">
-                        <option value="">Select category...</option>
-                        <option value="strategic">Strategic</option>
-                        <option value="operational">Operational</option>
-                        <option value="technical">Technical</option>
-                        <option value="training">Training</option>
-                      </select>
-                    </div>
-                    <Button className="w-full">Upload Content</Button>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Auto-Update Features</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Cross-referencing</span>
-                        <Badge variant="default">Active</Badge>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Contradiction detection</span>
-                        <Badge variant="default">Active</Badge>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Content updates</span>
-                        <Badge variant="secondary">Manual</Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
 
       {/* Add Material Modal */}
       <AddMaterialModal 
         open={showAddMaterialModal}
         onOpenChange={setShowAddMaterialModal}
         onSuccess={handleMaterialSuccess}
+        folderId={currentView === 'materials' ? selectedGrandchildFolder?._id : currentFolderId || undefined}
       />
+
+      {/* Create Folder Modal */}
+      <CreateFolderModal
+        open={showCreateFolderModal}
+        onOpenChange={setShowCreateFolderModal}
+        onSuccess={handleFolderCreationSuccess}
+        parentFolder={currentView === 'children' ? currentFolderId : null}
+        folderType={folderType}
+      />
+
+      {/* Content Library */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              {(currentView === 'children' || currentView === 'materials') && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleFolderClick(null)}
+                  className="mr-2"
+                >
+                  ← Back
+                </Button>
+              )}
+              {currentView === 'materials'
+                ? `${selectedGrandchildFolder?.name} - Materials`
+                : currentView === 'children' 
+                  ? `${currentParentFolder?.name} Contents`
+                  : 'Content Library'
+              }
+            </CardTitle>
+            <CardDescription>
+              {currentView === 'materials'
+                ? `Materials in ${selectedGrandchildFolder?.fullPath} (${folderMaterials.length} items)`
+                : currentView === 'children'
+                  ? `Viewing contents of ${currentParentFolder?.name}`
+                  : 'Browse and manage knowledge base content'
+              }
+            </CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            {currentView === 'materials' && (
+              <Button
+                variant="outline"
+                onClick={() => setShowAddMaterialModal(true)}
+                className="gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                Add Material
+              </Button>
+            )}
+            {currentView === 'children' && (
+              <Button
+                variant="outline"
+                onClick={handleAddMaterial}
+                className="gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                Add Material
+              </Button>
+            )}
+            {currentView !== 'materials' && (
+              <Button
+                onClick={() => currentView === 'children' 
+                  ? handleCreateChildFolder()
+                  : setShowCreateFolderModal(true)
+                }
+                className="gap-2"
+              >
+                <FolderPlus className="h-4 w-4" />
+                {currentView === 'children' 
+                  ? `New ${currentParentFolder?.level === 0 ? 'Child' : 'Grandchild'} Folder`
+                  : 'New Parent Folder'
+                }
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {currentView === 'materials' ? (
+            // Materials Grid View
+            <div>
+              {folderMaterials.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {folderMaterials.map((material) => (
+                    <MaterialCard
+                      key={material._id}
+                      material={material}
+                      onView={handleMaterialView}
+                      onDownload={handleMaterialDownload}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <FileText className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No Materials Found</h3>
+                  <p className="text-muted-foreground mb-4">
+                    This folder doesn't contain any materials yet.
+                  </p>
+                  <Button
+                    onClick={() => setShowAddMaterialModal(true)}
+                    variant="outline"
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Add First Material
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            // Folders Table View
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Level</TableHead>
+                    <TableHead>Contents</TableHead>
+                    <TableHead>Created By</TableHead>
+                    <TableHead>Created At</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {currentView === 'children' 
+                    ? childFolders.length > 0 
+                      ? childFolders.map((folder) => renderFolderRow(folder))
+                      : (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center py-8">
+                            <div className="flex flex-col items-center gap-2">
+                              <Folder className="h-8 w-8 text-muted-foreground" />
+                              <p className="text-muted-foreground">No folders found</p>
+                              <Button
+                                onClick={handleCreateChildFolder}
+                                variant="outline"
+                                size="sm"
+                                className="mt-2"
+                              >
+                                Create {currentParentFolder?.level === 0 ? 'Child' : 'Grandchild'} Folder
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    : rootFolders?.map((folder) => renderFolderRow(folder))
+                  }
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

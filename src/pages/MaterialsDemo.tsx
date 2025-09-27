@@ -30,7 +30,7 @@ import { YouTubePlayer } from '@/components/materials/YouTubePlayer';
 import {
   useGetMaterialsQuery,
   useGetMaterialQuery,
-  useGetMaterialsByCategoryQuery,
+  useGetMaterialsByFolderQuery,
   useSearchMaterialsQuery,
   useGetMyMaterialsQuery,
 } from '@/services/materialsApi';
@@ -510,7 +510,7 @@ export const MaterialsDemo: React.FC = () => {
                     <span className="text-gray-600">Personal materials</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-indigo-700">useGetMaterialsByCategoryQuery</Badge>
+                    <Badge variant="outline" className="text-indigo-700">useGetMaterialsByFolderQuery</Badge>
                     <span className="text-gray-600">Available in dashboard</span>
                   </li>
                 </ul>

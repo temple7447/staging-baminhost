@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { authApi } from '../services/authApi';
 import { categoriesApi } from '../services/categoriesApi';
 import { materialsApi } from '../services/materialsApi';
+import { foldersApi } from '../services/foldersApi';
 import authReducer from './authSlice';
 
 export const store = configureStore({
@@ -11,6 +12,7 @@ export const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [categoriesApi.reducerPath]: categoriesApi.reducer,
     [materialsApi.reducerPath]: materialsApi.reducer,
+    [foldersApi.reducerPath]: foldersApi.reducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
@@ -18,7 +20,8 @@ export const store = configureStore({
     getDefaultMiddleware().concat(
       authApi.middleware,
       categoriesApi.middleware,
-      materialsApi.middleware
+      materialsApi.middleware,
+      foldersApi.middleware
     ),
 });
 

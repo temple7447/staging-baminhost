@@ -59,7 +59,7 @@ import {
   useCreateMaterialMutation,
   useUpdateMaterialMutation,
   useDeleteMaterialMutation,
-  useGetMaterialsByCategoryQuery,
+  useGetMaterialsByFolderQuery,
   useSearchMaterialsQuery,
   useGetMyMaterialsQuery,
   useUpdateMaterialViewMutation,
@@ -130,7 +130,7 @@ export const MaterialsManagementDashboard: React.FC<MaterialsManagementDashboard
     setQueryParams(prev => ({
       ...prev,
       search: debouncedSearch,
-      category: selectedCategory || undefined,
+      folder: selectedCategory || undefined,
       materialType: selectedType || undefined,
       page: 1, // Reset to first page when filtering
     }));
@@ -156,12 +156,12 @@ export const MaterialsManagementDashboard: React.FC<MaterialsManagementDashboard
     skip: !selectedMaterialId
   });
 
-  // 3. useGetMaterialsByCategoryQuery - Get materials by category
+  // 3. useGetMaterialsByFolderQuery - Get materials by folder
   const {
-    data: categoryMaterialsResponse,
-    isLoading: isLoadingCategoryMaterials
-  } = useGetMaterialsByCategoryQuery(selectedCategory, {
-    skip: !selectedCategory || activeTab !== 'by-category'
+    data: folderMaterialsResponse,
+    isLoading: isLoadingFolderMaterials
+  } = useGetMaterialsByFolderQuery(selectedCategory, {
+    skip: !selectedCategory || activeTab !== 'by-folder'
   });
 
   // 4. useSearchMaterialsQuery - Search materials
@@ -202,7 +202,7 @@ export const MaterialsManagementDashboard: React.FC<MaterialsManagementDashboard
 
   const materials = materialsResponse?.data || [];
   const myMaterials = myMaterialsResponse?.data || [];
-  const categoryMaterials = categoryMaterialsResponse?.data || [];
+  const folderMaterials = folderMaterialsResponse?.data || [];
   const searchResults = searchResultsResponse?.data || [];
   const categories = categoriesResponse?.data || [];
   const selectedMaterial = selectedMaterialResponse?.data;
@@ -652,36 +652,36 @@ export const MaterialsManagementDashboard: React.FC<MaterialsManagementDashboard
           </Card>
         </TabsContent>
 
-        {/* By Category Tab - useGetMaterialsByCategoryQuery */}
-        <TabsContent value="by-category" className="space-y-4">
+        {/* By Folder Tab - useGetMaterialsByFolderQuery */}
+        <TabsContent value="by-folder" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Materials by Category (useGetMaterialsByCategoryQuery)</CardTitle>
+              <CardTitle>Materials by Folder (useGetMaterialsByFolderQuery)</CardTitle>
               <CardDescription>
-                Demonstrates useGetMaterialsByCategoryQuery with selected category: {selectedCategory || 'None selected'}
+                Demonstrates useGetMaterialsByFolderQuery with selected folder: {selectedCategory || 'None selected'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {!selectedCategory ? (
                 <div className="text-center py-8">
                   <FolderOpen className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Select a category</h3>
-                  <p className="text-muted-foreground mb-4">Choose a category from the filter above to see materials in that category.</p>
+                  <h3 className="text-lg font-semibold mb-2">Select a folder</h3>
+                  <p className="text-muted-foreground mb-4">Choose a folder from the filter above to see materials in that folder.</p>
                 </div>
-              ) : isLoadingCategoryMaterials ? (
+              ) : isLoadingFolderMaterials ? (
                 <div className="text-center py-8">
                   <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                  <p>Loading category materials...</p>
+                  <p>Loading folder materials...</p>
                 </div>
-              ) : categoryMaterials.length === 0 ? (
+              ) : folderMaterials.length === 0 ? (
                 <div className="text-center py-8">
                   <FolderOpen className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No materials in this category</h3>
-                  <p className="text-muted-foreground">This category doesn't have any materials yet.</p>
+                  <h3 className="text-lg font-semibold mb-2">No materials in this folder</h3>
+                  <p className="text-muted-foreground">This folder doesn't have any materials yet.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {categoryMaterials.map((material) => renderMaterialCard(material))}
+                  {folderMaterials.map((material) => renderMaterialCard(material))}
                 </div>
               )}
             </CardContent>
@@ -754,7 +754,7 @@ export const MaterialsManagementDashboard: React.FC<MaterialsManagementDashboard
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between p-2 bg-purple-50 rounded">
-                      <span className="text-sm">useGetMaterialsByCategoryQuery</span>
+                      <span className="text-sm">useGetMaterialsByFolderQuery</span>
                       <Badge variant="outline" className="text-purple-700">
                         {selectedCategory ? 'Active' : 'Inactive'}
                       </Badge>
