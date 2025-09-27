@@ -11,7 +11,7 @@ interface DashboardHeaderProps {
 export const DashboardHeader = ({ onMenuClick, sidebarOpen }: DashboardHeaderProps) => {
   const { user, logout } = useAuth();
   return (
-    <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+    <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50 md:ml-64 transition-all duration-300">
       <div className="flex items-center justify-between h-full px-4 md:px-6">
         <div className="flex items-center space-x-2 md:space-x-4">
           {/* Mobile Menu Button */}
