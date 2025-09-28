@@ -191,6 +191,50 @@ export const PERMISSIONS: Record<string, Permission> = {
     category: 'business'
   },
 
+  // Strategic Hiring Permissions
+  'view_strategic_hiring': {
+    id: 'view_strategic_hiring',
+    name: 'View Strategic Hiring',
+    description: 'Access to strategic hiring dashboard and overview',
+    category: 'business'
+  },
+  'view_hiring_triggers': {
+    id: 'view_hiring_triggers',
+    name: 'View Hiring Triggers',
+    description: 'Monitor hiring triggers and productivity analysis',
+    category: 'business'
+  },
+  'manage_org_chart': {
+    id: 'manage_org_chart',
+    name: 'Manage Organization Chart',
+    description: 'Create and modify organizational structure',
+    category: 'business'
+  },
+  'create_job_descriptions': {
+    id: 'create_job_descriptions',
+    name: 'Create Job Descriptions',
+    description: 'Generate and publish job descriptions',
+    category: 'business'
+  },
+  'manage_candidates': {
+    id: 'manage_candidates',
+    name: 'Manage Candidates',
+    description: 'Track and manage candidate applications',
+    category: 'business'
+  },
+  'view_hiring_metrics': {
+    id: 'view_hiring_metrics',
+    name: 'View Hiring Metrics',
+    description: 'Access hiring analytics and performance data',
+    category: 'business'
+  },
+  'conduct_halo_research': {
+    id: 'conduct_halo_research',
+    name: 'Conduct Halo Research',
+    description: 'Perform market research for strategic hiring',
+    category: 'business'
+  },
+
   // System Administration
   'manage_users': {
     id: 'manage_users',
@@ -249,7 +293,15 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
       'view_payment_history',
       'manage_reports',
       'view_all_data',
-      'manage_users'
+      'manage_users',
+      // Strategic Hiring
+      'view_strategic_hiring',
+      'view_hiring_triggers',
+      'manage_org_chart',
+      'create_job_descriptions',
+      'manage_candidates',
+      'view_hiring_metrics',
+      'conduct_halo_research'
     ]
   },
 
@@ -275,7 +327,12 @@ permissions: [
       'view_equipment',
       'manage_equipment',
       'manage_commissions',
-      'view_payment_history'
+      'view_payment_history',
+      // Strategic Hiring (limited)
+      'view_strategic_hiring',
+      'view_hiring_triggers',
+      'manage_candidates',
+      'conduct_halo_research'
     ]
   },
 
@@ -360,6 +417,9 @@ export const NAVIGATION_PERMISSIONS: Record<string, string[]> = {
   'filling-station': ['view_filling_station'],
   'equipment': ['view_equipment'],
   'personal-portfolios': ['view_personal_portfolios'],
+  // Strategic Hiring Navigation
+  'strategic-hiring-planner': ['view_strategic_hiring', 'view_hiring_triggers'],
+  'candidate-management': ['view_strategic_hiring', 'manage_candidates'],
 'reports': ['view_reports'],
   'transactions': ['view_all_data'],
   'theme-showcase': ['view_overview'], // Available to everyone who can view overview

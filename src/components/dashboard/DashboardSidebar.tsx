@@ -15,7 +15,9 @@ import {
   X,
   LogOut,
   ListChecks,
-  DollarSign
+  DollarSign,
+  UserCheck,
+  TrendingDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -93,6 +95,23 @@ const sidebarItems: SidebarItem[] = [
     icon: Users,
     category: 'system',
     requiredPermissions: ['view_contacts']
+  },
+  // Strategic Hiring - For Owner/Manager roles
+  {
+    id: "strategic-hiring-planner",
+    label: "Strategic Hiring",
+    icon: TrendingDown,
+    category: 'business',
+    requiredPermissions: ['view_strategic_hiring', 'view_hiring_triggers'],
+    isPremium: true
+  },
+  {
+    id: "candidate-management",
+    label: "Candidates",
+    icon: UserCheck,
+    category: 'business',
+    requiredPermissions: ['view_strategic_hiring', 'manage_candidates'],
+    isPremium: true
   },
   {
     id: "people",

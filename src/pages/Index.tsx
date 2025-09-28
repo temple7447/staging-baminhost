@@ -23,6 +23,8 @@ import { PortfolioDashboard, PersonalLifePortfolios } from "@/components/portfol
 import { SplitTracker } from "@/components/budget/SplitTracker";
 import { GoalsDashboard } from "@/components/goals/GoalsDashboard";
 import { Big5Dashboard } from "@/components/big5/Big5Dashboard";
+import StrategicHiringPlanner from "@/components/hiring/StrategicHiringPlanner";
+import CandidateManagement from "@/components/hiring/CandidateManagement";
 import { AdminPeople } from "@/components/dashboard/AdminPeople";
 import { SuperAdminTransactions } from "@/components/dashboard/SuperAdminTransactions";
 
@@ -163,6 +165,26 @@ const Index = () => {
             showUpgradePrompt={false}
           >
             <Big5Dashboard />
+          </ProtectedComponent>
+        );
+      case "strategic-hiring-planner":
+        return (
+          <ProtectedComponent 
+            requiredPermissions={['view_strategic_hiring', 'view_hiring_triggers']}
+            feature="Strategic Hiring Planner"
+            showUpgradePrompt={false}
+          >
+            <StrategicHiringPlanner />
+          </ProtectedComponent>
+        );
+      case "candidate-management":
+        return (
+          <ProtectedComponent 
+            requiredPermissions={['view_strategic_hiring', 'manage_candidates']}
+            feature="Candidate Management"
+            showUpgradePrompt={false}
+          >
+            <CandidateManagement />
           </ProtectedComponent>
         );
       case "contacts":
