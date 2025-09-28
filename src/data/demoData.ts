@@ -93,7 +93,7 @@ export interface LibraryContent {
   title: string;
   type: 'text' | 'audio' | 'video' | 'diagram';
   category: 'strategic' | 'operational' | 'technical' | 'training';
-  targetAudience: ('owner' | 'manager' | 'vendor' | 'customer')[];
+  targetAudience: ('super_admin' | 'admin' | 'manager' | 'vendor' | 'customer')[];
   content: string;
   tags: string[];
   crossReferences: string[];

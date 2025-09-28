@@ -3,10 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LIBRARY_CONTENT } from "@/data/demoData";
 import { useAuth } from "@/contexts/AuthContext";
-import { CategoryManager } from "../library/CategoryManager";
 import { 
   BookOpen, 
   FileText, 
@@ -78,7 +76,7 @@ const iconComponents: Record<string, React.ElementType> = {
 };
 
 export const LibraryDashboard = () => {
-  const { user } = useAuth();
+  const { user }:any = useAuth();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
@@ -108,7 +106,7 @@ export const LibraryDashboard = () => {
   // Filter content based on user role and access
   const getAccessibleContent = () => {
     return library.filter(content => 
-      content.targetAudience.includes(user?.role || 'owner')
+      content.targetAudience.includes(user?.role)
     );
   };
 
@@ -264,26 +262,7 @@ export const LibraryDashboard = () => {
     console.log('Material clicked:', material);
   };
 
-  // Handle material view
-  const handleMaterialView = (material: any) => {
-    toast({
-      title: "Viewing Material",
-      description: `Opening ${material.title}`,
-    });
-    // Add logic to view material details
-    console.log('Viewing material:', material);
-  };
-
-  // Handle material download
-  const handleMaterialDownload = (material: any) => {
-    toast({
-      title: "Download Started",
-      description: `Downloading ${material.title}`,
-    });
-    // Add logic to download material
-    console.log('Downloading material:', material);
-  };
-
+  
   // Statistics - combine demo data with real materials
   const realMaterials = materialsResponse?.data || [];
   const totalContent = accessibleContent.length + realMaterials.length;

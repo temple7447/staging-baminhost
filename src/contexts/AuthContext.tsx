@@ -44,7 +44,7 @@ const setStoredToken = (token: string | null): void => {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [token, setToken] = useState<string | null>(() => getStoredToken());
 
   // Initialize auth state from localStorage
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (storedToken && storedUser) {
       try {
-        const parsedUser = JSON.parse(storedUser) as User;
+        const parsedUser = JSON.parse(storedUser) as any;
         if (parsedUser.id && parsedUser.role) {
           setToken(storedToken);
           setUser(parsedUser);
