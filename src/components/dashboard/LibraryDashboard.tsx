@@ -86,15 +86,12 @@ export const LibraryDashboard = () => {
   const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
   const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("browse");
   const [currentView, setCurrentView] = useState<'root' | 'children' | 'materials'>('root');
   const [folderType, setFolderType] = useState<'parent' | 'child'>('parent');
   const [currentParentFolder, setCurrentParentFolder] = useState<any | null>(null);
   const [selectedGrandchildFolder, setSelectedGrandchildFolder] = useState<any | null>(null);
   const [folderMaterials, setFolderMaterials] = useState<any[]>([]);
 
-  const [updateCategory, { isLoading: isUpdating }] = useUpdateCategoryMutation();
-  const [deleteCategory, { isLoading: isDeleting }] = useDeleteCategoryMutation();
   const [deleteFolder] = useDeleteFolderMutation();
   const { data: materialsResponse, refetch: refetchMaterials } = useGetMaterialsQuery();
   const { data: rootFoldersResponse, refetch: refetchFolders, isLoading: isRootFoldersLoading } = useGetRootFoldersQuery();
@@ -137,58 +134,10 @@ export const LibraryDashboard = () => {
     }
   };
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'strategic': return 'bg-purple-100 text-purple-800';
-      case 'operational': return 'bg-blue-100 text-blue-800';
-      case 'technical': return 'bg-green-100 text-green-800';
-      case 'training': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
+ 
 
-  const getAudienceColor = (audience: string) => {
-    switch (audience) {
-      case 'super_admin': return 'bg-red-100 text-red-800';
-      case 'admin': return 'bg-purple-100 text-purple-800';
-      case 'manager': return 'bg-blue-100 text-blue-800';
-      case 'vendor': return 'bg-green-100 text-green-800';
-      case 'customer': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
 
-  const handleUpdateCategory = async (id: string, updates: any) => {
-    try {
-      await updateCategory({ id, ...updates }).unwrap();
-      toast({
-        title: "Category updated",
-        description: "The category has been updated successfully.",
-      });
-    } catch (error) {
-      toast({
-        title: "Update failed",
-        description: "Failed to update category. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
-  const handleDeleteCategory = async (id: string) => {
-    try {
-      await deleteCategory(id).unwrap();
-      toast({
-        title: "Category deleted",
-        description: "The category has been deleted successfully.",
-      });
-    } catch (error) {
-      toast({
-        title: "Delete failed",
-        description: "Failed to delete category. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleMaterialSuccess = () => {
     refetchMaterials();
