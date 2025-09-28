@@ -12,7 +12,7 @@ export const getFolderDeletionRequirements = (folder: Folder): FolderDeletionReq
         folderType: 'parent',
         level: 0,
         requirements: [
-          'Must delete all descendants (children + grandchildren) before deleting',
+          'Must delete all child folders before deleting',
           `Currently has ${subfolderCount} child folder(s)`,
           subfolderCount > 0 ? 'Delete all child folders first' : 'Folder is empty and can be deleted'
         ].filter(Boolean),
@@ -21,23 +21,10 @@ export const getFolderDeletionRequirements = (folder: Folder): FolderDeletionReq
       };
 
     case FOLDER_LEVELS.CHILD: // Level 1 - Child
+      const hasProtectedMaterials = isProtected && materialCount > 0;
       return {
         folderType: 'child',
         level: 1,
-        requirements: [
-          'Must delete all grandchild folders before deleting',
-          `Currently has ${subfolderCount} grandchild folder(s)`,
-          subfolderCount > 0 ? 'Delete all grandchild folders first' : 'Folder is empty and can be deleted'
-        ].filter(Boolean),
-        canDelete: subfolderCount === 0,
-        mustDeleteFirst: subfolderCount > 0 ? ['All grandchild folders'] : undefined
-      };
-
-    case FOLDER_LEVELS.GRANDCHILD: // Level 2 - Grandchild
-      const hasProtectedMaterials = isProtected && materialCount > 0;
-      return {
-        folderType: 'grandchild',
-        level: 2,
         requirements: [
           'Can contain materials (as long as they\'re not protected)',
           `Currently has ${materialCount} material(s)`,
@@ -59,11 +46,11 @@ export const getFolderDeletionRequirements = (folder: Folder): FolderDeletionReq
 };
 
 /**
- * Sort folders by deletion order (grandchildren -> children -> parents)
+ * Sort folders by deletion order (children -> parents)
  */
 export const sortFoldersForDeletion = (folders: Folder[]): Folder[] => {
   return [...folders].sort((a, b) => {
-    // Sort by level descending (2 -> 1 -> 0)
+    // Sort by level descending (1 -> 0)
     if (a.level !== b.level) {
       return b.level - a.level;
     }
@@ -77,7 +64,6 @@ export const sortFoldersForDeletion = (folders: Folder[]): Folder[] => {
  */
 export const groupFoldersByDeletionLevel = (folders: Folder[]) => {
   const grouped = {
-    grandchildren: folders.filter(f => f.level === FOLDER_LEVELS.GRANDCHILD),
     children: folders.filter(f => f.level === FOLDER_LEVELS.CHILD),
     parents: folders.filter(f => f.level === FOLDER_LEVELS.PARENT)
   };
@@ -85,7 +71,6 @@ export const groupFoldersByDeletionLevel = (folders: Folder[]) => {
   return {
     ...grouped,
     deletionOrder: [
-      ...grouped.grandchildren,
       ...grouped.children, 
       ...grouped.parents
     ]
@@ -108,8 +93,8 @@ export const canFolderBeDeleted = (
   // Find specific folders blocking deletion
   const blockedBy: string[] = [];
   
-  if (folder.level < FOLDER_LEVELS.GRANDCHILD) {
-    // Find child/grandchild folders
+  if (folder.level < FOLDER_LEVELS.CHILD) {
+    // Find child folders
     const childFolders = allFolders.filter(f => f.parentFolder === folder._id);
     blockedBy.push(...childFolders.map(f => f.name));
   }
@@ -129,24 +114,17 @@ export const getDeletionOrderExplanation = () => {
     title: '🗑️ Folder Deletion Order',
     steps: [
       {
-        level: 2,
+        level: 1,
         emoji: '📁',
-        title: 'Grandchild folders (Level 2)',
-        description: 'Delete first - these are the deepest level folders that can contain materials',
-        canContain: 'Materials (if not protected)'
-      },
-      {
-        level: 1, 
-        emoji: '📋',
         title: 'Child folders (Level 1)',
-        description: 'Delete second - must be empty of grandchild folders',
-        canContain: 'Only grandchild folders'
+        description: 'Delete first - these folders can contain materials',
+        canContain: 'Materials (if not protected)'
       },
       {
         level: 0,
         emoji: '💼', 
         title: 'Parent folders (Level 0)',
-        description: 'Delete last - must be empty of all descendants',
+        description: 'Delete second - must be empty of child folders',
         canContain: 'Only child folders'
       }
     ]

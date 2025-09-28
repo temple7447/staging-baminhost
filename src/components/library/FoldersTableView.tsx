@@ -74,7 +74,7 @@ interface TreeFolder {
     name: string;
     level: number;
   }>;
-  folderType: 'parent' | 'child' | 'grandchild';
+  folderType: 'parent' | 'child';
   canHaveSubfolders: boolean;
   canHaveMaterials: boolean;
   subfolders: TreeFolder[];
@@ -106,7 +106,6 @@ const FOLDER_LEVEL_COLORS = {
 const FOLDER_TYPE_NAMES = {
   'parent': 'Parent',
   'child': 'Child', 
-  'grandchild': 'Grandchild'
 };
 
 const formatFileSize = (bytes: number): string => {
@@ -365,7 +364,6 @@ export const FoldersTableView: React.FC<FoldersTableViewProps> = ({
                 <SelectItem value="">All Types</SelectItem>
                 <SelectItem value="parent">Parent Folders</SelectItem>
                 <SelectItem value="child">Child Folders</SelectItem>
-                <SelectItem value="grandchild">Grandchild Folders</SelectItem>
               </SelectContent>
             </Select>
 

@@ -127,31 +127,26 @@ export const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
   
   const rootFolders = rootFoldersResponse?.data || [];
   
-  // Get all grandchild folders (level 2) for material upload
-  const getGrandchildFolders = () => {
-    const grandchildFolders: any[] = [];
+  // Get all child folders (level 1) for material upload
+  const getChildFolders = () => {
+    const childFolders: any[] = [];
     rootFolders.forEach(rootFolder => {
       if (rootFolder.subfolders) {
         rootFolder.subfolders.forEach((childFolder: any) => {
-          if (childFolder.subfolders) {
-            childFolder.subfolders.forEach((grandchildFolder: any) => {
-              if (grandchildFolder.level === 2) {
-                grandchildFolders.push({
-                  ...grandchildFolder,
-                  fullPath: `${rootFolder.name}/${childFolder.name}/${grandchildFolder.name}`
-                });
-              }
+          if (childFolder.level === 1) {
+            childFolders.push({
+              ...childFolder,
+              fullPath: `${rootFolder.name}/${childFolder.name}`
             });
           }
         });
       }
     });
-    return grandchildFolders;
+    return childFolders;
   };
   
-  const grandchildFolders = getGrandchildFolders();
+  const childFolders = getChildFolders();
 
-  console.log('Available grandchild folders:', grandchildFolders, folderId);
 
 
   const [formData, setFormData] = useState<any>({
@@ -274,12 +269,12 @@ export const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
       return false;
     }
 
-    // Validate that selected folder is a grandchild folder (level 2)
-    const selectedFolder = grandchildFolders.find(f => f._id === formData.folder);
+    // Validate that selected folder is a child folder (level 1)
+    const selectedFolder = childFolders.find(f => f._id === formData.folder);
     if (!selectedFolder) {
       toast({
         title: "Validation Error",
-        description: "Please select a valid grandchild folder (level 2) for materials",
+        description: "Please select a valid child folder (level 1) for materials",
         variant: "destructive",
       });
       return false;
@@ -380,7 +375,7 @@ export const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
             {/* Folder Selection */}
             <div className="space-y-2">
               <Label htmlFor="folder">Target Folder *</Label>
-              {grandchildFolders.length > 0 ? (
+              {childFolders.length > 0 ? (
                 <Select 
                   value={formData.folder} 
                   onValueChange={(value) => handleInputChange('folder', value)}
@@ -389,7 +384,7 @@ export const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
                     <SelectValue placeholder="Select a folder for this material" />
                   </SelectTrigger>
                   <SelectContent>
-                    {grandchildFolders.map((folder) => (
+                    {childFolders.map((folder) => (
                       <SelectItem key={folder._id} value={folder._id}>
                         {folder.fullPath}
                       </SelectItem>
@@ -399,13 +394,13 @@ export const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
               ) : (
                 <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
                   <p className="text-sm text-yellow-800">
-                    No grandchild folders available. Materials can only be uploaded to level 2 folders. 
-                    Please create the folder structure: Parent → Child → Grandchild first.
+                    No child folders available. Materials can only be uploaded to child folders. 
+                    Please create a parent folder first, then create a child folder.
                   </p>
                 </div>
               )}
               <p className="text-xs text-gray-500">
-                Materials can only be uploaded to level 2 folders (grandchild folders)
+                Materials can only be uploaded to child folders
               </p>
             </div>
           </div>

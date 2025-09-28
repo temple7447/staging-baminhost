@@ -60,13 +60,11 @@ const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 const FOLDER_LEVEL_COLORS = {
   0: 'bg-blue-100 text-blue-800',    // Parent folders
   1: 'bg-green-100 text-green-800',  // Child folders  
-  2: 'bg-orange-100 text-orange-800', // Grandchild folders
 };
 
 const FOLDER_TYPE_NAMES = {
   'parent': 'Parent',
   'child': 'Child', 
-  'grandchild': 'Grandchild'
 };
 
 export const FoldersList: React.FC<FoldersListProps> = ({
@@ -286,7 +284,6 @@ export const FoldersList: React.FC<FoldersListProps> = ({
                 <SelectItem value="">All Types</SelectItem>
                 <SelectItem value="parent">Parent Folders</SelectItem>
                 <SelectItem value="child">Child Folders</SelectItem>
-                <SelectItem value="grandchild">Grandchild Folders</SelectItem>
               </SelectContent>
             </Select>
 

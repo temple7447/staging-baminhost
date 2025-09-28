@@ -129,7 +129,7 @@ export class FolderDeletionService {
       folderType: folder.folderType,
       step: index + 1,
       totalSteps: sortedFolders.length,
-      emoji: folder.level === 2 ? '📁' : folder.level === 1 ? '📋' : '💼',
+      emoji: folder.level === 1 ? '📁' : '💼',
       description: `Delete ${folder.folderType} folder "${folder.name}"`
     }));
   }
@@ -175,23 +175,16 @@ export class FolderDeletionService {
       steps: [
         {
           order: 1,
-          level: 2,
-          title: "📁 Grandchild Folders (Level 2)",
-          description: "Delete deepest level folders first",
-          rules: ["Can contain materials if not protected", "No subfolders to worry about"]
-        },
-        {
-          order: 2, 
           level: 1,
-          title: "📋 Child Folders (Level 1)",
-          description: "Delete middle level folders second",
-          rules: ["Must be empty of grandchild folders", "Cannot contain materials"]
+          title: "📁 Child Folders (Level 1)",
+          description: "Delete child folders first",
+          rules: ["Can contain materials if not protected", "No subfolders allowed"]
         },
         {
-          order: 3,
+          order: 2,
           level: 0, 
           title: "💼 Parent Folders (Level 0)",
-          description: "Delete root level folders last",
+          description: "Delete parent folders second",
           rules: ["Must be empty of all child folders", "Cannot contain materials"]
         }
       ],

@@ -5,7 +5,7 @@ export interface Folder {
   slug: string; // Auto-generated URL-friendly slug
   description?: string;
   parentFolder?: string | null; // null for root folders
-  level: number; // 0 = Parent, 1 = Child, 2 = Grandchild
+  level: number; // 0 = Parent, 1 = Child (can now store materials)
   fullPath: string; // Automatic path like "Sales & Marketing/Digital Marketing/Social Media"
   icon: string;
   color: string;
@@ -18,9 +18,9 @@ export interface Folder {
   allowedRoles: string[];
   isProtected: boolean;
   allowMaterials: boolean;
-  folderType: 'parent' | 'child' | 'grandchild'; // Virtual field based on level
-  canHaveSubfolders: boolean; // true for levels 0 and 1, false for level 2
-  canHaveMaterials: boolean; // false for levels 0 and 1, true for level 2
+  folderType: 'parent' | 'child'; // Virtual field based on level
+  canHaveSubfolders: boolean; // true for level 0, false for level 1
+  canHaveMaterials: boolean; // false for level 0, true for level 1
   depth?: number; // Used in tree view
   folderPath?: { _id: string; name: string; slug: string; level: number }[]; // Breadcrumb path
   subfolders?: Folder[]; // Nested subfolders in tree view
@@ -90,11 +90,6 @@ export interface CreateChildFolderRequest extends BaseFolderRequest {
   parentFolder: string; // Required, must reference a Level 0 folder
 }
 
-// Grandchild folder creation (Level 2) - parentFolder required (must be Level 1)
-export interface CreateGrandchildFolderRequest extends BaseFolderRequest {
-  parentFolder: string; // Required, must reference a Level 1 folder
-}
-
 // Legacy generic create folder request - for backward compatibility
 export interface CreateFolderRequest extends BaseFolderRequest {
   parentFolder?: string; // Optional for backward compatibility
@@ -146,7 +141,6 @@ export interface FolderStats {
     totalMaterials: number;
     parentFolders: number; // Level 0
     childFolders: number;  // Level 1
-    grandchildFolders: number; // Level 2
   };
   levelDistribution: { _id: number; count: number }[];
   topFolders: {
@@ -160,36 +154,34 @@ export interface FolderStats {
 // Folder hierarchy levels
 export const FOLDER_LEVELS = {
   PARENT: 0,     // Root level containers
-  CHILD: 1,      // Sub-categories
-  GRANDCHILD: 2  // Final level where materials are stored
+  CHILD: 1,      // Sub-categories (can now store materials)
 } as const;
 
 export type FolderLevel = typeof FOLDER_LEVELS[keyof typeof FOLDER_LEVELS];
 
 // Helper functions for folder capabilities
 export const getFolderCapabilities = (level: number) => ({
-  canHaveSubfolders: level < 2, // Only levels 0 and 1 can have subfolders
-  canHaveMaterials: level === 2  // Only level 2 can have materials
+  canHaveSubfolders: level < 1, // Only level 0 can have subfolders
+  canHaveMaterials: level === 1  // Only level 1 can have materials
 });
 
-export const getMaxLevel = () => FOLDER_LEVELS.GRANDCHILD;
+export const getMaxLevel = () => FOLDER_LEVELS.CHILD;
 
 export const getLevelName = (level: number): string => {
   switch (level) {
     case 0: return 'Parent';
     case 1: return 'Child';
-    case 2: return 'Grandchild';
     default: return 'Unknown';
   }
 };
 
 // Validation helpers
 export const canCreateSubfolder = (parentLevel: number): boolean => {
-  return parentLevel < 2; // Can create subfolders in levels 0 and 1
+  return parentLevel < 1; // Can only create subfolders in level 0
 };
 
 export const canAddMaterials = (folderLevel: number): boolean => {
-  return folderLevel === 2; // Can only add materials to level 2 (grandchild) folders
+  return folderLevel === 1; // Can only add materials to level 1 (child) folders
 };
 
 // Available folder icons (can be extended)
@@ -284,7 +276,7 @@ export interface BulkDeletionResponse {
 }
 
 export interface FolderDeletionRequirements {
-  folderType: 'parent' | 'child' | 'grandchild';
+  folderType: 'parent' | 'child';
   level: number;
   requirements: string[];
   canDelete: boolean;

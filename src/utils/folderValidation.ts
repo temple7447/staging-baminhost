@@ -28,11 +28,11 @@ export const validateFolderCreation = (parentFolder?: Folder | null): Validation
   // Determine the new folder's level
   const newLevel = parentFolder.level + 1;
 
-  // Check if we're exceeding the maximum levels (0, 1, 2)
-  if (newLevel > FOLDER_LEVELS.GRANDCHILD) {
+  // Check if we're exceeding the maximum levels (0, 1)
+  if (newLevel > FOLDER_LEVELS.CHILD) {
     return {
       isValid: false,
-      message: 'Maximum folder depth reached. Cannot create more than 3 levels of folders.',
+      message: 'Maximum folder depth reached. Cannot create more than 2 levels of folders.',
     };
   }
 
@@ -47,7 +47,7 @@ export const validateMaterialUpload = (folder: Folder): ValidationResult => {
   if (!folder.canHaveMaterials) {
     return {
       isValid: false,
-      message: `Materials can only be uploaded to the deepest level folders. Please select a "${getLevelName(FOLDER_LEVELS.GRANDCHILD)}" folder.`,
+      message: `Materials can only be uploaded to child folders. Please select a "${getLevelName(FOLDER_LEVELS.CHILD)}" folder.`,
     };
   }
 
@@ -66,9 +66,7 @@ export const getFolderCreationMessage = (parentFolder?: Folder | null): string =
   
   switch (newLevel) {
     case FOLDER_LEVELS.CHILD:
-      return `Create a sub-category under "${parentFolder.name}"`;
-    case FOLDER_LEVELS.GRANDCHILD:
-      return `Create a material folder under "${parentFolder.name}" (final level)`;
+      return `Create a child folder under "${parentFolder.name}" (can contain materials)`;
     default:
       return 'Cannot create folder at this level';
   }
@@ -78,11 +76,9 @@ export const getFolderCreationMessage = (parentFolder?: Folder | null): string =
 export const getLevelDescription = (level: number): string => {
   switch (level) {
     case FOLDER_LEVELS.PARENT:
-      return 'Root-level container (can have sub-categories, no materials)';
+      return 'Root-level container (can have child folders, no materials)';
     case FOLDER_LEVELS.CHILD:
-      return 'Sub-category (can have material folders, no materials)';
-    case FOLDER_LEVELS.GRANDCHILD:
-      return 'Material folder (can contain materials, no subfolders)';
+      return 'Child folder (can contain materials, no subfolders)';
     default:
       return 'Unknown level';
   }
@@ -95,8 +91,6 @@ export const getLevelName = (level: number): string => {
       return 'Parent';
     case FOLDER_LEVELS.CHILD:
       return 'Child';
-    case FOLDER_LEVELS.GRANDCHILD:
-      return 'Grandchild';
     default:
       return 'Unknown';
   }
@@ -120,8 +114,6 @@ export const getSuggestedFolderIcon = (level: number): string => {
     case FOLDER_LEVELS.PARENT:
       return 'briefcase'; // Business/category icon
     case FOLDER_LEVELS.CHILD:
-      return 'folder'; // Standard folder icon
-    case FOLDER_LEVELS.GRANDCHILD:
       return 'fileText'; // Document/material icon
     default:
       return 'folder';
@@ -134,9 +126,7 @@ export const getSuggestedFolderColor = (level: number): string => {
     case FOLDER_LEVELS.PARENT:
       return '#007bff'; // Blue for root containers
     case FOLDER_LEVELS.CHILD:
-      return '#28a745'; // Green for sub-categories
-    case FOLDER_LEVELS.GRANDCHILD:
-      return '#fd7e14'; // Orange for material folders
+      return '#28a745'; // Green for child folders (can contain materials)
     default:
       return '#6c757d'; // Gray as fallback
   }

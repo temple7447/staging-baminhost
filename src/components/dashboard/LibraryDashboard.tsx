@@ -57,6 +57,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
+import { Loader2 } from 'lucide-react';
 
 const iconComponents: Record<string, React.ElementType> = {
   folder: Folder,
@@ -87,31 +88,25 @@ export const LibraryDashboard = () => {
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("browse");
   const [currentView, setCurrentView] = useState<'root' | 'children' | 'materials'>('root');
-  const [currentParentFolder, setCurrentParentFolder] = useState<any>(null);
-  const [folderType, setFolderType] = useState<'parent' | 'child' | 'grandchild'>('parent');
-  const [selectedGrandchildFolder, setSelectedGrandchildFolder] = useState<any>(null);
+  const [folderType, setFolderType] = useState<'parent' | 'child'>('parent');
+  const [currentParentFolder, setCurrentParentFolder] = useState<any | null>(null);
+  const [selectedGrandchildFolder, setSelectedGrandchildFolder] = useState<any | null>(null);
+  const [folderMaterials, setFolderMaterials] = useState<any[]>([]);
 
   const [updateCategory, { isLoading: isUpdating }] = useUpdateCategoryMutation();
   const [deleteCategory, { isLoading: isDeleting }] = useDeleteCategoryMutation();
   const [deleteFolder] = useDeleteFolderMutation();
   const { data: materialsResponse, refetch: refetchMaterials } = useGetMaterialsQuery();
-  const { data: rootFoldersResponse, refetch: refetchFolders } = useGetRootFoldersQuery();
-  const { data: childFoldersResponse, refetch: refetchChildFolders } = useGetChildFoldersQuery(
+  const { data: rootFoldersResponse, refetch: refetchFolders, isLoading: isRootFoldersLoading } = useGetRootFoldersQuery();
+  const { data: childFoldersResponse, refetch: refetchChildFolders, isLoading: isChildFoldersLoading } = useGetChildFoldersQuery(
     currentFolderId!, 
     { skip: !currentFolderId }
-  );
-  const { data: folderMaterialsResponse, refetch: refetchFolderMaterials } = useGetFolderWithMaterialsQuery(
-    selectedGrandchildFolder?._id || '',
-    { skip: !selectedGrandchildFolder?._id }
   );
   
   const library = LIBRARY_CONTENT;
   const rootFolders = rootFoldersResponse?.data || [];
   const childFolders = childFoldersResponse?.data || [];
-  const folderWithMaterials = folderMaterialsResponse?.data;
-  const folderMaterials = folderWithMaterials?.materials || [];
 
-  console.log('User in LibraryDashboard:', materialsResponse);
 
   // Filter content based on user role and access
   const getAccessibleContent = () => {
@@ -197,9 +192,6 @@ export const LibraryDashboard = () => {
 
   const handleMaterialSuccess = () => {
     refetchMaterials();
-    if (selectedGrandchildFolder) {
-      refetchFolderMaterials();
-    }
     toast({
       title: "Material added",
       description: "The material has been added successfully.",
@@ -207,7 +199,7 @@ export const LibraryDashboard = () => {
   };
 
   const handleAddMaterial = () => {
-    if (!currentParentFolder) return;
+    if (!currentFolderId) return;
     setShowAddMaterialModal(true);
   };
 
@@ -217,30 +209,25 @@ export const LibraryDashboard = () => {
       setCurrentFolderId(null);
       setCurrentView('root');
       setCurrentParentFolder(null);
-      setSelectedGrandchildFolder(null);
     } else {
       const folderId = folder._id || folder.id;
+      setCurrentFolderId(folderId);
       
-      // If it's a grandchild folder (level 2), show materials
-      if (folder.level === 2 || folder.folderType === 'grandchild') {
-        setSelectedGrandchildFolder(folder);
-        setCurrentView('materials');
-        toast({
-          title: `Viewing Materials in ${folder.name}`,
-          description: `Loading materials from ${folder.fullPath}`,
-        });
-      } else {
-        // For parent and child folders, show subfolders
-        setCurrentFolderId(folderId);
+      // For 2-level hierarchy: Level 0 shows children, Level 1 shows materials
+      if (folder.level === 0) {
         setCurrentView('children');
         setCurrentParentFolder(folder);
-        setSelectedGrandchildFolder(null);
-        
-        toast({
-          title: `Opened ${folder.name}`,
-          description: `Viewing contents of ${folder.folderType || 'Level ' + folder.level} folder`,
-        });
+      } else if (folder.level === 1) {
+        // Level 1 folders can contain materials in the new 2-level system
+        setCurrentView('materials');
+        setSelectedGrandchildFolder(folder);
+        // Load materials for this folder if needed
       }
+      
+      toast({
+        title: `Opened ${folder.name}`,
+        description: `Viewing contents of ${folder.folderType || 'Level ' + folder.level} folder`,
+      });
     }
   };
 
@@ -265,18 +252,17 @@ export const LibraryDashboard = () => {
   const handleCreateChildFolder = () => {
     if (!currentParentFolder) return;
     
-    const newFolderType = currentParentFolder.level === 0 ? 'child' : 'grandchild';
-    
-    if (currentParentFolder.level >= 2) {
+    // In 2-level hierarchy, only Level 0 (parent) folders can have children
+    if (currentParentFolder.level >= 1) {
       toast({
         title: "Cannot create folder",
-        description: "Maximum folder depth reached",
+        description: "Child folders cannot have subfolders in the 2-level system",
         variant: "destructive"
       });
       return;
     }
 
-    setFolderType(newFolderType);
+    setFolderType('child');
     setShowCreateFolderModal(true);
   };
 
@@ -359,6 +345,17 @@ export const LibraryDashboard = () => {
     diagram: accessibleContent.filter(c => c.type === 'diagram').length + realMaterials.filter(m => m.materialType === 'image').length,
   };
 
+  const renderLoader = () => (
+    <TableRow>
+      <TableCell colSpan={6} className="h-32">
+        <div className="flex flex-col items-center justify-center h-full">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mb-4" />
+          <p className="text-sm text-muted-foreground">Loading folders...</p>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+
   const renderFolderRow = (folder: any) => {
     // Remove the level check since we want to show all folders in the current view
     const IconComponent = iconComponents[folder.icon as keyof typeof iconComponents];
@@ -438,15 +435,7 @@ export const LibraryDashboard = () => {
             Central knowledge hub with cross-referencing - {user?.role} access level
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline"
-            onClick={() => setShowAddMaterialModal(true)}
-          >
-            Add Content
-          </Button>
-          <Button>Manage Categories</Button>
-        </div>
+        
       </div>
 
 
@@ -476,7 +465,16 @@ export const LibraryDashboard = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleFolderClick(null)}
+                  onClick={() => {
+                    if (currentView === 'materials') {
+                      // Go back to the parent folder's children view
+                      setCurrentView('children');
+                      setSelectedGrandchildFolder(null);
+                    } else {
+                      // Go back to root
+                      handleFolderClick(null);
+                    }
+                  }}
                   className="mr-2"
                 >
                   ← Back
@@ -499,27 +497,19 @@ export const LibraryDashboard = () => {
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
-            {currentView === 'materials' && (
+            {/* Show Add Material button for Level 1 folders (which can contain materials in 2-level system) */}
+            {(currentView === 'children' && currentParentFolder?.level === 0) && (
               <Button
                 variant="outline"
                 onClick={() => setShowAddMaterialModal(true)}
                 className="gap-2"
               >
                 <FileText className="h-4 w-4" />
-                Add Material
+                Add Material to Child Folder
               </Button>
             )}
-            {currentView === 'children' && (
-              <Button
-                variant="outline"
-                onClick={handleAddMaterial}
-                className="gap-2"
-              >
-                <FileText className="h-4 w-4" />
-                Add Material
-              </Button>
-            )}
-            {currentView !== 'materials' && (
+            {/* Only show create folder button for Level 0 folders */}
+            {currentView === 'root' || (currentView === 'children' && currentParentFolder?.level === 0) ? (
               <Button
                 onClick={() => currentView === 'children' 
                   ? handleCreateChildFolder()
@@ -529,89 +519,116 @@ export const LibraryDashboard = () => {
               >
                 <FolderPlus className="h-4 w-4" />
                 {currentView === 'children' 
-                  ? `New ${currentParentFolder?.level === 0 ? 'Child' : 'Grandchild'} Folder`
+                  ? 'New Child Folder'
                   : 'New Parent Folder'
                 }
               </Button>
-            )}
+            ) : null}
           </div>
         </CardHeader>
         <CardContent>
-          {currentView === 'materials' ? (
-            // Materials Grid View
-            <div>
-              {folderMaterials.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {folderMaterials.map((material) => (
-                    <MaterialCard
-                      key={material._id}
-                      material={material}
-                      onView={handleMaterialView}
-                      onDownload={handleMaterialDownload}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No Materials Found</h3>
-                  <p className="text-muted-foreground mb-4">
-                    This folder doesn't contain any materials yet.
-                  </p>
-                  <Button
-                    onClick={() => setShowAddMaterialModal(true)}
-                    variant="outline"
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Add First Material
-                  </Button>
-                </div>
-              )}
-            </div>
-          ) : (
-            // Folders Table View
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Level</TableHead>
-                    <TableHead>Contents</TableHead>
-                    <TableHead>Created By</TableHead>
-                    <TableHead>Created At</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {currentView === 'children' 
-                    ? childFolders.length > 0 
-                      ? childFolders.map((folder) => renderFolderRow(folder))
-                      : (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Level</TableHead>
+                  <TableHead>Contents</TableHead>
+                  <TableHead>Created By</TableHead>
+                  <TableHead>Created At</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {currentView === 'materials'
+                  ? folderMaterials.length > 0
+                    ? folderMaterials.map((material) => (
+                        <TableRow key={material._id || material.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <FileText className="h-4 w-4 text-muted-foreground" />
+                              <div>
+                                <div className="font-medium">{material.title}</div>
+                                <div className="text-sm text-muted-foreground">{material.description}</div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-xs">
+                              Material
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary" className="text-xs">
+                              {material.type || 'File'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{material.createdBy?.name || 'Unknown'}</TableCell>
+                          <TableCell>{material.createdAt ? format(new Date(material.createdAt), 'MMM d, yyyy') : 'Unknown'}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleMaterialClick(material)}
+                              >
+                                View
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    : (
                         <TableRow>
                           <TableCell colSpan={6} className="text-center py-8">
                             <div className="flex flex-col items-center gap-2">
-                              <Folder className="h-8 w-8 text-muted-foreground" />
-                              <p className="text-muted-foreground">No folders found</p>
+                              <FileText className="h-8 w-8 text-muted-foreground" />
+                              <p className="text-muted-foreground">No materials found in this folder</p>
                               <Button
-                                onClick={handleCreateChildFolder}
+                                onClick={() => setShowAddMaterialModal(true)}
                                 variant="outline"
                                 size="sm"
                                 className="mt-2"
                               >
-                                Create {currentParentFolder?.level === 0 ? 'Child' : 'Grandchild'} Folder
+                                Add First Material
                               </Button>
                             </div>
                           </TableCell>
                         </TableRow>
                       )
-                    : rootFolders?.map((folder) => renderFolderRow(folder))
-                  }
-                </TableBody>
-              </Table>
-            </div>
-          )}
+                  : currentView === 'children' 
+                    ? isChildFoldersLoading 
+                      ? renderLoader()
+                      : childFolders.length > 0 
+                        ? childFolders.map((folder) => renderFolderRow(folder))
+                        : (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center py-8">
+                              <div className="flex flex-col items-center gap-2">
+                                <Folder className="h-8 w-8 text-muted-foreground" />
+                                <p className="text-muted-foreground">No folders found</p>
+                                <Button
+                                  onClick={handleCreateChildFolder}
+                                  variant="outline"
+                                  size="sm"
+                                  className="mt-2"
+                                >
+                                  Create Child Folder
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )
+                    : isRootFoldersLoading
+                      ? renderLoader()
+                      : rootFolders?.map((folder) => renderFolderRow(folder))
+                }
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
   );
 };
+                  

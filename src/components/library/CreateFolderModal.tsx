@@ -54,7 +54,6 @@ import {
 import { 
   useCreateParentFolderMutation,
   useCreateChildFolderMutation, 
-  useCreateGrandchildFolderMutation,
   useGetFolderQuery 
 } from '@/services/foldersApi';
 import { useToast } from '@/hooks/use-toast';
@@ -73,7 +72,7 @@ interface CreateFolderModalProps {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   parentFolder?: string | null;
-  folderType?: 'parent' | 'child' | 'grandchild';
+  folderType?: 'parent' | 'child' ;
 }
 
 const iconComponents: Record<FolderIcon, React.ElementType> = {
@@ -121,9 +120,8 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
   // Specific folder creation mutations
   const [createParentFolder, { isLoading: isLoadingParent }] = useCreateParentFolderMutation();
   const [createChildFolder, { isLoading: isLoadingChild }] = useCreateChildFolderMutation();
-  const [createGrandchildFolder, { isLoading: isLoadingGrandchild }] = useCreateGrandchildFolderMutation();
   
-  const isLoading = isLoadingParent || isLoadingChild || isLoadingGrandchild;
+  const isLoading = isLoadingParent || isLoadingChild;
   
   // Get parent folder data if parentId is provided
   const { data: parentFolderResponse } = useGetFolderQuery(parentFolder!, { 
@@ -172,9 +170,7 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
         case 'child':
           response = await createChildFolder(folderData).unwrap();
           break;
-        case 'grandchild':
-          response = await createGrandchildFolder(folderData).unwrap();
-          break;
+       
         default:
           response = await createParentFolder(folderData).unwrap();
       }

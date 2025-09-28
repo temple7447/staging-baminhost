@@ -4,8 +4,7 @@
 
 import type { 
   CreateParentFolderRequest,
-  CreateChildFolderRequest,
-  CreateGrandchildFolderRequest 
+  CreateChildFolderRequest
 } from '@/types/folders';
 
 /**
@@ -17,10 +16,8 @@ export const getFolderCreationEndpoint = (level: number): string => {
       return '/api/folders/parent';
     case 1:
       return '/api/folders/child';
-    case 2:
-      return '/api/folders/grandchild';
     default:
-      throw new Error(`Invalid folder level: ${level}. Only levels 0, 1, and 2 are supported.`);
+      throw new Error(`Invalid folder level: ${level}. Only levels 0 and 1 are supported.`);
   }
 };
 
@@ -33,8 +30,6 @@ export const getFolderTypeName = (level: number): string => {
       return 'Parent';
     case 1:
       return 'Child';
-    case 2:
-      return 'Grandchild';
     default:
       return 'Unknown';
   }
@@ -72,8 +67,7 @@ export const validateFolderCreationData = (
       break;
       
     case 1:
-    case 2:
-      // Child and Grandchild folders MUST have parentFolder
+      // Child folders MUST have parentFolder
       if (!data.parentFolder) {
         errors.push(`${getFolderTypeName(level)} folders must have a parent folder`);
       }
@@ -104,22 +98,13 @@ export const createFolderExamples = {
   
   child: (parentId: string): CreateChildFolderRequest => ({
     name: "Digital Marketing",
-    description: "Digital marketing strategies and campaigns",
+    description: "Digital marketing strategies and materials",
     parentFolder: parentId,
     icon: "monitor",
     color: "#17a2b8",
     visibility: "public",
-    isProtected: false
-  }),
-  
-  grandchild: (childId: string): CreateGrandchildFolderRequest => ({
-    name: "Social Media",
-    description: "Social media marketing materials",
-    parentFolder: childId,
-    icon: "users",
-    color: "#6f42c1",
-    isProtected: true,
-    allowMaterials: true
+    isProtected: false,
+    allowMaterials: true // Child folders can now contain materials
   })
 };
 
@@ -139,25 +124,14 @@ const parentFolder = await createParentFolder({
 `,
   
   child: `
-// Create Child Folder (Level 1)
+// Create Child Folder (Level 1) - Can now store materials!
 const childFolder = await createChildFolder({
   name: "Digital Marketing",
-  description: "Digital marketing strategies",
+  description: "Digital marketing strategies and materials",
   parentFolder: parentFolderId, // Required - must be Level 0 folder
   icon: "monitor",
-  color: "#17a2b8"
-});
-`,
-  
-  grandchild: `
-// Create Grandchild Folder (Level 2)
-const grandchildFolder = await createGrandchildFolder({
-  name: "Social Media",
-  description: "Social media materials",
-  parentFolder: childFolderId, // Required - must be Level 1 folder
-  icon: "users",
-  color: "#6f42c1",
-  allowMaterials: true
+  color: "#17a2b8",
+  allowMaterials: true // Child folders can now contain materials
 });
 `
 });
@@ -166,9 +140,9 @@ const grandchildFolder = await createGrandchildFolder({
  * Get folder capabilities based on level
  */
 export const getFolderCapabilities = (level: number) => ({
-  canHaveSubfolders: level < 2,
-  canHaveMaterials: level === 2,
-  maxDepthReached: level >= 2,
+  canHaveSubfolders: level < 1,
+  canHaveMaterials: level === 1,
+  maxDepthReached: level >= 1,
   levelName: getFolderTypeName(level),
   endpoint: getFolderCreationEndpoint(level)
 });

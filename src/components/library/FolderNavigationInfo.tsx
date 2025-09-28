@@ -18,7 +18,7 @@ interface FolderNavigationInfoProps {
     name: string;
     level: number;
     fullPath: string;
-    folderType: 'parent' | 'child' | 'grandchild';
+    folderType: 'parent' | 'child';
     materialCount: number;
     subfolderCount: number;
     canHaveSubfolders: boolean;
@@ -48,7 +48,6 @@ const getLevelInfo = (level: number) => {
       };
     case 2:
       return {
-        name: 'Grandchild Folder',
         description: 'Material folder (can contain materials, no subfolders)',
         color: 'bg-orange-50 text-orange-700 border-orange-200',
         bgColor: 'bg-orange-50',

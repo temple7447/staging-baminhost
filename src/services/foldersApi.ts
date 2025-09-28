@@ -7,7 +7,6 @@ import type {
   CreateFolderRequest,
   CreateParentFolderRequest,
   CreateChildFolderRequest,
-  CreateGrandchildFolderRequest,
   UpdateFolderRequest,
   MoveFolderRequest,
   FoldersQueryParams,
@@ -95,7 +94,7 @@ export const foldersApi = createApi({
       ],
     }),
 
-    // Get folders that can hold materials (Level 2 only)
+    // Get folders that can hold materials (Level 1 only)
     getFoldersForMaterials: builder.query<FoldersResponse, void>({
       query: () => '/api/folders/for-materials',
       providesTags: ['Folder'],
@@ -152,24 +151,6 @@ export const foldersApi = createApi({
       },
     }),
 
-    // Create grandchild folder (Level 2) - parentFolder required (must be Level 1)
-    createGrandchildFolder: builder.mutation<FolderResponse, CreateGrandchildFolderRequest>({
-      query: (folderData) => ({
-        url: '/api/folders/grandchild',
-        method: 'POST',
-        body: folderData,
-      }),
-      invalidatesTags: ['Folder', 'FolderContents'],
-      transformErrorResponse: (response: any) => {
-        if (response.status === 400) {
-          return {
-            status: 400,
-            data: response.data || { message: 'Grandchild folder creation failed - parent must be Level 1 folder' }
-          };
-        }
-        return response;
-      },
-    }),
 
     // Legacy create folder endpoint - kept for backward compatibility
     createFolder: builder.mutation<FolderResponse, CreateFolderRequest>({
@@ -343,7 +324,6 @@ export const {
   // Specific folder creation hooks
   useCreateParentFolderMutation,
   useCreateChildFolderMutation,
-  useCreateGrandchildFolderMutation,
   // Legacy create folder hook
   useCreateFolderMutation,
   useUpdateFolderMutation,
