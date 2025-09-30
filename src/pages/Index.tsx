@@ -38,13 +38,12 @@ const Index = () => {
     return <Navigate to="/login" replace />;
   }
 
-  // Render different dashboards based on user role
   const renderDashboard = () => {
     console.log('Rendering dashboard for user:', user);
     switch (user.role) {
-      case 'super_admin':
+      case 'owner':
         return <OwnerDashboard />;
-      case 'admin':
+      case 'big7':
         return <Big7Dashboard />;
       case 'manager':
         return <ManagerDashboard />;

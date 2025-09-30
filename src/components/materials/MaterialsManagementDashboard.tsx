@@ -451,7 +451,7 @@ export const MaterialsManagementDashboard: React.FC<MaterialsManagementDashboard
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {Object.entries(typeStats).sort(([,a], [,b]) => b - a)[0]?.[0] || 'N/A'}
+              {Object.entries(typeStats).sort(([,a], [,b]) => (b as number) - (a as number))[0]?.[0] || 'N/A'}
             </div>
           </CardContent>
         </Card>

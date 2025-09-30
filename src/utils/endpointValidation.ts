@@ -114,7 +114,7 @@ export const FOLDER_API_ENDPOINTS: ApiEndpoint[] = [
 
 export const validateEndpointCoverage = (): {
   totalEndpoints: number;
-  implementedEndpoints: number;
+  implementedCount: number;
   coveragePercentage: number;
   missingEndpoints: ApiEndpoint[];
   implementedEndpoints: ApiEndpoint[];
@@ -125,7 +125,7 @@ export const validateEndpointCoverage = (): {
   
   return {
     totalEndpoints,
-    implementedEndpoints: implementedEndpoints.length,
+    implementedCount: implementedEndpoints.length,
     coveragePercentage: (implementedEndpoints.length / totalEndpoints) * 100,
     missingEndpoints,
     implementedEndpoints,
