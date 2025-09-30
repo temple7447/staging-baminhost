@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import About from "./pages/About";
 import Projects from "./pages/Projects";
+import Product from "./pages/Product";
+import EntrepreneurGuide from "./pages/EntrepreneurGuide";
 import { LoginPage } from "@/components/auth/LoginPage";
 import { RegistrationPage } from "@/components/auth/RegistrationPage";
 
@@ -28,6 +30,8 @@ const App = () => (
             <Route path="/register" element={<RegistrationPage />} />
             <Route path="/about" element={<About />} />
             <Route path="/projects" element={<Projects />} />
+            <Route path="/product" element={<Product />} />
+            <Route path="/entrepreneur-guide" element={<EntrepreneurGuide />} />
 
             {/* Authenticated app */}
             <Route path="/app" element={<Index />} />

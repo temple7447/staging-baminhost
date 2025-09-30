@@ -18,8 +18,10 @@ const About = () => {
           <div className="text-lg font-semibold tracking-tight">Bami Hustle</div>
         </div>
         <nav className="hidden md:flex items-center gap-6 text-sm text-slate-200">
-          <Link to="/">Home</Link>
-          <Link to="/projects">Projects</Link>
+          <Link to="/" className="hover:text-white/90">Home</Link>
+          <Link to="/product" className="hover:text-white/90">Product</Link>
+          <Link to="/entrepreneur-guide" className="hover:text-white/90">Entrepreneur Guide</Link>
+          <Link to="/projects" className="hover:text-white/90">Projects</Link>
           <Link to="/about" className="text-white">About Us</Link>
         </nav>
         <div className="hidden md:flex items-center gap-3">

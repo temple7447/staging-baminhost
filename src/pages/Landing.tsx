@@ -92,11 +92,9 @@ const Landing = () => {
           <div className="text-lg font-semibold tracking-tight">Bami Hustle</div>
         </div>
         <nav className="hidden md:flex items-center gap-6 text-sm text-slate-200">
-          <a href="#features" className="hover:text-white/90">Features</a>
-          <a href="#product" className="hover:text-white/90">Product</a>
-          <a href="#how-it-works" className="hover:text-white/90">How it works</a>
-          <a href="#testimonials" className="hover:text-white/90">Testimonials</a>
-          <a href="#faq" className="hover:text-white/90">FAQ</a>
+          <Link to="/" className="hover:text-white/90">Home</Link>
+          <Link to="/product" className="hover:text-white/90">Product</Link>
+          <Link to="/entrepreneur-guide" className="hover:text-white/90">Entrepreneur Guide</Link>
           <Link to="/projects" className="hover:text-white/90">Projects</Link>
           <Link to="/about" className="hover:text-white/90">About Us</Link>
         </nav>
@@ -117,11 +115,9 @@ const Landing = () => {
             </SheetTrigger>
             <SheetContent side="right" className="bg-slate-950 text-white border-l border-white/10">
               <div className="mt-10 space-y-4">
-                <a href="#features" className="block text-sm text-slate-200 hover:text-white">Features</a>
-                <a href="#product" className="block text-sm text-slate-200 hover:text-white">Product</a>
-                <a href="#how-it-works" className="block text-sm text-slate-200 hover:text-white">How it works</a>
-                <a href="#testimonials" className="block text-sm text-slate-200 hover:text-white">Testimonials</a>
-                <a href="#faq" className="block text-sm text-slate-200 hover:text-white">FAQ</a>
+                <Link to="/" className="block text-sm text-slate-200 hover:text-white">Home</Link>
+                <Link to="/product" className="block text-sm text-slate-200 hover:text-white">Product</Link>
+                <Link to="/entrepreneur-guide" className="block text-sm text-slate-200 hover:text-white">Entrepreneur Guide</Link>
                 <Separator className="my-4 bg-white/10" />
                 <Link to="/projects" className="block text-sm text-slate-200 hover:text-white">Projects</Link>
                 <Link to="/about" className="block text-sm text-slate-200 hover:text-white">About Us</Link>
@@ -146,17 +142,41 @@ const Landing = () => {
               <Rocket className="h-3.5 w-3.5 text-blue-300" />
               New: Role-based dashboards and reports
             </div>
-            <h1 className="mt-4 text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
-              Manage your life and business portfolios in one place
+            <div className="mb-6 text-center md:text-left">
+              <div className="text-2xl md:text-3xl font-bold text-blue-300 mb-2">
+                AGREE OR DISAGREE?
+              </div>
+              <div className="text-lg md:text-xl text-slate-200">
+                <span className="text-blue-400 font-semibold">STARTING</span> a business is hard, but{" "}
+                <span className="text-blue-400 font-semibold">SCALING</span> a business is even harder.
+              </div>
+            </div>
+            
+            <div className="bg-white/10 border border-white/20 rounded-xl p-6 mb-6">
+              <div className="text-center mb-4">
+                <div className="text-sm text-slate-300 mb-2">WHAT PERCENTAGE OF BUSINESSES FAIL?</div>
+                <div className="text-6xl md:text-7xl font-black text-red-400 mb-2">91%</div>
+                <div className="text-sm text-slate-400">Start-Up & Small Business Failure Rate</div>
+              </div>
+              
+              <div className="text-center border-t border-white/20 pt-4">
+                <div className="text-sm text-slate-300 mb-2">WHAT PERCENTAGE OF BUSINESSES FAIL IN THE FIRST YEAR?</div>
+                <div className="text-5xl md:text-6xl font-black text-orange-400 mb-2">20%</div>
+                <div className="text-sm text-slate-400">First Year Small Business Failure Rate</div>
+              </div>
+            </div>
+
+            <h1 className="mt-6 text-3xl md:text-4xl font-extrabold leading-tight tracking-tight">
+              Break the cycle. Build a plan to <span className="text-green-400">DOUBLE</span> your take-home profit and achieve the "Level 7 Life."
             </h1>
             <p className="mt-4 text-slate-200/80 text-lg">
-              All-in-one platform for budgeting, portfolio tracking, operations and growth.
-              Built for clarity, control and momentum.
+              The entrepreneurial journey doesn't have to be an emotional rollercoaster. 
+              Our platform helps you manage portfolios, track performance, and scale systematically.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
-                <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 transition-transform hover:translate-y-[-1px] active:translate-y-[0]">
-                  Get started free
+                <Button size="lg" className="w-full sm:w-auto bg-green-600 hover:bg-green-500 transition-transform hover:translate-y-[-1px] active:translate-y-[0]">
+                  Build My Level 7 Plan
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </a>
@@ -167,7 +187,7 @@ const Landing = () => {
               </Link>
             </div>
             <div className="mt-6 text-sm text-slate-300/80">
-              No credit card required. You can upgrade anytime.
+              Join the 9% that succeed. No credit card required.
             </div>
 
             {/* Quick highlights */}
@@ -234,120 +254,53 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Trusted by */}
-      <section className="container mx-auto px-6 pb-12">
-        <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-xs sm:text-sm text-slate-300/80">Trusted by builders and operators</div>
-          <div className="flex items-center gap-4 sm:gap-6 opacity-80">
-            <img src="https://cdn.simpleicons.org/stripe/9ca3af" alt="Stripe" className="h-5 w-auto" loading="lazy" />
-            <img src="https://cdn.simpleicons.org/slack/9ca3af" alt="Slack" className="h-5 w-auto" loading="lazy" />
-            <img src="https://cdn.simpleicons.org/notion/9ca3af" alt="Notion" className="h-5 w-auto" loading="lazy" />
-            <img src="https://cdn.simpleicons.org/airtable/9ca3af" alt="Airtable" className="h-5 w-auto" loading="lazy" />
-            <img src="https://cdn.simpleicons.org/intercom/9ca3af" alt="Intercom" className="h-5 w-auto" loading="lazy" />
+      {/* Simple value proposition */}
+      <section className="container mx-auto px-6 pb-16">
+        <div className="text-center max-w-4xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6">Three Simple Steps to Level 7</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div className="text-center">
+              <div className="w-12 h-12 mx-auto mb-4 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">1</div>
+              <h3 className="font-semibold text-slate-200 mb-2">Define Your Number</h3>
+              <p className="text-sm text-slate-400">Set your revenue, profit, and valuation targets</p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 mx-auto mb-4 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-lg">2</div>
+              <h3 className="font-semibold text-slate-200 mb-2">Walk the 7 Levels</h3>
+              <p className="text-sm text-slate-400">Follow our proven roadmap to systematic growth</p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 mx-auto mb-4 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">3</div>
+              <h3 className="font-semibold text-slate-200 mb-2">Build Your Plan</h3>
+              <p className="text-sm text-slate-400">Create actionable steps to reach your goals</p>
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link to="/product">
+              <Button size="lg" variant="outline" className="bg-white text-slate-900 hover:bg-slate-100 border-slate-200">
+                Learn More About Our Platform
+              </Button>
+            </Link>
+            <Link to="/entrepreneur-guide">
+              <Button size="lg" variant="outline" className="border-blue-400 text-blue-400 hover:bg-blue-400/10">
+                Discover Your Entrepreneur Type
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Features section */}
-      <section id="features" className="container mx-auto px-6 pb-16">
-        <div className="grid md:grid-cols-3 gap-6">
-          {features.map((f, idx) => (
-            <div key={idx} className="rounded-xl p-6 bg-white/5 border border-white/10 transition-all hover:bg-white/10">
-              <div className="flex items-center gap-2 text-blue-300">
-                {f.icon}
-                <div className="font-semibold">{f.title}</div>
-              </div>
-              <div className="mt-2 text-slate-300/80">{f.desc}</div>
-              <div className="mt-4 flex items-center gap-2 text-xs text-slate-300/70">
-                <CheckCircle2 className="h-4 w-4 text-emerald-400" /> Included in all plans
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Product screenshots */}
-      <section id="product" className="container mx-auto px-6 pb-20">
+      {/* Accidental Entrepreneurs */}
+      <section className="container mx-auto px-6 pb-20">
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold">See the product in action</h2>
-          <p className="mt-2 text-slate-300/80">A glimpse of dashboards and workflows</p>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">What's an "Accidental Entrepreneur?"</h2>
         </div>
-        <Carousel 
-          className="mx-auto max-w-5xl"
-          opts={{
-            align: "start",
-            loop: true,
-            
-          }}
-        >
-          <CarouselContent>
-            {productShots?.map((src: any, i: number) => (
-              <CarouselItem key={i}>
-                <Card className="bg-white/5 border-white/10 backdrop-blur">
-                  <CardContent className="p-4">
-                    <AspectRatio ratio={16/9}>
-                      <img src={src} alt={`Product screenshot ${i+1}`} className="h-full w-full object-cover rounded-lg border border-white/10" loading="lazy" />
-                    </AspectRatio>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="hidden md:flex" />
-          <CarouselNext className="hidden md:flex" />
-        </Carousel>
-      </section>
-
-      {/* How it works */}
-      <section id="how-it-works" className="container mx-auto px-6 pb-20">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold">How it works</h2>
-          <p className="mt-2 text-slate-300/80">From setup to results in minutes</p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {steps.map((s) => (
-            <div key={s.step} className="rounded-xl p-6 bg-white/5 border border-white/10">
-              <div className="text-5xl font-black text-white/10">{s.step}</div>
-              <div className="mt-2 text-lg font-semibold">{s.title}</div>
-              <div className="mt-1 text-slate-300/80">{s.desc}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section id="testimonials" className="container mx-auto px-6 pb-20">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold">Loved by operators and creators</h2>
-          <p className="mt-2 text-slate-300/80">What our users are saying</p>
-        </div>
-        <div className="relative">
-          <Carousel className="mx-auto max-w-3xl">
-            <CarouselContent>
-              {testimonials.map((t, i) => (
-                <CarouselItem key={i}>
-                  <Card className="bg-white/5 border-white/10 backdrop-blur">
-                    <CardContent className="p-8">
-                      <div className="flex flex-col items-center text-center gap-4">
-                        <Quote className="h-6 w-6 text-blue-300" />
-                        <p className="text-lg text-slate-100">“{t.quote}”</p>
-                        <Separator className="bg-white/10" />
-                        <div className="text-sm text-slate-300/90 font-medium">{t.name} • {t.title}</div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
-          </Carousel>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section id="get-started" className="container mx-auto px-6 pb-20">
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-blue-700/40 via-purple-700/30 to-slate-900">
+        
+        <div className="max-w-6xl mx-auto">
+      {/* Final CTA */}
+      <section className="container mx-auto px-6 pb-16">
+        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-blue-700/40 via-purple-700/30 to-slate-900 max-w-4xl mx-auto">
           <div className="absolute inset-0 opacity-20">
             <img
               src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1600&q=60"
@@ -356,99 +309,48 @@ const Landing = () => {
               loading="lazy"
             />
           </div>
-          <div className="relative px-6 py-10 md:px-10 md:py-14 flex flex-col md:flex-row items-center gap-6">
-            <div className="flex-1">
-              <h3 className="text-2xl md:text-3xl font-bold">Ready to take control of your portfolios?</h3>
-              <p className="mt-2 text-slate-200/80">Start free today and upgrade anytime. No credit card required.</p>
-            </div>
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full bg-blue-600 text-white hover:bg-blue-500 font-semibold">Create account</Button>
+          <div className="relative px-6 py-12 md:px-10 md:py-16 text-center">
+            <h3 className="text-2xl md:text-3xl font-bold mb-4">Ready to break the 91% failure cycle?</h3>
+            <p className="mt-2 text-slate-200/80 max-w-xl mx-auto mb-8">
+              Join the 9% of entrepreneurs who succeed by building a systematic approach to scale.  
+              Our platform helps you create a Level 7 plan to double your take-home profit.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
+                <Button size="lg" className="w-full sm:w-auto bg-green-600 hover:bg-green-500 transition-transform hover:translate-y-[-1px] active:translate-y-[0]">
+                  Build My Level 7 Plan
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
               </a>
-              <Link to="/login" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="w-full bg-white text-slate-900 hover:bg-slate-100 border-slate-200">Log in</Button>
+              <Link to="/login">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto bg-white text-slate-900 hover:bg-slate-100 border-slate-200">
+                  I already have an account
+                </Button>
               </Link>
             </div>
-          </div>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section id="faq" className="container mx-auto px-6 pb-24">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold">Frequently asked questions</h2>
-          <p className="mt-2 text-slate-300/80">Everything you need to know</p>
-        </div>
-        <Accordion type="single" collapsible className="max-w-3xl mx-auto bg-white/5 border border-white/10 rounded-xl p-2">
-          {faqs.map((f, i) => (
-            <AccordionItem key={i} value={`item-${i}`}>
-              <AccordionTrigger className="px-4">{f.q}</AccordionTrigger>
-              <AccordionContent className="px-4 text-slate-300/90">{f.a}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </section>
-
-      {/* Footer */}
-      <footer id="contact" className="border-t border-white/10 bg-black/20 backdrop-blur">
-        <div className="container mx-auto px-6 py-12">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                  <Building2 className="w-4 h-4 text-white" />
-                </div>
-                <div className="text-lg font-semibold">Bami Hustle</div>
+      {/* Simple Footer */}
+      <footer className="border-t border-white/10 bg-black/20 backdrop-blur">
+        <div className="container mx-auto px-6 py-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+                <Building2 className="w-4 h-4 text-white" />
               </div>
-              <p className="mt-3 text-sm text-slate-300/80">
-                Manage your life and business portfolios in one place. Built for clarity, control and momentum.
-              </p>
+              <div className="text-base font-semibold">Bami Hustle</div>
             </div>
-
-            <div>
-              <div className="text-sm font-semibold mb-3">Product</div>
-              <ul className="space-y-2 text-sm text-slate-300/80">
-                <li><a href="#features" className="hover:text-white/90">Features</a></li>
-                <li><a href="#how-it-works" className="hover:text-white/90">How it works</a></li>
-                <li><a href="#testimonials" className="hover:text-white/90">Testimonials</a></li>
-                <li><a href="#faq" className="hover:text-white/90">FAQ</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <div className="text-sm font-semibold mb-3">Company</div>
-              <ul className="space-y-2 text-sm text-slate-300/80">
-                <li><a href="/about" className="hover:text-white/90">About</a></li>
-                <li><a href="#" className="hover:text-white/90">Careers</a></li>
-                <li><a href="mailto:hello@bamihustle.com" className="hover:text-white/90">Support</a></li>
-                <li><a href="#" className="hover:text-white/90">Blog</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <div className="text-sm font-semibold mb-3">Stay up to date</div>
-              <p className="text-sm text-slate-300/80 mb-3">Get product updates and tips.</p>
-              <form onSubmit={(e) => e.preventDefault()} className="flex gap-2">
-                <Input type="email" placeholder="you@example.com" className="bg-white/10 border-white/10 placeholder:text-slate-300/60 text-white" />
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-500">Subscribe</Button>
-              </form>
-              <div className="mt-4 flex items-center gap-3 text-slate-300/80">
-                <a href="#" aria-label="Twitter" className="hover:text-white"><Twitter className="h-4 w-4" /></a>
-                <a href="#" aria-label="GitHub" className="hover:text-white"><Github className="h-4 w-4" /></a>
-                <a href="#" aria-label="LinkedIn" className="hover:text-white"><Linkedin className="h-4 w-4" /></a>
-                <a href="mailto:hello@bamihustle.com" aria-label="Email" className="hover:text-white"><Mail className="h-4 w-4" /></a>
-              </div>
-            </div>
-          </div>
-
-          <Separator className="my-8 bg-white/10" />
-
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-300/70">
-            <div>© {new Date().getFullYear()} Bami Hustle. All rights reserved.</div>
-            <div className="flex items-center gap-4">
-              <a href="#" className="hover:text-white/90">Privacy</a>
-              <a href="#" className="hover:text-white/90">Terms</a>
-              <a href="#" className="hover:text-white/90">Security</a>
+            
+            <nav className="flex items-center gap-6 text-sm text-slate-300">
+              <Link to="/product" className="hover:text-white">Product</Link>
+              <Link to="/entrepreneur-guide" className="hover:text-white">Entrepreneur Guide</Link>
+              <Link to="/projects" className="hover:text-white">Projects</Link>
+              <Link to="/about" className="hover:text-white">About</Link>
+            </nav>
+            
+            <div className="text-xs text-slate-400">
+              © {new Date().getFullYear()} Bami Hustle. All rights reserved.
             </div>
           </div>
         </div>
