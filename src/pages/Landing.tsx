@@ -1,13 +1,9 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Navbar } from "@/components/layout/Navbar";
 import {
   Building2,
   ShieldCheck,
@@ -18,13 +14,6 @@ import {
   Gauge,
   Wallet,
   BarChart3,
-  CheckCircle2,
-  Quote,
-  Twitter,
-  Github,
-  Linkedin,
-  Mail,
-  Menu,
 } from "lucide-react";
 
 const features = [
@@ -83,56 +72,7 @@ const Landing = () => {
         <div className="absolute top-1/3 -right-16 h-24 w-24 md:h-40 md:w-40 rounded-full bg-emerald-500/20 blur-2xl animate-[spin_18s_linear_infinite]" />
       </div>
 
-      {/* Header */}
-      <header className="container mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
-            <Building2 className="w-5 h-5 text-white" />
-          </div>
-          <div className="text-lg font-semibold tracking-tight">Bami Hustle</div>
-        </div>
-        <nav className="hidden md:flex items-center gap-6 text-sm text-slate-200">
-          <Link to="/" className="hover:text-white/90">Home</Link>
-          <Link to="/product" className="hover:text-white/90">Product</Link>
-          <Link to="/entrepreneur-guide" className="hover:text-white/90">Entrepreneur Guide</Link>
-          <Link to="/projects" className="hover:text-white/90">Projects</Link>
-          <Link to="/about" className="hover:text-white/90">About Us</Link>
-        </nav>
-        <div className="hidden md:flex items-center gap-3">
-          <Link to="/login"><Button variant="outline" className="border-white/20 text-white hover:bg-white/10">Log in</Button></Link>
-          <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
-            <Button className="bg-blue-600 hover:bg-blue-500">Create account</Button>
-          </a>
-        </div>
-        {/* Mobile menu */}
-        <div className="md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="border-white/20 text-white bg-white/5 hover:bg-white/10">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="bg-slate-950 text-white border-l border-white/10">
-              <div className="mt-10 space-y-4">
-                <Link to="/" className="block text-sm text-slate-200 hover:text-white">Home</Link>
-                <Link to="/product" className="block text-sm text-slate-200 hover:text-white">Product</Link>
-                <Link to="/entrepreneur-guide" className="block text-sm text-slate-200 hover:text-white">Entrepreneur Guide</Link>
-                <Separator className="my-4 bg-white/10" />
-                <Link to="/projects" className="block text-sm text-slate-200 hover:text-white">Projects</Link>
-                <Link to="/about" className="block text-sm text-slate-200 hover:text-white">About Us</Link>
-                <Separator className="my-4 bg-white/10" />
-                <div className="flex flex-col gap-2">
-                  <Link to="/login"><Button variant="outline" className="bg-white text-slate-900 hover:bg-slate-100 border-slate-200 w-full">Log in</Button></Link>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" className="w-full">
-                    <Button className="bg-blue-600 hover:bg-blue-500 w-full">Create account</Button>
-                  </a>
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero */}
       <section className="container mx-auto px-6 py-16 md:py-24">
@@ -295,9 +235,10 @@ const Landing = () => {
       <section className="container mx-auto px-6 pb-20">
         <div className="text-center mb-10">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">What's an "Accidental Entrepreneur?"</h2>
+          <p className="text-slate-300 max-w-2xl mx-auto">Discover your entrepreneurial journey and learn how to scale systematically.</p>
         </div>
-        
-        <div className="max-w-6xl mx-auto">
+      </section>
+
       {/* Final CTA */}
       <section className="container mx-auto px-6 pb-16">
         <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-blue-700/40 via-purple-700/30 to-slate-900 max-w-4xl mx-auto">
@@ -328,6 +269,7 @@ const Landing = () => {
                 </Button>
               </Link>
             </div>
+          </div>
         </div>
       </section>
 

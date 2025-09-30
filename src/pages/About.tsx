@@ -1,36 +1,16 @@
 import { Link } from "react-router-dom";
-import { Building2, Rocket, Users, Target, ShieldCheck, ArrowRight } from "lucide-react";
+import { Rocket, Users, Target, ShieldCheck, ArrowRight, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
+import { Navbar } from "@/components/layout/Navbar";
 
 const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog";
 
 const About = () => {
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white">
-      {/* Header */}
-      <header className="container mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
-            <Building2 className="w-5 h-5 text-white" />
-          </div>
-          <div className="text-lg font-semibold tracking-tight">Bami Hustle</div>
-        </div>
-        <nav className="hidden md:flex items-center gap-6 text-sm text-slate-200">
-          <Link to="/" className="hover:text-white/90">Home</Link>
-          <Link to="/product" className="hover:text-white/90">Product</Link>
-          <Link to="/entrepreneur-guide" className="hover:text-white/90">Entrepreneur Guide</Link>
-          <Link to="/projects" className="hover:text-white/90">Projects</Link>
-          <Link to="/about" className="text-white">About Us</Link>
-        </nav>
-        <div className="hidden md:flex items-center gap-3">
-          <Link to="/login"><Button variant="outline" className="border-white/20 text-white hover:bg-white/10">Log in</Button></Link>
-          <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer">
-            <Button className="bg-blue-600 hover:bg-blue-500">Create account</Button>
-          </a>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero */}
       <section className="container mx-auto px-6 pt-6 pb-10 md:pb-16">
