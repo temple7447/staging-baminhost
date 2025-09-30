@@ -4,7 +4,10 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'super_admin' | 'admin' | 'manager' | 'vendor' | 'customer';
+  role: 'owner' | 'big7' | 'manager' | 'vendor' | 'customer';
+  phone?: string;
+  department?: string;
+  hourlyRate?: number;
   isActive: boolean;
   emailVerified: boolean;
   lastLogin: string;

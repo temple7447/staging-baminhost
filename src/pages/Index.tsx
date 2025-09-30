@@ -13,7 +13,7 @@ import { EstateManagement } from "@/components/dashboard/business/EstateManageme
 import { FillingStationManagement } from "@/components/dashboard/business/FillingStationManagement";
 import { EquipmentManagement } from "@/components/dashboard/business/EquipmentManagement";
 import { CRMDashboard } from "@/components/dashboard/CRMDashboard";
-import { LibraryDashboard } from "@/components/dashboard/LibraryDashboard";
+import { LibraryDashboard } from "@/components/dashboard/LibraryDashboardStub";
 import { AssistantDashboard } from "@/components/dashboard/AssistantDashboard";
 import { ReportsDashboard } from "@/components/dashboard/ReportsDashboard";
 import { GreenThemeShowcase } from "@/components/GreenThemeShowcase";

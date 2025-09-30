@@ -194,7 +194,9 @@ export const LoginPage = () => {
               
               {loginError && (
                 <p className="text-sm text-destructive text-center mt-2">
-                  {loginError?.data?.message || "Invalid credentials"}
+                  {typeof loginError === 'object' && 'data' in loginError && loginError.data 
+                    ? (loginError.data as any)?.message || "Invalid credentials"
+                    : "Invalid credentials"}
                 </p>
               )}
 

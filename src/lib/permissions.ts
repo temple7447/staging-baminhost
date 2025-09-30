@@ -258,14 +258,49 @@ export const PERMISSIONS: Record<string, Permission> = {
 
 // Define role configurations
 export const ROLE_CONFIGS: Record<string, RoleConfig> = {
-  super_admin: {
-    id: 'super_admin',
-    name: 'Super Admin',
-    description: 'Full system access with master control',
+  owner: {
+    id: 'owner',
+    name: 'Owner',
+    description: 'Business owner with full access',
     priority: 100,
     permissions: [
-      // All permissions - super admin has access to everything
+      // All permissions - owner has access to everything
       ...Object.keys(PERMISSIONS)
+    ]
+  },
+
+  big7: {
+    id: 'big7',
+    name: 'Big 7 Member',
+    description: 'Core team member with extensive access',
+    priority: 90,
+    permissions: [
+      'view_overview',
+      'view_big5',
+      'view_wallet',
+      'view_portfolio',
+      'view_split_tracker',
+      'view_goals',
+      'view_contacts',
+      'view_library',
+      'view_assistant',
+      'view_settings',
+      'view_personal_portfolios',
+      'view_reports',
+      'view_estate',
+      'view_filling_station',
+      'view_equipment',
+      'view_payment_history',
+      'manage_reports',
+      'view_all_data',
+      // Strategic Hiring
+      'view_strategic_hiring',
+      'view_hiring_triggers',
+      'manage_org_chart',
+      'create_job_descriptions',
+      'manage_candidates',
+      'view_hiring_metrics',
+      'conduct_halo_research'
     ]
   },
 

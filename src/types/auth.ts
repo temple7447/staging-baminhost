@@ -2,7 +2,10 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: 'owner' | 'big7' | 'manager' | 'vendor' | 'customer';
+  phone?: string;
+  department?: string;
+  hourlyRate?: number;
   isActive: boolean;
   emailVerified: boolean;
   lastLogin: string;
