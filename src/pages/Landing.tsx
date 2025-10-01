@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 import {
   Building2,
   ShieldCheck,
@@ -273,30 +274,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Simple Footer */}
-      <footer className="border-t border-white/10 bg-black/20 backdrop-blur">
-        <div className="container mx-auto px-6 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                <Building2 className="w-4 h-4 text-white" />
-              </div>
-              <div className="text-base font-semibold">Bami Hustle</div>
-            </div>
-            
-            <nav className="flex items-center gap-6 text-sm text-slate-300">
-              <Link to="/product" className="hover:text-white">Product</Link>
-              <Link to="/entrepreneur-guide" className="hover:text-white">Entrepreneur Guide</Link>
-              <Link to="/projects" className="hover:text-white">Projects</Link>
-              <Link to="/about" className="hover:text-white">About</Link>
-            </nav>
-            
-            <div className="text-xs text-slate-400">
-              © {new Date().getFullYear()} Bami Hustle. All rights reserved.
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

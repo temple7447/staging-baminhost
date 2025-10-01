@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 
 const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog";
 
@@ -336,74 +337,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 bg-black/20 backdrop-blur">
-        <div className="container mx-auto px-6 py-12">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg">
-                  <Building2 className="w-5 h-5 text-white" />
-                </div>
-                <div className="text-xl font-bold">Bami Hustle</div>
-              </div>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Empowering entrepreneurs to break the 91% failure rate with systematic growth and proven frameworks.
-              </p>
-            </div>
-
-            <div>
-              <div className="text-sm font-bold mb-4 text-slate-200">Product</div>
-              <ul className="space-y-3 text-sm text-slate-400">
-                <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
-                <li><Link to="/product" className="hover:text-white transition-colors">Features</Link></li>
-                <li><Link to="/entrepreneur-guide" className="hover:text-white transition-colors">Entrepreneur Guide</Link></li>
-                <li><Link to="/projects" className="hover:text-white transition-colors">Projects</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <div className="text-sm font-bold mb-4 text-slate-200">Company</div>
-              <ul className="space-y-3 text-sm text-slate-400">
-                <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>
-                <li><a href="mailto:hello@bamihustle.com" className="hover:text-white transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <div className="text-sm font-bold mb-4 text-slate-200">Stay Connected</div>
-              <p className="text-sm text-slate-400 mb-4">
-                Get updates on new features and entrepreneurship tips.
-              </p>
-              <form onSubmit={(e) => e.preventDefault()} className="space-y-2">
-                <Input 
-                  type="email" 
-                  placeholder="your@email.com" 
-                  className="bg-white/10 border-white/20 placeholder:text-slate-500 text-white focus:border-blue-500"
-                />
-                <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-500">
-                  Subscribe
-                </Button>
-              </form>
-            </div>
-          </div>
-
-          <Separator className="my-8 bg-white/10" />
-
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-400">
-            <div>
-              © {new Date().getFullYear()} Bami Hustle. All rights reserved.
-            </div>
-            <div className="flex items-center gap-6">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
