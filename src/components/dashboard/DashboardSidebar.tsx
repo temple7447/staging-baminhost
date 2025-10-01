@@ -17,7 +17,8 @@ import {
   ListChecks,
   DollarSign,
   UserCheck,
-  TrendingDown
+  TrendingDown,
+  Scale
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -56,6 +57,14 @@ const sidebarItems: SidebarItem[] = [
     icon: ListChecks,
     category: 'core',
     requiredPermissions: ['view_big5']
+  },
+  {
+    id: "scalable-impact-planner",
+    label: "Scalable Impact Planner",
+    icon: Scale,
+    category: 'core',
+    requiredPermissions: ['view_scalable_impact'],
+    isPremium: true
   },
   { 
     id: "wallet", 

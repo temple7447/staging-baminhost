@@ -27,6 +27,7 @@ import StrategicHiringPlanner from "@/components/hiring/StrategicHiringPlanner";
 import CandidateManagement from "@/components/hiring/CandidateManagement";
 import { AdminPeople } from "@/components/dashboard/AdminPeople";
 import { SuperAdminTransactions } from "@/components/dashboard/SuperAdminTransactions";
+import ScalableImpactPlanner from "@/components/scalable-impact/ScalableImpactPlanner";
 
 const Index = () => {
   const { isAuthenticated, user } = useAuth();
@@ -164,6 +165,16 @@ const Index = () => {
             showUpgradePrompt={false}
           >
             <Big5Dashboard />
+          </ProtectedComponent>
+        );
+      case "scalable-impact-planner":
+        return (
+          <ProtectedComponent 
+            requiredPermissions={['view_scalable_impact']}
+            feature="Scalable Impact Planner"
+            showUpgradePrompt={true}
+          >
+            <ScalableImpactPlanner />
           </ProtectedComponent>
         );
       case "strategic-hiring-planner":

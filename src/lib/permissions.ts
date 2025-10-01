@@ -28,6 +28,12 @@ export const PERMISSIONS: Record<string, Permission> = {
     description: 'Access to personal Big 5 priorities page',
     category: 'dashboard'
   },
+  'view_scalable_impact': {
+    id: 'view_scalable_impact',
+    name: 'View Scalable Impact Planner',
+    description: 'Access to the Scalable Impact Planner for business growth tracking',
+    category: 'dashboard'
+  },
   'view_wallet': {
     id: 'view_wallet',
     name: 'View Wallet',
@@ -277,6 +283,7 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
     permissions: [
       'view_overview',
       'view_big5',
+      'view_scalable_impact',
       'view_wallet',
       'view_portfolio',
       'view_split_tracker',
@@ -312,6 +319,7 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
     permissions: [
 'view_overview',
       'view_big5',
+      'view_scalable_impact',
       'view_wallet',
       'view_portfolio',
       'view_split_tracker',
@@ -348,6 +356,7 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
 permissions: [
       'view_overview',
       'view_big5',
+      'view_scalable_impact',
       'view_wallet',
       'view_contacts',
       'view_library',
@@ -440,6 +449,7 @@ export const getPermissionsByCategory = (userRole: string, category: Permission[
 export const NAVIGATION_PERMISSIONS: Record<string, string[]> = {
 'overview': ['view_overview'],
   'big5': ['view_big5'],
+  'scalable-impact-planner': ['view_scalable_impact'],
   'wallet': ['view_wallet'],
   'portfolio': ['view_portfolio'],
   'split-tracker': ['view_split_tracker'],
