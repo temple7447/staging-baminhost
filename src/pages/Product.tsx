@@ -58,7 +58,7 @@ const testimonials = [
 
 const faqs = [
   { q: "Is there a free plan?", a: "Yes, you can start free. You can upgrade anytime for advanced features." },
-  { q: "Do you support teams?", a: "Yes, roles include owner, admin, manager, vendor and customer with tailored dashboards." },
+  { q: "Do you support teams?", a: "Yes, roles include super admin, admin, manager, vendor and customer with tailored dashboards." },
   { q: "Can I import existing data?", a: "You can import CSVs for budgets, contacts and assets. More connectors are coming." },
   { q: "Is my data secure?", a: "We use token-based auth and follow best practices. You control roles and access." },
 ];

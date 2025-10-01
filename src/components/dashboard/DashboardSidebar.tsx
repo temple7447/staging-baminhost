@@ -193,6 +193,7 @@ const sidebarItems: SidebarItem[] = [
 export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onClose }: DashboardSidebarProps) => {
   const { userRole, hasPermission, canAccessNavigation, rolePriority } = usePermissions();
   const { user, logout } = useAuth();
+  console.log("User Role:", userRole, user);
   
   // Filter sidebar items based on user permissions
   const filteredItems = useFilteredNavigation(sidebarItems);

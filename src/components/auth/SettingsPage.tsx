@@ -82,7 +82,7 @@ export const SettingsPage = () => {
       description: 'Payment methods and subscription management',
       icon: CreditCard,
       component: null,
-      available: user?.role === 'owner' || user?.role === 'big7'
+      available: user?.role === 'super_admin' || user?.role === 'big7'
     },
     {
       id: 'integrations' as SettingSection,
@@ -90,7 +90,7 @@ export const SettingsPage = () => {
       description: 'Third-party connections and API access',
       icon: Zap,
       component: null,
-      available: user?.role === 'owner' || user?.role === 'manager'
+      available: user?.role === 'super_admin' || user?.role === 'manager'
     },
     {
       id: 'data' as SettingSection,

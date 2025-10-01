@@ -37,7 +37,7 @@ interface AccessDeniedUIProps {
 
 const getRoleIcon = (role: string) => {
   switch (role) {
-    case 'owner': return Crown;
+    case 'super_admin': return Crown;
     case 'big7': return Building;
     case 'manager': return Users;
     case 'vendor': return UserCheck;
@@ -48,7 +48,7 @@ const getRoleIcon = (role: string) => {
 
 const getRoleColor = (role: string) => {
   switch (role) {
-    case 'owner': return 'bg-red-100 text-red-800 border-red-200';
+    case 'super_admin': return 'bg-red-100 text-red-800 border-red-200';
     case 'big7': return 'bg-purple-100 text-purple-800 border-purple-200';
     case 'manager': return 'bg-blue-100 text-blue-800 border-blue-200';
     case 'vendor': return 'bg-green-100 text-green-800 border-green-200';
@@ -76,8 +76,8 @@ const getUpgradeTarget = (userRole: string): { role: string; description: string
       };
     default:
       return {
-        role: 'owner',
-        description: 'Owner privileges required for full system access'
+        role: 'super_admin',
+        description: 'Super Admin privileges required for full system access'
       };
   }
 };

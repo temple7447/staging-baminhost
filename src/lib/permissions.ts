@@ -258,9 +258,9 @@ export const PERMISSIONS: Record<string, Permission> = {
 
 // Define role configurations
 export const ROLE_CONFIGS: Record<string, RoleConfig> = {
-  owner: {
-    id: 'owner',
-    name: 'Owner',
+  super_admin: {
+    id: 'super_admin',
+    name: 'Super Admin',
     description: 'Business owner with full access',
     priority: 100,
     permissions: [

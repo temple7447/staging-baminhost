@@ -107,7 +107,7 @@ export const DEMO_USERS = [
     id: '1',
     email: 'ebami@eyituoyo.com',
     name: 'Ebami Eyituoyo',
-    role: 'owner' as const,
+    role: 'super_admin' as const,
     permissions: ['all'],
     workHours: { total: 8, active: 3 }, // 1/3rd rule
   },

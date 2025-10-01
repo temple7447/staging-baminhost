@@ -41,7 +41,7 @@ const Index = () => {
   const renderDashboard = () => {
     console.log('Rendering dashboard for user:', user);
     switch (user.role) {
-      case 'owner':
+      case 'super_admin':
         return <OwnerDashboard />;
       case 'big7':
         return <Big7Dashboard />;

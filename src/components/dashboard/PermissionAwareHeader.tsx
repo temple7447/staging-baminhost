@@ -79,7 +79,7 @@ export const PermissionAwareHeader: React.FC<PermissionAwareHeaderProps> = ({
 
             {/* Premium Feature Indicator */}
             {premiumFeature && (
-              <ProtectedFeature allowedRoles={['owner', 'big7', 'manager']}>
+              <ProtectedFeature allowedRoles={['super_admin', 'big7', 'manager']}>
                 <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-xs">
                   <Crown className="w-3 h-3 mr-1" />
                   Premium

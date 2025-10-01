@@ -66,7 +66,7 @@ export const usePermissions = () => {
       getPermissionsByCategory: getPermissionsByCat,
       
       // Convenience computed values
-      isOwner: userRole === 'owner',
+      isOwner: userRole === 'super_admin',
       isBig7: userRole === 'big7',
       isManager: userRole === 'manager',
       isVendor: userRole === 'vendor',

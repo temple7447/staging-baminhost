@@ -67,9 +67,9 @@ export const UserProfile = () => {
   // Get user role details
   const getRoleDetails = (role: string) => {
     switch (role) {
-      case 'owner':
+      case 'super_admin':
         return {
-          title: 'System Owner',
+          title: 'System Super Admin',
           description: 'Full system access with master control',
           color: 'bg-red-100 text-red-800',
           permissions: ['All Permissions'],

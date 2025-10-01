@@ -61,7 +61,7 @@ const Projects = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-slate-300/85">
-              Owner, admin, manager, vendor, and customer experiences tailored to their needs.
+              super admin, admin, manager, vendor, and customer experiences tailored to their needs.
             </CardContent>
           </Card>
         </div>

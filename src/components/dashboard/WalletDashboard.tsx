@@ -27,7 +27,7 @@ export const WalletDashboard = () => {
 
   // Get wallet data based on user role
   const getWalletData = () => {
-    const role = user?.role || 'owner';
+    const role = user?.role || 'super_admin';
     return WALLET_DATA[role as keyof typeof WALLET_DATA] || WALLET_DATA.owner;
   };
 
@@ -71,7 +71,7 @@ export const WalletDashboard = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground">Universal Wallet</h1>
           <p className="text-muted-foreground">
-            {user?.role === 'owner' ? 'Master' : user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)} Wallet - 50/30/20 Split Management
+            {user?.role === 'super_admin' ? 'Master' : user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)} Wallet - 50/30/20 Split Management
           </p>
         </div>
         <div className="flex gap-2">
@@ -187,11 +187,11 @@ export const WalletDashboard = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center justify-between">
-                  {user?.role === 'owner' ? 'Owner Withdrawals' : 'Profit Share'}
+                  {user?.role === 'super_admin' ? 'Owner Withdrawals' : 'Profit Share'}
                   <Badge variant="secondary">30%</Badge>
                 </CardTitle>
                 <CardDescription>
-                  {user?.role === 'owner' ? 'Pocket money & personal use' : 'Your profit allocation'}
+                  {user?.role === 'super_admin' ? 'Pocket money & personal use' : 'Your profit allocation'}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">

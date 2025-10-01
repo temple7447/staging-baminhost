@@ -38,7 +38,7 @@ export interface FolderPermission {
   id: string;
   folderId: string;
   userId?: string;
-  roleType?: 'super_admin' | 'admin' | 'manager' | 'vendor' | 'customer' | 'owner';
+  roleType?: 'super_admin' | 'admin' | 'manager' | 'vendor' | 'customer';
   permission: 'read' | 'write' | 'admin' | 'full';
   createdAt: string;
 }
