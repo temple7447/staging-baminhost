@@ -97,6 +97,20 @@ interface WhyStatement {
   };
 }
 
+interface HowStatement {
+  action1: string;
+  action2: string;
+  action3: string;
+  action4: string;
+  action5: string;
+}
+
+interface TakingActionItems {
+  currentAction1: string;
+  currentAction2: string;
+  currentAction3: string;
+}
+
 const ScalableImpactPlanner: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
@@ -191,6 +205,20 @@ const ScalableImpactPlanner: React.FC = () => {
       externalWhy: ''
     }
   });
+  
+  const [howStatement, setHowStatement] = useState<HowStatement>({
+    action1: '',
+    action2: '',
+    action3: '',
+    action4: '',
+    action5: ''
+  });
+  
+  const [takingActionItems, setTakingActionItems] = useState<TakingActionItems>({
+    currentAction1: '',
+    currentAction2: '',
+    currentAction3: ''
+  });
 
   // Local storage utility functions
   const saveToLocalStorage = (key: string, data: any) => {
@@ -233,6 +261,14 @@ const ScalableImpactPlanner: React.FC = () => {
     // Load why statement
     const savedWhy = loadFromLocalStorage('scalable_impact_why');
     if (savedWhy) setWhyStatement(savedWhy);
+    
+    // Load how statement
+    const savedHow = loadFromLocalStorage('scalable_impact_how');
+    if (savedHow) setHowStatement(savedHow);
+    
+    // Load taking action items
+    const savedTakingAction = loadFromLocalStorage('scalable_impact_taking_action');
+    if (savedTakingAction) setTakingActionItems(savedTakingAction);
 
     // Load financial targets
     const savedCurrent = loadFromLocalStorage('scalable_impact_current_target');
@@ -248,6 +284,8 @@ const ScalableImpactPlanner: React.FC = () => {
     saveToLocalStorage('scalable_impact_starting', startingPoint);
     saveToLocalStorage('scalable_impact_ending', endingPoint);
     saveToLocalStorage('scalable_impact_why', whyStatement);
+    saveToLocalStorage('scalable_impact_how', howStatement);
+    saveToLocalStorage('scalable_impact_taking_action', takingActionItems);
     saveToLocalStorage('scalable_impact_current_target', currentTarget);
     saveToLocalStorage('scalable_impact_year_target', yearTarget);
     if (progressData) {
@@ -260,7 +298,7 @@ const ScalableImpactPlanner: React.FC = () => {
     if (user?.id) {
       saveStepData();
     }
-  }, [currentStep, startingPoint, endingPoint, whyStatement, currentTarget, yearTarget, progressData, user?.id]);
+  }, [currentStep, startingPoint, endingPoint, whyStatement, howStatement, takingActionItems, currentTarget, yearTarget, progressData, user?.id]);
 
   const loadProgressData = async () => {
     if (!user?.id) return;
@@ -1060,53 +1098,137 @@ const ScalableImpactPlanner: React.FC = () => {
       </div>
 
       {/* HOW Section */}
-      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <Card className="border-2 border-green-200">
           <CardHeader className="bg-green-600 text-white">
             <CardTitle className="text-xl font-bold">HOW</CardTitle>
+            <p className="text-green-100 text-sm mt-1">Strategic Action Items</p>
           </CardHeader>
           <CardContent className="p-6">
             <div className="relative">
               {/* Green sidebar */}
               <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-600"></div>
               
-              <ol className="space-y-3 ml-6">
-                <li className="flex items-center">
-                  <span className="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3">1</span>
-                  Test new acquisition funnel
-                </li>
-                <li className="flex items-center">
-                  <span className="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3">2</span>
-                  Find a new traffic agency
-                </li>
-                <li className="flex items-center">
-                  <span className="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3">3</span>
-                  Hire and onboard an operations manager
-                </li>
-                <li className="flex items-center">
-                  <span className="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3">4</span>
-                  Launch an employee training program
-                </li>
-                <li className="flex items-center">
-                  <span className="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3">5</span>
-                  Upgrade tech stack
-                </li>
-              </ol>
+              <div className="space-y-4 ml-6">
+                <div className="flex items-center space-x-3">
+                  <span className="bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
+                  <Input
+                    value={howStatement.action1}
+                    onChange={(e) => setHowStatement(prev => ({ ...prev, action1: e.target.value }))}
+                    placeholder="e.g., Test new acquisition funnel"
+                    className="flex-1"
+                  />
+                </div>
+                <div className="flex items-center space-x-3">
+                  <span className="bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
+                  <Input
+                    value={howStatement.action2}
+                    onChange={(e) => setHowStatement(prev => ({ ...prev, action2: e.target.value }))}
+                    placeholder="e.g., Find a new traffic agency"
+                    className="flex-1"
+                  />
+                </div>
+                <div className="flex items-center space-x-3">
+                  <span className="bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
+                  <Input
+                    value={howStatement.action3}
+                    onChange={(e) => setHowStatement(prev => ({ ...prev, action3: e.target.value }))}
+                    placeholder="e.g., Hire and onboard an operations manager"
+                    className="flex-1"
+                  />
+                </div>
+                <div className="flex items-center space-x-3">
+                  <span className="bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">4</span>
+                  <Input
+                    value={howStatement.action4}
+                    onChange={(e) => setHowStatement(prev => ({ ...prev, action4: e.target.value }))}
+                    placeholder="e.g., Launch an employee training program"
+                    className="flex-1"
+                  />
+                </div>
+                <div className="flex items-center space-x-3">
+                  <span className="bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">5</span>
+                  <Input
+                    value={howStatement.action5}
+                    onChange={(e) => setHowStatement(prev => ({ ...prev, action5: e.target.value }))}
+                    placeholder="e.g., Upgrade tech stack"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
         
-        {/* Taking Action Circle */}
-        <div className="absolute bottom-4 right-4">
-          <div className="relative">
-            <div className="w-24 h-24 border-4 border-red-500 rounded-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-xs font-bold text-red-500 leading-tight">TAKING</div>
-                <div className="text-xs font-bold text-red-500 leading-tight">ACTION</div>
-              </div>
-            </div>
-          </div>
+        {/* Save HOW Statement Button */}
+        <div className="flex justify-center mt-6">
+          <Button onClick={() => {
+            saveStepData();
+            toast({
+              title: "HOW Statement Saved! ⚙️",
+              description: "Your strategic action items have been saved.",
+            });
+          }} size="lg" className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
+            <Save className="w-4 h-4" />
+            Save Action Plan
+          </Button>
         </div>
+      </div>
+
+      {/* Taking Action Section */}
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <Card className="border-2 border-red-200 bg-red-50">
+          <CardHeader className="bg-red-600 text-white text-center">
+            <CardTitle className="text-xl font-bold">TAKING ACTION</CardTitle>
+            <p className="text-red-100 text-sm mt-1">Current Active Initiatives</p>
+          </CardHeader>
+          <CardContent className="p-6 space-y-4">
+            <div>
+              <Label htmlFor="current-action-1" className="text-sm font-medium text-gray-700">Current Priority Action 1</Label>
+              <Input
+                id="current-action-1"
+                value={takingActionItems.currentAction1}
+                onChange={(e) => setTakingActionItems(prev => ({ ...prev, currentAction1: e.target.value }))}
+                placeholder="What are you actively working on right now?"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="current-action-2" className="text-sm font-medium text-gray-700">Current Priority Action 2</Label>
+              <Input
+                id="current-action-2"
+                value={takingActionItems.currentAction2}
+                onChange={(e) => setTakingActionItems(prev => ({ ...prev, currentAction2: e.target.value }))}
+                placeholder="What's your second priority this week?"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="current-action-3" className="text-sm font-medium text-gray-700">Current Priority Action 3</Label>
+              <Input
+                id="current-action-3"
+                value={takingActionItems.currentAction3}
+                onChange={(e) => setTakingActionItems(prev => ({ ...prev, currentAction3: e.target.value }))}
+                placeholder="What else are you focusing on this week?"
+                className="mt-1"
+              />
+            </div>
+            
+            {/* Save Taking Action Button */}
+            <div className="flex justify-center mt-6">
+              <Button onClick={() => {
+                saveStepData();
+                toast({
+                  title: "Taking Action Saved! 🎨",
+                  description: "Your current action items have been saved.",
+                });
+              }} size="lg" className="flex items-center gap-2 bg-red-600 hover:bg-red-700">
+                <Save className="w-4 h-4" />
+                Save Current Actions
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Seven Levels Framework Explanation */}
