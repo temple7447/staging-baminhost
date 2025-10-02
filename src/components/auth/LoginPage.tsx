@@ -121,12 +121,7 @@ export const LoginPage = () => {
             <Building className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold">Eyituoyo Portfolio System</h1>
-          <p className="text-muted-foreground">Complete Business & Personal Portfolio Management</p>
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <Badge variant="outline" className="text-xs">₦52.75M Net Worth</Badge>
-            <Badge variant="outline" className="text-xs">50/30/20 Split</Badge>
-            <Badge variant="outline" className="text-xs">1/3rd Rule</Badge>
-          </div>
+          
         </div>
 
         {/* Login Form */}
@@ -215,30 +210,8 @@ export const LoginPage = () => {
         </Card>
 
       
-        
-        {/* System Features Overview */}
-        <Card className="backdrop-blur-md bg-white/90 shadow-xl border-white/20">
-          <CardHeader>
-            <CardTitle className="text-lg">System Features</CardTitle>
-            <CardDescription>What you'll find in this portfolio management system</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="space-y-2">
-                <div className="font-medium text-foreground">🏢 Business Operations</div>
-                <div className="text-muted-foreground">• 38 Estate Properties</div>
-                <div className="text-muted-foreground">• Filling Station (4 Tanks)</div>
-                <div className="text-muted-foreground">• Equipment Rental (3 Units)</div>
-              </div>
-              <div className="space-y-2">
-                <div className="font-medium text-foreground">📊 Advanced Features</div>
-                <div className="text-muted-foreground">• 50/30/20 Recursive Splits</div>
-                <div className="text-muted-foreground">• AI Assistant & WhatsApp</div>
-                <div className="text-muted-foreground">• CRM & Library System</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
+     
       </div>
     </div>
   );

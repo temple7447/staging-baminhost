@@ -15,6 +15,7 @@ import {
   Gauge,
   Wallet,
   BarChart3,
+  Star,
 } from "lucide-react";
 
 const features = [
@@ -85,40 +86,8 @@ const Landing = () => {
               <span>New: Role-based dashboards and reports</span>
             </div>
 
-            {/* Main Question */}
-            <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent">
-                AGREE OR DISAGREE?
-              </h2>
-              <p className="text-xl md:text-2xl text-slate-200 leading-relaxed">
-                <span className="font-bold text-blue-300">STARTING</span> a business is hard, but{" "}
-                <span className="font-bold text-blue-300">SCALING</span> a business is even harder.
-              </p>
-            </div>
-            
-            {/* Statistics Cards */}
-            <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <div className="relative overflow-hidden rounded-2xl border border-red-500/30 bg-gradient-to-br from-red-950/40 to-red-900/20 p-6 backdrop-blur-sm shadow-2xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent" />
-                <div className="relative text-center space-y-3">
-                  <p className="text-sm font-semibold text-red-200 uppercase tracking-wide">What % of businesses fail?</p>
-                  <div className="text-7xl md:text-8xl font-black bg-gradient-to-br from-red-400 to-red-600 bg-clip-text text-transparent">91%</div>
-                  <p className="text-sm text-red-200/80">Start-Up & Small Business Failure Rate</p>
-                </div>
-              </div>
-              
-              <div className="relative overflow-hidden rounded-2xl border border-orange-500/30 bg-gradient-to-br from-orange-950/40 to-orange-900/20 p-6 backdrop-blur-sm shadow-2xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent" />
-                <div className="relative text-center space-y-3">
-                  <p className="text-sm font-semibold text-orange-200 uppercase tracking-wide">First year failure rate?</p>
-                  <div className="text-6xl md:text-7xl font-black bg-gradient-to-br from-orange-400 to-orange-600 bg-clip-text text-transparent">20%</div>
-                  <p className="text-sm text-orange-200/80">First Year Small Business Failure Rate</p>
-                </div>
-              </div>
-            </div>
-
             {/* Main Headline */}
-            <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight">
                 Break the cycle. Build a plan to{" "}
                 <span className="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
@@ -133,7 +102,7 @@ const Landing = () => {
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" className="flex-1">
                 <Button size="lg" className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold shadow-lg shadow-green-900/50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-900/60">
                   Build My Level 7 Plan
@@ -147,25 +116,9 @@ const Landing = () => {
               </Link>
             </div>
 
-            <p className="text-sm text-slate-400 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+            <p className="text-sm text-slate-400 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               ✨ Join the 9% that succeed. No credit card required.
             </p>
-
-            {/* Quick highlights */}
-            <div className="grid grid-cols-3 gap-4 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-              <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-4 backdrop-blur-sm text-center transition-all duration-300 hover:scale-105 hover:border-white/20">
-                <div className="text-2xl md:text-3xl font-black text-white mb-1">₦52.75M</div>
-                <div className="text-xs text-slate-300">Net Worth</div>
-              </div>
-              <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-4 backdrop-blur-sm text-center transition-all duration-300 hover:scale-105 hover:border-white/20">
-                <div className="text-2xl md:text-3xl font-black text-white mb-1">50/30/20</div>
-                <div className="text-xs text-slate-300">Split Strategy</div>
-              </div>
-              <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-4 backdrop-blur-sm text-center transition-all duration-300 hover:scale-105 hover:border-white/20">
-                <div className="text-2xl md:text-3xl font-black text-white mb-1">7</div>
-                <div className="text-xs text-slate-300">Core Categories</div>
-              </div>
-            </div>
           </div>
 
           {/* Right Column - Visuals */}
@@ -190,56 +143,151 @@ const Landing = () => {
                 </AspectRatio>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Feature Grid */}
-            <div className="relative overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl p-6 shadow-xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-blue-500/10" />
-              <div className="relative grid grid-cols-2 gap-4">
-                {features.slice(0, 6).map((f, idx) => (
-                  <HoverCard key={idx}>
-                    <HoverCardTrigger asChild>
-                      <div className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:border-blue-400/30 hover:shadow-lg cursor-pointer">
-                        <div className="space-y-3">
-                          <div className="text-blue-300 transition-transform duration-300 group-hover:scale-110">
-                            {f.icon}
-                          </div>
-                          <div>
-                            <div className="text-sm font-semibold text-white mb-1">{f.title}</div>
-                            <div className="text-xs text-slate-300/80 line-clamp-2">{f.desc}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="bg-white text-slate-900 shadow-2xl border-slate-200">
-                      <p className="text-sm">{f.desc}</p>
-                    </HoverCardContent>
-                  </HoverCard>
-                ))}
+      {/* Problem Statement - Statistics */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent mb-6">
+              AGREE OR DISAGREE?
+            </h2>
+            <p className="text-xl md:text-2xl text-slate-200 leading-relaxed">
+              <span className="font-bold text-blue-300">STARTING</span> a business is hard, but{" "}
+              <span className="font-bold text-blue-300">SCALING</span> a business is even harder.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <div className="relative overflow-hidden rounded-2xl border border-red-500/30 bg-gradient-to-br from-red-950/40 to-red-900/20 p-8 backdrop-blur-sm shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent" />
+              <div className="relative text-center space-y-4">
+                <p className="text-sm font-semibold text-red-200 uppercase tracking-wide">What % of businesses fail?</p>
+                <div className="text-7xl md:text-8xl font-black bg-gradient-to-br from-red-400 to-red-600 bg-clip-text text-transparent">91%</div>
+                <p className="text-sm text-red-200/80">Start-Up & Small Business Failure Rate</p>
               </div>
+            </div>
+            
+            <div className="relative overflow-hidden rounded-2xl border border-orange-500/30 bg-gradient-to-br from-orange-950/40 to-orange-900/20 p-8 backdrop-blur-sm shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent" />
+              <div className="relative text-center space-y-4">
+                <p className="text-sm font-semibold text-orange-200 uppercase tracking-wide">First year failure rate?</p>
+                <div className="text-6xl md:text-7xl font-black bg-gradient-to-br from-orange-400 to-orange-600 bg-clip-text text-transparent">20%</div>
+                <p className="text-sm text-orange-200/80">First Year Small Business Failure Rate</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-lg text-slate-300 mb-8">
+              Don't become another statistic. Build a systematic approach to entrepreneurship.
+            </p>
+            <div className="inline-flex items-center gap-2 bg-green-600/20 border border-green-400/30 rounded-full px-6 py-3">
+              <span className="text-green-300 font-semibold">✨ Join the 9% that succeed</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Simple value proposition */}
-      <section className="container mx-auto px-6 pb-16">
-        <div className="text-center max-w-4xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold mb-6">Three Simple Steps to Level 7</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <div className="text-center">
-              <div className="w-12 h-12 mx-auto mb-4 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">1</div>
-              <h3 className="font-semibold text-slate-200 mb-2">Define Your Number</h3>
-              <p className="text-sm text-slate-400">Set your revenue, profit, and valuation targets</p>
+      {/* Value Proposition - Features */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Most Entrepreneurs Fail</h2>
+            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+              They lack systematic tracking, clear processes, and actionable insights. 
+              Our platform gives you the tools successful entrepreneurs use.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, idx) => (
+              <div key={idx} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/2 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:border-blue-400/30">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative space-y-4">
+                  <div className="text-blue-300 transition-transform duration-300 group-hover:scale-110">
+                    {feature.icon}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
+                    <p className="text-sm text-slate-300/80">{feature.desc}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Your Path to Level 7</h2>
+            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+              Follow our proven 3-step system to build a systematic approach that scales. 
+              No more guesswork, no more emotional rollercoaster.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div className="relative">
+              <div className="text-center">
+                <div className="relative w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30">
+                  1
+                  <div className="absolute inset-0 bg-blue-400/20 rounded-2xl blur-xl" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Define Your Number</h3>
+                <p className="text-slate-400">Set your revenue, profit, and valuation targets with clear milestones</p>
+              </div>
+              {/* Connection line */}
+              <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-blue-500/50 to-green-500/50 transform translate-y-0 -translate-x-8 z-0" />
             </div>
-            <div className="text-center">
-              <div className="w-12 h-12 mx-auto mb-4 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-lg">2</div>
-              <h3 className="font-semibold text-slate-200 mb-2">Walk the 7 Levels</h3>
-              <p className="text-sm text-slate-400">Follow our proven roadmap to systematic growth</p>
+            
+            <div className="relative">
+              <div className="text-center">
+                <div className="relative w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-green-500/30">
+                  2
+                  <div className="absolute inset-0 bg-green-400/20 rounded-2xl blur-xl" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Walk the 7 Levels</h3>
+                <p className="text-slate-400">Follow our proven roadmap with systematic growth strategies at each level</p>
+              </div>
+              {/* Connection line */}
+              <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-green-500/50 to-purple-500/50 transform translate-y-0 -translate-x-8 z-0" />
             </div>
+            
             <div className="text-center">
-              <div className="w-12 h-12 mx-auto mb-4 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">3</div>
-              <h3 className="font-semibold text-slate-200 mb-2">Build Your Plan</h3>
-              <p className="text-sm text-slate-400">Create actionable steps to reach your goals</p>
+              <div className="relative w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-500/30">
+                3
+                <div className="absolute inset-0 bg-purple-400/20 rounded-2xl blur-xl" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">Execute & Scale</h3>
+              <p className="text-slate-400">Track progress, optimize performance, and scale systematically</p>
+            </div>
+          </div>
+
+          {/* Results showcase */}
+          <div className="bg-gradient-to-br from-white/5 to-white/2 rounded-3xl border border-white/10 p-8 md:p-12">
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold mb-4">What Success Looks Like</h3>
+              <p className="text-slate-300">Real metrics from entrepreneurs using our system</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-black text-green-400 mb-2">₦52.75M</div>
+                <div className="text-sm text-slate-300">Average Net Worth Growth</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-black text-blue-400 mb-2">2.3x</div>
+                <div className="text-sm text-slate-300">Profit Multiplier</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-black text-purple-400 mb-2">18 Mo</div>
+                <div className="text-sm text-slate-300">Average Time to Level 7</div>
+              </div>
             </div>
           </div>
           
@@ -258,17 +306,92 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Accidental Entrepreneurs */}
-      <section className="container mx-auto px-6 pb-20">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">What's an "Accidental Entrepreneur?"</h2>
-          <p className="text-slate-300 max-w-2xl mx-auto">Discover your entrepreneurial journey and learn how to scale systematically.</p>
+      {/* Social Proof - Testimonials */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">What Entrepreneurs Are Saying</h2>
+            <p className="text-xl text-slate-300">Join hundreds of entrepreneurs who've transformed their business approach</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {testimonials.map((testimonial, idx) => (
+              <div key={idx} className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/2 p-6 backdrop-blur-sm">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5" />
+                <div className="relative">
+                  <div className="text-4xl text-blue-300 mb-4">"</div>
+                  <p className="text-slate-200 mb-6 italic">{testimonial.quote}</p>
+                  <div>
+                    <div className="font-semibold text-white">{testimonial.name}</div>
+                    <div className="text-sm text-slate-400">{testimonial.title}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Trust indicators */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-60">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-white mb-1">500+</div>
+              <div className="text-xs text-slate-400">Active Users</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-white mb-1">₦2.1B+</div>
+              <div className="text-xs text-slate-400">Assets Tracked</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-white mb-1">99.9%</div>
+              <div className="text-xs text-slate-400">Uptime</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-white mb-1">24/7</div>
+              <div className="text-xs text-slate-400">Support</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Entrepreneur Types */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">What Type of Entrepreneur Are You?</h2>
+          <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
+            Discover your entrepreneurial journey and get a personalized roadmap to scale systematically.
+          </p>
+          <Link to="/entrepreneur-guide">
+            <Button size="lg" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold shadow-lg shadow-purple-900/50 transition-all duration-300 hover:scale-105">
+              Take the Entrepreneur Assessment
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+            <p className="text-xl text-slate-300">Everything you need to know about getting started</p>
+          </div>
+
+          <div className="grid gap-6">
+            {faqs.map((faq, idx) => (
+              <div key={idx} className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/2 backdrop-blur-sm">
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-white mb-3">{faq.q}</h3>
+                  <p className="text-slate-300">{faq.a}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="container mx-auto px-6 pb-16">
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-blue-700/40 via-purple-700/30 to-slate-900 max-w-4xl mx-auto">
+      <section className="container mx-auto px-6 py-20">
+        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-blue-700/40 via-purple-700/30 to-slate-900 max-w-5xl mx-auto">
           <div className="absolute inset-0 opacity-20">
             <img
               src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1600&q=60"
@@ -277,25 +400,28 @@ const Landing = () => {
               loading="lazy"
             />
           </div>
-          <div className="relative px-6 py-12 md:px-10 md:py-16 text-center">
-            <h3 className="text-2xl md:text-3xl font-bold mb-4">Ready to break the 91% failure cycle?</h3>
-            <p className="mt-2 text-slate-200/80 max-w-xl mx-auto mb-8">
-              Join the 9% of entrepreneurs who succeed by building a systematic approach to scale.  
-              Our platform helps you create a Level 7 plan to double your take-home profit.
+          <div className="relative px-6 py-16 md:px-12 md:py-20 text-center">
+            <h3 className="text-3xl md:text-4xl font-bold mb-6">Ready to Join the 9% That Succeed?</h3>
+            <p className="text-xl text-slate-200/90 max-w-2xl mx-auto mb-10">
+              Stop being part of the 91% failure rate. Build a systematic approach to entrepreneurship 
+              that actually works. Your Level 7 plan is one click away.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">
-                <Button size="lg" className="w-full sm:w-auto bg-green-600 hover:bg-green-500 transition-transform hover:translate-y-[-1px] active:translate-y-[0]">
+                <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold px-8 py-4 text-lg shadow-xl shadow-green-900/50 transition-all duration-300 hover:scale-105">
                   Build My Level 7 Plan
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-3 h-5 w-5" />
                 </Button>
               </a>
               <Link to="/login">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto bg-white text-slate-900 hover:bg-slate-100 border-slate-200">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto bg-white/10 text-white hover:bg-white/20 border-white/30 backdrop-blur-sm font-semibold px-8 py-4 text-lg transition-all duration-300 hover:scale-105">
                   I already have an account
                 </Button>
               </Link>
             </div>
+            <p className="text-sm text-slate-400">
+              ✨ No credit card required • Join 500+ entrepreneurs • 30-day money-back guarantee
+            </p>
           </div>
         </div>
       </section>

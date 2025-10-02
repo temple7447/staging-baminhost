@@ -150,26 +150,7 @@ export const ForgotPassword = ({ onBack }: PasswordResetProps) => {
             </Alert>
           )}
 
-          {/* Demo Email Hints */}
-          <Alert>
-            <Shield className="h-4 w-4" />
-            <AlertDescription>
-              <div className="font-medium mb-2">Demo Reset Emails:</div>
-              <div className="space-y-1 text-sm">
-                {validEmails.slice(0, 3).map((demoEmail, index) => (
-                  <Badge 
-                    key={index}
-                    variant="outline" 
-                    className="mr-2 mb-1 cursor-pointer hover:bg-muted"
-                    onClick={() => setEmail(demoEmail)}
-                  >
-                    {demoEmail}
-                  </Badge>
-                ))}
-              </div>
-              <div className="mt-2 text-xs">Click any email to auto-fill</div>
-            </AlertDescription>
-          </Alert>
+        
 
           <div className="space-y-3">
             <Button type="submit" className="w-full" disabled={isLoading}>
