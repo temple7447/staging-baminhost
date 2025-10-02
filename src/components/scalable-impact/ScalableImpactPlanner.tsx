@@ -20,7 +20,10 @@ import {
   Info,
   RefreshCw,
   Save,
-  Bell
+  Bell,
+  Check,
+  ArrowRight,
+  Calculator
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
@@ -99,18 +102,18 @@ const ScalableImpactPlanner: React.FC = () => {
   const { user } = useAuth();
   const [userNumber, setUserNumber] = useState<string>('');
   const [currentTarget, setCurrentTarget] = useState<FinancialTarget>({
-    revenue: '',
-    profit: '',
-    profitPercentage: '',
-    value: '',
-    valueMultiplier: ''
+    revenue: '100,000,000',
+    profit: '15,000,000',
+    profitPercentage: '15',
+    value: '37,500,000',
+    valueMultiplier: '2.5'
   });
   const [yearTarget, setYearTarget] = useState<FinancialTarget>({
-    revenue: '',
-    profit: '',
-    profitPercentage: '',
-    value: '',
-    valueMultiplier: ''
+    revenue: '500,000,000',
+    profit: '100,000,000',
+    profitPercentage: '20',
+    value: '750,000,000',
+    valueMultiplier: '7.5'
   });
   
   // Progress tracking state - Initialize with default structure to prevent null errors
@@ -418,6 +421,42 @@ const ScalableImpactPlanner: React.FC = () => {
     });
   };
 
+  // Calculate smart targets based on current values
+  const calculateSmartTargets = () => {
+    const currentRev = parseFloat(currentTarget.revenue.replace(/,/g, '')) || 0;
+    const currentProfit = parseFloat(currentTarget.profit.replace(/,/g, '')) || 0;
+    const currentValue = parseFloat(currentTarget.value.replace(/,/g, '')) || 0;
+
+    if (currentRev === 0) {
+      toast({
+        title: "Enter Current Values First",
+        description: "Please enter your current revenue to generate smart targets.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Calculate 3-year targets with 40-50% annual growth (aggressive but achievable)
+    const growthMultiplier = 3.5; // Approximately 40% annual growth compounded
+    const targetRevenue = Math.round(currentRev * growthMultiplier);
+    const targetProfit = Math.round(currentProfit * growthMultiplier * 1.2); // Slightly higher profit growth
+    const targetValue = Math.round(currentValue * growthMultiplier * 2); // Higher value multiple
+    const targetProfitPercentage = Math.min(parseFloat(currentTarget.profitPercentage) + 5, 25); // Improve margins by 5%
+
+    setYearTarget({
+      revenue: targetRevenue.toLocaleString(),
+      profit: targetProfit.toLocaleString(),
+      profitPercentage: targetProfitPercentage.toString(),
+      value: targetValue.toLocaleString(),
+      valueMultiplier: '7.5'
+    });
+
+    toast({
+      title: "Smart Targets Generated! 🎢",
+      description: "3-year targets calculated based on aggressive but achievable 40% annual growth.",
+    });
+  };
+
   // Calculate growth benchmarks
   const calculateBenchmarks = (currentRevenue: number, targetRevenue: number, strategy: string) => {
     let year1, year2, year3;
@@ -523,989 +562,698 @@ const ScalableImpactPlanner: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* Header Section */}
-      <div className="text-center space-y-6">
-        <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-gray-900">What is your number</h1>
-          <p className="text-xl text-gray-600">The Scalable Impact Planner</p>
-          <p className="max-w-3xl mx-auto text-gray-700">
-            Entrepreneurs should define their 'number'—a financial or business goal that represents their success. 
-            The Scalable Impact Planner helps align their goal with their vision and create a concrete plan to achieve it.
-          </p>
-        </div>
-        
-        {/* Step Navigation */}
-        <div className="flex justify-center mb-6">
-          <div className="flex items-center space-x-4">
-            {[1, 2, 3, 4].map((step) => {
-              const isActive = currentStep === step;
-              const isCompleted = (
-                (step === 1) ||
-                (step === 2 && isStep2Valid()) ||
-                (step === 3 && isStep2Valid() && isStep3Valid()) ||
-                (step === 4 && isStep2Valid() && isStep3Valid() && isStep4Valid())
-              );
-              const stepTitles = {
-                1: "Define Your Number",
-                2: "Starting Point",
-                3: "Ending Point", 
-                4: "Codify Your Why"
-              };
+    <div className="max-w-6xl mx-auto p-6 bg-white">
+      {/* Top Progress Section */}
+      <div className="bg-gray-100 p-4 rounded-t-lg border-b">
+        <div className="flex justify-between items-center px-4">
+          {/* Step Progress Indicators */}
+          <div className="flex items-center justify-center space-x-4 sm:space-x-6 lg:space-x-8 w-full overflow-x-auto pb-2">
+            {[1, 2, 3, 4, 5, 6, 7].map((step, index) => {
+              const stepTitles = [
+                'Sell and Serve\nTen Customers',
+                'Build a Growth\nFlywheel',
+                'Upgrade Your\nBusiness OS',
+                'Double Your\nTake-Home',
+                'Build Your\nAdvisory Board',
+                'Expand Through\nAcquisition',
+                'Hit Your\nNumber'
+              ];
+              const colors = [
+                'bg-red-500',
+                'bg-orange-500', 
+                'bg-yellow-500',
+                'bg-green-500',
+                'bg-blue-500',
+                'bg-indigo-500',
+                'bg-black'
+              ];
               
               return (
-                <React.Fragment key={step}>
-                  <div 
-                    onClick={() => goToStep(step)}
-                    className={`flex flex-col items-center cursor-pointer transition-all duration-200 ${
-                      isActive ? 'scale-110' : 'hover:scale-105'
-                    }`}
-                  >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold border-2 ${
-                      isCompleted ? 'bg-green-500 border-green-500' :
-                      isActive ? 'bg-blue-500 border-blue-500' :
-                      'bg-gray-400 border-gray-400'
-                    }`}>
-                      {isCompleted && step !== currentStep ? (
-                        <CheckCircle2 className="w-6 h-6" />
-                      ) : (
-                        step
-                      )}
-                    </div>
-                    <span className={`text-xs mt-1 font-medium ${
-                      isActive ? 'text-blue-600' : 'text-gray-600'
-                    }`}>
-                      {stepTitles[step as keyof typeof stepTitles]}
-                    </span>
+                <div key={step} className="flex flex-col items-center min-w-0 flex-shrink-0">
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full ${colors[index]} flex items-center justify-center text-white text-sm font-bold mb-3`}>
+                    {step <= 5 ? <Check className="w-5 h-5 sm:w-6 sm:h-6" /> : step}
                   </div>
-                  {step < 4 && (
-                    <div className={`w-8 h-0.5 ${
-                      step < currentStep ? 'bg-green-500' : 'bg-gray-300'
-                    }`} />
-                  )}
-                </React.Fragment>
+                  <div className="text-center max-w-24 sm:max-w-28">
+                    <div className="text-xs sm:text-sm font-medium text-gray-700 leading-tight whitespace-pre-line px-1">
+                      {stepTitles[index]}
+                    </div>
+                    <Checkbox className="mt-3" checked={step <= 5} disabled />
+                  </div>
+                </div>
               );
             })}
           </div>
         </div>
-        
-        {/* Progress Assessment Controls */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Bell className="w-4 h-4" />
-            <span>Current Level: <strong>Level {progressData?.currentLevel || 1}</strong></span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Info className="w-4 h-4" />
-            <span>Last Assessment: {new Date(lastAssessmentTime).toLocaleDateString()}</span>
-          </div>
-          <Button 
-            onClick={assessAllProgress} 
-            disabled={isAssessing}
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            {isAssessing ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <RefreshCw className="w-4 h-4" />
-            )}
-            Assess Progress
-          </Button>
-        </div>
       </div>
 
-      {/* Step Content */}
-      {currentStep === 1 && (
-        <div className="space-y-8">
-          {/* Financial Goals Section - Step 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* WHAT Section - Current State */}
-        <Card className="border-2 border-green-200 bg-green-50">
-          <CardHeader className="bg-green-600 text-white">
-            <CardTitle className="text-xl font-bold">WHAT</CardTitle>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 p-4 sm:p-6 lg:p-8 bg-white">
+        {/* Current Section */}
+        <Card className="border-2 border-green-200">
+          <CardHeader className="bg-green-600 text-white text-center">
+            <CardTitle className="text-2xl font-bold">CURRENT</CardTitle>
           </CardHeader>
-          <CardContent className="p-6 space-y-4">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="current-revenue">Revenue</Label>
-                <div className="flex items-center space-x-2">
-                  <DollarSign className="w-4 h-4 text-green-600" />
-                  <Input
-                    id="current-revenue"
-                    value={currentTarget.revenue}
-                    onChange={(e) => setCurrentTarget(prev => ({ ...prev, revenue: e.target.value }))}
-                    placeholder="Enter current revenue"
-                    className="flex-1"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="current-profit">Profit</Label>
-                  <div className="flex items-center space-x-2">
-                    <DollarSign className="w-4 h-4 text-green-600" />
-                    <Input
-                      id="current-profit"
-                      value={currentTarget.profit}
-                      onChange={(e) => setCurrentTarget(prev => ({ ...prev, profit: e.target.value }))}
-                      placeholder="Profit amount"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="current-profit-percent">Profit %</Label>
-                  <Input
-                    id="current-profit-percent"
-                    value={currentTarget.profitPercentage}
-                    onChange={(e) => setCurrentTarget(prev => ({ ...prev, profitPercentage: e.target.value }))}
-                    placeholder="Percentage"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="current-value">Value</Label>
-                  <div className="flex items-center space-x-2">
-                    <DollarSign className="w-4 h-4 text-green-600" />
-                    <Input
-                      id="current-value"
-                      value={currentTarget.value}
-                      onChange={(e) => setCurrentTarget(prev => ({ ...prev, value: e.target.value }))}
-                      placeholder="Business value"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="current-multiplier">x</Label>
-                  <Input
-                    id="current-multiplier"
-                    value={currentTarget.valueMultiplier}
-                    onChange={(e) => setCurrentTarget(prev => ({ ...prev, valueMultiplier: e.target.value }))}
-                    placeholder="Multiplier"
-                  />
-                </div>
-              </div>
+          <CardContent className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl font-bold text-green-600 mb-2">₦</div>
+              <Input
+                value={currentTarget.revenue}
+                onChange={(e) => setCurrentTarget(prev => ({ ...prev, revenue: e.target.value }))}
+                placeholder="Enter revenue"
+                className="text-center text-xl sm:text-2xl font-bold border-0 bg-transparent focus:bg-white focus:border focus:border-green-300"
+              />
+              <div className="text-sm text-gray-600 mt-1">Revenue</div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* TARGET Section - Future Goal */}
-        <Card className="border-2 border-green-200 bg-green-50">
-          <CardHeader className="bg-green-600 text-white">
-            <CardTitle className="text-xl font-bold">5-10 YEAR TARGET</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 space-y-4">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="target-revenue">Revenue</Label>
-                <div className="flex items-center space-x-2">
-                  <DollarSign className="w-4 h-4 text-green-600" />
-                  <Input
-                    id="target-revenue"
-                    value={yearTarget.revenue}
-                    onChange={(e) => setYearTarget(prev => ({ ...prev, revenue: e.target.value }))}
-                    placeholder="Target revenue"
-                    className="flex-1"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="target-profit">Profit</Label>
-                  <div className="flex items-center space-x-2">
-                    <DollarSign className="w-4 h-4 text-green-600" />
-                    <Input
-                      id="target-profit"
-                      value={yearTarget.profit}
-                      onChange={(e) => setYearTarget(prev => ({ ...prev, profit: e.target.value }))}
-                      placeholder="Target profit"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="target-profit-percent">Profit %</Label>
-                  <Input
-                    id="target-profit-percent"
-                    value={yearTarget.profitPercentage}
-                    onChange={(e) => setYearTarget(prev => ({ ...prev, profitPercentage: e.target.value }))}
-                    placeholder="Percentage"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="target-value">Value</Label>
-                  <div className="flex items-center space-x-2">
-                    <DollarSign className="w-4 h-4 text-green-600" />
-                    <Input
-                      id="target-value"
-                      value={yearTarget.value}
-                      onChange={(e) => setYearTarget(prev => ({ ...prev, value: e.target.value }))}
-                      placeholder="Target value"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="target-multiplier">x</Label>
-                  <Input
-                    id="target-multiplier"
-                    value={yearTarget.valueMultiplier}
-                    onChange={(e) => setYearTarget(prev => ({ ...prev, valueMultiplier: e.target.value }))}
-                    placeholder="Multiplier"
-                  />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Save Goals Button */}
-      <div className="flex justify-center">
-        <Button onClick={saveFinancialGoals} size="lg" className="flex items-center gap-2">
-          <Save className="w-4 h-4" />
-          Save Financial Goals
-        </Button>
-      </div>
-        </div>
-      )}
-
-      {/* Step 2: Starting Point */}
-      {currentStep === 2 && (
-        <div className="space-y-8">
-          <Card className="max-w-4xl mx-auto">
-            <CardHeader className="bg-blue-600 text-white text-center">
-              <CardTitle className="text-2xl">Step 2: Determine Your Starting Point</CardTitle>
-              <p className="text-blue-100 mt-2">
-                Assess your current revenue, profitability, and business valuation to establish your baseline.
-              </p>
-            </CardHeader>
-            <CardContent className="p-8 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Current Financial Metrics */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800">Current Financial Metrics</h3>
-                  
-                  <div>
-                    <Label htmlFor="current-revenue">Annual Revenue</Label>
-                    <div className="flex items-center space-x-2">
-                      <DollarSign className="w-4 h-4 text-blue-600" />
-                      <Input
-                        id="current-revenue"
-                        value={startingPoint.currentRevenue}
-                        onChange={(e) => setStartingPoint(prev => ({ ...prev, currentRevenue: e.target.value }))}
-                        placeholder="Enter annual revenue"
-                        type="number"
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="current-profit">Annual Profit</Label>
-                    <div className="flex items-center space-x-2">
-                      <DollarSign className="w-4 h-4 text-blue-600" />
-                      <Input
-                        id="current-profit"
-                        value={startingPoint.currentProfit}
-                        onChange={(e) => setStartingPoint(prev => ({ ...prev, currentProfit: e.target.value }))}
-                        placeholder="Enter annual profit"
-                        type="number"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="current-profitability">Profitability %</Label>
-                    <Input
-                      id="current-profitability"
-                      value={startingPoint.currentProfitability}
-                      onChange={(e) => setStartingPoint(prev => ({ ...prev, currentProfitability: e.target.value }))}
-                      placeholder="Profit margin percentage"
-                      type="number"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="current-valuation">Current Business Valuation</Label>
-                    <div className="flex items-center space-x-2">
-                      <DollarSign className="w-4 h-4 text-blue-600" />
-                      <Input
-                        id="current-valuation"
-                        value={startingPoint.currentValuation}
-                        onChange={(e) => setStartingPoint(prev => ({ ...prev, currentValuation: e.target.value }))}
-                        placeholder="Estimated business value"
-                        type="number"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Business Context */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800">Business Context</h3>
-                  
-                  <div>
-                    <Label htmlFor="revenue-source">Primary Revenue Source</Label>
-                    <Input
-                      id="revenue-source"
-                      value={startingPoint.revenueSource}
-                      onChange={(e) => setStartingPoint(prev => ({ ...prev, revenueSource: e.target.value }))}
-                      placeholder="e.g., Product sales, Services, SaaS"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="business-stage">Business Stage</Label>
-                    <select
-                      id="business-stage"
-                      value={startingPoint.businessStage}
-                      onChange={(e) => setStartingPoint(prev => ({ ...prev, businessStage: e.target.value }))}
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="idea">Idea Stage</option>
-                      <option value="startup">Startup</option>
-                      <option value="growth">Growth Stage</option>
-                      <option value="expansion">Expansion</option>
-                      <option value="maturity">Mature Business</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="assessment-date">Assessment Date</Label>
-                    <Input
-                      id="assessment-date"
-                      type="date"
-                      value={startingPoint.assessmentDate}
-                      onChange={(e) => setStartingPoint(prev => ({ ...prev, assessmentDate: e.target.value }))}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Insights */}
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-blue-800 mb-2">💡 Key Insights</h4>
-                <ul className="text-sm text-blue-700 space-y-1">
-                  <li>• Revenue represents your annual earnings from all sources</li>
-                  <li>• Profitability shows how much you retain after expenses</li>
-                  <li>• Valuation estimates what your business could sell for today</li>
-                  <li>• Be honest - this baseline determines your growth trajectory</li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Step 3: Ending Point */}
-      {currentStep === 3 && (
-        <div className="space-y-8">
-          <Card className="max-w-4xl mx-auto">
-            <CardHeader className="bg-purple-600 text-white text-center">
-              <CardTitle className="text-2xl">Step 3: Determine Your Ending Point</CardTitle>
-              <p className="text-purple-100 mt-2">
-                Define your three-year growth targets and choose your strategy: 'Double in Three' or 'Top to Bottom'.
-              </p>
-            </CardHeader>
-            <CardContent className="p-8 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Target Metrics */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800">3-Year Targets</h3>
-                  
-                  <div>
-                    <Label htmlFor="target-revenue">Target Annual Revenue</Label>
-                    <div className="flex items-center space-x-2">
-                      <Target className="w-4 h-4 text-purple-600" />
-                      <Input
-                        id="target-revenue"
-                        value={endingPoint.targetRevenue}
-                        onChange={(e) => setEndingPoint(prev => ({ ...prev, targetRevenue: e.target.value }))}
-                        placeholder="Revenue goal in 3 years"
-                        type="number"
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="target-profit">Target Annual Profit</Label>
-                    <div className="flex items-center space-x-2">
-                      <Target className="w-4 h-4 text-purple-600" />
-                      <Input
-                        id="target-profit"
-                        value={endingPoint.targetProfit}
-                        onChange={(e) => setEndingPoint(prev => ({ ...prev, targetProfit: e.target.value }))}
-                        placeholder="Profit goal in 3 years"
-                        type="number"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="target-valuation">Target Business Valuation</Label>
-                    <div className="flex items-center space-x-2">
-                      <Target className="w-4 h-4 text-purple-600" />
-                      <Input
-                        id="target-valuation"
-                        value={endingPoint.targetValuation}
-                        onChange={(e) => setEndingPoint(prev => ({ ...prev, targetValuation: e.target.value }))}
-                        placeholder="Business value goal"
-                        type="number"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Growth Strategy */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800">Growth Strategy</h3>
-                  
-                  <div>
-                    <Label>Timeframe</Label>
-                    <select
-                      value={endingPoint.timeframe}
-                      onChange={(e) => setEndingPoint(prev => ({ ...prev, timeframe: e.target.value as any }))}
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="3-year">3 Years</option>
-                      <option value="5-year">5 Years</option>
-                      <option value="10-year">10 Years</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <Label>Growth Approach</Label>
-                    <select
-                      value={endingPoint.growthStrategy}
-                      onChange={(e) => setEndingPoint(prev => ({ ...prev, growthStrategy: e.target.value as any }))}
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="double-in-three">Double in Three (~26% annual growth)</option>
-                      <option value="top-to-bottom">Top to Bottom (Linear growth)</option>
-                      <option value="custom">Custom Strategy</option>
-                    </select>
-                  </div>
-
-                  {/* Growth Benchmarks */}
-                  {endingPoint.benchmarks.year1Revenue && (
-                    <div className="bg-purple-50 p-4 rounded-lg">
-                      <h4 className="font-semibold text-purple-800 mb-2">📊 Growth Benchmarks</h4>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span>Year 1:</span>
-                          <span className="font-medium">${parseInt(endingPoint.benchmarks.year1Revenue).toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Year 2:</span>
-                          <span className="font-medium">${parseInt(endingPoint.benchmarks.year2Revenue).toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Year 3:</span>
-                          <span className="font-medium">${parseInt(endingPoint.benchmarks.year3Revenue).toLocaleString()}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Strategy Explanations */}
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-purple-800 mb-2">🎯 Strategy Guide</h4>
-                <ul className="text-sm text-purple-700 space-y-1">
-                  <li>• <strong>Double in Three:</strong> Aggressive 26% annual growth - requires significant investment</li>
-                  <li>• <strong>Top to Bottom:</strong> Steady linear growth - more predictable and manageable</li>
-                  <li>• <strong>Custom:</strong> Create your own growth trajectory based on market conditions</li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Step 4: Codify Your Why */}
-      {currentStep === 4 && (
-        <div className="space-y-8">
-          <Card className="max-w-6xl mx-auto">
-            <CardHeader className="bg-green-600 text-white text-center">
-              <CardTitle className="text-2xl">Step 4: Codify Your Why</CardTitle>
-              <p className="text-green-100 mt-2">
-                Connect your business goals to a deeper purpose—ME, US, THEM—to avoid burnout and stay inspired.
-              </p>
-            </CardHeader>
-            <CardContent className="p-8">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* ME Section */}
-                <Card className="border-2 border-green-200">
-                  <CardHeader className="bg-green-600 text-white text-center">
-                    <CardTitle className="text-xl font-bold">ME</CardTitle>
-                    <p className="text-green-100 text-sm">Personal Purpose</p>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-4">
-                    <div>
-                      <Label htmlFor="personal-goals">Personal Goals</Label>
-                      <Input
-                        id="personal-goals"
-                        value={whyStatement.me.personalGoals}
-                        onChange={(e) => setWhyStatement(prev => ({
-                          ...prev,
-                          me: { ...prev.me, personalGoals: e.target.value }
-                        }))}
-                        placeholder="What do you want to achieve personally?"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="motivation">Core Motivation</Label>
-                      <Input
-                        id="motivation"
-                        value={whyStatement.me.motivation}
-                        onChange={(e) => setWhyStatement(prev => ({
-                          ...prev,
-                          me: { ...prev.me, motivation: e.target.value }
-                        }))}
-                        placeholder="What drives you daily?"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="skills-development">Skills Development</Label>
-                      <Input
-                        id="skills-development"
-                        value={whyStatement.me.skillsDevelopment}
-                        onChange={(e) => setWhyStatement(prev => ({
-                          ...prev,
-                          me: { ...prev.me, skillsDevelopment: e.target.value }
-                        }))}
-                        placeholder="What skills do you want to master?"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="personal-why">Your Personal Why</Label>
-                      <textarea
-                        id="personal-why"
-                        value={whyStatement.me.personalWhy}
-                        onChange={(e) => setWhyStatement(prev => ({
-                          ...prev,
-                          me: { ...prev.me, personalWhy: e.target.value }
-                        }))}
-                        placeholder="Why is this business journey important to you?"
-                        className="w-full p-2 border border-gray-300 rounded-md h-20 resize-none"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* US Section */}
-                <Card className="border-2 border-green-200">
-                  <CardHeader className="bg-green-600 text-white text-center">
-                    <CardTitle className="text-xl font-bold">US</CardTitle>
-                    <p className="text-green-100 text-sm">Team & Company Purpose</p>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-4">
-                    <div>
-                      <Label htmlFor="team-vision">Team Vision</Label>
-                      <Input
-                        id="team-vision"
-                        value={whyStatement.us.teamVision}
-                        onChange={(e) => setWhyStatement(prev => ({
-                          ...prev,
-                          us: { ...prev.us, teamVision: e.target.value }
-                        }))}
-                        placeholder="What's your shared vision?"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="company-mission">Company Mission</Label>
-                      <Input
-                        id="company-mission"
-                        value={whyStatement.us.companyMission}
-                        onChange={(e) => setWhyStatement(prev => ({
-                          ...prev,
-                          us: { ...prev.us, companyMission: e.target.value }
-                        }))}
-                        placeholder="What is your company's mission?"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="cultural-values">Cultural Values</Label>
-                      <Input
-                        id="cultural-values"
-                        value={whyStatement.us.culturalValues}
-                        onChange={(e) => setWhyStatement(prev => ({
-                          ...prev,
-                          us: { ...prev.us, culturalValues: e.target.value }
-                        }))}
-                        placeholder="What values define your culture?"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="collective-why">Collective Why</Label>
-                      <textarea
-                        id="collective-why"
-                        value={whyStatement.us.collectiveWhy}
-                        onChange={(e) => setWhyStatement(prev => ({
-                          ...prev,
-                          us: { ...prev.us, collectiveWhy: e.target.value }
-                        }))}
-                        placeholder="Why does this matter to your team?"
-                        className="w-full p-2 border border-gray-300 rounded-md h-20 resize-none"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* THEM Section */}
-                <Card className="border-2 border-green-200">
-                  <CardHeader className="bg-green-600 text-white text-center">
-                    <CardTitle className="text-xl font-bold">THEM</CardTitle>
-                    <p className="text-green-100 text-sm">Customer & Market Purpose</p>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-4">
-                    <div>
-                      <Label htmlFor="customer-impact">Customer Impact</Label>
-                      <Input
-                        id="customer-impact"
-                        value={whyStatement.them.customerImpact}
-                        onChange={(e) => setWhyStatement(prev => ({
-                          ...prev,
-                          them: { ...prev.them, customerImpact: e.target.value }
-                        }))}
-                        placeholder="How do you improve customers' lives?"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="market-problem">Market Problem</Label>
-                      <Input
-                        id="market-problem"
-                        value={whyStatement.them.marketProblem}
-                        onChange={(e) => setWhyStatement(prev => ({
-                          ...prev,
-                          them: { ...prev.them, marketProblem: e.target.value }
-                        }))}
-                        placeholder="What problem are you solving?"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="social-contribution">Social Contribution</Label>
-                      <Input
-                        id="social-contribution"
-                        value={whyStatement.them.socialContribution}
-                        onChange={(e) => setWhyStatement(prev => ({
-                          ...prev,
-                          them: { ...prev.them, socialContribution: e.target.value }
-                        }))}
-                        placeholder="How do you contribute to society?"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="external-why">External Why</Label>
-                      <textarea
-                        id="external-why"
-                        value={whyStatement.them.externalWhy}
-                        onChange={(e) => setWhyStatement(prev => ({
-                          ...prev,
-                          them: { ...prev.them, externalWhy: e.target.value }
-                        }))}
-                        placeholder="Why does the world need your business?"
-                        className="w-full p-2 border border-gray-300 rounded-md h-20 resize-none"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Why Statement Summary */}
-              {(whyStatement.me.personalWhy || whyStatement.us.collectiveWhy || whyStatement.them.externalWhy) && (
-                <div className="mt-8 bg-green-50 p-6 rounded-lg">
-                  <h3 className="text-lg font-semibold text-green-800 mb-4">🎯 Your Complete Why Statement</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {whyStatement.me.personalWhy && (
-                      <div>
-                        <h4 className="font-medium text-green-700">Personal Why:</h4>
-                        <p className="text-sm text-green-600 italic">"{whyStatement.me.personalWhy}"</p>
-                      </div>
-                    )}
-                    {whyStatement.us.collectiveWhy && (
-                      <div>
-                        <h4 className="font-medium text-green-700">Team Why:</h4>
-                        <p className="text-sm text-green-600 italic">"{whyStatement.us.collectiveWhy}"</p>
-                      </div>
-                    )}
-                    {whyStatement.them.externalWhy && (
-                      <div>
-                        <h4 className="font-medium text-green-700">World Why:</h4>
-                        <p className="text-sm text-green-600 italic">"{whyStatement.them.externalWhy}"</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Step Navigation Buttons */}
-      <div className="flex justify-between items-center max-w-4xl mx-auto">
-        <Button 
-          onClick={prevStep} 
-          disabled={currentStep === 1}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
-          ← Previous Step
-        </Button>
-        
-        <div className="text-center">
-          <p className="text-sm text-gray-600">Step {currentStep} of 4</p>
-        </div>
-        
-        <Button 
-          onClick={nextStep} 
-          disabled={currentStep === 4}
-          className="flex items-center gap-2"
-        >
-          Next Step →
-        </Button>
-      </div>
-
-      <Separator />
-
-      {/* Scale Levels Section */}
-      <div className="space-y-6">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold mb-4">Your Scalable Impact Journey</h2>
-          <p className="text-gray-600 max-w-4xl mx-auto">
-            Entrepreneurs must confirm their current level of scale without skipping steps. Even if some advanced tasks are done, 
-            all prior levels must be completed first. The Scalable Impact Planner provides clarity on progress.
-          </p>
-        </div>
-
-        {/* Show loading or progress data */}
-        {!progressData ? (
-          <div className="flex justify-center items-center min-h-[200px]">
-            <div className="text-center space-y-4">
-              <RefreshCw className="w-8 h-8 animate-spin mx-auto text-blue-600" />
-              <p className="text-gray-600">Loading your progress data...</p>
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Progress Indicator */}
-            <div className="flex justify-center items-center space-x-4 mb-8">
-              {progressData?.levels?.map((level, index) => {
-            const config = getScaleLevelConfig(level.levelId);
-            const isLocked = level.levelId > (progressData?.currentLevel || 1);
-            return (
-              <React.Fragment key={level.levelId}>
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold ${
-                  level.completed ? 'bg-green-500' : 
-                  isLocked ? 'bg-gray-400' : 
-                  config?.color || 'bg-gray-500'
-                }`}>
-                  {level.completed ? <CheckCircle2 className="w-6 h-6" /> : level.levelId}
-                </div>
-                {index < (progressData?.levels?.length || 7) - 1 && (
-                  <div className={`w-8 h-1 ${
-                    level.completed ? 'bg-green-500' : 'bg-gray-300'
-                  }`} />
-                )}
-              </React.Fragment>
-            );
-          })}
-        </div>
-
-        {/* Scale Levels Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {progressData?.levels?.map((level) => {
-            const config = getScaleLevelConfig(level.levelId);
-            const Icon = config?.icon || Target;
-            const isLocked = level.levelId > (progressData?.currentLevel || 1);
-            const canAccess = canProgressToLevel(level.levelId);
             
-            return (
-              <Card key={level.levelId} className={`relative transition-all duration-300 ${
-                level.completed ? 'border-green-500 bg-green-50' :
-                isLocked ? 'border-gray-300 bg-gray-50 opacity-60' :
-                'border-blue-300 bg-blue-50 hover:shadow-lg'
-              }`}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white ${
-                      config?.color || 'bg-gray-500'
-                    }`}>
-                      {level.completed ? <CheckCircle2 className="w-6 h-6" /> : <Icon className="w-5 h-5" />}
-                    </div>
-                    <Badge variant={level.completed ? "default" : isLocked ? "secondary" : "outline"}>
-                      Level {level.levelId}
-                    </Badge>
-                  </div>
-                  <CardTitle className="text-lg">{config?.title || level.title}</CardTitle>
-                  <p className="text-sm text-gray-600">{config?.description}</p>
-                  
-                  {/* Progress Bar */}
-                  {level.overallProgress > 0 && (
-                    <div className="mt-2">
-                      <div className="flex justify-between items-center text-xs text-gray-600 mb-1">
-                        <span>Progress</span>
-                        <span>{level.overallProgress.toFixed(1)}%</span>
-                      </div>
-                      <Progress value={level.overallProgress} className="h-2" />
-                    </div>
-                  )}
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
-                  {/* Benchmarks List */}
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-sm text-gray-700">Benchmarks:</h4>
-                    {level.benchmarks?.map((benchmark, index) => (
-                      <div key={benchmark.id} className="flex items-start space-x-2 text-xs">
-                        <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                          benchmark.isCompleted ? 'bg-green-500' : 'bg-gray-400'
-                        }`} />
-                        <div className="flex-1">
-                          <span className="text-gray-600">{benchmark.description}</span>
-                          {benchmark.targetValue > 1 && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              {benchmark.currentValue.toLocaleString()} / {benchmark.targetValue.toLocaleString()}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-6">
+              <div className="text-center flex-1 w-full">
+                <div className="text-xl sm:text-2xl font-bold text-green-600 mb-2">₦</div>
+                <Input
+                  value={currentTarget.profit}
+                  onChange={(e) => setCurrentTarget(prev => ({ ...prev, profit: e.target.value }))}
+                  placeholder="Profit"
+                  className="text-center text-lg sm:text-xl font-bold border-0 bg-transparent focus:bg-white focus:border focus:border-green-300"
+                />
+                <div className="text-sm sm:text-base text-gray-600 mt-1">Profit</div>
+              </div>
+              <div className="text-center flex-1 w-full">
+                <div className="text-xl sm:text-2xl font-bold text-green-600 mb-2">%</div>
+                <Input
+                  value={currentTarget.profitPercentage}
+                  onChange={(e) => setCurrentTarget(prev => ({ ...prev, profitPercentage: e.target.value }))}
+                  placeholder="Margin"
+                  className="text-center text-lg sm:text-xl font-bold border-0 bg-transparent focus:bg-white focus:border focus:border-green-300"
+                />
+                <div className="text-sm sm:text-base text-gray-600 mt-1">Margin</div>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-6">
+              <div className="text-center flex-1 w-full">
+                <div className="text-xl sm:text-2xl font-bold text-green-600 mb-2">₦</div>
+                <Input
+                  value={currentTarget.value}
+                  onChange={(e) => setCurrentTarget(prev => ({ ...prev, value: e.target.value }))}
+                  placeholder="Value"
+                  className="text-center text-lg sm:text-xl font-bold border-0 bg-transparent focus:bg-white focus:border focus:border-green-300"
+                />
+                <div className="text-sm sm:text-base text-gray-600 mt-1">Value</div>
+              </div>
+              <div className="text-center flex-1 w-full">
+                <div className="text-xl sm:text-2xl font-bold text-green-600 mb-2">x</div>
+                <Input
+                  value={currentTarget.valueMultiplier}
+                  onChange={(e) => setCurrentTarget(prev => ({ ...prev, valueMultiplier: e.target.value }))}
+                  placeholder="Multiple"
+                  className="text-center text-lg sm:text-xl font-bold border-0 bg-transparent focus:bg-white focus:border focus:border-green-300"
+                />
+                <div className="text-sm sm:text-base text-gray-600 mt-1">Multiple</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-                  {/* Action Buttons */}
-                  <div className="flex flex-col space-y-2">
+        {/* 3-Year Target Section */}
+        <Card className="border-2 border-green-200">
+          <CardHeader className="bg-green-600 text-white text-center">
+            <CardTitle className="text-2xl font-bold">3-YEAR TARGET</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl font-bold text-green-600 mb-2">₦</div>
+              <Input
+                value={yearTarget.revenue}
+                onChange={(e) => setYearTarget(prev => ({ ...prev, revenue: e.target.value }))}
+                placeholder="Enter target revenue"
+                className="text-center text-xl sm:text-2xl font-bold border-0 bg-transparent focus:bg-white focus:border focus:border-green-300"
+              />
+              <div className="text-sm sm:text-base text-gray-600 mt-1">Revenue</div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-6">
+              <div className="text-center flex-1 w-full">
+                <div className="text-xl sm:text-2xl font-bold text-green-600 mb-2">₦</div>
+                <Input
+                  value={yearTarget.profit}
+                  onChange={(e) => setYearTarget(prev => ({ ...prev, profit: e.target.value }))}
+                  placeholder="Target profit"
+                  className="text-center text-lg sm:text-xl font-bold border-0 bg-transparent focus:bg-white focus:border focus:border-green-300"
+                />
+                <div className="text-sm sm:text-base text-gray-600 mt-1">Profit</div>
+              </div>
+              <div className="text-center flex-1 w-full">
+                <div className="text-xl sm:text-2xl font-bold text-green-600 mb-2">%</div>
+                <Input
+                  value={yearTarget.profitPercentage}
+                  onChange={(e) => setYearTarget(prev => ({ ...prev, profitPercentage: e.target.value }))}
+                  placeholder="Margin"
+                  className="text-center text-lg sm:text-xl font-bold border-0 bg-transparent focus:bg-white focus:border focus:border-green-300"
+                />
+                <div className="text-sm sm:text-base text-gray-600 mt-1">Margin</div>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-6">
+              <div className="text-center flex-1 w-full">
+                <div className="text-xl sm:text-2xl font-bold text-green-600 mb-2">₦</div>
+                <Input
+                  value={yearTarget.value}
+                  onChange={(e) => setYearTarget(prev => ({ ...prev, value: e.target.value }))}
+                  placeholder="Target value"
+                  className="text-center text-lg sm:text-xl font-bold border-0 bg-transparent focus:bg-white focus:border focus:border-green-300"
+                />
+                <div className="text-sm sm:text-base text-gray-600 mt-1">Value</div>
+              </div>
+              <div className="text-center flex-1 w-full">
+                <div className="text-xl sm:text-2xl font-bold text-green-600 mb-2">x</div>
+                <Input
+                  value={yearTarget.valueMultiplier}
+                  onChange={(e) => setYearTarget(prev => ({ ...prev, valueMultiplier: e.target.value }))}
+                  placeholder="Multiple"
+                  className="text-center text-lg sm:text-xl font-bold border-0 bg-transparent focus:bg-white focus:border focus:border-green-300"
+                />
+                <div className="text-sm sm:text-base text-gray-600 mt-1">Multiple</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Growth Relationship Indicator */}
+      <div className="px-4 sm:px-6 lg:px-8">
+        <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0 lg:space-x-8">
+              {/* Current Summary */}
+              <div className="text-center lg:text-left">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Current Position</h3>
+                <div className="space-y-1">
+                  <div className="text-sm text-gray-600">Revenue: <span className="font-medium text-green-600">₦{currentTarget.revenue}</span></div>
+                  <div className="text-sm text-gray-600">Profit: <span className="font-medium text-green-600">₦{currentTarget.profit} ({currentTarget.profitPercentage}%)</span></div>
+                  <div className="text-sm text-gray-600">Value: <span className="font-medium text-green-600">₦{currentTarget.value}</span></div>
+                </div>
+              </div>
+
+              {/* Growth Arrow and Calculations */}
+              <div className="flex flex-col items-center space-y-2">
+                <div className="flex items-center space-x-2">
+                  <ArrowRight className="w-8 h-8 text-green-600" />
+                  <div className="bg-white rounded-lg px-3 py-2 border border-green-200">
                     <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`level-${level.levelId}`}
-                        checked={level.completed}
-                        disabled={true}
-                        className="data-[state=checked]:bg-green-500"
-                      />
-                      <Label 
-                        htmlFor={`level-${level.levelId}`} 
-                        className={`text-sm ${level.completed ? 'text-green-700 font-medium' : 'text-gray-600'}`}
-                      >
-                        {level.completed ? 'Completed' : 'In Progress'}
-                      </Label>
+                      <Calculator className="w-4 h-4 text-green-600" />
+                      <span className="text-sm font-medium text-green-600">
+                        {(() => {
+                          const currentRev = parseFloat(currentTarget.revenue.replace(/,/g, '')) || 0;
+                          const targetRev = parseFloat(yearTarget.revenue.replace(/,/g, '')) || 0;
+                          const growthRate = currentRev > 0 ? ((targetRev / currentRev - 1) * 100).toFixed(1) : '0';
+                          return `${growthRate}% Growth`;
+                        })()} 
+                      </span>
                     </div>
-                    
-                    <Button
-                      size="sm"
-                      variant={level.completed ? "outline" : isLocked ? "secondary" : "default"}
-                      onClick={() => checkLevelProgress(level.levelId)}
-                      disabled={isLocked}
-                      className="w-full"
-                    >
-                      {level.completed ? 'View Details' : isLocked ? 'Locked' : 'Check Progress'}
-                    </Button>
                   </div>
-                </CardContent>
+                </div>
+                <div className="text-xs text-gray-500">3-Year Journey</div>
+              </div>
 
-                {/* Level Status Indicator */}
-                {isLocked && (
-                  <div className="absolute top-2 right-2">
-                    <AlertTriangle className="w-4 h-4 text-gray-400" />
+              {/* Target Summary */}
+              <div className="text-center lg:text-right">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">3-Year Target</h3>
+                <div className="space-y-1">
+                  <div className="text-sm text-gray-600">Revenue: <span className="font-medium text-blue-600">₦{yearTarget.revenue}</span></div>
+                  <div className="text-sm text-gray-600">Profit: <span className="font-medium text-blue-600">₦{yearTarget.profit} ({yearTarget.profitPercentage}%)</span></div>
+                  <div className="text-sm text-gray-600">Value: <span className="font-medium text-blue-600">₦{yearTarget.value}</span></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Growth Insights */}
+            <div className="mt-4 pt-4 border-t border-green-200">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                <div className="bg-white rounded-lg p-3 border border-green-100">
+                  <div className="text-lg font-bold text-green-600">
+                    {(() => {
+                      const currentRev = parseFloat(currentTarget.revenue.replace(/,/g, '')) || 0;
+                      const targetRev = parseFloat(yearTarget.revenue.replace(/,/g, '')) || 0;
+                      const multiplier = currentRev > 0 ? (targetRev / currentRev).toFixed(1) : '0';
+                      return `${multiplier}x`;
+                    })()} 
                   </div>
-                )}
-                {level.completed && (
-                  <div className="absolute top-2 right-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  <div className="text-xs text-gray-600">Revenue Growth</div>
+                </div>
+                <div className="bg-white rounded-lg p-3 border border-blue-100">
+                  <div className="text-lg font-bold text-blue-600">
+                    {(() => {
+                      const currentProfit = parseFloat(currentTarget.profit.replace(/,/g, '')) || 0;
+                      const targetProfit = parseFloat(yearTarget.profit.replace(/,/g, '')) || 0;
+                      const multiplier = currentProfit > 0 ? (targetProfit / currentProfit).toFixed(1) : '0';
+                      return `${multiplier}x`;
+                    })()} 
                   </div>
-                )}
-                
-                {/* Completion Date */}
-                {level.completed && level.completionDate && (
-                  <div className="absolute bottom-2 right-2 text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
-                    Completed {new Date(level.completionDate).toLocaleDateString()}
+                  <div className="text-xs text-gray-600">Profit Growth</div>
+                </div>
+                <div className="bg-white rounded-lg p-3 border border-purple-100">
+                  <div className="text-lg font-bold text-purple-600">
+                    {(() => {
+                      const currentValue = parseFloat(currentTarget.value.replace(/,/g, '')) || 0;
+                      const targetValue = parseFloat(yearTarget.value.replace(/,/g, '')) || 0;
+                      const multiplier = currentValue > 0 ? (targetValue / currentValue).toFixed(1) : '0';
+                      return `${multiplier}x`;
+                    })()} 
                   </div>
-                )}
-              </Card>
-            );
-          })}
+                  <div className="text-xs text-gray-600">Value Growth</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Smart Target Actions */}
+            <div className="mt-4 pt-4 border-t border-green-200">
+              <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                <Button 
+                  onClick={calculateSmartTargets} 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-2 border-green-300 text-green-700 hover:bg-green-50"
+                >
+                  <Calculator className="w-4 h-4" />
+                  Calculate Smart Targets
+                </Button>
+                <div className="text-xs text-gray-500 text-center">
+                  Generate 3-year targets based on 40% annual growth
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Save Financial Targets Button */}
+      <div className="flex justify-center py-4">
+        <Button onClick={saveFinancialGoals} size="lg" className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
+          <Save className="w-4 h-4" />
+          Save Financial Targets
+        </Button>
+      </div>
+
+      {/* WHY Section - ME, US, THEM */}
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          {/* ME Section */}
+          <Card className="border-2 border-green-200">
+            <CardHeader className="bg-green-600 text-white text-center">
+              <CardTitle className="text-xl font-bold">ME</CardTitle>
+              <p className="text-green-100 text-sm mt-1">Personal Goals & Motivations</p>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              <div>
+                <Label htmlFor="me-goal-1" className="text-sm font-medium text-gray-700">Personal Goal 1</Label>
+                <Input
+                  id="me-goal-1"
+                  value={whyStatement.me.personalGoals}
+                  onChange={(e) => setWhyStatement(prev => ({
+                    ...prev,
+                    me: { ...prev.me, personalGoals: e.target.value }
+                  }))}
+                  placeholder="e.g., Exit the day-to-day operations"
+                  className="mt-1 text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="me-goal-2" className="text-sm font-medium text-gray-700">Financial Goal</Label>
+                <Input
+                  id="me-goal-2"
+                  value={whyStatement.me.motivation}
+                  onChange={(e) => setWhyStatement(prev => ({
+                    ...prev,
+                    me: { ...prev.me, motivation: e.target.value }
+                  }))}
+                  placeholder="e.g., ₦100M in passive investments"
+                  className="mt-1 text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="me-goal-3" className="text-sm font-medium text-gray-700">Lifestyle Goal</Label>
+                <Input
+                  id="me-goal-3"
+                  value={whyStatement.me.skillsDevelopment}
+                  onChange={(e) => setWhyStatement(prev => ({
+                    ...prev,
+                    me: { ...prev.me, skillsDevelopment: e.target.value }
+                  }))}
+                  placeholder="e.g., Travel one month every year"
+                  className="mt-1 text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="me-goal-4" className="text-sm font-medium text-gray-700">Additional Goal</Label>
+                <Input
+                  id="me-goal-4"
+                  value={whyStatement.me.personalWhy}
+                  onChange={(e) => setWhyStatement(prev => ({
+                    ...prev,
+                    me: { ...prev.me, personalWhy: e.target.value }
+                  }))}
+                  placeholder="e.g., Build dream investment portfolio"
+                  className="mt-1 text-sm"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* US Section */}
+          <Card className="border-2 border-green-200">
+            <CardHeader className="bg-green-600 text-white text-center">
+              <CardTitle className="text-xl font-bold">US</CardTitle>
+              <p className="text-green-100 text-sm mt-1">Team & Family Goals</p>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              <div>
+                <Label htmlFor="us-goal-1" className="text-sm font-medium text-gray-700">Family Goal</Label>
+                <Input
+                  id="us-goal-1"
+                  value={whyStatement.us.teamVision}
+                  onChange={(e) => setWhyStatement(prev => ({
+                    ...prev,
+                    us: { ...prev.us, teamVision: e.target.value }
+                  }))}
+                  placeholder="e.g., Fund kids' college education"
+                  className="mt-1 text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="us-goal-2" className="text-sm font-medium text-gray-700">Team Goal</Label>
+                <Input
+                  id="us-goal-2"
+                  value={whyStatement.us.companyMission}
+                  onChange={(e) => setWhyStatement(prev => ({
+                    ...prev,
+                    us: { ...prev.us, companyMission: e.target.value }
+                  }))}
+                  placeholder="e.g., Distribute ₦100M in profit sharing to team"
+                  className="mt-1 text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="us-goal-3" className="text-sm font-medium text-gray-700">Shared Investment</Label>
+                <Input
+                  id="us-goal-3"
+                  value={whyStatement.us.culturalValues}
+                  onChange={(e) => setWhyStatement(prev => ({
+                    ...prev,
+                    us: { ...prev.us, culturalValues: e.target.value }
+                  }))}
+                  placeholder="e.g., Buy a family vacation property"
+                  className="mt-1 text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="us-goal-4" className="text-sm font-medium text-gray-700">Collective Goal</Label>
+                <Input
+                  id="us-goal-4"
+                  value={whyStatement.us.collectiveWhy}
+                  onChange={(e) => setWhyStatement(prev => ({
+                    ...prev,
+                    us: { ...prev.us, collectiveWhy: e.target.value }
+                  }))}
+                  placeholder="e.g., Create generational wealth"
+                  className="mt-1 text-sm"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* THEM Section */}
+          <Card className="border-2 border-green-200">
+            <CardHeader className="bg-green-600 text-white text-center">
+              <CardTitle className="text-xl font-bold">THEM</CardTitle>
+              <p className="text-green-100 text-sm mt-1">Community & Impact Goals</p>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              <div>
+                <Label htmlFor="them-goal-1" className="text-sm font-medium text-gray-700">Charitable Goal</Label>
+                <Input
+                  id="them-goal-1"
+                  value={whyStatement.them.customerImpact}
+                  onChange={(e) => setWhyStatement(prev => ({
+                    ...prev,
+                    them: { ...prev.them, customerImpact: e.target.value }
+                  }))}
+                  placeholder="e.g., Become a 7-figure donor"
+                  className="mt-1 text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="them-goal-2" className="text-sm font-medium text-gray-700">Service Goal</Label>
+                <Input
+                  id="them-goal-2"
+                  value={whyStatement.them.marketProblem}
+                  onChange={(e) => setWhyStatement(prev => ({
+                    ...prev,
+                    them: { ...prev.them, marketProblem: e.target.value }
+                  }))}
+                  placeholder="e.g., Volunteer 2 hours a week"
+                  className="mt-1 text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="them-goal-3" className="text-sm font-medium text-gray-700">Leadership Role</Label>
+                <Input
+                  id="them-goal-3"
+                  value={whyStatement.them.socialContribution}
+                  onChange={(e) => setWhyStatement(prev => ({
+                    ...prev,
+                    them: { ...prev.them, socialContribution: e.target.value }
+                  }))}
+                  placeholder="e.g., Serve on industry association board"
+                  className="mt-1 text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="them-goal-4" className="text-sm font-medium text-gray-700">Legacy Goal</Label>
+                <Input
+                  id="them-goal-4"
+                  value={whyStatement.them.externalWhy}
+                  onChange={(e) => setWhyStatement(prev => ({
+                    ...prev,
+                    them: { ...prev.them, externalWhy: e.target.value }
+                  }))}
+                  placeholder="e.g., Create scholarship fund"
+                  className="mt-1 text-sm"
+                />
+              </div>
+            </CardContent>
+          </Card>
         </div>
-          </>
-        )}
-      </div>
-
-      {/* Bottom Section - ME, US, THEM */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        {/* ME Section */}
-        <Card className="border-2 border-green-200">
-          <CardHeader className="bg-green-600 text-white text-center">
-            <CardTitle className="text-xl font-bold">ME</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 min-h-[200px]">
-            <p className="text-gray-600 text-center italic">
-              Personal goals, skills development, and individual contribution to the business growth.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* US Section */}
-        <Card className="border-2 border-green-200">
-          <CardHeader className="bg-green-600 text-white text-center">
-            <CardTitle className="text-xl font-bold">US</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 min-h-[200px]">
-            <p className="text-gray-600 text-center italic">
-              Team collaboration, shared objectives, and collective efforts toward business success.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* THEM Section */}
-        <Card className="border-2 border-green-200">
-          <CardHeader className="bg-green-600 text-white text-center">
-            <CardTitle className="text-xl font-bold">THEM</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 min-h-[200px]">
-            <p className="text-gray-600 text-center italic">
-              Customer needs, market demands, and external stakeholder expectations.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Call-to-Action Section */}
-      <Card className="bg-gradient-to-r from-green-600 to-green-700 text-white">
-        <CardContent className="p-8 text-center">
-          <h3 className="text-2xl font-bold mb-4">Ready to Scale Your Impact?</h3>
-          <p className="mb-6 text-green-100">
-            Start with Level 1 and work your way up systematically. Each level builds on the previous one.
-          </p>
-          <Button size="lg" variant="secondary" className="bg-white text-green-700 hover:bg-gray-100">
-            Begin Your Journey
+        
+        {/* Save WHY Statement Button */}
+        <div className="flex justify-center mt-6">
+          <Button onClick={() => {
+            saveStepData();
+            toast({
+              title: "WHY Statement Saved! 🎯",
+              description: "Your personal, team, and community goals have been saved.",
+            });
+          }} size="lg" className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
+            <Save className="w-4 h-4" />
+            Save WHY Statement
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Info Alert */}
-      <Alert className="border-blue-200 bg-blue-50">
-        <Info className="h-4 w-4 text-blue-600" />
-        <AlertDescription className="text-blue-800">
-          <strong>Important:</strong> The system will automatically track your progress across all dashboard activities. 
-          Checkboxes will be marked automatically when you complete the required benchmarks from your other dashboard tools.
-        </AlertDescription>
-      </Alert>
+      {/* HOW Section */}
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative">
+        <Card className="border-2 border-green-200">
+          <CardHeader className="bg-green-600 text-white">
+            <CardTitle className="text-xl font-bold">HOW</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="relative">
+              {/* Green sidebar */}
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-600"></div>
+              
+              <ol className="space-y-3 ml-6">
+                <li className="flex items-center">
+                  <span className="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3">1</span>
+                  Test new acquisition funnel
+                </li>
+                <li className="flex items-center">
+                  <span className="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3">2</span>
+                  Find a new traffic agency
+                </li>
+                <li className="flex items-center">
+                  <span className="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3">3</span>
+                  Hire and onboard an operations manager
+                </li>
+                <li className="flex items-center">
+                  <span className="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3">4</span>
+                  Launch an employee training program
+                </li>
+                <li className="flex items-center">
+                  <span className="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3">5</span>
+                  Upgrade tech stack
+                </li>
+              </ol>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Taking Action Circle */}
+        <div className="absolute bottom-4 right-4">
+          <div className="relative">
+            <div className="w-24 h-24 border-4 border-red-500 rounded-full flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-xs font-bold text-red-500 leading-tight">TAKING</div>
+                <div className="text-xs font-bold text-red-500 leading-tight">ACTION</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Seven Levels Framework Explanation */}
+      <div className="px-6 py-8 bg-gray-50">
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-3xl font-bold text-gray-900">Understanding the Seven Levels of Scale</CardTitle>
+            <p className="text-lg text-gray-600 mt-2">A Framework for Entrepreneurial Growth</p>
+          </CardHeader>
+          <CardContent className="p-8 space-y-6">
+            <div className="prose max-w-none">
+              <blockquote className="border-l-4 border-green-500 pl-4 italic text-gray-700">
+                "What do I do next?"—This is the question I'm most often asked by entrepreneurs. It makes sense; after launching a business, the list of possible actions is endless.
+              </blockquote>
+              
+              <p className="text-gray-700 leading-relaxed">
+                Should you focus on hiring, installing new accounting systems, or rolling out sales and marketing processes? Once you've achieved your first traction, knowing your next move is crucial.
+              </p>
+              
+              <p className="text-gray-700 leading-relaxed">
+                Because there wasn't a clear, reliable framework to answer this, we created one: <strong>the Seven Levels of Scale</strong>. This roadmap shows you exactly where you are in your growth journey and what you should do next.
+              </p>
+              
+              <p className="text-gray-700 leading-relaxed font-medium">
+                As you read through these levels, ask yourself: "Which level am I at?" Identifying your current stage brings clarity amidst the whirlwind of scaling a business.
+              </p>
+            </div>
+            
+            <Separator />
+            
+            <div className="space-y-8">
+              {/* Level 1 */}
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  1
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Sell and Serve Ten Customers</h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    Before anything else, focus on making your first ten sales and delivering value to those customers. Don't even think about scaling until you've proven that people want what you offer and that you can deliver. If you've already served ten satisfied customers, you're ready for the next level.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Level 2 */}
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  2
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Build a Growth Flywheel</h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    Now, it's time to move from isolated sales to consistent, repeatable growth. This requires systems that generate ongoing sales momentum—a growth flywheel. Once established, your business will start to accelerate.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Level 3 */}
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  3
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Upgrade Your Business Operating System</h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    With rapid growth comes operational challenges. It may feel like things are flying out of control. The solution is to upgrade your business's operating system. The methods that got you to this point won't take you all the way to level seven. If you're stalled, it's often because your systems aren't keeping up—so focus here.
+                  </p>
+                  <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm font-medium text-yellow-800">
+                      💡 Once you've upgraded, you cross what we call the "Scalable Line." Now your business is truly ready to grow at scale, with the fundamentals in place.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Level 4 */}
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  4
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Double Your Take-Home</h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    The biggest risk at this stage is running out of cash. So, turn your business from a cash-consuming machine to a cash-generating one. Focus on profitability and start paying yourself more. If your income is inconsistent, your cash flow likely needs attention. The goal here is reliable, growing profits.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Level 5 */}
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  5
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Build Your Advisory Board</h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    Growth brings challenges you can't always anticipate. At this stage, it's essential to surround yourself with mentors and peers—your advisory board. Their guidance will help you solve problems outside your playbook, making this a critical part of your support system.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Level 6 */}
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  6
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Expand Through Acquisition</h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    Every business eventually hits a ceiling for organic growth. To break through, look to acquisitions—whether talent, products, or entire companies. Learning the skills of acquisition enables another leap in scale.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Level 7 */}
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  7
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Hit Your Number</h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    At this point, you've reached your personal and business goals—"your number." Now, you have options: set new goals, take a step back, or consider an exit. You finally gain true freedom and control over your destiny.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <Separator />
+            
+            <div className="bg-green-50 p-6 rounded-lg">
+              <h3 className="text-xl font-bold text-green-800 mb-3">Define Your Number</h3>
+              <p className="text-green-700 leading-relaxed">
+                But to get to level seven, you must define what "your number" is. The Scalable Impact Planner above helps you build a scalable impact plan—so you know where you are, where you want to go, and how to get there.
+              </p>
+              <p className="text-green-700 leading-relaxed mt-2 font-medium">
+                Use the planner above to clarify your current position, set your 3-year targets, and create actionable steps to reach your entrepreneurial goals.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Footer with Brand */}
+      <div className="px-6 py-4 border-t border-gray-200 text-center">
+        <p className="text-sm text-gray-500">© The Scalable Company</p>
+      </div>
     </div>
   );
 };
