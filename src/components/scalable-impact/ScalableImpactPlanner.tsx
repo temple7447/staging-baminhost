@@ -189,12 +189,12 @@ const ScalableImpactPlanner: React.FC = () => {
     me: {
       personalGoals: 'Exit the day-to-day',
       motivation: 'Build dream home',
-      skillsDevelopment: '$1M in passive investments',
+      skillsDevelopment: '₦1M in passive investments',
       personalWhy: 'Travel one month every year'
     },
     us: {
       teamVision: "Fund kids' college",
-      companyMission: 'Distribute $1M in profit sharing to team',
+      companyMission: 'Distribute ₦1M in profit sharing to team',
       culturalValues: 'Buy a vacation property',
       collectiveWhy: ''
     },
@@ -690,7 +690,7 @@ const ScalableImpactPlanner: React.FC = () => {
             <div className="text-center">
               <div className="text-sm text-gray-600 mb-1">Revenue</div>
               <div className="flex items-center justify-center">
-                <span className="text-2xl font-bold text-gray-800">$</span>
+                <span className="text-2xl font-bold text-gray-800">₦</span>
                 <Input
                   value={currentTarget.revenue}
                   onChange={(e) => setCurrentTarget(prev => ({ ...prev, revenue: e.target.value }))}
@@ -705,7 +705,7 @@ const ScalableImpactPlanner: React.FC = () => {
               <div className="text-center flex-1">
                 <div className="text-sm text-gray-600 mb-1">Profit</div>
                 <div className="flex items-center justify-center">
-                  <span className="text-xl font-bold text-gray-800">$</span>
+                  <span className="text-xl font-bold text-gray-800">₦</span>
                   <Input
                     value={currentTarget.profit}
                     onChange={(e) => setCurrentTarget(prev => ({ ...prev, profit: e.target.value }))}
@@ -732,7 +732,7 @@ const ScalableImpactPlanner: React.FC = () => {
               <div className="text-center flex-1">
                 <div className="text-sm text-gray-600 mb-1">Value</div>
                 <div className="flex items-center justify-center">
-                  <span className="text-xl font-bold text-gray-800">$</span>
+                  <span className="text-xl font-bold text-gray-800">₦</span>
                   <Input
                     value={currentTarget.value}
                     onChange={(e) => setCurrentTarget(prev => ({ ...prev, value: e.target.value }))}
@@ -774,7 +774,7 @@ const ScalableImpactPlanner: React.FC = () => {
             <div className="text-center">
               <div className="text-sm text-gray-600 mb-1">Revenue</div>
               <div className="flex items-center justify-center">
-                <span className="text-2xl font-bold text-gray-800">$</span>
+                <span className="text-2xl font-bold text-gray-800">₦</span>
                 <Input
                   value={yearTarget.revenue}
                   onChange={(e) => setYearTarget(prev => ({ ...prev, revenue: e.target.value }))}
@@ -789,7 +789,7 @@ const ScalableImpactPlanner: React.FC = () => {
               <div className="text-center flex-1">
                 <div className="text-sm text-gray-600 mb-1">Profit</div>
                 <div className="flex items-center justify-center">
-                  <span className="text-xl font-bold text-gray-800">$</span>
+                  <span className="text-xl font-bold text-gray-800">₦</span>
                   <Input
                     value={yearTarget.profit}
                     onChange={(e) => setYearTarget(prev => ({ ...prev, profit: e.target.value }))}
@@ -816,7 +816,7 @@ const ScalableImpactPlanner: React.FC = () => {
               <div className="text-center flex-1">
                 <div className="text-sm text-gray-600 mb-1">Value</div>
                 <div className="flex items-center justify-center">
-                  <span className="text-xl font-bold text-gray-800">$</span>
+                  <span className="text-xl font-bold text-gray-800">₦</span>
                   <Input
                     value={yearTarget.value}
                     onChange={(e) => setYearTarget(prev => ({ ...prev, value: e.target.value }))}
@@ -1004,7 +1004,7 @@ const ScalableImpactPlanner: React.FC = () => {
                       ...prev,
                       me: { ...prev.me, skillsDevelopment: e.target.value }
                     }))}
-                    placeholder="$1M in passive investments"
+                    placeholder="₦1M in passive investments"
                     className="border-0 bg-transparent text-blue-600 font-medium p-0 h-auto focus:bg-white focus:border focus:border-blue-300 focus:p-2 flex-1"
                   />
                 </div>
@@ -1047,7 +1047,7 @@ const ScalableImpactPlanner: React.FC = () => {
                       ...prev,
                       us: { ...prev.us, companyMission: e.target.value }
                     }))}
-                    placeholder="Distribute $1M in profit sharing to team"
+                    placeholder="Distribute ₦1M in profit sharing to team"
                     className="border-0 bg-transparent text-blue-600 font-medium p-0 resize-none focus:bg-white focus:border focus:border-blue-300 focus:p-2 flex-1 min-h-[60px]"
                     rows={3}
                   />
@@ -1112,7 +1112,10 @@ const ScalableImpactPlanner: React.FC = () => {
                   />
                 </div>
               </div>
-             
+              {/* Red underline */}
+              <div className="mt-4 relative">
+                <div className="h-1 bg-red-500 rounded-full" style={{ width: '80%', margin: '0 auto' }}></div>
+              </div>
             </div>
           </div>
         </div>
