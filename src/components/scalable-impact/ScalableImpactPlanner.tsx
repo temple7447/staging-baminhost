@@ -171,6 +171,27 @@ const ScalableImpactPlanner: React.FC = () => {
   
   // Growth benchmark state
   const [selectedGrowthType, setSelectedGrowthType] = useState<string>('');
+  const [businessStage, setBusinessStage] = useState<'owner-dependent' | 'professionalized'>('owner-dependent');
+
+  // SDE Multiple Table (based on Seller's Discretionary Earnings)
+  const SDE_MULTIPLES = {
+    50000: { min: 1.0, max: 1.25, avg: 1.125 }, // $0-$50K SDE
+    75000: { min: 1.1, max: 1.6, avg: 1.35 },  // $50K-$75K SDE
+    100000: { min: 2.0, max: 2.7, avg: 2.35 }, // $75K-$100K SDE
+    200000: { min: 2.5, max: 3.0, avg: 2.75 }, // $100K-$200K SDE
+    500000: { min: 3.3, max: 4.0, avg: 3.65 }, // $200K-$500K SDE
+    1000000: { min: 3.25, max: 4.25, avg: 3.75 } // $500K-$1M SDE
+  };
+
+  // EBITDA Multiple Table (for professionalized businesses)
+  const EBITDA_MULTIPLES = {
+    999000: { avg: 3.9 },    // $0K-$999K EBITDA
+    4990000: { avg: 5.5 },   // $1M-$4.99M EBITDA
+    9990000: { avg: 6.1 },   // $5M-$9.99M EBITDA
+    24990000: { avg: 7.0 },  // $10M-$24.99M EBITDA
+    49990000: { avg: 8.1 },  // $25M-$49.99M EBITDA
+    Infinity: { avg: 9.2 }   // $50M+ EBITDA
+  };
 
   // Local storage utility functions
   const saveToLocalStorage = (key: string, data: any) => {
@@ -232,6 +253,10 @@ const ScalableImpactPlanner: React.FC = () => {
     // Load growth selection
     const savedGrowth = loadFromLocalStorage('scalable_impact_growth_type');
     if (savedGrowth) setSelectedGrowthType(savedGrowth);
+    
+    // Load business stage
+    const savedStage = loadFromLocalStorage('scalable_impact_business_stage');
+    if (savedStage) setBusinessStage(savedStage);
   };
 
   // Auto-save functions
@@ -245,6 +270,7 @@ const ScalableImpactPlanner: React.FC = () => {
     saveToLocalStorage('scalable_impact_current_target', currentTarget);
     saveToLocalStorage('scalable_impact_year_target', yearTarget);
     saveToLocalStorage('scalable_impact_growth_type', selectedGrowthType);
+    saveToLocalStorage('scalable_impact_business_stage', businessStage);
     if (progressData) {
       saveToLocalStorage('scalable_impact_progress', progressData);
     }
@@ -255,7 +281,7 @@ const ScalableImpactPlanner: React.FC = () => {
     if (user?.id) {
       saveStepData();
     }
-  }, [currentStep, startingPoint, endingPoint, whyStatement, howStatement, takingActionItems, currentTarget, yearTarget, selectedGrowthType, progressData, user?.id]);
+  }, [currentStep, startingPoint, endingPoint, whyStatement, howStatement, takingActionItems, currentTarget, yearTarget, selectedGrowthType, businessStage, progressData, user?.id]);
 
   const loadProgressData = async () => {
     if (!user?.id) return;
@@ -291,6 +317,62 @@ const ScalableImpactPlanner: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Calculate appropriate multiple based on earnings and business stage
+  const getValuationMultiple = (earnings: number, stage: 'owner-dependent' | 'professionalized' = businessStage) => {
+    const earningsUSD = earnings; // Assuming input is already in USD equivalent
+    
+    if (stage === 'owner-dependent') {
+      // Use SDE multiples
+      const thresholds = Object.keys(SDE_MULTIPLES).map(Number).sort((a, b) => a - b);
+      for (const threshold of thresholds) {
+        if (earningsUSD <= threshold) {
+          return {
+            multiple: SDE_MULTIPLES[threshold as keyof typeof SDE_MULTIPLES].avg,
+            type: 'SDE',
+            range: `${SDE_MULTIPLES[threshold as keyof typeof SDE_MULTIPLES].min}x - ${SDE_MULTIPLES[threshold as keyof typeof SDE_MULTIPLES].max}x`
+          };
+        }
+      }
+      return { multiple: 3.75, type: 'SDE', range: '3.25x - 4.25x' }; // Default to highest SDE
+    } else {
+      // Use EBITDA multiples (3.3-7.5x higher than SDE)
+      const thresholds = Object.keys(EBITDA_MULTIPLES).map(Number).sort((a, b) => a - b);
+      for (const threshold of thresholds) {
+        if (earningsUSD <= threshold) {
+          return {
+            multiple: EBITDA_MULTIPLES[threshold as keyof typeof EBITDA_MULTIPLES].avg,
+            type: 'EBITDA',
+            range: `~${EBITDA_MULTIPLES[threshold as keyof typeof EBITDA_MULTIPLES].avg}x avg`
+          };
+        }
+      }
+      return { multiple: 9.2, type: 'EBITDA', range: '~9.2x avg' }; // Default to highest EBITDA
+    }
+  };
+
+  // Determine business stage based on revenue and profit characteristics
+  const determineBusinessStage = (revenue: number, profit: number): 'owner-dependent' | 'professionalized' => {
+    // If profit > $250K and revenue > $1M, likely professionalized
+    // Also factor in profit margins - higher margins with scale suggest systems
+    const profitMargin = profit / revenue;
+    
+    if (profit > 250000 && revenue > 1000000 && profitMargin > 0.15) {
+      return 'professionalized';
+    }
+    return 'owner-dependent';
+  };
+
+  // Calculate business value using proper multiples
+  const calculateBusinessValue = (profit: number, stage?: 'owner-dependent' | 'professionalized') => {
+    const valuationData = getValuationMultiple(profit, stage);
+    return {
+      value: Math.round(profit * valuationData.multiple),
+      multiple: valuationData.multiple,
+      type: valuationData.type,
+      range: valuationData.range
+    };
   };
 
   // Get scale level configuration
@@ -420,7 +502,6 @@ const ScalableImpactPlanner: React.FC = () => {
   const calculateTargetsFromGrowth = (growthType: string, currentRev: number, currentProfit: number, currentValue: number) => {
     let revenueMultiplier: number;
     let profitMultiplier: number;
-    let valueMultiplier: number;
     let profitMarginIncrease: number;
     
     switch (growthType) {
@@ -428,28 +509,24 @@ const ScalableImpactPlanner: React.FC = () => {
         // 3X, 3X, 2X, 2X = ~36X over 4 years, ~9X over 3 years
         revenueMultiplier = 9;
         profitMultiplier = 12; // Higher profit growth for hypergrowth
-        valueMultiplier = 15;
         profitMarginIncrease = 8;
         break;
       case 'rapid':
         // 2X, 2X, 75%, 50% = ~10.5X over 4 years, ~5.25X over 3 years
         revenueMultiplier = 5;
         profitMultiplier = 6;
-        valueMultiplier = 8;
         profitMarginIncrease = 5;
         break;
       case 'steady':
         // 25-50% YoY = ~2.4X over 3 years (37.5% average)
         revenueMultiplier = 2.4;
         profitMultiplier = 2.8;
-        valueMultiplier = 4;
         profitMarginIncrease = 3;
         break;
       case 'mature':
         // 10-20% YoY = ~1.73X over 3 years (15% average)
         revenueMultiplier = 1.7;
         profitMultiplier = 1.9;
-        valueMultiplier = 2.5;
         profitMarginIncrease = 2;
         break;
       default:
@@ -458,17 +535,36 @@ const ScalableImpactPlanner: React.FC = () => {
     
     const targetRevenue = Math.round(currentRev * revenueMultiplier);
     const targetProfit = Math.round(currentProfit * profitMultiplier);
-    const targetValue = Math.round(currentValue * valueMultiplier);
     const currentProfitPercentage = parseFloat(currentTarget.profitPercentage) || 15;
     const targetProfitPercentage = Math.min(currentProfitPercentage + profitMarginIncrease, 30);
-    const newValueMultiplier = targetValue / targetRevenue;
+    
+    // Determine current and target business stages
+    const currentStage = determineBusinessStage(currentRev, currentProfit);
+    const targetStage = determineBusinessStage(targetRevenue, targetProfit);
+    
+    // Calculate values using appropriate multiples
+    const currentValuation = calculateBusinessValue(currentProfit, currentStage);
+    const targetValuation = calculateBusinessValue(targetProfit, targetStage);
+    
+    // Calculate value multiplier for display
+    const newValueMultiplier = targetValuation.multiple;
     
     return {
       revenue: targetRevenue.toLocaleString(),
       profit: targetProfit.toLocaleString(),
       profitPercentage: targetProfitPercentage.toString(),
-      value: targetValue.toLocaleString(),
-      valueMultiplier: newValueMultiplier.toFixed(1)
+      value: targetValuation.value.toLocaleString(),
+      valueMultiplier: newValueMultiplier.toFixed(1),
+      // Additional data for insights
+      valuationInsight: {
+        currentStage,
+        targetStage,
+        currentMultiple: currentValuation.multiple,
+        targetMultiple: targetValuation.multiple,
+        currentType: currentValuation.type,
+        targetType: targetValuation.type,
+        multipleExpansion: targetValuation.multiple / currentValuation.multiple
+      }
     };
   };
   
@@ -491,7 +587,14 @@ const ScalableImpactPlanner: React.FC = () => {
     
     const newTargets = calculateTargetsFromGrowth(growthType, currentRev, currentProfit, currentValue);
     if (newTargets) {
-      setYearTarget(newTargets);
+      // Update financial targets
+      setYearTarget({
+        revenue: newTargets.revenue,
+        profit: newTargets.profit,
+        profitPercentage: newTargets.profitPercentage,
+        value: newTargets.value,
+        valueMultiplier: newTargets.valueMultiplier
+      });
       
       const growthNames = {
         hypergrowth: 'Hypergrowth (3X, 3X, 2X, 2X)',
@@ -500,10 +603,23 @@ const ScalableImpactPlanner: React.FC = () => {
         mature: 'Mature Growth (10-20% YoY)'
       };
       
-      toast({
-        title: "3-Year Targets Updated! 🚀",
-        description: `Targets calculated based on ${growthNames[growthType as keyof typeof growthNames]} benchmark.`,
-      });
+      // Enhanced toast with valuation insights
+      if (newTargets.valuationInsight) {
+        const insight = newTargets.valuationInsight;
+        const stageTransition = insight.currentStage !== insight.targetStage 
+          ? ` | Stage: ${insight.currentStage} → ${insight.targetStage}` 
+          : '';
+        
+        toast({
+          title: "3-Year Targets Updated! 🚀",
+          description: `${growthNames[growthType as keyof typeof growthNames]} | Multiple: ${insight.currentMultiple.toFixed(1)}x (${insight.currentType}) → ${insight.targetMultiple.toFixed(1)}x (${insight.targetType})${stageTransition}`,
+        });
+      } else {
+        toast({
+          title: "3-Year Targets Updated! 🚀",
+          description: `Targets calculated based on ${growthNames[growthType as keyof typeof growthNames]} benchmark.`,
+        });
+      }
     }
   };
 
@@ -526,20 +642,26 @@ const ScalableImpactPlanner: React.FC = () => {
     const growthMultiplier = 3.5; // Approximately 40% annual growth compounded
     const targetRevenue = Math.round(currentRev * growthMultiplier);
     const targetProfit = Math.round(currentProfit * growthMultiplier * 1.2); // Slightly higher profit growth
-    const targetValue = Math.round(currentValue * growthMultiplier * 2); // Higher value multiple
     const targetProfitPercentage = Math.min(parseFloat(currentTarget.profitPercentage) + 5, 25); // Improve margins by 5%
+    
+    // Determine current and target business stages
+    const currentStage = determineBusinessStage(currentRev, currentProfit);
+    const targetStage = determineBusinessStage(targetRevenue, targetProfit);
+    
+    // Calculate values using appropriate multiples
+    const targetValuation = calculateBusinessValue(targetProfit, targetStage);
 
     setYearTarget({
       revenue: targetRevenue.toLocaleString(),
       profit: targetProfit.toLocaleString(),
       profitPercentage: targetProfitPercentage.toString(),
-      value: targetValue.toLocaleString(),
-      valueMultiplier: '7.5'
+      value: targetValuation.value.toLocaleString(),
+      valueMultiplier: targetValuation.multiple.toFixed(1)
     });
 
     toast({
       title: "Smart Targets Generated! 🎢",
-      description: "3-year targets calculated based on aggressive but achievable 40% annual growth.",
+      description: `40% annual growth targets using ${targetValuation.type} multiples (${targetValuation.multiple.toFixed(1)}x)`,
     });
   };
 
@@ -722,15 +844,43 @@ const ScalableImpactPlanner: React.FC = () => {
                 </SelectItem>
               </SelectContent>
             </Select>
+            
+            {/* Business Stage Selector */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Business Stage (affects valuation multiples):</Label>
+              <Select value={businessStage} onValueChange={setBusinessStage}>
+                <SelectTrigger className="w-full max-w-md">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="owner-dependent">
+                    <div className="flex flex-col">
+                      <span className="font-semibold">Owner-Dependent Business</span>
+                      <span className="text-sm text-gray-500">Uses SDE multiples (1.0x - 4.25x)</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="professionalized">
+                    <div className="flex flex-col">
+                      <span className="font-semibold">Professionalized Business</span>
+                      <span className="text-sm text-gray-500">Uses EBITDA multiples (3.9x - 9.2x+)</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
             {selectedGrowthType && (
               <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-700">
-                  <span className="font-medium">Selected:</span> {{
+                <p className="text-sm text-blue-700 mb-2">
+                  <span className="font-medium">Growth Strategy:</span> {{
                     hypergrowth: 'Hypergrowth (3X, 3X, 2X, 2X) - VC-Funded trajectory',
                     rapid: 'Rapid Growth (2X, 2X, 75%, 50%) - Early-stage growth',
                     steady: 'Steady Growth (25-50% YoY) - Sustainable expansion',
                     mature: 'Mature Growth (10-20% YoY) - Established business growth'
                   }[selectedGrowthType]}
+                </p>
+                <p className="text-sm text-blue-600">
+                  <span className="font-medium">Valuation Method:</span> {businessStage === 'owner-dependent' ? 'SDE (Seller\'s Discretionary Earnings)' : 'EBITDA (Earnings Before Interest, Taxes, Depreciation & Amortization)'}
                 </p>
               </div>
             )}
