@@ -24,7 +24,7 @@ const FinancialTargets: React.FC<FinancialTargetsProps> = ({
   setYearTarget
 }) => {
   return (
-    <div className="flex flex-col lg:flex-row bg-white border border-gray-300 overflow-hidden" style={{ maxWidth: '900px', margin: '0 auto' }}>
+    <div className="flex flex-col lg:flex-row bg-white border border-gray-300 overflow-hidden" style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
       {/* WHAT Section - Green sidebar */}
       <div className="bg-green-500 flex items-center justify-center p-4 lg:p-6 min-h-[60px] lg:min-h-[400px]">
         <div className="transform lg:-rotate-90 text-white font-bold text-lg lg:text-xl tracking-wider">
@@ -50,7 +50,7 @@ const FinancialTargets: React.FC<FinancialTargetsProps> = ({
                 value={currentTarget.revenue}
                 onChange={(e) => setCurrentTarget(prev => ({ ...prev, revenue: e.target.value }))}
                 placeholder="1,000,000"
-                className="text-center text-2xl lg:text-3xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-48"
+                className="text-center text-2xl lg:text-3xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-56"
               />
             </div>
           </div>
@@ -65,7 +65,7 @@ const FinancialTargets: React.FC<FinancialTargetsProps> = ({
                   value={currentTarget.profit}
                   onChange={(e) => setCurrentTarget(prev => ({ ...prev, profit: e.target.value }))}
                   placeholder="150,000"
-                  className="text-center text-xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-32"
+                  className="text-center text-xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-40"
                 />
               </div>
             </div>
@@ -92,7 +92,7 @@ const FinancialTargets: React.FC<FinancialTargetsProps> = ({
                   value={currentTarget.value}
                   onChange={(e) => setCurrentTarget(prev => ({ ...prev, value: e.target.value }))}
                   placeholder="375,000"
-                  className="text-center text-xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-32"
+                  className="text-center text-xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-40"
                 />
               </div>
             </div>
@@ -134,7 +134,7 @@ const FinancialTargets: React.FC<FinancialTargetsProps> = ({
                 value={yearTarget.revenue}
                 onChange={(e) => setYearTarget(prev => ({ ...prev, revenue: e.target.value }))}
                 placeholder="5,000,000"
-                className="text-center text-2xl lg:text-3xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-48"
+                className="text-center text-2xl lg:text-3xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-56"
               />
             </div>
           </div>
@@ -149,7 +149,7 @@ const FinancialTargets: React.FC<FinancialTargetsProps> = ({
                   value={yearTarget.profit}
                   onChange={(e) => setYearTarget(prev => ({ ...prev, profit: e.target.value }))}
                   placeholder="1,000,000"
-                  className="text-center text-xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-32"
+                  className="text-center text-xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-40"
                 />
               </div>
             </div>
@@ -176,7 +176,7 @@ const FinancialTargets: React.FC<FinancialTargetsProps> = ({
                   value={yearTarget.value}
                   onChange={(e) => setYearTarget(prev => ({ ...prev, value: e.target.value }))}
                   placeholder="7,500,000"
-                  className="text-center text-xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-32"
+                  className="text-center text-xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-40"
                 />
               </div>
             </div>

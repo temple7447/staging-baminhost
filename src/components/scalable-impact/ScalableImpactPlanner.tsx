@@ -795,7 +795,7 @@ const ScalableImpactPlanner: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white">
+    <div className="max-w-7xl mx-auto p-6 bg-white">
       {/* Progress Bar */}
       <ProgressBar />
       
