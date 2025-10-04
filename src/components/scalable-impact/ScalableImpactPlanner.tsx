@@ -171,7 +171,7 @@ const ScalableImpactPlanner: React.FC = () => {
   
   // Growth benchmark state
   const [selectedGrowthType, setSelectedGrowthType] = useState<string>('');
-  const [businessStage, setBusinessStage] = useState<'owner-dependent' | 'professionalized'>('owner-dependent');
+  const [businessStage, setBusinessStage] = useState<any>('owner-dependent');
 
   // SDE Multiple Table (based on Seller's Discretionary Earnings)
   const SDE_MULTIPLES = {
