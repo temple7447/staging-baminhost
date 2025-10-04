@@ -3,6 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { 
   Target, 
   TrendingUp, 
@@ -160,6 +168,9 @@ const ScalableImpactPlanner: React.FC = () => {
     currentAction2: '',
     currentAction3: ''
   });
+  
+  // Growth benchmark state
+  const [selectedGrowthType, setSelectedGrowthType] = useState<string>('');
 
   // Local storage utility functions
   const saveToLocalStorage = (key: string, data: any) => {
@@ -217,6 +228,10 @@ const ScalableImpactPlanner: React.FC = () => {
 
     const savedYear = loadFromLocalStorage('scalable_impact_year_target');
     if (savedYear) setYearTarget(savedYear);
+    
+    // Load growth selection
+    const savedGrowth = loadFromLocalStorage('scalable_impact_growth_type');
+    if (savedGrowth) setSelectedGrowthType(savedGrowth);
   };
 
   // Auto-save functions
@@ -229,6 +244,7 @@ const ScalableImpactPlanner: React.FC = () => {
     saveToLocalStorage('scalable_impact_taking_action', takingActionItems);
     saveToLocalStorage('scalable_impact_current_target', currentTarget);
     saveToLocalStorage('scalable_impact_year_target', yearTarget);
+    saveToLocalStorage('scalable_impact_growth_type', selectedGrowthType);
     if (progressData) {
       saveToLocalStorage('scalable_impact_progress', progressData);
     }
@@ -239,7 +255,7 @@ const ScalableImpactPlanner: React.FC = () => {
     if (user?.id) {
       saveStepData();
     }
-  }, [currentStep, startingPoint, endingPoint, whyStatement, howStatement, takingActionItems, currentTarget, yearTarget, progressData, user?.id]);
+  }, [currentStep, startingPoint, endingPoint, whyStatement, howStatement, takingActionItems, currentTarget, yearTarget, selectedGrowthType, progressData, user?.id]);
 
   const loadProgressData = async () => {
     if (!user?.id) return;
@@ -398,6 +414,97 @@ const ScalableImpactPlanner: React.FC = () => {
       title: "Goals Saved! 💾",
       description: "Your financial targets have been saved successfully.",
     });
+  };
+
+  // Calculate targets based on selected growth benchmark
+  const calculateTargetsFromGrowth = (growthType: string, currentRev: number, currentProfit: number, currentValue: number) => {
+    let revenueMultiplier: number;
+    let profitMultiplier: number;
+    let valueMultiplier: number;
+    let profitMarginIncrease: number;
+    
+    switch (growthType) {
+      case 'hypergrowth':
+        // 3X, 3X, 2X, 2X = ~36X over 4 years, ~9X over 3 years
+        revenueMultiplier = 9;
+        profitMultiplier = 12; // Higher profit growth for hypergrowth
+        valueMultiplier = 15;
+        profitMarginIncrease = 8;
+        break;
+      case 'rapid':
+        // 2X, 2X, 75%, 50% = ~10.5X over 4 years, ~5.25X over 3 years
+        revenueMultiplier = 5;
+        profitMultiplier = 6;
+        valueMultiplier = 8;
+        profitMarginIncrease = 5;
+        break;
+      case 'steady':
+        // 25-50% YoY = ~2.4X over 3 years (37.5% average)
+        revenueMultiplier = 2.4;
+        profitMultiplier = 2.8;
+        valueMultiplier = 4;
+        profitMarginIncrease = 3;
+        break;
+      case 'mature':
+        // 10-20% YoY = ~1.73X over 3 years (15% average)
+        revenueMultiplier = 1.7;
+        profitMultiplier = 1.9;
+        valueMultiplier = 2.5;
+        profitMarginIncrease = 2;
+        break;
+      default:
+        return;
+    }
+    
+    const targetRevenue = Math.round(currentRev * revenueMultiplier);
+    const targetProfit = Math.round(currentProfit * profitMultiplier);
+    const targetValue = Math.round(currentValue * valueMultiplier);
+    const currentProfitPercentage = parseFloat(currentTarget.profitPercentage) || 15;
+    const targetProfitPercentage = Math.min(currentProfitPercentage + profitMarginIncrease, 30);
+    const newValueMultiplier = targetValue / targetRevenue;
+    
+    return {
+      revenue: targetRevenue.toLocaleString(),
+      profit: targetProfit.toLocaleString(),
+      profitPercentage: targetProfitPercentage.toString(),
+      value: targetValue.toLocaleString(),
+      valueMultiplier: newValueMultiplier.toFixed(1)
+    };
+  };
+  
+  // Handle growth selection from GrowthBenchmarks component
+  const handleGrowthSelect = (growthType: string, value: string) => {
+    setSelectedGrowthType(growthType);
+    
+    const currentRev = parseFloat(currentTarget.revenue.replace(/,/g, '')) || 0;
+    const currentProfit = parseFloat(currentTarget.profit.replace(/,/g, '')) || 0;
+    const currentValue = parseFloat(currentTarget.value.replace(/,/g, '')) || 0;
+    
+    if (currentRev === 0) {
+      toast({
+        title: "Enter Current Values First",
+        description: "Please enter your current revenue and values to calculate targets.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const newTargets = calculateTargetsFromGrowth(growthType, currentRev, currentProfit, currentValue);
+    if (newTargets) {
+      setYearTarget(newTargets);
+      
+      const growthNames = {
+        hypergrowth: 'Hypergrowth (3X, 3X, 2X, 2X)',
+        rapid: 'Rapid Growth (2X, 2X, 75%, 50%)',
+        steady: 'Steady Growth (25-50% YoY)',
+        mature: 'Mature Growth (10-20% YoY)'
+      };
+      
+      toast({
+        title: "3-Year Targets Updated! 🚀",
+        description: `Targets calculated based on ${growthNames[growthType as keyof typeof growthNames]} benchmark.`,
+      });
+    }
   };
 
   // Calculate smart targets based on current values
@@ -569,7 +676,68 @@ const ScalableImpactPlanner: React.FC = () => {
     <div className="max-w-6xl mx-auto p-6 bg-white">
       {/* Progress Bar */}
       <ProgressBar />
-
+      
+      {/* Growth Strategy Selection */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5" />
+            Select Your Growth Strategy
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Label htmlFor="growth-select" className="text-base font-medium">
+              How much do you plan to grow over the next 3 years?
+            </Label>
+            <Select 
+              value={selectedGrowthType} 
+              onValueChange={(value) => handleGrowthSelect(value, value)}
+            >
+              <SelectTrigger className="w-full max-w-md">
+                <SelectValue placeholder="Choose your growth benchmark" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hypergrowth">
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Hypergrowth: 3X, 3X, 2X, 2X</span>
+                    <span className="text-sm text-gray-500">(VC-Funded...₦100M in 7 years)</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="rapid">
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Rapid Growth: 2X, 2X, 75%, 50%</span>
+                    <span className="text-sm text-gray-500">(Early-Stage Growth)</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="steady">
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Steady Growth: 25 - 50% YoY</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="mature">
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Mature Growth: 10 - 20% YoY</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            {selectedGrowthType && (
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-700">
+                  <span className="font-medium">Selected:</span> {{
+                    hypergrowth: 'Hypergrowth (3X, 3X, 2X, 2X) - VC-Funded trajectory',
+                    rapid: 'Rapid Growth (2X, 2X, 75%, 50%) - Early-stage growth',
+                    steady: 'Steady Growth (25-50% YoY) - Sustainable expansion',
+                    mature: 'Mature Growth (10-20% YoY) - Established business growth'
+                  }[selectedGrowthType]}
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+      
       {/* Financial Targets Section */}
       <FinancialTargets
         currentTarget={currentTarget}
