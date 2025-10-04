@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
 import { 
   Target, 
-  DollarSign, 
   TrendingUp, 
   Users, 
   Building, 
@@ -17,13 +12,7 @@ import {
   Zap,
   CheckCircle2,
   AlertTriangle,
-  Info,
-  RefreshCw,
-  Save,
-  Bell,
-  Check,
-  ArrowRight,
-  Calculator
+  RefreshCw
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
@@ -34,6 +23,24 @@ import scalableImpactProgressService, {
   type ProgressBenchmark
 } from "@/services/scalableImpactProgressService";
 
+// Import separate components
+import ProgressBar from './ProgressBar';
+import FinancialTargets from './FinancialTargets';
+import GrowthInsights from './GrowthInsights';
+import WhySection from './WhySection';
+import HowSection from './HowSection';
+import TakingActionSection from './TakingActionSection';
+
+// Import shared types
+import type { 
+  FinancialTarget, 
+  StartingPoint, 
+  EndingPoint, 
+  WhyStatement, 
+  HowStatement, 
+  TakingActionItems 
+} from './types';
+
 interface ScaleLevel {
   id: number;
   title: string;
@@ -43,72 +50,6 @@ interface ScaleLevel {
   completed: boolean;
   locked: boolean;
   requirements: string[];
-}
-
-interface FinancialTarget {
-  revenue: string;
-  profit: string;
-  profitPercentage: string;
-  value: string;
-  valueMultiplier: string;
-}
-
-interface StartingPoint {
-  currentRevenue: string;
-  currentProfit: string;
-  currentProfitability: string;
-  currentValuation: string;
-  assessmentDate: string;
-  revenueSource: string;
-  businessStage: string;
-}
-
-interface EndingPoint {
-  targetRevenue: string;
-  targetProfit: string;
-  targetValuation: string;
-  timeframe: '3-year' | '5-year' | '10-year';
-  growthStrategy: 'double-in-three' | 'top-to-bottom' | 'custom';
-  benchmarks: {
-    year1Revenue: string;
-    year2Revenue: string;
-    year3Revenue: string;
-  };
-}
-
-interface WhyStatement {
-  me: {
-    personalGoals: string;
-    motivation: string;
-    skillsDevelopment: string;
-    personalWhy: string;
-  };
-  us: {
-    teamVision: string;
-    companyMission: string;
-    culturalValues: string;
-    collectiveWhy: string;
-  };
-  them: {
-    customerImpact: string;
-    marketProblem: string;
-    socialContribution: string;
-    externalWhy: string;
-  };
-}
-
-interface HowStatement {
-  action1: string;
-  action2: string;
-  action3: string;
-  action4: string;
-  action5: string;
-}
-
-interface TakingActionItems {
-  currentAction1: string;
-  currentAction2: string;
-  currentAction3: string;
 }
 
 const ScalableImpactPlanner: React.FC = () => {
@@ -599,675 +540,72 @@ const ScalableImpactPlanner: React.FC = () => {
     );
   }
 
+  // Save handlers for child components
+  const handleSaveWhy = () => {
+    saveStepData();
+    toast({
+      title: "WHY Statement Saved! 🎯",
+      description: "Your personal, team, and community goals have been saved.",
+    });
+  };
+
+  const handleSaveHow = () => {
+    saveStepData();
+    toast({
+      title: "HOW Statement Saved! ⚙️",
+      description: "Your strategic action items have been saved.",
+    });
+  };
+
+  const handleSaveTakingAction = () => {
+    saveStepData();
+    toast({
+      title: "Taking Action Saved! 🎨",
+      description: "Your current action items have been saved.",
+    });
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white">
-      {/* Top Progress Section */}
-      <div className="bg-gray-100 p-6 border-b">
-        <div className="max-w-6xl mx-auto">
-          {/* Progress Bar Background */}
-          <div className="flex items-center justify-between mb-4">
-            {[1, 2, 3, 4, 5, 6, 7].map((step, index) => {
-              const colors = [
-                'bg-red-500',
-                'bg-orange-500', 
-                'bg-yellow-500',
-                'bg-green-500',
-                'bg-blue-500',
-                'bg-indigo-500',
-                'bg-black'
-              ];
-              const isCompleted = step <= 5;
-              
-              return (
-                <React.Fragment key={step}>
-                  <div className={`w-12 h-12 rounded-full ${colors[index]} flex items-center justify-center text-white font-bold text-lg`}>
-                    {isCompleted ? <Check className="w-6 h-6" /> : step}
-                  </div>
-                  {index < 6 && (
-                    <div className="flex-1 h-2 bg-gray-300 mx-2 rounded-full">
-                      <div className={`h-full rounded-full ${
-                        step <= 5 ? colors[index] : 'bg-gray-300'
-                      }`} style={{ width: step <= 5 ? '100%' : '0%' }}></div>
-                    </div>
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </div>
-          
-          {/* Step Labels and Checkboxes */}
-          <div className="flex items-start justify-between">
-            {[1, 2, 3, 4, 5, 6, 7].map((step, index) => {
-              const stepTitles = [
-                'Get 10\nCustomers',
-                'Automate\nGrowth',
-                'Upgrade\nYour OS',
-                '2X Your\nTake-Home',
-                'Build Your\nBoard',
-                'Expand\nWith M&A',
-                'Hit Your\n"Number"'
-              ];
-              const isCompleted = step <= 5;
-              
-              return (
-                <div key={step} className="flex flex-col items-center" style={{ width: '14.28%' }}>
-                  <div className="text-center mb-2">
-                    <div className="text-xs font-medium text-gray-700 leading-tight whitespace-pre-line">
-                      {stepTitles[index]}
-                    </div>
-                  </div>
-                  <Checkbox 
-                    checked={isCompleted} 
-                    disabled 
-                    className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      {/* Progress Bar */}
+      <ProgressBar />
 
-      {/* Main Financial Targets Section - Exact replica of the design */}
-      <div className="flex flex-col lg:flex-row bg-white border border-gray-300 overflow-hidden" style={{ maxWidth: '900px', margin: '0 auto' }}>
-        {/* WHAT Section - Green sidebar */}
-        <div className="bg-green-500 flex items-center justify-center p-4 lg:p-6 min-h-[60px] lg:min-h-[400px]">
-          <div className="transform lg:-rotate-90 text-white font-bold text-lg lg:text-xl tracking-wider">
-            WHAT
-          </div>
-        </div>
+      {/* Financial Targets Section */}
+      <FinancialTargets
+        currentTarget={currentTarget}
+        setCurrentTarget={setCurrentTarget}
+        yearTarget={yearTarget}
+        setYearTarget={setYearTarget}
+      />
 
-        {/* CURRENT Section */}
-        <div className="flex-1 border-r border-gray-300">
-          {/* Header */}
-          <div className="bg-gray-100 text-center py-4 border-b border-gray-300">
-            <h2 className="text-xl font-bold text-gray-700">CURRENT</h2>
-          </div>
-          
-          {/* Content */}
-          <div className="p-6 lg:p-8 space-y-6">
-            {/* Revenue */}
-            <div className="text-center">
-              <div className="text-sm text-gray-600 mb-1">Revenue</div>
-              <div className="flex items-center justify-center">
-                <span className="text-2xl font-bold text-gray-800">₦</span>
-                <Input
-                  value={currentTarget.revenue}
-                  onChange={(e) => setCurrentTarget(prev => ({ ...prev, revenue: e.target.value }))}
-                  placeholder="1,000,000"
-                  className="text-center text-2xl lg:text-3xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-48"
-                />
-              </div>
-            </div>
-            
-            {/* Profit Row */}
-            <div className="flex justify-between items-center">
-              <div className="text-center flex-1">
-                <div className="text-sm text-gray-600 mb-1">Profit</div>
-                <div className="flex items-center justify-center">
-                  <span className="text-xl font-bold text-gray-800">₦</span>
-                  <Input
-                    value={currentTarget.profit}
-                    onChange={(e) => setCurrentTarget(prev => ({ ...prev, profit: e.target.value }))}
-                    placeholder="150,000"
-                    className="text-center text-xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-32"
-                  />
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center">
-                  <Input
-                    value={currentTarget.profitPercentage}
-                    onChange={(e) => setCurrentTarget(prev => ({ ...prev, profitPercentage: e.target.value }))}
-                    placeholder="15"
-                    className="text-center text-2xl lg:text-3xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-16"
-                  />
-                  <span className="text-2xl lg:text-3xl font-bold text-blue-600">%</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Value Row */}
-            <div className="flex justify-between items-center">
-              <div className="text-center flex-1">
-                <div className="text-sm text-gray-600 mb-1">Value</div>
-                <div className="flex items-center justify-center">
-                  <span className="text-xl font-bold text-gray-800">₦</span>
-                  <Input
-                    value={currentTarget.value}
-                    onChange={(e) => setCurrentTarget(prev => ({ ...prev, value: e.target.value }))}
-                    placeholder="375,000"
-                    className="text-center text-xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-32"
-                  />
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center">
-                  <Input
-                    value={currentTarget.valueMultiplier}
-                    onChange={(e) => setCurrentTarget(prev => ({ ...prev, valueMultiplier: e.target.value }))}
-                    placeholder="2.5"
-                    className="text-center text-2xl lg:text-3xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-16"
-                  />
-                  <span className="text-2xl lg:text-3xl font-bold text-blue-600">x</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Growth Insights and Smart Targets */}
+      <GrowthInsights
+        currentTarget={currentTarget}
+        yearTarget={yearTarget}
+        onCalculateSmartTargets={calculateSmartTargets}
+        onSaveFinancialGoals={saveFinancialGoals}
+      />
 
-        {/* Arrow Section */}
-        <div className="flex items-center justify-center bg-green-500 p-4">
-          <ArrowRight className="w-8 h-8 text-white" />
-        </div>
-
-        {/* 3-YEAR TARGET Section */}
-        <div className="flex-1">
-          {/* Header */}
-          <div className="bg-gray-100 text-center py-4 border-b border-gray-300">
-            <h2 className="text-xl font-bold text-gray-700">3-YEAR TARGET</h2>
-          </div>
-          
-          {/* Content */}
-          <div className="p-6 lg:p-8 space-y-6">
-            {/* Revenue */}
-            <div className="text-center">
-              <div className="text-sm text-gray-600 mb-1">Revenue</div>
-              <div className="flex items-center justify-center">
-                <span className="text-2xl font-bold text-gray-800">₦</span>
-                <Input
-                  value={yearTarget.revenue}
-                  onChange={(e) => setYearTarget(prev => ({ ...prev, revenue: e.target.value }))}
-                  placeholder="5,000,000"
-                  className="text-center text-2xl lg:text-3xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-48"
-                />
-              </div>
-            </div>
-            
-            {/* Profit Row */}
-            <div className="flex justify-between items-center">
-              <div className="text-center flex-1">
-                <div className="text-sm text-gray-600 mb-1">Profit</div>
-                <div className="flex items-center justify-center">
-                  <span className="text-xl font-bold text-gray-800">₦</span>
-                  <Input
-                    value={yearTarget.profit}
-                    onChange={(e) => setYearTarget(prev => ({ ...prev, profit: e.target.value }))}
-                    placeholder="1,000,000"
-                    className="text-center text-xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-32"
-                  />
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center">
-                  <Input
-                    value={yearTarget.profitPercentage}
-                    onChange={(e) => setYearTarget(prev => ({ ...prev, profitPercentage: e.target.value }))}
-                    placeholder="20"
-                    className="text-center text-2xl lg:text-3xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-16"
-                  />
-                  <span className="text-2xl lg:text-3xl font-bold text-blue-600">%</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Value Row */}
-            <div className="flex justify-between items-center">
-              <div className="text-center flex-1">
-                <div className="text-sm text-gray-600 mb-1">Value</div>
-                <div className="flex items-center justify-center">
-                  <span className="text-xl font-bold text-gray-800">₦</span>
-                  <Input
-                    value={yearTarget.value}
-                    onChange={(e) => setYearTarget(prev => ({ ...prev, value: e.target.value }))}
-                    placeholder="7,500,000"
-                    className="text-center text-xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-32"
-                  />
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center">
-                  <Input
-                    value={yearTarget.valueMultiplier}
-                    onChange={(e) => setYearTarget(prev => ({ ...prev, valueMultiplier: e.target.value }))}
-                    placeholder="7.5"
-                    className="text-center text-2xl lg:text-3xl font-bold border-0 bg-transparent text-blue-600 focus:bg-white focus:border focus:border-blue-300 w-16"
-                  />
-                  <span className="text-2xl lg:text-3xl font-bold text-blue-600">x</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Growth Relationship Indicator */}
-      <div className="px-4 sm:px-6 lg:px-8">
-        <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0 lg:space-x-8">
-              {/* Current Summary */}
-              <div className="text-center lg:text-left">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Current Position</h3>
-                <div className="space-y-1">
-                  <div className="text-sm text-gray-600">Revenue: <span className="font-medium text-green-600">₦{currentTarget.revenue}</span></div>
-                  <div className="text-sm text-gray-600">Profit: <span className="font-medium text-green-600">₦{currentTarget.profit} ({currentTarget.profitPercentage}%)</span></div>
-                  <div className="text-sm text-gray-600">Value: <span className="font-medium text-green-600">₦{currentTarget.value}</span></div>
-                </div>
-              </div>
-
-              {/* Growth Arrow and Calculations */}
-              <div className="flex flex-col items-center space-y-2">
-                <div className="flex items-center space-x-2">
-                  <ArrowRight className="w-8 h-8 text-green-600" />
-                  <div className="bg-white rounded-lg px-3 py-2 border border-green-200">
-                    <div className="flex items-center space-x-2">
-                      <Calculator className="w-4 h-4 text-green-600" />
-                      <span className="text-sm font-medium text-green-600">
-                        {(() => {
-                          const currentRev = parseFloat(currentTarget.revenue.replace(/,/g, '')) || 0;
-                          const targetRev = parseFloat(yearTarget.revenue.replace(/,/g, '')) || 0;
-                          const growthRate = currentRev > 0 ? ((targetRev / currentRev - 1) * 100).toFixed(1) : '0';
-                          return `${growthRate}% Growth`;
-                        })()} 
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-xs text-gray-500">3-Year Journey</div>
-              </div>
-
-              {/* Target Summary */}
-              <div className="text-center lg:text-right">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">3-Year Target</h3>
-                <div className="space-y-1">
-                  <div className="text-sm text-gray-600">Revenue: <span className="font-medium text-blue-600">₦{yearTarget.revenue}</span></div>
-                  <div className="text-sm text-gray-600">Profit: <span className="font-medium text-blue-600">₦{yearTarget.profit} ({yearTarget.profitPercentage}%)</span></div>
-                  <div className="text-sm text-gray-600">Value: <span className="font-medium text-blue-600">₦{yearTarget.value}</span></div>
-                </div>
-              </div>
-            </div>
-
-            {/* Growth Insights */}
-            <div className="mt-4 pt-4 border-t border-green-200">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-                <div className="bg-white rounded-lg p-3 border border-green-100">
-                  <div className="text-lg font-bold text-green-600">
-                    {(() => {
-                      const currentRev = parseFloat(currentTarget.revenue.replace(/,/g, '')) || 0;
-                      const targetRev = parseFloat(yearTarget.revenue.replace(/,/g, '')) || 0;
-                      const multiplier = currentRev > 0 ? (targetRev / currentRev).toFixed(1) : '0';
-                      return `${multiplier}x`;
-                    })()} 
-                  </div>
-                  <div className="text-xs text-gray-600">Revenue Growth</div>
-                </div>
-                <div className="bg-white rounded-lg p-3 border border-blue-100">
-                  <div className="text-lg font-bold text-blue-600">
-                    {(() => {
-                      const currentProfit = parseFloat(currentTarget.profit.replace(/,/g, '')) || 0;
-                      const targetProfit = parseFloat(yearTarget.profit.replace(/,/g, '')) || 0;
-                      const multiplier = currentProfit > 0 ? (targetProfit / currentProfit).toFixed(1) : '0';
-                      return `${multiplier}x`;
-                    })()} 
-                  </div>
-                  <div className="text-xs text-gray-600">Profit Growth</div>
-                </div>
-                <div className="bg-white rounded-lg p-3 border border-purple-100">
-                  <div className="text-lg font-bold text-purple-600">
-                    {(() => {
-                      const currentValue = parseFloat(currentTarget.value.replace(/,/g, '')) || 0;
-                      const targetValue = parseFloat(yearTarget.value.replace(/,/g, '')) || 0;
-                      const multiplier = currentValue > 0 ? (targetValue / currentValue).toFixed(1) : '0';
-                      return `${multiplier}x`;
-                    })()} 
-                  </div>
-                  <div className="text-xs text-gray-600">Value Growth</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Smart Target Actions */}
-            <div className="mt-4 pt-4 border-t border-green-200">
-              <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                <Button 
-                  onClick={calculateSmartTargets} 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex items-center gap-2 border-green-300 text-green-700 hover:bg-green-50"
-                >
-                  <Calculator className="w-4 h-4" />
-                  Calculate Smart Targets
-                </Button>
-                <div className="text-xs text-gray-500 text-center">
-                  Generate 3-year targets based on 40% annual growth
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Save Financial Targets Button */}
-      <div className="flex justify-center py-4">
-        <Button onClick={saveFinancialGoals} size="lg" className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
-          <Save className="w-4 h-4" />
-          Save Financial Targets
-        </Button>
-      </div>
-
-      {/* WHY Section - Editable input fields with exact design */}
-      <div className="py-6 sm:py-8">
-        <div className="flex flex-col lg:flex-row bg-white border border-gray-300 overflow-hidden" style={{ maxWidth: '900px', margin: '0 auto' }}>
-          {/* WHY Section - Green sidebar */}
-          <div className="bg-green-500 flex items-center justify-center p-4 lg:p-6 min-h-[60px] lg:min-h-[300px]">
-            <div className="transform lg:-rotate-90 text-white font-bold text-lg lg:text-xl tracking-wider">
-              WHY
-            </div>
-          </div>
-
-          {/* Content Grid */}
-          <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 border-l border-gray-300">
-            {/* ME Column */}
-            <div className="border-r border-gray-300 p-6">
-              <h3 className="text-xl font-bold text-gray-700 mb-4 text-center">ME</h3>
-              <div className="space-y-3">
-                <div className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <Input
-                    value={whyStatement.me.personalGoals}
-                    onChange={(e) => setWhyStatement(prev => ({
-                      ...prev,
-                      me: { ...prev.me, personalGoals: e.target.value }
-                    }))}
-                    placeholder="Exit the day-to-day"
-                    className="border-0 bg-transparent text-blue-600 font-medium p-0 h-auto focus:bg-white focus:border focus:border-blue-300 focus:p-2 flex-1"
-                  />
-                </div>
-                <div className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <Input
-                    value={whyStatement.me.motivation}
-                    onChange={(e) => setWhyStatement(prev => ({
-                      ...prev,
-                      me: { ...prev.me, motivation: e.target.value }
-                    }))}
-                    placeholder="Build dream home"
-                    className="border-0 bg-transparent text-blue-600 font-medium p-0 h-auto focus:bg-white focus:border focus:border-blue-300 focus:p-2 flex-1"
-                  />
-                </div>
-                <div className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <Input
-                    value={whyStatement.me.skillsDevelopment}
-                    onChange={(e) => setWhyStatement(prev => ({
-                      ...prev,
-                      me: { ...prev.me, skillsDevelopment: e.target.value }
-                    }))}
-                    placeholder="₦1M in passive investments"
-                    className="border-0 bg-transparent text-blue-600 font-medium p-0 h-auto focus:bg-white focus:border focus:border-blue-300 focus:p-2 flex-1"
-                  />
-                </div>
-                <div className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <Input
-                    value={whyStatement.me.personalWhy}
-                    onChange={(e) => setWhyStatement(prev => ({
-                      ...prev,
-                      me: { ...prev.me, personalWhy: e.target.value }
-                    }))}
-                    placeholder="Travel one month every year"
-                    className="border-0 bg-transparent text-blue-600 font-medium p-0 h-auto focus:bg-white focus:border focus:border-blue-300 focus:p-2 flex-1"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* US Column */}
-            <div className="border-r border-gray-300 p-6">
-              <h3 className="text-xl font-bold text-gray-700 mb-4 text-center">US</h3>
-              <div className="space-y-3">
-                <div className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <Input
-                    value={whyStatement.us.teamVision}
-                    onChange={(e) => setWhyStatement(prev => ({
-                      ...prev,
-                      us: { ...prev.us, teamVision: e.target.value }
-                    }))}
-                    placeholder="Fund kids' college"
-                    className="border-0 bg-transparent text-blue-600 font-medium p-0 h-auto focus:bg-white focus:border focus:border-blue-300 focus:p-2 flex-1"
-                  />
-                </div>
-                <div className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <textarea
-                    value={whyStatement.us.companyMission}
-                    onChange={(e) => setWhyStatement(prev => ({
-                      ...prev,
-                      us: { ...prev.us, companyMission: e.target.value }
-                    }))}
-                    placeholder="Distribute ₦1M in profit sharing to team"
-                    className="border-0 bg-transparent text-blue-600 font-medium p-0 resize-none focus:bg-white focus:border focus:border-blue-300 focus:p-2 flex-1 min-h-[60px]"
-                    rows={3}
-                  />
-                </div>
-                <div className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <textarea
-                    value={whyStatement.us.culturalValues}
-                    onChange={(e) => setWhyStatement(prev => ({
-                      ...prev,
-                      us: { ...prev.us, culturalValues: e.target.value }
-                    }))}
-                    placeholder="Buy a vacation property"
-                    className="border-0 bg-transparent text-blue-600 font-medium p-0 resize-none focus:bg-white focus:border focus:border-blue-300 focus:p-2 flex-1 min-h-[40px]"
-                    rows={2}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* THEM Column */}
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-700 mb-4 text-center">THEM</h3>
-              <div className="space-y-3">
-                <div className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <textarea
-                    value={whyStatement.them.customerImpact}
-                    onChange={(e) => setWhyStatement(prev => ({
-                      ...prev,
-                      them: { ...prev.them, customerImpact: e.target.value }
-                    }))}
-                    placeholder="Become a 6-figure donor"
-                    className="border-0 bg-transparent text-blue-600 font-medium p-0 resize-none focus:bg-white focus:border focus:border-blue-300 focus:p-2 flex-1 min-h-[40px]"
-                    rows={2}
-                  />
-                </div>
-                <div className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <textarea
-                    value={whyStatement.them.marketProblem}
-                    onChange={(e) => setWhyStatement(prev => ({
-                      ...prev,
-                      them: { ...prev.them, marketProblem: e.target.value }
-                    }))}
-                    placeholder="Volunteer an hour a week"
-                    className="border-0 bg-transparent text-blue-600 font-medium p-0 resize-none focus:bg-white focus:border focus:border-blue-300 focus:p-2 flex-1 min-h-[40px]"
-                    rows={2}
-                  />
-                </div>
-                <div className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <textarea
-                    value={whyStatement.them.socialContribution}
-                    onChange={(e) => setWhyStatement(prev => ({
-                      ...prev,
-                      them: { ...prev.them, socialContribution: e.target.value }
-                    }))}
-                    placeholder="Serve on association board"
-                    className="border-0 bg-transparent text-blue-600 font-medium p-0 resize-none focus:bg-white focus:border focus:border-blue-300 focus:p-2 flex-1 min-h-[40px]"
-                    rows={2}
-                  />
-                </div>
-              </div>
-              {/* Red underline */}
-              <div className="mt-4 relative">
-                <div className="h-1 bg-red-500 rounded-full" style={{ width: '80%', margin: '0 auto' }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Save WHY Statement Button */}
-        <div className="flex justify-center mt-6">
-          <Button onClick={() => {
-            saveStepData();
-            toast({
-              title: "WHY Statement Saved! 🎯",
-              description: "Your personal, team, and community goals have been saved.",
-            });
-          }} size="lg" className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
-            <Save className="w-4 h-4" />
-            Save WHY Statement
-          </Button>
-        </div>
-      </div>
+      {/* WHY Section */}
+      <WhySection
+        whyStatement={whyStatement}
+        setWhyStatement={setWhyStatement}
+        onSave={handleSaveWhy}
+      />
 
       {/* HOW Section */}
-      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <Card className="border-2 border-green-200">
-          <CardHeader className="bg-green-600 text-white">
-            <CardTitle className="text-xl font-bold">HOW</CardTitle>
-            <p className="text-green-100 text-sm mt-1">Strategic Action Items</p>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="relative">
-              {/* Green sidebar */}
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-600"></div>
-              
-              <div className="space-y-4 ml-6">
-                <div className="flex items-center space-x-3">
-                  <span className="bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
-                  <Input
-                    value={howStatement.action1}
-                    onChange={(e) => setHowStatement(prev => ({ ...prev, action1: e.target.value }))}
-                    placeholder="e.g., Test new acquisition funnel"
-                    className="flex-1"
-                  />
-                </div>
-                <div className="flex items-center space-x-3">
-                  <span className="bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
-                  <Input
-                    value={howStatement.action2}
-                    onChange={(e) => setHowStatement(prev => ({ ...prev, action2: e.target.value }))}
-                    placeholder="e.g., Find a new traffic agency"
-                    className="flex-1"
-                  />
-                </div>
-                <div className="flex items-center space-x-3">
-                  <span className="bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
-                  <Input
-                    value={howStatement.action3}
-                    onChange={(e) => setHowStatement(prev => ({ ...prev, action3: e.target.value }))}
-                    placeholder="e.g., Hire and onboard an operations manager"
-                    className="flex-1"
-                  />
-                </div>
-                <div className="flex items-center space-x-3">
-                  <span className="bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">4</span>
-                  <Input
-                    value={howStatement.action4}
-                    onChange={(e) => setHowStatement(prev => ({ ...prev, action4: e.target.value }))}
-                    placeholder="e.g., Launch an employee training program"
-                    className="flex-1"
-                  />
-                </div>
-                <div className="flex items-center space-x-3">
-                  <span className="bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">5</span>
-                  <Input
-                    value={howStatement.action5}
-                    onChange={(e) => setHowStatement(prev => ({ ...prev, action5: e.target.value }))}
-                    placeholder="e.g., Upgrade tech stack"
-                    className="flex-1"
-                  />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Save HOW Statement Button */}
-        <div className="flex justify-center mt-6">
-          <Button onClick={() => {
-            saveStepData();
-            toast({
-              title: "HOW Statement Saved! ⚙️",
-              description: "Your strategic action items have been saved.",
-            });
-          }} size="lg" className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
-            <Save className="w-4 h-4" />
-            Save Action Plan
-          </Button>
-        </div>
-      </div>
+      <HowSection
+        howStatement={howStatement}
+        setHowStatement={setHowStatement}
+        onSave={handleSaveHow}
+      />
 
       {/* Taking Action Section */}
-      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <Card className="border-2 border-red-200 bg-red-50">
-          <CardHeader className="bg-red-600 text-white text-center">
-            <CardTitle className="text-xl font-bold">TAKING ACTION</CardTitle>
-            <p className="text-red-100 text-sm mt-1">Current Active Initiatives</p>
-          </CardHeader>
-          <CardContent className="p-6 space-y-4">
-            <div>
-              <Label htmlFor="current-action-1" className="text-sm font-medium text-gray-700">Current Priority Action 1</Label>
-              <Input
-                id="current-action-1"
-                value={takingActionItems.currentAction1}
-                onChange={(e) => setTakingActionItems(prev => ({ ...prev, currentAction1: e.target.value }))}
-                placeholder="What are you actively working on right now?"
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="current-action-2" className="text-sm font-medium text-gray-700">Current Priority Action 2</Label>
-              <Input
-                id="current-action-2"
-                value={takingActionItems.currentAction2}
-                onChange={(e) => setTakingActionItems(prev => ({ ...prev, currentAction2: e.target.value }))}
-                placeholder="What's your second priority this week?"
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="current-action-3" className="text-sm font-medium text-gray-700">Current Priority Action 3</Label>
-              <Input
-                id="current-action-3"
-                value={takingActionItems.currentAction3}
-                onChange={(e) => setTakingActionItems(prev => ({ ...prev, currentAction3: e.target.value }))}
-                placeholder="What else are you focusing on this week?"
-                className="mt-1"
-              />
-            </div>
-            
-            {/* Save Taking Action Button */}
-            <div className="flex justify-center mt-6">
-              <Button onClick={() => {
-                saveStepData();
-                toast({
-                  title: "Taking Action Saved! 🎨",
-                  description: "Your current action items have been saved.",
-                });
-              }} size="lg" className="flex items-center gap-2 bg-red-600 hover:bg-red-700">
-                <Save className="w-4 h-4" />
-                Save Current Actions
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <TakingActionSection
+        takingActionItems={takingActionItems}
+        setTakingActionItems={setTakingActionItems}
+        onSave={handleSaveTakingAction}
+      />
 
    
 

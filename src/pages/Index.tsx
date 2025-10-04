@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/hooks/usePermissions";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { OwnerDashboard } from "@/components/dashboard/OwnerDashboard";
 import { Big7Dashboard } from "@/components/dashboard/Big7Dashboard";
@@ -28,15 +28,22 @@ import CandidateManagement from "@/components/hiring/CandidateManagement";
 import { AdminPeople } from "@/components/dashboard/AdminPeople";
 import { SuperAdminTransactions } from "@/components/dashboard/SuperAdminTransactions";
 import ScalableImpactPlanner from "@/components/scalable-impact/ScalableImpactPlanner";
+import DashboardRouter from "@/components/dashboard/DashboardRouter";
 
 const Index = () => {
   const { isAuthenticated, user } = useAuth();
   const { canAccessNavigation, hasPermission } = usePermissions();
   const [currentView, setCurrentView] = useState("overview");
+  const location = useLocation();
 
   // Redirect to login if not authenticated
   if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
+  }
+
+  // If we're on a dashboard route, use the DashboardRouter
+  if (location.pathname.startsWith('/dashboard')) {
+    return <DashboardRouter />;
   }
 
   const renderDashboard = () => {

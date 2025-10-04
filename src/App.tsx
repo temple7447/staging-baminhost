@@ -35,6 +35,7 @@ const App = () => (
 
             {/* Authenticated app */}
             <Route path="/app" element={<Index />} />
+            <Route path="/dashboard/*" element={<Index />} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

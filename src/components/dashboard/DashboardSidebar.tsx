@@ -26,6 +26,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { cn } from "@/lib/utils";
 import { usePermissions, useFilteredNavigation } from "@/hooks/usePermissions";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface DashboardSidebarProps {
   currentView: string;
@@ -41,6 +42,7 @@ interface SidebarItem {
   requiredPermissions?: string[];
   category?: 'core' | 'business' | 'financial' | 'system';
   isPremium?: boolean;
+  path?: string; // URL path for navigation
 }
 
 const sidebarItems: SidebarItem[] = [
@@ -49,14 +51,16 @@ const sidebarItems: SidebarItem[] = [
     label: "Overview", 
     icon: LayoutDashboard,
     category: 'core',
-    requiredPermissions: ['view_overview']
+    requiredPermissions: ['view_overview'],
+    path: '/dashboard/overview'
   },
   { 
     id: "big5", 
     label: "My Big 5", 
     icon: ListChecks,
     category: 'core',
-    requiredPermissions: ['view_big5']
+    requiredPermissions: ['view_big5'],
+    path: '/dashboard/big5'
   },
   {
     id: "scalable-impact-planner",
@@ -64,7 +68,8 @@ const sidebarItems: SidebarItem[] = [
     icon: Scale,
     category: 'core',
     requiredPermissions: ['view_scalable_impact'],
-    isPremium: true
+    isPremium: true,
+    path: '/dashboard/ScalableImpactPlanner'
   },
   { 
     id: "wallet", 
@@ -72,7 +77,8 @@ const sidebarItems: SidebarItem[] = [
     icon: Wallet,
     category: 'financial',
     requiredPermissions: ['view_wallet'],
-    isPremium: true
+    isPremium: true,
+    path: '/dashboard/wallet'
   },
   { 
     id: "portfolio", 
@@ -80,7 +86,8 @@ const sidebarItems: SidebarItem[] = [
     icon: TrendingUp,
     category: 'financial',
     requiredPermissions: ['view_portfolio'],
-    isPremium: true
+    isPremium: true,
+    path: '/dashboard/portfolio'
   },
   { 
     id: "split-tracker", 
@@ -88,7 +95,8 @@ const sidebarItems: SidebarItem[] = [
     icon: PieChart,
     category: 'financial',
     requiredPermissions: ['view_split_tracker'],
-    isPremium: true
+    isPremium: true,
+    path: '/dashboard/split-tracker'
   },
   { 
     id: "goals", 
@@ -96,14 +104,16 @@ const sidebarItems: SidebarItem[] = [
     icon: Target,
     category: 'financial',
     requiredPermissions: ['view_goals'],
-    isPremium: true
+    isPremium: true,
+    path: '/dashboard/goals'
   },
   { 
     id: "contacts", 
     label: "Contacts", 
     icon: Users,
     category: 'system',
-    requiredPermissions: ['view_contacts']
+    requiredPermissions: ['view_contacts'],
+    path: '/dashboard/contacts'
   },
   // Strategic Hiring - For Owner/Manager roles
   {
@@ -112,7 +122,8 @@ const sidebarItems: SidebarItem[] = [
     icon: TrendingDown,
     category: 'business',
     requiredPermissions: ['view_strategic_hiring', 'view_hiring_triggers'],
-    isPremium: true
+    isPremium: true,
+    path: '/dashboard/strategic-hiring-planner'
   },
   {
     id: "candidate-management",
@@ -120,34 +131,39 @@ const sidebarItems: SidebarItem[] = [
     icon: UserCheck,
     category: 'business',
     requiredPermissions: ['view_strategic_hiring', 'manage_candidates'],
-    isPremium: true
+    isPremium: true,
+    path: '/dashboard/candidate-management'
   },
   {
     id: "people",
     label: "People",
     icon: Users,
-    category: 'system'
+    category: 'system',
+    path: '/dashboard/people'
   },
   { 
     id: "library", 
     label: "Library", 
     icon: FileText,
     category: 'system',
-    requiredPermissions: ['view_library']
+    requiredPermissions: ['view_library'],
+    path: '/dashboard/library'
   },
   { 
     id: "assistant", 
     label: "Assistant", 
     icon: MessageSquare,
     category: 'system',
-    requiredPermissions: ['view_assistant']
+    requiredPermissions: ['view_assistant'],
+    path: '/dashboard/assistant'
   },
   { 
     id: "settings", 
     label: "Settings", 
     icon: Settings,
     category: 'core',
-    requiredPermissions: ['view_settings']
+    requiredPermissions: ['view_settings'],
+    path: '/dashboard/settings'
   },
   // Business Operations - Only for Manager+ roles
   {
@@ -156,7 +172,8 @@ const sidebarItems: SidebarItem[] = [
     icon: Building,
     category: 'business',
     requiredPermissions: ['view_estate'],
-    isPremium: true
+    isPremium: true,
+    path: '/dashboard/estate'
   },
   {
     id: "filling-station",
@@ -164,7 +181,8 @@ const sidebarItems: SidebarItem[] = [
     icon: Building,
     category: 'business',
     requiredPermissions: ['view_filling_station'],
-    isPremium: true
+    isPremium: true,
+    path: '/dashboard/filling-station'
   },
   {
     id: "equipment",
@@ -172,7 +190,8 @@ const sidebarItems: SidebarItem[] = [
     icon: Building,
     category: 'business',
     requiredPermissions: ['view_equipment'],
-    isPremium: true
+    isPremium: true,
+    path: '/dashboard/equipment'
   },
   {
     id: "personal-portfolios",
@@ -180,7 +199,8 @@ const sidebarItems: SidebarItem[] = [
     icon: Crown,
     category: 'financial',
     requiredPermissions: ['view_personal_portfolios'],
-    isPremium: true
+    isPremium: true,
+    path: '/dashboard/personal-portfolios'
   },
   {
     id: "reports",
@@ -188,24 +208,44 @@ const sidebarItems: SidebarItem[] = [
     icon: FileText,
     category: 'financial',
     requiredPermissions: ['view_reports'],
-    isPremium: true
+    isPremium: true,
+    path: '/dashboard/reports'
   },
   {
     id: "transactions",
     label: "Transactions",
     icon: DollarSign,
     category: 'financial',
-    requiredPermissions: ['view_all_data']
+    requiredPermissions: ['view_all_data'],
+    path: '/dashboard/transactions'
   }
 ];
 
 export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onClose }: DashboardSidebarProps) => {
   const { userRole, hasPermission, canAccessNavigation, rolePriority } = usePermissions();
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   console.log("User Role:", userRole, user);
   
   // Filter sidebar items based on user permissions
   const filteredItems = useFilteredNavigation(sidebarItems);
+  
+  // Handle navigation
+  const handleNavigation = (item: SidebarItem) => {
+    if (!canAccessNavigation(item.id)) return;
+    
+    if (item.path) {
+      // Use URL navigation for new routing system
+      navigate(item.path);
+    } else {
+      // Fallback to old state-based navigation
+      onViewChange(item.id);
+    }
+    
+    // Close mobile sidebar after navigation
+    onClose?.();
+  };
   
   // Group items by category for better organization
   const groupedItems = {
@@ -218,7 +258,8 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
   const renderSidebarItem = (item: SidebarItem) => {
     const Icon = item.icon;
     const hasAccess = canAccessNavigation(item.id);
-    const isActive = currentView === item.id;
+    // Check if current URL matches the item's path or if item id matches currentView (fallback)
+    const isActive = (item.path && location.pathname === item.path) || currentView === item.id;
     
     const button = (
       <Button
@@ -231,7 +272,7 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
           !hasAccess && "opacity-50 cursor-not-allowed hover:bg-transparent",
           hasAccess && !isActive && "text-slate-300 hover:text-white"
         )}
-        onClick={() => hasAccess && onViewChange(item.id)}
+        onClick={() => hasAccess && handleNavigation(item)}
         disabled={!hasAccess}
       >
         <Icon className={cn(
