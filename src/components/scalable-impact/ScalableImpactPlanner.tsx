@@ -529,6 +529,19 @@ const ScalableImpactPlanner: React.FC = () => {
         profitMultiplier = 1.9;
         profitMarginIncrease = 2;
         break;
+      case 'double-3-years':
+        // 26% YoY = 2X in 3 years
+        revenueMultiplier = 2.0;
+        profitMultiplier = 2.2;
+        profitMarginIncrease = 3;
+        break;
+      case 'double-2-years':
+      case 'double-2-years-mom':
+        // 40% YoY or 3% MoM = 2X in 2 years, extrapolated to 3 years = ~2.8X
+        revenueMultiplier = 2.8;
+        profitMultiplier = 3.2;
+        profitMarginIncrease = 4;
+        break;
       default:
         return;
     }
@@ -600,7 +613,10 @@ const ScalableImpactPlanner: React.FC = () => {
         hypergrowth: 'Hypergrowth (3X, 3X, 2X, 2X)',
         rapid: 'Rapid Growth (2X, 2X, 75%, 50%)',
         steady: 'Steady Growth (25-50% YoY)',
-        mature: 'Mature Growth (10-20% YoY)'
+        mature: 'Mature Growth (10-20% YoY)',
+        'double-3-years': 'Double in 3 Years (26% YoY)',
+        'double-2-years': 'Double in 2 Years (40% YoY)',
+        'double-2-years-mom': 'Double in 2 Years (3% MoM)'
       };
       
       // Enhanced toast with valuation insights
@@ -842,6 +858,24 @@ const ScalableImpactPlanner: React.FC = () => {
                     <span className="font-semibold">Mature Growth: 10 - 20% YoY</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="double-3-years">
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Double in 3 Years: 26% YoY</span>
+                    <span className="text-sm text-gray-500">Can you really DOUBLE in 3 years?</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="double-2-years">
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Double in 2 Years: 40% YoY</span>
+                    <span className="text-sm text-gray-500">Aggressive 2X growth target</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="double-2-years-mom">
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Double in 2 Years: 3% MoM</span>
+                    <span className="text-sm text-gray-500">Month-over-month compounding</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
             
@@ -876,7 +910,10 @@ const ScalableImpactPlanner: React.FC = () => {
                     hypergrowth: 'Hypergrowth (3X, 3X, 2X, 2X) - VC-Funded trajectory',
                     rapid: 'Rapid Growth (2X, 2X, 75%, 50%) - Early-stage growth',
                     steady: 'Steady Growth (25-50% YoY) - Sustainable expansion',
-                    mature: 'Mature Growth (10-20% YoY) - Established business growth'
+                    mature: 'Mature Growth (10-20% YoY) - Established business growth',
+                    'double-3-years': 'Double in 3 Years (26% YoY) - Can you really DOUBLE?',
+                    'double-2-years': 'Double in 2 Years (40% YoY) - Aggressive 2X target',
+                    'double-2-years-mom': 'Double in 2 Years (3% MoM) - Month-over-month compounding'
                   }[selectedGrowthType]}
                 </p>
                 <p className="text-sm text-blue-600">
