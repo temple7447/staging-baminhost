@@ -38,7 +38,8 @@ const EntrepreneurGuide = () => {
             The <span className="text-blue-400">Accidental Entrepreneur</span> Guide
           </h1>
           <p className="text-lg md:text-xl text-slate-200/80 max-w-3xl mx-auto">
-            Understanding the journey, struggles, and path forward for self-taught, bootstrapped entrepreneurs who never planned to start a business but ended up building something meaningful.
+            If you're stuck in the entrepreneurial flatline, burned out, or wondering "what's next?"—you're not broken. 
+            You're part of the majority who bootstrapped, self-taught, and audience-first. Here's your roadmap forward.
           </p>
         </div>
       </section>
@@ -175,8 +176,8 @@ const EntrepreneurGuide = () => {
               <h3 className="text-xl font-bold mb-6 text-center">The Silent Struggle</h3>
               
               <div className="text-center mb-6">
-                <div className="text-6xl md:text-7xl font-black text-red-400 mb-2">84%</div>
-                <div className="text-sm text-slate-400">Percentage of entrepreneurs suffering from "imposter syndrome."</div>
+                <div className="text-6xl md:text-7xl font-black text-red-400 mb-2">91%</div>
+                <div className="text-sm text-slate-400">Eventually fail because they can't break through the scaling flatline</div>
               </div>
               
               <div className="space-y-4 mb-6">
@@ -188,12 +189,12 @@ const EntrepreneurGuide = () => {
                 </div>
                 
                 <div>
-                  <h4 className="font-semibold text-slate-200 mb-2">Result: Imposter Syndrome is rampant.</h4>
+                  <h4 className="font-semibold text-slate-200 mb-2">Result: Most get stuck in the entrepreneurial flatline.</h4>
                   <ul className="space-y-1 text-sm text-slate-300 ml-4">
-                    <li>○ 84% report experiencing it (Kajabi study).</li>
-                    <li>○ Feel underserving of success.</li>
-                    <li>○ Fear their success is temporary.</li>
-                    <li>○ Worry failure will expose them as "frauds."</li>
+                    <li>○ Growth stagnates despite early success</li>
+                    <li>○ Burnout from working harder, not smarter</li>
+                    <li>○ Loss of control as business demands increase</li>
+                    <li>○ Wondering "what's next?" without a clear roadmap</li>
                   </ul>
                 </div>
               </div>
@@ -203,11 +204,11 @@ const EntrepreneurGuide = () => {
           {/* Do The Math */}
           <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-400/30 rounded-xl p-8 mb-8">
             <div className="text-center">
-              <div className="text-sm text-slate-300 mb-2">DO THE MATH: Accidental Entrepreneurs are...</div>
-              <div className="text-4xl md:text-5xl font-black text-green-400 mb-4">EVERYWHERE!!!</div>
+              <div className="text-sm text-slate-300 mb-2">THE REALITY: Most entrepreneurs are...</div>
+              <div className="text-4xl md:text-5xl font-black text-green-400 mb-4">STUCK IN THE FLATLINE</div>
               <div className="flex items-center justify-center gap-2 text-sm text-slate-300">
                 <span>👉</span>
-                <span>Meaning: accidental entrepreneurs are the majority, not the minority.</span>
+                <span>But there's a systematic way to break through and scale without burning out.</span>
               </div>
             </div>
           </div>
@@ -220,45 +221,41 @@ const EntrepreneurGuide = () => {
                 WRITE THIS DOWN...
               </div>
               <div className="text-xl md:text-2xl text-slate-200 mb-2">
-                Your business isn't <span className="text-blue-400 font-bold underline">BROKEN</span>.
+                You're not stuck because you're <span className="text-red-400 font-bold underline">BROKEN</span>.
               </div>
-              <div className="text-xl md:text-2xl font-bold text-blue-400 underline mb-4">
-                YOU aren't broken.
+              <div className="text-xl md:text-2xl text-slate-200 mb-2">
+                You're stuck because you don't know how to <span className="text-green-400 font-bold underline">SCALE SYSTEMATICALLY</span>.
+              </div>
+              <div className="text-lg md:text-xl text-slate-200 mb-2">
+                The solution: Scale <span className="text-blue-400 font-bold underline">YOURSELF</span> first,
               </div>
               <div className="text-lg md:text-xl text-slate-200">
-                You just need a new <span className="text-blue-400 font-bold underline">ROADMAP</span>
-              </div>
-              <div className="text-lg md:text-xl text-slate-200">
-                and a new set of <span className="text-blue-400 font-bold underline">TOOLS</span>.
+                then scale your <span className="text-blue-400 font-bold underline">COMPANY</span>.
               </div>
             </div>
             
-            <div className="text-left max-w-md mx-auto">
-              <ul className="space-y-3 text-sm text-slate-300">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-400 mt-1">•</span>
-                  You are not broken.
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-400 mt-1">•</span>
-                  Your business isn't broken.
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-400 mt-1">•</span>
-                  You simply need:
-                </li>
-                <li className="ml-6">
-                  <ul className="space-y-1 text-slate-400">
-                    <li>○ A new roadmap</li>
-                    <li>○ A new set of tools</li>
-                    <li>○ A new vehicle to take you to the next level</li>
-                  </ul>
-                </li>
-              </ul>
+            <div className="text-left max-w-lg mx-auto">
+              <div className="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-lg p-6 border border-emerald-400/30 mb-6">
+                <h4 className="text-lg font-bold text-emerald-400 mb-3">The Breakthrough Formula:</h4>
+                <ul className="space-y-3 text-sm text-slate-300">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">•</span>
+                    <strong>Define your number:</strong> Know exactly what success looks like
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">•</span>
+                    <strong>Walk the 7 Levels:</strong> Follow a proven roadmap with clear milestones
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">•</span>
+                    <strong>Scale systematically:</strong> Build systems that work without you
+                  </li>
+                </ul>
+              </div>
               
-              <div className="mt-6 p-4 bg-slate-800/50 rounded-lg border border-white/10">
-                <p className="text-sm text-slate-300 italic">
-                  What got you here was enough. What will take you further requires an upgrade in systems, skills, and mindset.
+              <div className="p-4 bg-slate-800/50 rounded-lg border border-white/10">
+                <p className="text-sm text-slate-300 italic text-center">
+                  "The secret is not working harder—it's scaling yourself so you can scale your company without burning out."
                 </p>
               </div>
             </div>
@@ -274,15 +271,15 @@ const EntrepreneurGuide = () => {
               <div className="inline-block bg-green-500 text-black font-bold text-xs px-3 py-1 rounded mb-4">
                 OUR PURPOSE
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                Help entrepreneurs <span className="text-green-400">scale</span>
-              </h2>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                themselves, so they can <span className="text-green-400">scale</span>
-              </h3>
-              <h4 className="text-2xl md:text-3xl font-bold text-white">
-                their companies.
-              </h4>
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                  Help entrepreneurs break through
+                </h2>
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                  the <span className="text-red-400">flatline</span> by learning to <span className="text-green-400">scale</span>
+                </h3>
+                <h4 className="text-2xl md:text-3xl font-bold text-white">
+                  themselves, then their companies.
+                </h4>
               
               <div className="w-16 h-16 mx-auto mt-6 bg-green-500 rounded-full flex items-center justify-center">
                 <span className="text-black font-bold text-2xl">$</span>
@@ -311,23 +308,25 @@ const EntrepreneurGuide = () => {
                 
                 <div className="space-y-4 text-slate-300">
                   <p className="text-sm leading-relaxed">
-                    This is the question that keeps entrepreneurs up at night. You've built something meaningful, 
-                    but you know there's more potential waiting to be unlocked.
+                    This is the question that haunts every entrepreneur stuck in the flatline. You've built something meaningful, 
+                    but growth has stagnated. You're working harder but not seeing results. You're burned out and losing control.
                   </p>
                   
                   <p className="text-sm leading-relaxed">
-                    The answer isn't more hustle. It's not working harder or longer hours. 
-                    The answer is having a clear roadmap that takes you from where you are now 
-                    to where you want to be.
+                    The answer isn't more hustle or longer hours. The answer is learning to 
+                    <span className="text-green-400 font-semibold">scale yourself</span> so you can 
+                    <span className="text-green-400 font-semibold">scale your company</span> systematically.
                   </p>
                   
-                  <div className="bg-slate-800/50 rounded-lg p-4 mt-6 border border-white/10">
+                  <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg p-4 mt-6 border border-green-400/30">
                     <p className="text-sm font-semibold text-green-400 mb-2">
-                      Your next step is simple:
+                      Break through the flatline with our proven system:
                     </p>
-                    <p className="text-sm text-slate-300">
-                      Define your number, understand your current level, and build your Level 7 plan.
-                    </p>
+                    <div className="text-sm text-slate-300 space-y-1">
+                      <p>1. Define your number (revenue, profit, valuation goals)</p>
+                      <p>2. Walk the 7 Levels of Scale (systematic roadmap)</p>
+                      <p>3. Execute your Level 7 plan (without burning out)</p>
+                    </div>
                   </div>
                 </div>
               </div>

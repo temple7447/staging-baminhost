@@ -375,50 +375,57 @@ const ScalableImpactPlanner: React.FC = () => {
     };
   };
 
-  // Get scale level configuration
+  // Get scale level configuration based on the 7 Levels of Scale framework
   const getScaleLevelConfig = (levelId: number) => {
     const configs = {
       1: {
-        title: "Solopreneur",
-        description: "Individual contributor with direct customer service",
-        color: "bg-red-500",
-        icon: Users
+        title: "Sell & Serve 10 Customers",
+        description: "Focus on proving product-market fit by making and fulfilling 10 sales before any scaling—essential for traction.",
+        color: "bg-pink-500",
+        icon: Target,
+        transcriptExplanation: "This is your foundation. Before you think about scaling, you need to prove that people actually want what you're selling. Get 10 real customers paying real money."
       },
       2: {
-        title: "Startup Growth",
-        description: "Small team with systematic customer acquisition",
-        color: "bg-orange-500",
-        icon: TrendingUp
+        title: "Build a Growth Flywheel",
+        description: "Shift from one-off sales to predictable growth via a 'growth flywheel' (leads → customers → revenue loop).",
+        color: "bg-yellow-500",
+        icon: TrendingUp,
+        transcriptExplanation: "Stop relying on random sales. Build a systematic process: consistent lead generation → convert leads to customers → happy customers generate more leads. This creates momentum."
       },
       3: {
-        title: "Small Year Or Team-Home",
-        description: "Established processes with consistent revenue streams",
-        color: "bg-yellow-500",
-        icon: Building
+        title: "Upgrade Your Business OS",
+        description: "Address operational chaos from growth; upgrade your 'business operating system' (processes, tools) to handle scale. Crossing the 'Scalable Line' here means your business has the capacity for true scalability.",
+        color: "bg-orange-500",
+        icon: Building,
+        transcriptExplanation: "This is the make-or-break level. Growth creates chaos. You need systems, processes, and tools that work without you. Cross the 'Scalable Line' - where your business can grow without breaking."
       },
       4: {
-        title: "Scale Your Brand",
-        description: "Brand recognition with scalable business model",
+        title: "Double Your Take-Home",
+        description: "Prioritize cash flow by making your business a 'cash-generating machine'—pay yourself more consistently to avoid burnout and fuel sustainability.",
         color: "bg-green-500",
-        icon: Crown
+        icon: Crown,
+        transcriptExplanation: "Now that you have systems, focus on profitability. Your business should pay YOU well. If you're not making good money, you'll burn out. Make it a cash-generating machine."
       },
       5: {
-        title: "Build Your Empire",
-        description: "Multiple revenue streams with market dominance",
+        title: "Build Your Board",
+        description: "Assemble an advisory board of mentors/peers for guidance on non-playbook challenges; essential after core systems are solid.",
         color: "bg-blue-500",
-        icon: Building
+        icon: Users,
+        transcriptExplanation: "You've built a profitable, systematic business. Now you need wisdom for the bigger challenges ahead. Surround yourself with people who've been where you're going."
       },
       6: {
-        title: "10 Million Year",
-        description: "Industry leadership with significant market impact",
-        color: "bg-indigo-500",
-        icon: Target
+        title: "Expand with Acquisitions",
+        description: "Break organic growth ceilings via acquisitions (talent, assets, or full businesses)—the fastest way to accelerate beyond limits.",
+        color: "bg-purple-500",
+        icon: Target,
+        transcriptExplanation: "Organic growth has limits. To break through growth ceilings, you need to acquire - talent, assets, or entire businesses. This is how you accelerate beyond natural limits."
       },
       7: {
-        title: "Legacy With M&A",
-        description: "Exit strategy with lasting impact and wealth creation",
-        color: "bg-purple-500",
-        icon: Zap
+        title: "Hit Your Number (and live the 'Level 7 Life')",
+        description: "Achieve your personal 'number' (e.g., revenue goal), gaining 'optionality'—choose to reset goals, exit, or enjoy freedom without external threats.",
+        color: "bg-gray-500",
+        icon: Zap,
+        transcriptExplanation: "You've hit your number - the revenue, profit, or valuation goal you set out to achieve. Now you have optionality: keep growing, sell the business, or just enjoy the freedom you've created."
       }
     };
     return configs[levelId as keyof typeof configs];

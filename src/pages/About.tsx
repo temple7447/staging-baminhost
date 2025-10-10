@@ -38,13 +38,14 @@ const About = () => {
           <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
             About{" "}
             <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-green-400 bg-clip-text text-transparent">
-              Bami Hustle
+              The Scalable Company
             </span>
           </h1>
           
           <p className="text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-            We help entrepreneurs break free from the 91% failure rate by providing systematic frameworks, 
-            proven strategies, and powerful tools to build sustainable, profitable businesses.
+            We help entrepreneurs <span className="text-green-400 font-semibold">scale themselves</span> so they can 
+            <span className="text-green-400 font-semibold">scale their companies</span>—without burning out, 
+            losing control, or sacrificing what matters most.
           </p>
         </div>
       </section>
@@ -55,20 +56,39 @@ const About = () => {
           <Card className="bg-white/5 backdrop-blur-sm border-white/10">
             <CardContent className="p-12">
               <div className="mb-8">
-                <h2 className="text-3xl md:text-4xl font-bold mb-6">Our Story</h2>
-                <div className="space-y-4 text-slate-300 leading-relaxed">
-                  <p className="text-lg">
-                    Bami Hustle was born from a simple observation: <span className="text-white font-semibold">91% of businesses fail</span>, 
-                    and most entrepreneurs struggle not because they lack ambition, but because they lack systems.
-                  </p>
-                  <p className="text-lg">
-                    We watched countless talented founders burn out, trying to juggle business operations, personal finances, 
-                    team management, and growth—all without a clear roadmap or unified platform to manage it all.
-                  </p>
-                  <p className="text-lg">
-                    That's why we built Bami Hustle: <span className="text-white font-semibold">to give entrepreneurs the systematic approach 
-                    they need to succeed</span>. We combine proven frameworks (like 50/30/20 budgeting, 4/20/80 hiring, and the 7 Levels of Growth) 
-                    with powerful technology to create a platform where business and personal life work in harmony, not conflict.
+                <h2 className="text-3xl md:text-4xl font-bold mb-6">Our Story: From Success to Breaking Point (and Back)</h2>
+                <div className="space-y-6 text-slate-300 leading-relaxed">
+                  <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg p-6 border border-green-400/30">
+                    <h3 className="text-xl font-bold text-white mb-3">The Highs</h3>
+                    <p className="text-lg">
+                      Like many entrepreneurs, we started not to "build a business," but to solve a problem. 
+                      The early success was intoxicating—growing companies, hitting milestones, feeling unstoppable.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-lg p-6 border border-red-400/30">
+                    <h3 className="text-xl font-bold text-white mb-3">The Breaking Point</h3>
+                    <p className="text-lg mb-4">
+                      But as growth accelerated, so did the sacrifices. Late dinners became routine. Missed family events turned standard. 
+                      Weekends blurred into work emails. The breaking point came with this realization:
+                    </p>
+                    <blockquote className="text-lg font-semibold text-red-200 italic border-l-4 border-red-400 pl-4">
+                      "I no longer owned my company. My company owned me."
+                    </blockquote>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-lg p-6 border border-emerald-400/30">
+                    <h3 className="text-xl font-bold text-white mb-3">The Breakthrough</h3>
+                    <p className="text-lg">
+                      That's when we discovered the truth: <span className="text-emerald-400 font-semibold">Scaling isn't just about the business—it's about scaling yourself as the founder</span>. 
+                      We learned to build systems that worked without us, create frameworks that prevented burnout, 
+                      and develop a platform where business success amplifies personal fulfillment, not destroys it.
+                    </p>
+                  </div>
+                  
+                  <p className="text-lg font-semibold text-slate-200">
+                    The Scalable Company exists because we've been in the trenches. We know what it feels like to be 
+                    stuck in the flatline, burned out, and wondering "what's next?" More importantly, we know there's a way out.
                   </p>
                 </div>
               </div>
@@ -87,8 +107,9 @@ const About = () => {
               </div>
               <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
               <p className="text-slate-300 text-lg leading-relaxed">
-                To empower 1 million entrepreneurs with the tools, systems, and frameworks they need to build 
-                sustainable, profitable businesses—breaking free from the 91% failure statistic.
+                Help entrepreneurs <span className="text-blue-400 font-semibold">scale themselves</span> so they can 
+                <span className="text-blue-400 font-semibold">scale their companies</span>. Because stronger founders 
+                create better teams, healthier families, and thriving economies.
               </p>
             </CardContent>
           </Card>
@@ -100,8 +121,9 @@ const About = () => {
               </div>
               <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
               <p className="text-slate-300 text-lg leading-relaxed">
-                A world where entrepreneurship is no longer an emotional rollercoaster, but a systematic journey 
-                with clear milestones, proven strategies, and achievable success.
+                A world where entrepreneurs break through the flatline without burning out or losing control. 
+                Where scaling becomes systematic, not chaotic. Where founders stay at the helm as long as they want—
+                building businesses that serve their lives, not consume them.
               </p>
             </CardContent>
           </Card>
@@ -147,9 +169,9 @@ const About = () => {
               <div className="w-14 h-14 rounded-full bg-green-600/20 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
                 <TrendingUp className="w-7 h-7 text-green-400" />
               </div>
-              <h3 className="text-lg font-bold mb-3">Systematic Growth</h3>
+              <h3 className="text-lg font-bold mb-3">Scale Yourself First</h3>
               <p className="text-slate-400 text-sm leading-relaxed">
-                Proven frameworks and measurable progress over hustle culture
+                Transform the founder before transforming the business
               </p>
             </CardContent>
           </Card>
@@ -183,9 +205,10 @@ const About = () => {
               <div className="w-12 h-12 rounded-lg bg-blue-600/20 flex items-center justify-center mb-6">
                 <Users className="w-6 h-6 text-blue-400" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Built by Entrepreneurs, for Entrepreneurs</h3>
+              <h3 className="text-xl font-bold mb-3">Battle-Tested by Founders in the Trenches</h3>
               <p className="text-slate-300 leading-relaxed">
-                We understand the journey because we've lived it. Every feature solves a real problem we've faced.
+                We've experienced the flatline, the burnout, and the breakthrough. Every system we teach 
+                comes from real-world experience scaling companies without losing ourselves.
               </p>
             </CardContent>
           </Card>
@@ -195,9 +218,10 @@ const About = () => {
               <div className="w-12 h-12 rounded-lg bg-purple-600/20 flex items-center justify-center mb-6">
                 <BarChart3 className="w-6 h-6 text-purple-400" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Proven Frameworks Integrated</h3>
+              <h3 className="text-xl font-bold mb-3">The 7 Levels of Scale Framework</h3>
               <p className="text-slate-300 leading-relaxed">
-                50/30/20 budgeting, 4/20/80 hiring, 7 Levels of Growth—all in one seamless platform.
+                A systematic roadmap from startup to exit, with clear milestones and strategies 
+                for each level—no more guessing what comes next.
               </p>
             </CardContent>
           </Card>
@@ -207,9 +231,10 @@ const About = () => {
               <div className="w-12 h-12 rounded-lg bg-green-600/20 flex items-center justify-center mb-6">
                 <CheckCircle2 className="w-6 h-6 text-green-400" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Results That Matter</h3>
+              <h3 className="text-xl font-bold mb-3">Break Through the Flatline</h3>
               <p className="text-slate-300 leading-relaxed">
-                We focus on outcomes: increased profit, better time management, and sustainable growth.
+                Don't just survive the entrepreneurial lifecycle—master it. Turn the emotional 
+                rollercoaster into a systematic journey with predictable outcomes.
               </p>
             </CardContent>
           </Card>

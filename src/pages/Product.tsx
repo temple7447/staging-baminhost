@@ -93,10 +93,11 @@ const Product = () => {
       <section className="container mx-auto px-6 py-8">
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-extrabold leading-tight tracking-tight mb-4">
-            Product <span className="text-blue-400">Features</span>
+            The <span className="text-blue-400">7 Levels of Scale</span> Platform
           </h1>
           <p className="text-lg md:text-xl text-slate-200/80 max-w-3xl mx-auto">
-            Everything you need to manage your personal and business portfolios in one place. Built for clarity, control, and momentum.
+            A systematic approach to entrepreneurship. Scale yourself, then scale your company. 
+            Break through the flatline with proven frameworks and tools.
           </p>
         </div>
       </section>
@@ -161,54 +162,84 @@ const Product = () => {
           <p className="mt-2 text-slate-300/80 text-lg">AN EMOTIONAL ROLLERCOASTER</p>
         </div>
         
-        <div className="max-w-4xl mx-auto mb-12">
-          <div className="bg-white/5 border border-white/10 rounded-xl p-8">
+        <div className="max-w-6xl mx-auto mb-12">
+          {/* The Problem: Scaling vs Starting */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-8 mb-8">
             <div className="text-center mb-8">
-              <div className="text-lg text-slate-200 mb-4">Most entrepreneurs experience:</div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <span className="text-slate-300">"Uninformed optimism" - This is going to be easy!</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                    <span className="text-slate-300">"It's a failure and we're all doomed"</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                    <span className="text-slate-300">"This is false - we're still going to be okay!"</span>
-                  </div>
+              <h3 className="text-2xl font-bold text-red-400 mb-4">The Hidden Truth About Business Failure</h3>
+              <p className="text-lg text-slate-200 mb-6">Here's what the data shows:</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center">
+                  <div className="text-4xl font-black text-green-400 mb-2">80%</div>
+                  <div className="text-sm text-slate-300">Survive Year 1</div>
+                  <div className="text-xs text-green-400">✓ Starting is achievable</div>
                 </div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <span className="text-slate-300">"What we might have something"</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                    <span className="text-slate-300">"Finally got it - where's the champagne?"</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-slate-300">"Informed Realism" - I can put in my and my family's bank account</span>
-                  </div>
+                <div className="text-center">
+                  <div className="text-4xl font-black text-yellow-400 mb-2">50%</div>
+                  <div className="text-sm text-slate-300">Make it to Year 5</div>
+                  <div className="text-xs text-yellow-400">⚠ Scaling is harder</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-black text-red-400 mb-2">9%</div>
+                  <div className="text-sm text-slate-300">Achieve Long-term Success</div>
+                  <div className="text-xs text-red-400">💔 Most get stuck in the flatline</div>
                 </div>
               </div>
             </div>
             
-            <div className="border-t border-white/20 pt-8">
+            <div className="bg-gradient-to-r from-red-500/20 to-emerald-500/20 rounded-lg p-6 border border-emerald-400/30">
+              <p className="text-lg font-semibold text-center text-white mb-2">
+                <span className="text-red-400">The Real Challenge:</span> It's not starting a business—
+                <span className="text-emerald-400 font-bold">it's scaling without burning out</span>
+              </p>
+              <p className="text-center text-slate-300">Our platform helps you break through the entrepreneurial flatline systematically.</p>
+            </div>
+          </div>
+          
+          {/* The Entrepreneurial Lifecycle */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-8">
+            <div className="text-center mb-8">
+              <div className="text-lg text-slate-200 mb-4">The Entrepreneurial Lifecycle Every Founder Experiences:</div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                <div className="bg-blue-500/10 border border-blue-400/20 rounded-lg p-4">
+                  <div className="text-blue-400 font-bold mb-2">1. Eureka Moment</div>
+                  <div className="text-sm text-slate-300">"This is going to be easy!" Uninformed optimism</div>
+                </div>
+                <div className="bg-purple-500/10 border border-purple-400/20 rounded-lg p-4">
+                  <div className="text-purple-400 font-bold mb-2">2. Launch Drudgery</div>
+                  <div className="text-sm text-slate-300">"We're all doomed." Reality hits hard</div>
+                </div>
+                <div className="bg-green-500/10 border border-green-400/20 rounded-lg p-4">
+                  <div className="text-green-400 font-bold mb-2">3. Initial Traction</div>
+                  <div className="text-sm text-slate-300">"We might have something!" First success</div>
+                </div>
+                <div className="bg-yellow-500/10 border border-yellow-400/20 rounded-lg p-4">
+                  <div className="text-yellow-400 font-bold mb-2">4. Early Growth</div>
+                  <div className="text-sm text-slate-300">"Where's the champagne?" Peak confidence</div>
+                </div>
+                <div className="bg-red-500/10 border border-red-400/20 rounded-lg p-4">
+                  <div className="text-red-400 font-bold mb-2">5. The Flatline</div>
+                  <div className="text-sm text-slate-300">"Why isn't this working?" Growth stagnates</div>
+                </div>
+                <div className="bg-emerald-500/10 border border-emerald-400/20 rounded-lg p-4">
+                  <div className="text-emerald-400 font-bold mb-2">6. Breakthrough</div>
+                  <div className="text-sm text-slate-300">"Informed realism." Systematic scaling</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="border-t border-white/20 pt-6">
               <div className="text-center">
-                <h3 className="text-xl font-bold text-green-400 mb-4">THE GOAL</h3>
-                <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg p-6 border border-green-400/30">
+                <h3 className="text-xl font-bold text-emerald-400 mb-4">THE GOAL: Your Level 7 Life</h3>
+                <div className="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-lg p-6 border border-emerald-400/30">
                   <p className="text-lg font-semibold text-white mb-2">
-                    Build a plan to (at least) <span className="text-green-400 font-bold">DOUBLE</span> your net sales, 
-                    <span className="text-green-400 font-bold"> DOUBLE</span> your take-home profit, 
-                    hit your <span className="text-yellow-400 font-bold">"number,"</span> and achieve the <span className="text-blue-400 font-bold">"Level 7 Life."</span>
+                    <span className="text-emerald-400 font-bold">DOUBLE</span> your revenue, 
+                    <span className="text-emerald-400 font-bold">DOUBLE</span> your take-home profit, 
+                    hit your <span className="text-blue-400 font-bold">"number"</span> without burning out
                   </p>
-                  <div className="w-12 h-12 mx-auto mt-4 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-black font-bold text-xl">$</span>
-                  </div>
+                  <p className="text-slate-300 text-sm mt-2">Scale yourself so you can scale your company</p>
                 </div>
               </div>
             </div>
@@ -223,22 +254,56 @@ const Product = () => {
           <p className="mt-2 text-slate-300/80">The Ultimate Shortcut/Roadmap of knowing where you are right now and hitting your numbers</p>
         </div>
         
-        <div className="max-w-4xl mx-auto mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-white/10 border border-white/20 rounded-lg p-4 text-center">
-              <div className="text-sm text-slate-300 mb-2">Step 1</div>
-              <div className="font-semibold text-blue-400">Define your number</div>
-              <p className="text-xs text-slate-400 mt-2">What revenue target you want to hit, a profit and a business valuation to where to know if you want to walk away or sell this I what I can call it for this is how much I can put in my and my family's bank account</p>
+        <div className="max-w-6xl mx-auto mb-8">
+          <div className="bg-gradient-to-r from-slate-900 to-slate-800 border border-white/10 rounded-xl p-8 mb-8">
+            <div className="text-center mb-6">
+              <div className="inline-block bg-green-500 text-black font-bold text-xs px-3 py-1 rounded mb-4">
+                THE SYSTEMATIC APPROACH
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4">How to Break Through the Flatline</h3>
             </div>
-            <div className="bg-white/10 border border-white/20 rounded-lg p-4 text-center">
-              <div className="text-sm text-slate-300 mb-2">Step 2</div>
-              <div className="font-semibold text-green-400">Walk through the 7 levels</div>
-              <p className="text-xs text-slate-400 mt-2">This is the Ultimate shortcut/Roadmap of knowing where you are right now and hitting your numbers</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div className="bg-blue-500/10 border border-blue-400/20 rounded-lg p-6 text-center">
+                <div className="w-12 h-12 mx-auto mb-4 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  1
+                </div>
+                <div className="font-semibold text-blue-400 mb-3">Define Your Number</div>
+                <p className="text-sm text-slate-400">
+                  Set your revenue target, profit goals, and business valuation. Know exactly 
+                  what "success" looks like for you and your family.
+                </p>
+              </div>
+              
+              <div className="bg-green-500/10 border border-green-400/20 rounded-lg p-6 text-center">
+                <div className="w-12 h-12 mx-auto mb-4 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  2
+                </div>
+                <div className="font-semibold text-green-400 mb-3">Walk the 7 Levels</div>
+                <p className="text-sm text-slate-400">
+                  Follow our proven roadmap. Know exactly where you are now and 
+                  what specific steps will take you to your next level.
+                </p>
+              </div>
+              
+              <div className="bg-purple-500/10 border border-purple-400/20 rounded-lg p-6 text-center">
+                <div className="w-12 h-12 mx-auto mb-4 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  3
+                </div>
+                <div className="font-semibold text-purple-400 mb-3">Scale Systematically</div>
+                <p className="text-sm text-slate-400">
+                  Execute your Level 7 plan with systems that work without you. 
+                  Scale yourself, then scale your company.
+                </p>
+              </div>
             </div>
-            <div className="bg-white/10 border border-white/20 rounded-lg p-4 text-center">
-              <div className="text-sm text-slate-300 mb-2">Step 3</div>
-              <div className="font-semibold text-purple-400">Build a level 7 plan</div>
-              <p className="text-xs text-slate-400 mt-2">What are the specific steps that you need to take from where you're to your vision of level 7</p>
+            
+            <div className="text-center">
+              <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-lg p-4 border border-green-400/30">
+                <p className="text-sm font-semibold text-green-400">
+                  The result: Break through the flatline without burning out or losing control
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -313,8 +378,10 @@ const Product = () => {
           </div>
           <div className="relative px-6 py-10 md:px-10 md:py-14 flex flex-col md:flex-row items-center gap-6">
             <div className="flex-1">
-              <h3 className="text-2xl md:text-3xl font-bold">Ready to get started?</h3>
-              <p className="mt-2 text-slate-200/80">Join the platform that helps entrepreneurs scale systematically. Start free today.</p>
+              <h3 className="text-2xl md:text-3xl font-bold">Ready to Break Through the Flatline?</h3>
+              <p className="mt-2 text-slate-200/80">
+                Stop being stuck. Scale yourself to scale your company. Join the 9% that succeed systematically.
+              </p>
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">

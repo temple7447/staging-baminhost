@@ -18,8 +18,8 @@ const Projects = () => {
       <section className="container mx-auto px-6 pt-6 pb-10 md:pb-16">
         <div className="flex items-end justify-between gap-6">
           <div>
-            <h1 className="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">Projects Showcase</h1>
-            <p className="mt-3 text-slate-200/85 text-lg max-w-2xl">A glimpse into what teams build and manage with Bami Hustle.</p>
+            <h1 className="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">Scale Without Burning Out</h1>
+            <p className="mt-3 text-slate-200/85 text-lg max-w-2xl">See how entrepreneurs use our platform to break through the flatline and build Level 7 businesses systematically.</p>
           </div>
           <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer" className="hidden md:block">
             <Button size="lg" className="bg-blue-600 hover:bg-blue-500">
@@ -35,33 +35,33 @@ const Projects = () => {
           <Card className="bg-white/5 border-white/10 backdrop-blur">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <Wallet className="h-4 w-4 text-blue-300" /> Personal Finance Suite
+                <Wallet className="h-4 w-4 text-green-300" /> Scale Your Personal Wealth
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-slate-300/85">
-              Budgets, split tracker (50/30/20), net worth, and goals — all in one place.
+              Track the 50/30/20 framework, net worth growth, and personal financial goals while scaling your business.
             </CardContent>
           </Card>
 
           <Card className="bg-white/5 border-white/10 backdrop-blur">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <BarChart3 className="h-4 w-4 text-purple-300" /> Business KPIs Dashboard
+                <BarChart3 className="h-4 w-4 text-blue-300" /> The 7 Levels Framework
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-slate-300/85">
-              Track revenue, expenses, and operational metrics across units and roles.
+              Systematic roadmap from startup to Level 7. Know where you are and what's next to hit your numbers.
             </CardContent>
           </Card>
 
           <Card className="bg-white/5 border-white/10 backdrop-blur">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <Users className="h-4 w-4 text-emerald-300" /> Role-based Workflows
+                <Users className="h-4 w-4 text-purple-300" /> Systems That Work Without You
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-slate-300/85">
-              super admin, admin, manager, vendor, and customer experiences tailored to their needs.
+              Build teams and processes that scale systematically. Role-based access ensures the right people see the right information.
             </CardContent>
           </Card>
         </div>
@@ -80,8 +80,8 @@ const Projects = () => {
           </div>
           <div className="relative px-6 py-10 md:px-10 md:py-14 flex flex-col md:flex-row items-center gap-6">
             <div className="flex-1">
-              <h3 className="text-2xl md:text-3xl font-bold">Have a project in mind?</h3>
-              <p className="mt-2 text-slate-200/80">Start with templates and grow at your own pace.</p>
+              <h3 className="text-2xl md:text-3xl font-bold">Ready to Break Through the Flatline?</h3>
+              <p className="mt-2 text-slate-200/80">Start your Level 7 journey. Scale yourself, then scale your company systematically.</p>
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
