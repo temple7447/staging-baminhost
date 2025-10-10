@@ -28,7 +28,6 @@ import CandidateManagement from "@/components/hiring/CandidateManagement";
 import { AdminPeople } from "@/components/dashboard/AdminPeople";
 import { SuperAdminTransactions } from "@/components/dashboard/SuperAdminTransactions";
 import ScalableImpactPlanner from "@/components/scalable-impact/ScalableImpactPlanner";
-import { SevenLevelsScaleDashboard } from "@/components/dashboard/SevenLevelsScaleDashboard";
 import DashboardRouter from "@/components/dashboard/DashboardRouter";
 
 const Index = () => {
@@ -185,16 +184,7 @@ const Index = () => {
             <ScalableImpactPlanner />
           </ProtectedComponent>
         );
-      case "seven-levels-scale":
-        return (
-          <ProtectedComponent 
-            requiredPermissions={['view_scalable_impact']}
-            feature="7 Levels of Scale"
-            showUpgradePrompt={true}
-          >
-            <SevenLevelsScaleDashboard />
-          </ProtectedComponent>
-        );
+     
       case "strategic-hiring-planner":
         return (
           <ProtectedComponent 

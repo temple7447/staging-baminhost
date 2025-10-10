@@ -29,6 +29,8 @@ import {
   STORAGE_KEYS,
   formatDate
 } from '@/lib/hiringUtils';
+import WhatsYourNumber from './WhatsYourNumber';
+import Level7LifeMotivation from './Level7LifeMotivation';
 
 interface BigItem {
   id: string;
@@ -54,8 +56,11 @@ export const Big5Dashboard: React.FC = () => {
     createItem(),
   ]);
 
-  // King's Audit Dashboard state
-  const [activeTab, setActiveTab] = useState('big5');
+  // User's target number for Level 7 Life integration
+  const [userTargetAmount, setUserTargetAmount] = useState<string>('');
+
+  // King's Audit Dashboard state - start with 'number' tab to encourage setting target first
+  const [activeTab, setActiveTab] = useState('number');
   const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [delegationItems, setDelegationItems] = useState<DelegationItem[]>([]);
@@ -94,6 +99,17 @@ export const Big5Dashboard: React.FC = () => {
       setHourlyRateConfig(savedConfig);
       setWeeklyIncomeInput(savedConfig.weeklyIncome.toString());
       setWorkHoursInput(savedConfig.workHoursPerWeek.toString());
+    }
+
+    // Load user's target number
+    try {
+      const targetNumber = localStorage.getItem(`user_target_number_v1_${user?.id}`);
+      if (targetNumber) {
+        const parsed = JSON.parse(targetNumber);
+        setUserTargetAmount(parsed.targetAmount || '');
+      }
+    } catch (error) {
+      console.warn('Failed to load user target number', error);
     }
   }, []);
 
@@ -222,10 +238,18 @@ export const Big5Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">The King's Audit Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Strategic hiring system with Big 5 prioritization and time tracking</p>
+          <h1 className="text-2xl font-bold tracking-tight">Your Level 7 Life Dashboard</h1>
+          <p className="text-sm text-muted-foreground">
+            Define your number, focus on your Big 5, and systematically scale to your Level 7 Life
+          </p>
         </div>
         <div className="flex items-center gap-2">
+          {userTargetAmount && (
+            <Badge variant="outline" className="gap-2 bg-green-50 text-green-700 border-green-200">
+              <Target className="w-3 h-3" />
+              Target: {userTargetAmount}
+            </Badge>
+          )}
           {currentTimeEntry && (
             <Badge variant="destructive" className="gap-2">
               <Clock className="w-3 h-3" />
@@ -237,12 +261,24 @@ export const Big5Dashboard: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="number">Your Number</TabsTrigger>
           <TabsTrigger value="big5">Big 5 Items</TabsTrigger>
           <TabsTrigger value="time-tracking">Time Tracking</TabsTrigger>
           <TabsTrigger value="tasks">Task Management</TabsTrigger>
           <TabsTrigger value="delegation">Delegation List</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="number" className="space-y-6">
+          {/* What's Your Number Section */}
+          <WhatsYourNumber />
+          
+          {/* Level 7 Life Motivation */}
+          <Level7LifeMotivation 
+            userTargetAmount={userTargetAmount}
+            currentLevel={2} // You can make this dynamic based on user progress
+          />
+        </TabsContent>
 
         <TabsContent value="big5" className="space-y-6">
 
