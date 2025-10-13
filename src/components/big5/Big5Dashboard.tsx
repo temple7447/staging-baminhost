@@ -30,6 +30,13 @@ import {
   formatDate
 } from '@/lib/hiringUtils';
 import WhatsYourNumber from './WhatsYourNumber';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { StartingPointSection } from '@/components/scalable-impact/StartingPointSection';
+import { EndGameSection } from '@/components/scalable-impact/EndGameSection';
+import WhySection from '@/components/scalable-impact/WhySection';
+import HowSection from '@/components/scalable-impact/HowSection';
+import TakingActionSection from '@/components/scalable-impact/TakingActionSection';
 
 interface BigItem {
   id: string;
@@ -46,6 +53,8 @@ const createItem = (): BigItem => ({
 });
 
 export const Big5Dashboard: React.FC = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   // Existing Big5 state
   const [items, setItems] = useState<BigItem[]>([
     createItem(),
@@ -75,6 +84,37 @@ export const Big5Dashboard: React.FC = () => {
   const [weeklyIncomeInput, setWeeklyIncomeInput] = useState('50000');
   const [workHoursInput, setWorkHoursInput] = useState('40');
 
+  // Moved Scalable Impact calculations state
+  const [startingPointData, setStartingPointData] = useState({
+    currentRevenue: '',
+    currentProfit: '',
+    currentProfitMargin: '',
+    currentValuation: '',
+    assessmentDate: '',
+    revenueSource: '',
+    businessStage: 'owner-dependent' as 'owner-dependent' | 'professionalized'
+  });
+
+  const [endGameData, setEndGameData] = useState({
+    targetRevenue: '',
+    targetProfit: '',
+    targetValuation: '',
+    timeframe: '3-year' as '3-year',
+    growthStrategy: '',
+    selectedBenchmark: '',
+    targetProfitMargin: ''
+  });
+
+  const [whyStatement, setWhyStatement] = useState({
+    me: { personalGoals: '', motivation: '', skillsDevelopment: '', personalWhy: '' },
+    us: { teamVision: '', companyMission: '', culturalValues: '', collectiveWhy: '' },
+    them: { customerImpact: '', marketProblem: '', socialContribution: '', externalWhy: '' },
+  });
+
+  const [howStatement, setHowStatement] = useState({ action1: '', action2: '', action3: '', action4: '', action5: '' });
+
+  const [takingActionItems, setTakingActionItems] = useState({ currentAction1: '', currentAction2: '', currentAction3: '' });
+
   // Load from localStorage once
   useEffect(() => {
     try {
@@ -102,7 +142,7 @@ export const Big5Dashboard: React.FC = () => {
 
     // Load user's target number
     try {
-      const targetNumber = localStorage.getItem(`user_target_number_v1_${user?.id}`);
+      const targetNumber = user?.id ? localStorage.getItem(`user_target_number_v1_${user.id}`) : null;
       if (targetNumber) {
         const parsed = JSON.parse(targetNumber);
         setUserTargetAmount(parsed.targetAmount || '');
@@ -110,7 +150,21 @@ export const Big5Dashboard: React.FC = () => {
     } catch (error) {
       console.warn('Failed to load user target number', error);
     }
-  }, []);
+
+    // Load moved Scalable Impact data (keep existing keys for continuity)
+    if (user?.id) {
+      const sp = localStorage.getItem(`scalable_impact_starting_data_${user.id}`);
+      const eg = localStorage.getItem(`scalable_impact_endgame_data_${user.id}`);
+      const wy = localStorage.getItem(`scalable_impact_why_${user.id}`);
+      const hw = localStorage.getItem(`scalable_impact_how_${user.id}`);
+      const ta = localStorage.getItem(`scalable_impact_taking_action_${user.id}`);
+      if (sp) setStartingPointData(JSON.parse(sp));
+      if (eg) setEndGameData(JSON.parse(eg));
+      if (wy) setWhyStatement(JSON.parse(wy));
+      if (hw) setHowStatement(JSON.parse(hw));
+      if (ta) setTakingActionItems(JSON.parse(ta));
+    }
+  }, [user?.id]);
 
   const itemsCount = items.length;
   const filledCount = useMemo(() => items.filter(i => i.title?.trim()).length, [items]);
@@ -260,8 +314,13 @@ export const Big5Dashboard: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-10 md:grid-cols-10 overflow-x-auto">
           <TabsTrigger value="number">Your Number</TabsTrigger>
+          <TabsTrigger value="starting-point">Starting Point</TabsTrigger>
+          <TabsTrigger value="end-game">End Game</TabsTrigger>
+          <TabsTrigger value="why">WHY (THEM)</TabsTrigger>
+          <TabsTrigger value="focus5">Focus 5</TabsTrigger>
+          <TabsTrigger value="action-plan">Action Plan</TabsTrigger>
           <TabsTrigger value="big5">Big 5 Items</TabsTrigger>
           <TabsTrigger value="time-tracking">Time Tracking</TabsTrigger>
           <TabsTrigger value="tasks">Task Management</TabsTrigger>
@@ -271,6 +330,74 @@ export const Big5Dashboard: React.FC = () => {
         <TabsContent value="number" className="space-y-6">
           {/* What's Your Number Section */}
           <WhatsYourNumber />
+        </TabsContent>
+
+        <TabsContent value="starting-point" className="space-y-6">
+          <StartingPointSection
+            data={startingPointData}
+            onDataChange={(d) => {
+              setStartingPointData(d);
+              if (user?.id) localStorage.setItem(`scalable_impact_starting_data_${user.id}`, JSON.stringify(d));
+            }}
+            onComplete={() => toast({ title: 'Starting point saved', description: 'We updated your current metrics.' })}
+          />
+        </TabsContent>
+
+        <TabsContent value="end-game" className="space-y-6">
+          <EndGameSection
+            data={endGameData}
+            startingPoint={startingPointData}
+            onDataChange={(d) => {
+              setEndGameData(d);
+              if (user?.id) localStorage.setItem(`scalable_impact_endgame_data_${user.id}`, JSON.stringify(d));
+            }}
+            onComplete={() => toast({ title: 'End game set', description: 'Your 3-year targets were saved.' })}
+          />
+        </TabsContent>
+
+        <TabsContent value="why" className="space-y-6">
+          <Card>
+            <CardContent>
+              <WhySection
+                whyStatement={whyStatement}
+                setWhyStatement={setWhyStatement}
+                onSave={() => {
+                  if (user?.id) localStorage.setItem(`scalable_impact_why_${user.id}`, JSON.stringify(whyStatement));
+                  toast({ title: 'WHY saved', description: 'Your impact statement has been saved.' });
+                }}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="focus5" className="space-y-6">
+          <Card>
+            <CardContent>
+              <HowSection
+                howStatement={howStatement}
+                setHowStatement={setHowStatement}
+                onSave={() => {
+                  if (user?.id) localStorage.setItem(`scalable_impact_how_${user.id}`, JSON.stringify(howStatement));
+                  toast({ title: 'Focus 5 saved', description: 'Your 5 key actions have been saved.' });
+                }}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="action-plan" className="space-y-6">
+          <Card>
+            <CardContent>
+              <TakingActionSection
+                takingActionItems={takingActionItems}
+                setTakingActionItems={setTakingActionItems}
+                onSave={() => {
+                  if (user?.id) localStorage.setItem(`scalable_impact_taking_action_${user.id}`, JSON.stringify(takingActionItems));
+                  toast({ title: 'Action plan saved', description: 'Your current initiatives were saved.' });
+                }}
+              />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="big5" className="space-y-6">

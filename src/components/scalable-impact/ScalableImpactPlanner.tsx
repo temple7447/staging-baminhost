@@ -38,9 +38,9 @@ const ScalableImpactPlanner: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   
-  // Step navigation state (now 7 steps total)
+  // Step navigation state (limited to initial 2 steps on this page)
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [completedSteps, setCompletedSteps] = useState<boolean[]>([false, false, false, false, false, false, false]);
+  const [completedSteps, setCompletedSteps] = useState<boolean[]>([false, false]);
   
   // Step 1: Level 1 - First 10 Customers (MANDATORY GATING STEP)
   const [level1Data, setLevel1Data] = useState({
@@ -216,7 +216,7 @@ const ScalableImpactPlanner: React.FC = () => {
   };
 
   const handleNextStep = () => {
-    if (currentStep < 7) {
+    if (currentStep < 2) {
       handleStepComplete(currentStep - 1);
       setCurrentStep(currentStep + 1);
     }
@@ -286,109 +286,6 @@ const ScalableImpactPlanner: React.FC = () => {
           />
         );
       
-      case 3:
-        return (
-          <StartingPointSection
-            data={startingPointData}
-            onDataChange={setStartingPointData}
-            onComplete={handleStep3Complete}
-          />
-        );
-      
-      case 4:
-        return (
-          <EndGameSection
-            data={endGameData}
-            startingPoint={startingPointData}
-            onDataChange={setEndGameData}
-            onComplete={handleStep4Complete}
-          />
-        );
-      
-      case 5:
-        return (
-          <Card className="border-2 border-red-200 bg-gradient-to-r from-red-50 to-pink-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl text-red-900">
-                ❤️ Step 5: Codify Your WHY (THEM)
-              </CardTitle>
-              <div className="text-slate-600">
-                <p>Define the impact you want to make on your customers and community.</p>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <WhySection
-                whyStatement={whyStatement}
-                setWhyStatement={setWhyStatement}
-                onSave={() => {
-                  toast({
-                    title: "WHY Statement Saved! ❤️",
-                    description: "Your impact goals have been saved.",
-                  });
-                  handleNextStep();
-                }}
-              />
-            </CardContent>
-          </Card>
-        );
-      
-      case 6:
-        return (
-          <Card className="border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl text-purple-900">
-                <Users className="w-6 h-6" />
-                Step 6: Focus 5
-              </CardTitle>
-              <div className="text-slate-600">
-                <p>Identify 5 key actions for the next 3-6 months.</p>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <HowSection
-                howStatement={howStatement}
-                setHowStatement={setHowStatement}
-                onSave={() => {
-                  toast({
-                    title: "Focus 5 Saved! ⚙️",
-                    description: "Your key actions have been saved.",
-                  });
-                  handleNextStep();
-                }}
-              />
-            </CardContent>
-          </Card>
-        );
-      
-      case 7:
-        return (
-          <Card className="border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-red-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl text-orange-900">
-                <Zap className="w-6 h-6" />
-                Step 7: Create Your Action Plan
-              </CardTitle>
-              <div className="text-slate-600">
-                <p>Set your weekly priorities and start taking action.</p>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <TakingActionSection
-                takingActionItems={takingActionItems}
-                setTakingActionItems={setTakingActionItems}
-                onSave={() => {
-                  toast({
-                    title: "Action Plan Created! 🚀",
-                    description: "Your weekly action items have been saved.",
-                  });
-                  // Mark as completed and show success
-                  handleStepComplete(6);
-                }}
-              />
-            </CardContent>
-          </Card>
-        );
-      
       default:
         return (
           <Card>
@@ -419,6 +316,7 @@ const ScalableImpactPlanner: React.FC = () => {
         currentStep={currentStep}
         onStepChange={handleStepChange}
         completedSteps={completedSteps}
+        visibleStepIds={[1, 2]}
       />
 
       {/* Current Step Content */}
@@ -445,18 +343,16 @@ const ScalableImpactPlanner: React.FC = () => {
                 Step {currentStep} of 7
               </Badge>
               <p className="text-sm text-gray-600 mt-1">
-                Progress: {Math.round((completedSteps.filter(Boolean).length / 7) * 100)}%
+                Progress: {Math.round((completedSteps.filter(Boolean).length / Math.max(1, completedSteps.length)) * 100)}%
               </p>
             </div>
             
             <Button 
               onClick={handleNextStep}
               disabled={
-                currentStep === 7 || 
+                currentStep === 2 || 
                 (currentStep === 1 && !level1Data.isCompleted) ||
-                (currentStep === 2 && selectedScaleLevel === 0) ||
-                (currentStep === 3 && (!startingPointData.currentRevenue || !startingPointData.currentProfit)) ||
-                (currentStep === 4 && !endGameData.selectedBenchmark)
+                (currentStep === 2 && selectedScaleLevel === 0)
               }
               className="gap-2"
             >

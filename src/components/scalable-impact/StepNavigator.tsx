@@ -18,6 +18,7 @@ interface StepNavigatorProps {
   currentStep: number;
   onStepChange: (step: number) => void;
   completedSteps: boolean[];
+  visibleStepIds?: number[];
 }
 
 interface Step {
@@ -91,8 +92,12 @@ const steps: Step[] = [
 export const StepNavigator: React.FC<StepNavigatorProps> = ({ 
   currentStep, 
   onStepChange, 
-  completedSteps 
+  completedSteps,
+  visibleStepIds
 }) => {
+  const visibleSteps = visibleStepIds ? steps.filter(s => visibleStepIds.includes(s.id)) : steps;
+  const currentIndex = Math.max(0, visibleSteps.findIndex(s => s.id === currentStep));
+  const safeCompleted = completedSteps.slice(0, visibleSteps.length);
   return (
     <Card className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200">
       <CardContent className="p-6">
@@ -101,17 +106,17 @@ export const StepNavigator: React.FC<StepNavigatorProps> = ({
             Scalable Impact Planner Steps
           </h2>
           <Badge variant="outline" className="bg-white text-blue-700">
-            Step {currentStep} of 7
+            Step {currentIndex + 1} of {visibleSteps.length}
           </Badge>
         </div>
         
         {/* Mobile/Small screens - vertical layout */}
         <div className="block md:hidden space-y-3">
-          {steps.map((step, index) => {
+          {visibleSteps.map((step, index) => {
             const IconComponent = step.icon;
-            const isCompleted = completedSteps[index];
+            const isCompleted = safeCompleted[index];
             const isCurrent = currentStep === step.id;
-            const isClickable = step.isClickable(currentStep, completedSteps);
+            const isClickable = step.isClickable(currentStep, safeCompleted);
             
             return (
               <div key={step.id} className="relative">
@@ -158,12 +163,12 @@ export const StepNavigator: React.FC<StepNavigatorProps> = ({
         </div>
 
         {/* Large screens - horizontal layout with better spacing */}
-        <div className="hidden md:grid md:grid-cols-7 gap-1 lg:gap-2">
-          {steps.map((step, index) => {
+        <div className={`hidden md:grid gap-1 lg:gap-2`} style={{ gridTemplateColumns: `repeat(${visibleSteps.length}, minmax(0, 1fr))` }}>
+          {visibleSteps.map((step, index) => {
             const IconComponent = step.icon;
-            const isCompleted = completedSteps[index];
+            const isCompleted = safeCompleted[index];
             const isCurrent = currentStep === step.id;
-            const isClickable = step.isClickable(currentStep, completedSteps);
+            const isClickable = step.isClickable(currentStep, safeCompleted);
             
             return (
               <div key={step.id} className="relative">
@@ -212,7 +217,7 @@ export const StepNavigator: React.FC<StepNavigatorProps> = ({
                 </Button>
                 
                 {/* Arrow connector for larger screens */}
-                {index < steps.length - 1 && (
+                {index < visibleSteps.length - 1 && (
                   <div className="hidden xl:block absolute top-1/2 -right-1.5 transform -translate-y-1/2 z-10">
                     <ArrowRight className="w-3 h-3 text-gray-400" />
                   </div>

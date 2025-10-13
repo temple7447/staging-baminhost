@@ -8,11 +8,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { 
   Target, 
-  Download, 
-  ExternalLink, 
   Save, 
   ArrowRight, 
-  DollarSign,
   TrendingUp,
   Calendar,
   CheckCircle2,
@@ -20,6 +17,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface UserNumber {
   id: string;
@@ -46,6 +44,7 @@ const createEmptyNumber = (): UserNumber => ({
 export const WhatsYourNumber: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [userNumber, setUserNumber] = useState<UserNumber>(createEmptyNumber());
   const [isEditing, setIsEditing] = useState(false);
   const [hasNumber, setHasNumber] = useState(false);
@@ -124,12 +123,8 @@ export const WhatsYourNumber: React.FC = () => {
   };
 
   const openScalableImpactPlanner = () => {
-    // Navigate to the Scalable Impact Planner
-    window.location.href = '/app';
-    // Then switch to scalable-impact-planner view
-    setTimeout(() => {
-      window.location.hash = 'scalable-impact-planner';
-    }, 100);
+    // Navigate to the Scalable Impact Planner route within the dashboard
+    navigate('/dashboard/ScalableImpactPlanner');
   };
 
   return (
@@ -296,16 +291,6 @@ export const WhatsYourNumber: React.FC = () => {
                 <ArrowRight className="w-4 h-4" />
               </Button>
               
-              <Button 
-                variant="outline" 
-                onClick={() => window.open('/dashboard/seven-levels-scale', '_blank')}
-                className="gap-2"
-                size="sm"
-              >
-                <Target className="w-4 h-4" />
-                View 7 Levels Framework
-                <ExternalLink className="w-3 h-3" />
-              </Button>
             </div>
           </div>
         </div>
