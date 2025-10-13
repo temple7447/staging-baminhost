@@ -64,7 +64,7 @@ const DashboardRouter: React.FC = () => {
     if (pathname.includes('equipment')) return 'equipment';
     if (pathname.includes('personal-portfolios')) return 'personal-portfolios';
     if (pathname.includes('goals')) return 'goals';
-    if (pathname.includes('big5')) return 'big5';
+    if (pathname.includes('defining-your-number')) return 'defining-your-number';
     if (pathname.includes('strategic-hiring-planner')) return 'strategic-hiring-planner';
     if (pathname.includes('candidate-management')) return 'candidate-management';
     if (pathname.includes('contacts')) return 'contacts';
@@ -244,16 +244,16 @@ const DashboardRouter: React.FC = () => {
           } 
         />
 
-        {/* Big5 */}
+        {/* Defining Your Number */}
         <Route 
-          path="/big5" 
+          path="/defining-your-number" 
           element={
             <ProtectedRoute
               element={<Big5Dashboard />}
               requiredPermissions={['view_big5']}
-              feature="My Big 5"
+              feature="Defining Your Number"
               showUpgradePrompt={false}
-              viewName="big5"
+              viewName="defining-your-number"
             />
           } 
         />

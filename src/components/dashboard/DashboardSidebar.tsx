@@ -55,12 +55,12 @@ const sidebarItems: SidebarItem[] = [
     path: '/dashboard/overview'
   },
   { 
-    id: "big5", 
-    label: "My Big 5", 
+    id: "defining-your-number", 
+    label: "Defining Your Number", 
     icon: ListChecks,
     category: 'core',
     requiredPermissions: ['view_big5'],
-    path: '/dashboard/big5'
+    path: '/dashboard/defining-your-number'
   },
   {
     id: "scalable-impact-planner",

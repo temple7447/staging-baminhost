@@ -30,7 +30,6 @@ import {
   formatDate
 } from '@/lib/hiringUtils';
 import WhatsYourNumber from './WhatsYourNumber';
-import Level7LifeMotivation from './Level7LifeMotivation';
 
 interface BigItem {
   id: string;
@@ -272,12 +271,6 @@ export const Big5Dashboard: React.FC = () => {
         <TabsContent value="number" className="space-y-6">
           {/* What's Your Number Section */}
           <WhatsYourNumber />
-          
-          {/* Level 7 Life Motivation */}
-          <Level7LifeMotivation 
-            userTargetAmount={userTargetAmount}
-            currentLevel={2} // You can make this dynamic based on user progress
-          />
         </TabsContent>
 
         <TabsContent value="big5" className="space-y-6">

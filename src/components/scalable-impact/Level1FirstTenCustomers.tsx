@@ -17,8 +17,15 @@ import {
   Lightbulb,
   Trophy,
   ShoppingCart,
-  Heart
+  Heart,
+  Info
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Level1Data {
   hasMadeSale: boolean;
@@ -26,7 +33,9 @@ interface Level1Data {
   hasReached10Customers: boolean;
   hasTestimonials: boolean;
   customerList: string;
-  salesProof: string;
+  salesProof: string; // short proof/summary or testimonial
+  testimonialText?: string; // required short text proof
+  testimonialFileName?: string; // optional uploaded filename for UI display
   isCompleted: boolean;
 }
 
@@ -126,23 +135,37 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
     });
   };
 
-  const canProceed = data.hasMadeSale && data.hasDeliveredPromise && data.hasReached10Customers && data.hasTestimonials;
+  const canProceed =
+    data.hasMadeSale &&
+    data.hasDeliveredPromise &&
+    data.hasReached10Customers &&
+    data.hasTestimonials &&
+    (data.testimonialText ? data.testimonialText.trim().length >= 10 : false);
 
   return (
     <div className="space-y-6">
       {/* Main Header */}
       <Card className="border-2 border-pink-200 bg-gradient-to-r from-pink-50 to-purple-50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3 text-3xl text-pink-900">
-            <Target className="w-8 h-8" />
-            Level 1: Sell & Serve 10 Customers
-            <Badge className="bg-red-500 text-white">DO THIS FIRST!</Badge>
-          </CardTitle>
-          <div className="text-slate-700 space-y-3">
+        <CardHeader className="relative">
+          <div className="flex items-start justify-between gap-4">
+            <CardTitle className="flex items-center gap-3 text-3xl text-pink-900">
+              <Target className="w-8 h-8" />
+              Level 1: Sell & Serve 10 Customers
+              <Badge className="bg-red-500 text-white">DO THIS FIRST!</Badge>
+            </CardTitle>
+            <div className="hidden md:flex items-center gap-2">
+              <Badge variant="outline" className="bg-white text-gray-700">The Scalable Company</Badge>
+              <Button size="sm" disabled={!canProceed} onClick={onComplete} className="gap-2">
+                Next
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="text-slate-700 space-y-3 mt-3">
             <p className="text-lg font-medium">
               🚨 <strong>WARNING:</strong> Do NOT skip this step! Many entrepreneurs want to perfect everything before selling. Don't fall into that trap!
             </p>
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
               <div className="flex items-start gap-2">
                 <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
                 <div className="text-sm text-yellow-800">
@@ -152,6 +175,13 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
                 </div>
               </div>
             </div>
+            {/* Outcome/Summary box */}
+            <Alert className="border-blue-200 bg-blue-50">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="text-blue-800">
+                <strong>Outcome Required:</strong> You may not proceed until you have achieved and documented these concrete, customer-facing milestones.
+              </AlertDescription>
+            </Alert>
           </div>
         </CardHeader>
 
@@ -232,9 +262,21 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
                   className="mt-1"
                 />
                 <div className="flex-1">
-                  <Label htmlFor="made-sale" className="font-semibold cursor-pointer">
-                    I have made at least 1 actual sale
-                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="made-sale" className="font-semibold cursor-pointer">
+                      I have made at least 1 actual sale
+                    </Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-4 h-4 text-gray-400" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs text-xs">A customer paid you real money for your offer (not a free trial or a promise).</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                   <p className="text-sm text-gray-600 mt-1">
                     Real money exchanged hands. Someone paid you for your product or service.
                   </p>
@@ -249,9 +291,21 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
                   className="mt-1"
                 />
                 <div className="flex-1">
-                  <Label htmlFor="delivered-promise" className="font-semibold cursor-pointer">
-                    I have delivered on my promise and the customer was happy
-                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="delivered-promise" className="font-semibold cursor-pointer">
+                      I have delivered on my promise and the customer was happy
+                    </Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-4 h-4 text-gray-400" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs text-xs">Delivery completed, customer confirmed satisfaction (via message, survey, or rating).</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                   <p className="text-sm text-gray-600 mt-1">
                     You fulfilled what you promised. The customer got value and was satisfied.
                   </p>
@@ -266,9 +320,21 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
                   className="mt-1"
                 />
                 <div className="flex-1">
-                  <Label htmlFor="reached-10" className="font-semibold cursor-pointer">
-                    I have reached 10 paying, satisfied customers
-                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="reached-10" className="font-semibold cursor-pointer">
+                      I have reached 10 paying, satisfied customers
+                    </Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-4 h-4 text-gray-400" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs text-xs">10 unique customers (not repeated transactions from the same person).</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                   <p className="text-sm text-gray-600 mt-1">
                     You've successfully sold to and served 10 different customers.
                   </p>
@@ -283,9 +349,21 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
                   className="mt-1"
                 />
                 <div className="flex-1">
-                  <Label htmlFor="has-testimonials" className="font-semibold cursor-pointer">
-                    I have testimonials, referrals, or feedback from actual buyers
-                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="has-testimonials" className="font-semibold cursor-pointer">
+                      I have testimonials, referrals, or feedback from actual buyers
+                    </Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-4 h-4 text-gray-400" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs text-xs">A sentence from a real buyer, a screenshot, or a public review is sufficient.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                   <p className="text-sm text-gray-600 mt-1">
                     You have proof that customers were happy and would recommend you.
                   </p>
@@ -294,41 +372,65 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
             </div>
 
             {/* Optional Details */}
-            {canProceed && (
-              <div className="space-y-4 pt-4 border-t">
-                <Label className="text-lg font-bold text-gray-800">
-                  Optional: Tell us about your success (for motivation!)
-                </Label>
+            <div className="space-y-4 pt-4 border-t">
+              <Label className="text-lg font-bold text-gray-800">
+                Document Your Proof (at least one short testimonial is required):
+              </Label>
+              
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="testimonial-text" className="text-sm font-medium">
+                    Short testimonial or proof (required)
+                  </Label>
+                  <Textarea
+                    id="testimonial-text"
+                    placeholder="e.g., 'This saved me 10 hours a week' — Ada, bakery owner"
+                    value={data.testimonialText || ''}
+                    onChange={(e) => handleTextChange('testimonialText', e.target.value)}
+                    className="mt-1"
+                  />
+                  {!data.testimonialText || data.testimonialText.trim().length < 10 ? (
+                    <p className="text-xs text-red-600 mt-1">Please enter at least 10 characters to proceed.</p>
+                  ) : (
+                    <p className="text-xs text-green-700 mt-1">Looks good.</p>
+                  )}
+                </div>
                 
-                <div className="space-y-3">
-                  <div>
-                    <Label htmlFor="customer-list" className="text-sm font-medium">
-                      Brief description of your customers or customer types:
-                    </Label>
-                    <Textarea
-                      id="customer-list"
-                      placeholder="e.g., Local restaurants, small business owners, fitness enthusiasts..."
-                      value={data.customerList}
-                      onChange={(e) => handleTextChange('customerList', e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="sales-proof" className="text-sm font-medium">
-                      What evidence do you have of success? (testimonials, reviews, referrals):
-                    </Label>
-                    <Textarea
-                      id="sales-proof"
-                      placeholder="e.g., 5-star Google reviews, customer referred 3 friends, testimonial: 'This saved me 10 hours a week'..."
-                      value={data.salesProof}
-                      onChange={(e) => handleTextChange('salesProof', e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="testimonial-file" className="text-sm font-medium">
+                    Optional screenshot or file (testimonial, review, etc.)
+                  </Label>
+                  <input
+                    id="testimonial-file"
+                    type="file"
+                    accept="image/*,application/pdf"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      handleTextChange('testimonialFileName', file ? file.name : '');
+                    }}
+                    className="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                  {data.testimonialFileName && (
+                    <p className="text-xs text-gray-600 mt-1">Selected: {data.testimonialFileName}</p>
+                  )}
                 </div>
               </div>
-            )}
+              
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="customer-list" className="text-sm font-medium">
+                    Briefly describe your 10 customers and what you learned (optional)
+                  </Label>
+                  <Textarea
+                    id="customer-list"
+                    placeholder="Who did you serve, what did you sell, what did you learn?"
+                    value={data.customerList}
+                    onChange={(e) => handleTextChange('customerList', e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           <Separator />
@@ -375,44 +477,47 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
 
           {/* Success Message */}
           {canProceed && (
-            <Alert className="border-green-200 bg-green-50">
+            <Alert className="border-green-200 bg-green-50 animate-in fade-in-50">
               <CheckCircle2 className="h-5 w-5 text-green-600" />
               <AlertDescription className="text-green-800">
                 <div className="space-y-2">
-                  <div className="font-bold text-lg">🎉 Congratulations! You are now ready to SCALE!</div>
+                  <div className="font-bold text-lg">🎉 Congratulations! You are now ready to scale!</div>
                   <p>
                     You have proven you have something people will pay for AND you can deliver on what you promised. 
                     You have the <strong>CLARITY</strong> and <strong>CONFIDENCE</strong> needed to scale your business.
                   </p>
                   <p className="text-sm italic">
-                    Progress, not perfection! Now let's build your scaling plan.
+                    “Congratulations! You are now ready to scale—because you have concrete proof of market fit.”
                   </p>
                 </div>
               </AlertDescription>
             </Alert>
           )}
 
-          {/* Action Button */}
-          <div className="flex justify-center pt-6">
-            <Button 
-              onClick={onComplete}
-              disabled={!canProceed}
-              className={`gap-2 px-8 py-3 ${canProceed ? 'bg-green-600 hover:bg-green-700' : ''}`}
-              size="lg"
-            >
-              {canProceed ? (
-                <>
-                  <Trophy className="w-5 h-5" />
-                  I'm Ready to Scale! Continue to Scale Level Confirmation
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              ) : (
-                <>
-                  <Lightbulb className="w-4 h-4" />
-                  Complete All Requirements First
-                </>
-              )}
-            </Button>
+          {/* Action Button (bottom) */}
+          <div className="flex justify-between items-center pt-6 border-t">
+            <Badge variant="outline" className="bg-white text-gray-700">Level 1 of 7</Badge>
+            <div className="flex gap-2">
+              <Button 
+                onClick={onComplete}
+                disabled={!canProceed}
+                className={`gap-2 px-8 py-3 ${canProceed ? 'bg-green-600 hover:bg-green-700' : ''}`}
+                size="lg"
+              >
+                {canProceed ? (
+                  <>
+                    <Trophy className="w-5 h-5" />
+                    I'm Ready to Scale! Continue
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                ) : (
+                  <>
+                    <Lightbulb className="w-4 h-4" />
+                    Complete All Requirements First
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
           
           {!canProceed && (

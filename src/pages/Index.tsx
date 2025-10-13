@@ -164,11 +164,11 @@ const Index = () => {
             <GoalsDashboard />
           </ProtectedComponent>
         );
-      case "big5":
+      case "defining-your-number":
         return (
           <ProtectedComponent 
             requiredPermissions={['view_big5']}
-            feature="My Big 5"
+            feature="Defining Your Number"
             showUpgradePrompt={false}
           >
             <Big5Dashboard />
