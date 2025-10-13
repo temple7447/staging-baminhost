@@ -25,19 +25,19 @@ const HowSection: React.FC<HowSectionProps> = ({
 }) => {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-      <Card className="border-2 border-green-200">
-        <CardHeader className="bg-green-600 text-white text-center">
-          <CardTitle className="text-xl font-bold">HOW</CardTitle>
-          <p className="text-green-100 text-sm mt-1">Strategic Action Items</p>
+      <Card className="border bg-card">
+        <CardHeader className="bg-muted text-foreground text-center">
+          <CardTitle className="text-sm font-semibold tracking-wide">HOW</CardTitle>
+          <p className="text-muted-foreground text-xs mt-1">Strategic Action Items</p>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
           {/* Numbers Row */}
           <div className="flex justify-center sm:justify-around items-center mb-6 space-x-4 sm:space-x-0">
-            <span className="bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">1</span>
-            <span className="bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">2</span>
-            <span className="bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">3</span>
-            <span className="bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">4</span>
-            <span className="bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">5</span>
+            <span className="bg-muted text-muted-foreground w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+            <span className="bg-muted text-muted-foreground w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+            <span className="bg-muted text-muted-foreground w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+            <span className="bg-muted text-muted-foreground w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+            <span className="bg-muted text-muted-foreground w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">5</span>
           </div>
           
           {/* Input Fields in Columns */}
@@ -78,7 +78,7 @@ const HowSection: React.FC<HowSectionProps> = ({
       
       {/* Save HOW Statement Button */}
       <div className="flex justify-center mt-6">
-        <Button onClick={onSave} size="lg" className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
+        <Button onClick={onSave} size="lg" className="flex items-center gap-2 bg-primary hover:bg-primary/90">
           <Save className="w-4 h-4" />
           Save Action Plan
         </Button>

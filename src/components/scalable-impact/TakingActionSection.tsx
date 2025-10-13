@@ -24,24 +24,24 @@ const TakingActionSection: React.FC<TakingActionSectionProps> = ({
 }) => {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-      <Card className="border-2 border-red-200 bg-red-50">
-        <CardHeader className="bg-red-600 text-white text-center">
-          <CardTitle className="text-xl font-bold">TAKING ACTION</CardTitle>
-          <p className="text-red-100 text-sm mt-1">Current Active Initiatives</p>
+      <Card className="border bg-card">
+        <CardHeader className="bg-muted text-foreground text-center">
+          <CardTitle className="text-sm font-semibold tracking-wide">TAKING ACTION</CardTitle>
+          <p className="text-muted-foreground text-xs mt-1">Current Active Initiatives</p>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
           {/* Numbers Row with Labels */}
           <div className="flex justify-center lg:justify-around items-center mb-6 space-x-6 lg:space-x-0">
             <div className="flex flex-col items-center space-y-2">
-              <span className="bg-red-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+              <span className="bg-muted text-muted-foreground w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">1</span>
               <Label className="text-xs text-gray-600 text-center">Priority Action 1</Label>
             </div>
             <div className="flex flex-col items-center space-y-2">
-              <span className="bg-red-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+              <span className="bg-muted text-muted-foreground w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">2</span>
               <Label className="text-xs text-gray-600 text-center">Priority Action 2</Label>
             </div>
             <div className="flex flex-col items-center space-y-2">
-              <span className="bg-red-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">3</span>
+              <span className="bg-muted text-muted-foreground w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">3</span>
               <Label className="text-xs text-gray-600 text-center">Priority Action 3</Label>
             </div>
           </div>
@@ -70,7 +70,7 @@ const TakingActionSection: React.FC<TakingActionSectionProps> = ({
           
           {/* Save Taking Action Button */}
           <div className="flex justify-center mt-6">
-            <Button onClick={onSave} size="lg" className="flex items-center gap-2 bg-red-600 hover:bg-red-700">
+            <Button onClick={onSave} size="lg" className="flex items-center gap-2 bg-primary hover:bg-primary/90">
               <Save className="w-4 h-4" />
               Save Current Actions
             </Button>

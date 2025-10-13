@@ -113,9 +113,9 @@ export const StartingPointSection: React.FC<StartingPointSectionProps> = ({
 
   return (
     <div className="space-y-6">
-      <Card className="border-2 border-green-200 bg-gradient-to-r from-green-50 to-blue-50">
+      <Card className="border bg-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-2xl text-green-900">
+          <CardTitle className="flex items-center gap-2 text-lg">
             <TrendingUp className="w-6 h-6" />
             Step 2: Determine Your Starting Point
           </CardTitle>

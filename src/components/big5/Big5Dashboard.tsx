@@ -314,7 +314,7 @@ export const Big5Dashboard: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-10 md:grid-cols-10 overflow-x-auto">
+        <TabsList className="sticky top-0 z-20 w-full rounded-none bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b p-1 flex flex-wrap gap-1">
           <TabsTrigger value="number">Your Number</TabsTrigger>
           <TabsTrigger value="starting-point">Starting Point</TabsTrigger>
           <TabsTrigger value="end-game">End Game</TabsTrigger>

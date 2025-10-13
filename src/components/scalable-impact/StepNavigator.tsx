@@ -99,7 +99,7 @@ export const StepNavigator: React.FC<StepNavigatorProps> = ({
   const currentIndex = Math.max(0, visibleSteps.findIndex(s => s.id === currentStep));
   const safeCompleted = completedSteps.slice(0, visibleSteps.length);
   return (
-    <Card className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200">
+    <Card className="mb-4 bg-card border">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-900">

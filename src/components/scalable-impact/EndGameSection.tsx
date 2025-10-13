@@ -130,9 +130,9 @@ export const EndGameSection: React.FC<EndGameSectionProps> = ({
 
   return (
     <div className="space-y-6">
-      <Card className="border-2 border-yellow-200 bg-gradient-to-r from-yellow-50 to-orange-50">
+      <Card className="border bg-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-2xl text-yellow-900">
+          <CardTitle className="flex items-center gap-2 text-lg">
             <Target className="w-6 h-6" />
             Step 3: Determine Your End Game
           </CardTitle>

@@ -39,8 +39,8 @@ const WhySection: React.FC<WhySectionProps> = ({
     <div className="py-6 sm:py-8">
       <div className="flex flex-col lg:flex-row bg-white border border-gray-300 overflow-hidden" style={{ maxWidth: '900px', margin: '0 auto' }}>
         {/* WHY Section - Green sidebar */}
-        <div className="bg-green-500 flex items-center justify-center p-4 lg:p-6 min-h-[60px] lg:min-h-[300px]">
-          <div className="transform lg:-rotate-90 text-white font-bold text-lg lg:text-xl tracking-wider">
+        <div className="bg-muted flex items-center justify-center p-4 lg:p-6 min-h-[60px] lg:min-h-[300px]">
+          <div className="transform lg:-rotate-90 text-foreground font-bold text-lg lg:text-xl tracking-wider">
             WHY
           </div>
         </div>
@@ -201,7 +201,7 @@ const WhySection: React.FC<WhySectionProps> = ({
       
       {/* Save WHY Statement Button */}
       <div className="flex justify-center mt-6">
-        <Button onClick={onSave} size="lg" className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
+        <Button onClick={onSave} size="lg" className="flex items-center gap-2 bg-primary hover:bg-primary/90">
           <Save className="w-4 h-4" />
           Save WHY Statement
         </Button>

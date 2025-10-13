@@ -298,18 +298,14 @@ const ScalableImpactPlanner: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
+    <div className="max-w-7xl mx-auto p-6 bg-background min-h-screen">
       {/* Header */}
-      <Card className="mb-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0">
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold text-center">
-            🚀 Scalable Impact Planner
-          </CardTitle>
-          <p className="text-center text-blue-100 text-lg">
-            A systematic approach to scaling your business using the 7 Levels of Scale framework
-          </p>
-        </CardHeader>
-      </Card>
+      <div className="sticky top-0 z-30 -mx-6 mb-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b px-6 py-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-xl font-semibold">Scalable Impact Planner</CardTitle>
+          <span className="text-sm text-muted-foreground">Steps 1–2</span>
+        </div>
+      </div>
 
       {/* Step Navigator */}
       <StepNavigator 
@@ -325,7 +321,7 @@ const ScalableImpactPlanner: React.FC = () => {
       </div>
 
       {/* Navigation Controls */}
-      <Card className="bg-white border-2">
+      <Card className="bg-card border">
         <CardContent className="p-4">
           <div className="flex justify-between items-center">
             <Button 
