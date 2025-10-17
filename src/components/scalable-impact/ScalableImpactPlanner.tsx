@@ -19,11 +19,13 @@ import {
 import { StepNavigator } from './StepNavigator';
 import { Level1FirstTenCustomers } from './Level1FirstTenCustomers';
 import { ScaleLevelConfirmation } from './ScaleLevelConfirmation';
+import GrowthFlywheelBuilder, { GrowthFlywheelData } from './GrowthFlywheelBuilder';
 import { StartingPointSection } from './StartingPointSection';
 import { EndGameSection } from './EndGameSection';
 import WhySection from './WhySection';
 import HowSection from './HowSection';
 import TakingActionSection from './TakingActionSection';
+import OperatingSystemBuilder, { OperatingSystemData } from './OperatingSystemBuilder';
 
 // Import shared types
 import type { 
@@ -40,7 +42,7 @@ const ScalableImpactPlanner: React.FC = () => {
   
   // Step navigation state (limited to initial 2 steps on this page)
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [completedSteps, setCompletedSteps] = useState<boolean[]>([false, false]);
+  const [completedSteps, setCompletedSteps] = useState<boolean[]>([false, false, false, false, false, false, false]);
   
   // Step 1: Level 1 - First 10 Customers (MANDATORY GATING STEP)
   const [level1Data, setLevel1Data] = useState({
@@ -48,13 +50,34 @@ const ScalableImpactPlanner: React.FC = () => {
     hasDeliveredPromise: false,
     hasReached10Customers: false,
     hasTestimonials: false,
+    hasTenPromoters: false,
+    hasModel10List: false,
+    promotersCount: 0,
+    npsNotes: '',
+    model10List: '',
     customerList: '',
     salesProof: '',
     isCompleted: false
   });
   
-  // Step 2: Scale Level Confirmation
-  const [selectedScaleLevel, setSelectedScaleLevel] = useState<number>(0);
+  // Step 2 (Level 2): Growth Flywheel builder data
+  const [growthFlywheel, setGrowthFlywheel] = useState<GrowthFlywheelData>({
+    growthPattern: '',
+    flagshipOffers: '',
+    awarenessChannels: '',
+    engageReengage: '',
+    leadMagnets: '',
+    microCommitments: '',
+    ahaMoments: '',
+    focusFlagship: '',
+    triggeringEvents: '',
+    endingEvent: '',
+    stepsOutline: '',
+    isCompleted: false
+  });
+
+  // Step 3 (OS) state – declared early so effects can reference it safely
+  const [osData, setOsData] = useState<OperatingSystemData>({});
   
   // Step 2: Starting Point  
   const [startingPoint, setStartingPoint] = useState<StartingPoint>({
@@ -78,7 +101,7 @@ const ScalableImpactPlanner: React.FC = () => {
     businessStage: 'owner-dependent' as 'owner-dependent' | 'professionalized'
   });
   
-  // Step 3: Ending Point (new format for component)
+  // Step 3 (later steps): Ending Point (new format for component)
   const [endGameData, setEndGameData] = useState({
     targetRevenue: '',
     targetProfit: '',
@@ -164,7 +187,8 @@ const ScalableImpactPlanner: React.FC = () => {
       const savedStep = loadFromLocalStorage('scalable_impact_current_step');
       const savedCompleted = loadFromLocalStorage('scalable_impact_completed_steps');
       const savedLevel1 = loadFromLocalStorage('scalable_impact_level1_data');
-      const savedScaleLevel = loadFromLocalStorage('scalable_impact_scale_level');
+      const savedScaleLevel = null; // deprecated
+      const savedFlywheel = loadFromLocalStorage('scalable_impact_growth_flywheel');
       const savedStarting = loadFromLocalStorage('scalable_impact_starting');
       const savedStartingData = loadFromLocalStorage('scalable_impact_starting_data');
       const savedEnding = loadFromLocalStorage('scalable_impact_ending');
@@ -172,11 +196,12 @@ const ScalableImpactPlanner: React.FC = () => {
       const savedWhy = loadFromLocalStorage('scalable_impact_why');
       const savedHow = loadFromLocalStorage('scalable_impact_how');
       const savedTakingAction = loadFromLocalStorage('scalable_impact_taking_action');
+      const savedOS = loadFromLocalStorage('scalable_impact_os');
       
       if (savedStep) setCurrentStep(savedStep);
       if (savedCompleted) setCompletedSteps(savedCompleted);
       if (savedLevel1) setLevel1Data(savedLevel1);
-      if (savedScaleLevel) setSelectedScaleLevel(savedScaleLevel);
+      if (savedFlywheel) setGrowthFlywheel(savedFlywheel);
       if (savedStarting) setStartingPoint(savedStarting);
       if (savedStartingData) setStartingPointData(savedStartingData);
       if (savedEnding) setEndingPoint(savedEnding);
@@ -184,6 +209,7 @@ const ScalableImpactPlanner: React.FC = () => {
       if (savedWhy) setWhyStatement(savedWhy);
       if (savedHow) setHowStatement(savedHow);
       if (savedTakingAction) setTakingActionItems(savedTakingAction);
+      if (savedOS) setOsData(savedOS);
     }
   }, [user?.id]);
 
@@ -193,7 +219,7 @@ const ScalableImpactPlanner: React.FC = () => {
       saveToLocalStorage('scalable_impact_current_step', currentStep);
       saveToLocalStorage('scalable_impact_completed_steps', completedSteps);
       saveToLocalStorage('scalable_impact_level1_data', level1Data);
-      saveToLocalStorage('scalable_impact_scale_level', selectedScaleLevel);
+      saveToLocalStorage('scalable_impact_growth_flywheel', growthFlywheel);
       saveToLocalStorage('scalable_impact_starting', startingPoint);
       saveToLocalStorage('scalable_impact_starting_data', startingPointData);
       saveToLocalStorage('scalable_impact_ending', endingPoint);
@@ -201,8 +227,9 @@ const ScalableImpactPlanner: React.FC = () => {
       saveToLocalStorage('scalable_impact_why', whyStatement);
       saveToLocalStorage('scalable_impact_how', howStatement);
       saveToLocalStorage('scalable_impact_taking_action', takingActionItems);
+      saveToLocalStorage('scalable_impact_os', osData);
     }
-  }, [currentStep, completedSteps, level1Data, selectedScaleLevel, startingPoint, startingPointData, endingPoint, endGameData, whyStatement, howStatement, takingActionItems, user?.id]);
+  }, [currentStep, completedSteps, level1Data, growthFlywheel, startingPoint, startingPointData, endingPoint, endGameData, whyStatement, howStatement, takingActionItems, osData, user?.id]);
 
   // Step navigation handlers
   const handleStepChange = (step: number) => {
@@ -216,7 +243,7 @@ const ScalableImpactPlanner: React.FC = () => {
   };
 
   const handleNextStep = () => {
-    if (currentStep < 2) {
+    if (currentStep < 7) {
       handleStepComplete(currentStep - 1);
       setCurrentStep(currentStep + 1);
     }
@@ -240,11 +267,11 @@ const ScalableImpactPlanner: React.FC = () => {
   };
 
   const handleStep2Complete = () => {
-    if (selectedScaleLevel > 0) {
+    if (growthFlywheel.isCompleted) {
       handleNextStep();
       toast({
-        title: "Scale Level Confirmed! 🎯",
-        description: `Starting from Level ${selectedScaleLevel}. Let's determine your current numbers.`,
+        title: "Growth Engine Mapped! ⚙️",
+        description: "Great! Your first engine is defined. Start iterating it to scale.",
       });
     }
   };
@@ -255,6 +282,14 @@ const ScalableImpactPlanner: React.FC = () => {
       title: "Starting Point Established! 📊",
       description: "Great! Now let's set your 3-year targets.",
     });
+  };
+
+  // Step 3 (OS): complete handler
+  const handleOsComplete = () => {
+    if (osData.isCompleted) {
+      handleNextStep();
+      toast({ title: 'Operating System Draft Installed ✅', description: 'Your OS baseline is set with SOPs, scorecards, and meeting rhythm.' });
+    }
   };
 
   const handleStep4Complete = () => {
@@ -279,10 +314,20 @@ const ScalableImpactPlanner: React.FC = () => {
       
       case 2:
         return (
-          <ScaleLevelConfirmation
-            selectedLevel={selectedScaleLevel}
-            onLevelChange={setSelectedScaleLevel}
+          <GrowthFlywheelBuilder
+            data={growthFlywheel}
+            onDataChange={setGrowthFlywheel}
             onComplete={handleStep2Complete}
+            onSave={() => saveToLocalStorage('scalable_impact_growth_flywheel', growthFlywheel)}
+          />
+        );
+      case 3:
+        return (
+          <OperatingSystemBuilder
+            data={osData}
+            onDataChange={setOsData}
+            onComplete={handleOsComplete}
+            onSave={() => saveToLocalStorage('scalable_impact_os', osData)}
           />
         );
       
@@ -303,7 +348,7 @@ const ScalableImpactPlanner: React.FC = () => {
       <div className="sticky top-0 z-30 -mx-6 mb-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b px-6 py-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-semibold">Scalable Impact Planner</CardTitle>
-          <span className="text-sm text-muted-foreground">Steps 1–2</span>
+          <span className="text-sm text-muted-foreground">Steps 1–7</span>
         </div>
       </div>
 
@@ -312,7 +357,6 @@ const ScalableImpactPlanner: React.FC = () => {
         currentStep={currentStep}
         onStepChange={handleStepChange}
         completedSteps={completedSteps}
-        visibleStepIds={[1, 2]}
       />
 
       {/* Current Step Content */}
@@ -346,9 +390,9 @@ const ScalableImpactPlanner: React.FC = () => {
             <Button 
               onClick={handleNextStep}
               disabled={
-                currentStep === 2 || 
                 (currentStep === 1 && !level1Data.isCompleted) ||
-                (currentStep === 2 && selectedScaleLevel === 0)
+                (currentStep === 2 && !growthFlywheel.isCompleted) ||
+                (currentStep === 3 && !osData.isCompleted)
               }
               className="gap-2"
             >

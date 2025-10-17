@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { 
   Target, 
   Users, 
@@ -32,6 +33,12 @@ interface Level1Data {
   hasDeliveredPromise: boolean;
   hasReached10Customers: boolean;
   hasTestimonials: boolean;
+  // New: NPS promoters and Model 10 gating
+  hasTenPromoters: boolean;
+  hasModel10List: boolean;
+  promotersCount?: number; // count of NPS 9-10
+  npsNotes?: string; // optional notes
+  model10List?: string; // comma or newline separated names
   customerList: string;
   salesProof: string; // short proof/summary or testimonial
   testimonialText?: string; // required short text proof
@@ -110,37 +117,39 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
 }) => {
   const [showWhatNotToDo, setShowWhatNotToDo] = useState(false);
 
+  const computeIsCompleted = (d: Level1Data) => {
+    const hasTestimonialText = d.testimonialText ? d.testimonialText.trim().length >= 10 : false;
+    return (
+      d.hasMadeSale &&
+      d.hasDeliveredPromise &&
+      d.hasReached10Customers &&
+      d.hasTestimonials &&
+      d.hasTenPromoters &&
+      d.hasModel10List &&
+      hasTestimonialText
+    );
+  };
+
   const handleCheckboxChange = (field: keyof Level1Data, value: boolean) => {
     const newData = {
       ...data,
       [field]: value
     };
-    
-    // Check if all requirements are met
-    const isCompleted = newData.hasMadeSale && 
-                       newData.hasDeliveredPromise && 
-                       newData.hasReached10Customers && 
-                       newData.hasTestimonials;
-    
     onDataChange({
       ...newData,
-      isCompleted
+      isCompleted: computeIsCompleted(newData)
     });
   };
 
-  const handleTextChange = (field: keyof Level1Data, value: string) => {
+  const handleTextChange = (field: keyof Level1Data, value: any) => {
+    const newData = { ...data, [field]: value } as Level1Data;
     onDataChange({
-      ...data,
-      [field]: value
+      ...newData,
+      isCompleted: computeIsCompleted(newData)
     });
   };
 
-  const canProceed =
-    data.hasMadeSale &&
-    data.hasDeliveredPromise &&
-    data.hasReached10Customers &&
-    data.hasTestimonials &&
-    (data.testimonialText ? data.testimonialText.trim().length >= 10 : false);
+  const canProceed = computeIsCompleted(data);
 
   return (
     <div className="space-y-6">
@@ -186,6 +195,14 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
         </CardHeader>
 
         <CardContent className="space-y-6">
+          {/* Core mantra callout */}
+          <div className="rounded-lg border-2 border-indigo-200 bg-indigo-50 p-4">
+            <div className="text-[11px] font-bold uppercase tracking-widest text-indigo-700">Write this down</div>
+            <div className="mt-1 text-lg sm:text-xl font-extrabold text-indigo-900">
+              Forget <span className="underline">SCALABILITY</span>… just sell and serve 10 customers!
+            </div>
+          </div>
+
           {/* The Goal */}
           <Alert className="border-green-200 bg-green-50">
             <Trophy className="h-5 w-5 text-green-600" />
@@ -247,13 +264,13 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
           <Separator />
 
           {/* Interactive Checklist */}
-          <div className="space-y-4">
-            <Label className="text-xl font-bold text-gray-800">
-              Complete This Checklist (All required to proceed):
-            </Label>
-
             <div className="space-y-4">
-              {/* Checklist Items */}
+              <Label className="text-xl font-bold text-gray-800">
+                Complete This Checklist (All required to proceed):
+              </Label>
+
+              <div className="space-y-4">
+                {/* Checklist Items */}
               <div className="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg">
                 <Checkbox
                   id="made-sale"
@@ -369,6 +386,69 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
                   </p>
                 </div>
               </div>
+
+              {/* New: Ten Promoters requirement */}
+              <div className="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg">
+                <Checkbox
+                  id="has-ten-promoters"
+                  checked={data.hasTenPromoters}
+                  onCheckedChange={(checked) => handleCheckboxChange('hasTenPromoters', checked as boolean)}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="has-ten-promoters" className="font-semibold cursor-pointer">
+                      I have at least 10 promoters (NPS 9–10)
+                    </Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-4 h-4 text-gray-400" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs text-xs">Ask every customer: “On a scale of 0–10, how likely are you to recommend us?” Count 9s and 10s as promoters.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
+                    <span>Promoters (9–10):</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={data.promotersCount ?? ''}
+                      onChange={(e) => handleTextChange('promotersCount' as any, String(e.target.value))}
+                      className="h-8 w-24"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* New: Model 10 requirement */}
+              <div className="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg">
+                <Checkbox
+                  id="has-model10"
+                  checked={data.hasModel10List}
+                  onCheckedChange={(checked) => handleCheckboxChange('hasModel10List', checked as boolean)}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="has-model10" className="font-semibold cursor-pointer">
+                      I have created my “Model 10” list (high LTV + high advocacy)
+                    </Label>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Optional: paste names here so you always have them handy.
+                  </p>
+                  <Textarea
+                    placeholder="List your 10 best customers by name (comma or newline separated)"
+                    value={data.model10List || ''}
+                    onChange={(e) => handleTextChange('model10List', e.target.value)}
+                    className="mt-2"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Optional Details */}
@@ -435,6 +515,32 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
 
           <Separator />
 
+          {/* One-Question Survey (NPS) */}
+          <Card className="border-emerald-200 bg-emerald-50">
+            <CardHeader>
+              <CardTitle className="text-emerald-800">The One-Question Survey (NPS)</CardTitle>
+              <p className="text-emerald-700 text-sm">Ask this after every sale to confirm you truly served the customer.</p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="rounded-lg bg-white border p-4 text-center text-base font-semibold">
+                “On a scale of 0–10, how likely are you to recommend my services to a friend or colleague?”
+              </div>
+              <div className="text-xs text-emerald-800">
+                9–10 = Promoter • 7–8 = Passive • 0–6 = Detractor. Your goal: get 10 promoters.
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Write this down: easiest & hardest */}
+          <div className="rounded-lg border-2 border-violet-200 bg-violet-50 p-4">
+            <div className="text-[11px] font-bold uppercase tracking-widest text-violet-700">Write this down</div>
+            <div className="mt-1 text-lg sm:text-xl font-extrabold text-violet-900">
+              Level 1 is the <span className="underline">EASIEST</span>, but it’s also the <span className="underline">HARDEST</span>.
+            </div>
+          </div>
+
+          <Separator />
+
           {/* What NOT To Do First */}
           <div className="space-y-4">
             <Button 
@@ -493,6 +599,29 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
               </AlertDescription>
             </Alert>
           )}
+
+          {/* Ready to Level Up checklist summary */}
+          <Card className="border-slate-200">
+            <CardHeader>
+              <CardTitle className="text-base">Ready to level up?</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className={`w-4 h-4 ${data.hasMadeSale && data.hasReached10Customers ? 'text-green-600' : 'text-gray-400'}`} />
+                  Generate at least 10 sales
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className={`w-4 h-4 ${data.hasTenPromoters ? 'text-green-600' : 'text-gray-400'}`} />
+                  Generate at least 10 promoters (NPS ≥ 9)
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className={`w-4 h-4 ${data.hasModel10List ? 'text-green-600' : 'text-gray-400'}`} />
+                  Make your “Model 10” list (High-LTV + High-Advocacy)
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
 
           {/* Action Button (bottom) */}
           <div className="flex justify-between items-center pt-6 border-t">

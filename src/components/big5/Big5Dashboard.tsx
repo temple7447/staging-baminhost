@@ -318,9 +318,8 @@ export const Big5Dashboard: React.FC = () => {
           <TabsTrigger value="number">Your Number</TabsTrigger>
           <TabsTrigger value="starting-point">Starting Point</TabsTrigger>
           <TabsTrigger value="end-game">End Game</TabsTrigger>
-          <TabsTrigger value="why">WHY (THEM)</TabsTrigger>
-          <TabsTrigger value="focus5">Focus 5</TabsTrigger>
-          <TabsTrigger value="action-plan">Action Plan</TabsTrigger>
+          <TabsTrigger value="why">WHY</TabsTrigger>
+          <TabsTrigger value="focus5">How + Taking Action</TabsTrigger>
           <TabsTrigger value="big5">Big 5 Items</TabsTrigger>
           <TabsTrigger value="time-tracking">Time Tracking</TabsTrigger>
           <TabsTrigger value="tasks">Task Management</TabsTrigger>
@@ -356,6 +355,32 @@ export const Big5Dashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="why" className="space-y-6">
+          {/* Guidance: Three WHY questions */}
+          <Card className="border-blue-200 bg-blue-50">
+            <CardHeader>
+              <CardTitle className="text-base text-blue-800">Start with these three questions</CardTitle>
+              <CardDescription className="text-blue-700">Use them to guide your WHY for the next 3 years</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="bg-white rounded-lg border p-4">
+                  <div className="text-xs font-semibold text-blue-600 mb-1">THE “ME” QUESTION</div>
+                  <div className="text-sm font-bold">How do I want my life to look in 3 years?<br/>What is my Level 7 Life?</div>
+                </div>
+                <div className="bg-white rounded-lg border p-4">
+                  <div className="text-xs font-semibold text-blue-600 mb-1">THE “US” QUESTION</div>
+                  <div className="text-sm font-bold">What do I want for the people closest to me?</div>
+                  <div className="text-xs text-muted-foreground">Family / Partners / Key Execs</div>
+                </div>
+                <div className="bg-white rounded-lg border p-4">
+                  <div className="text-xs font-semibold text-blue-600 mb-1">THE “THEM” QUESTION</div>
+                  <div className="text-sm font-bold">What dent do I want to make in my little corner of the universe?</div>
+                  <div className="text-xs text-muted-foreground">Industry / Community</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardContent>
               <WhySection
@@ -371,33 +396,32 @@ export const Big5Dashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="focus5" className="space-y-6">
-          <Card>
-            <CardContent>
-              <HowSection
-                howStatement={howStatement}
-                setHowStatement={setHowStatement}
-                onSave={() => {
-                  if (user?.id) localStorage.setItem(`scalable_impact_how_${user.id}`, JSON.stringify(howStatement));
-                  toast({ title: 'Focus 5 saved', description: 'Your 5 key actions have been saved.' });
-                }}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="action-plan" className="space-y-6">
-          <Card>
-            <CardContent>
-              <TakingActionSection
-                takingActionItems={takingActionItems}
-                setTakingActionItems={setTakingActionItems}
-                onSave={() => {
-                  if (user?.id) localStorage.setItem(`scalable_impact_taking_action_${user.id}`, JSON.stringify(takingActionItems));
-                  toast({ title: 'Action plan saved', description: 'Your current initiatives were saved.' });
-                }}
-              />
-            </CardContent>
-          </Card>
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card>
+              <CardContent>
+                <HowSection
+                  howStatement={howStatement}
+                  setHowStatement={setHowStatement}
+                  onSave={() => {
+                    if (user?.id) localStorage.setItem(`scalable_impact_how_${user.id}`, JSON.stringify(howStatement));
+                    toast({ title: 'Focus 5 saved', description: 'Your 5 key actions have been saved.' });
+                  }}
+                />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent>
+                <TakingActionSection
+                  takingActionItems={takingActionItems}
+                  setTakingActionItems={setTakingActionItems}
+                  onSave={() => {
+                    if (user?.id) localStorage.setItem(`scalable_impact_taking_action_${user.id}`, JSON.stringify(takingActionItems));
+                    toast({ title: 'Action plan saved', description: 'Your current initiatives were saved.' });
+                  }}
+                />
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="big5" className="space-y-6">

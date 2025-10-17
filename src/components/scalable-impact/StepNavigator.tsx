@@ -13,6 +13,7 @@ import {
   Users,
   Zap
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface StepNavigatorProps {
   currentStep: number;
@@ -23,7 +24,8 @@ interface StepNavigatorProps {
 
 interface Step {
   id: number;
-  title: string;
+  title: string; // full title
+  shortTitle: string; // short label version
   description: string;
   icon: any;
   color: string;
@@ -34,6 +36,7 @@ const steps: Step[] = [
   {
     id: 1,
     title: "Sell & Serve 10 Customers",
+    shortTitle: "Sell & Serve 10",
     description: "Prove your business with first 10 customers",
     icon: Target,
     color: "bg-pink-500",
@@ -41,48 +44,54 @@ const steps: Step[] = [
   },
   {
     id: 2,
-    title: "Confirm Your Scale Level",
-    description: "Where are you in the 7 levels of scale?",
+    title: "Build a Growth Flywheel",
+    shortTitle: "Growth Flywheel",
+    description: "Create predictable revenue systems",
     icon: TrendingUp,
     color: "bg-blue-500",
     isClickable: (currentStep, completedSteps) => currentStep >= 2 || completedSteps[0]
   },
   {
     id: 3,
-    title: "Determine Your Starting Point",
-    description: "Current revenue, profit & business value",
+    title: "Upgrade Your OS",
+    shortTitle: "Upgrade OS",
+    description: "Professionalize your business operations",
     icon: AlertTriangle,
     color: "bg-green-500",
     isClickable: (currentStep, completedSteps) => currentStep >= 3 || completedSteps[1]
   },
   {
     id: 4,
-    title: "Determine Your End Game",
-    description: "Set your 3-year target numbers",
+    title: "Double Your Take-Home",
+    shortTitle: "Double Take-Home",
+    description: "Turn the business into a cash machine",
     icon: Heart,
     color: "bg-yellow-500",
     isClickable: (currentStep, completedSteps) => currentStep >= 4 || completedSteps[2]
   },
   {
     id: 5,
-    title: "Codify Your WHY (THEM)",
-    description: "What impact will you make?",
+    title: "Build Your Board",
+    shortTitle: "Build Board",
+    description: "Add advisors and accountability",
     icon: Users,
     color: "bg-red-500",
     isClickable: (currentStep, completedSteps) => currentStep >= 5 || completedSteps[3]
   },
   {
     id: 6,
-    title: "Focus 5",
-    description: "5 key actions for next 3-6 months",
+    title: "Complete an Acquisition",
+    shortTitle: "Acquisition",
+    description: "Expand capacity or market share",
     icon: Users,
     color: "bg-purple-500",
     isClickable: (currentStep, completedSteps) => currentStep >= 6 || completedSteps[4]
   },
   {
     id: 7,
-    title: "Create Your Action Plan",
-    description: "Weekly priorities & taking action",
+    title: "Hit Your Number",
+    shortTitle: "Hit Number",
+    description: "Reach your Level 7 Life target",
     icon: Zap,
     color: "bg-orange-500",
     isClickable: (currentStep, completedSteps) => currentStep >= 7 || completedSteps[5]
@@ -98,6 +107,7 @@ export const StepNavigator: React.FC<StepNavigatorProps> = ({
   const visibleSteps = visibleStepIds ? steps.filter(s => visibleStepIds.includes(s.id)) : steps;
   const currentIndex = Math.max(0, visibleSteps.findIndex(s => s.id === currentStep));
   const safeCompleted = completedSteps.slice(0, visibleSteps.length);
+  const completedCount = safeCompleted.filter(Boolean).length;
   return (
     <Card className="mb-4 bg-card border">
       <CardContent className="p-6">
@@ -105,8 +115,8 @@ export const StepNavigator: React.FC<StepNavigatorProps> = ({
           <h2 className="text-xl font-bold text-gray-900">
             Scalable Impact Planner Steps
           </h2>
-          <Badge variant="outline" className="bg-white text-blue-700">
-            Step {currentIndex + 1} of {visibleSteps.length}
+          <Badge variant="outline" className="bg-white text-green-700 flex items-center gap-1">
+            ✓ {completedCount} / {visibleSteps.length}
           </Badge>
         </div>
         
@@ -130,30 +140,16 @@ export const StepNavigator: React.FC<StepNavigatorProps> = ({
                   `}
                   onClick={() => isClickable && onStepChange(step.id)}
                   disabled={!isClickable}
+                  title={`${step.title} — ${step.description}`}
                 >
-                  <div className={`
-                    w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
-                    ${isCurrent ? 'bg-white text-blue-600' : 
-                      isCompleted ? 'bg-green-100 text-green-600' : 
-                      'bg-gray-100 text-gray-600'}
-                  `}>
-                    {isCompleted ? (
-                      <CheckCircle2 className="w-5 h-5" />
-                    ) : (
-                      <span className="font-bold text-sm">{step.id}</span>
-                    )}
-                  </div>
-                  
+                  <Checkbox
+                    checked={isCompleted}
+                    readOnly
+                    className="w-5 h-5 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                  />
                   <div className="flex-1">
                     <div className={`font-semibold text-sm ${isCurrent ? 'text-white' : ''}`}>
-                      {step.title}
-                    </div>
-                    <div className={`text-xs mt-1 ${
-                      isCurrent ? 'text-blue-100' : 
-                      isCompleted ? 'text-green-600' : 
-                      'text-gray-500'
-                    }`}>
-                      {step.description}
+                      {step.shortTitle}
                     </div>
                   </div>
                 </Button>
@@ -182,36 +178,16 @@ export const StepNavigator: React.FC<StepNavigatorProps> = ({
                   `}
                   onClick={() => isClickable && onStepChange(step.id)}
                   disabled={!isClickable}
+                  title={`${step.title} — ${step.description}`}
                 >
-                  <div className={`
-                    w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center flex-shrink-0
-                    ${isCurrent ? 'bg-white text-blue-600' : 
-                      isCompleted ? 'bg-green-100 text-green-600' : 
-                      'bg-gray-100 text-gray-600'}
-                  `}>
-                    {isCompleted ? (
-                      <CheckCircle2 className="w-5 h-5 lg:w-6 lg:h-6" />
-                    ) : (
-                      <span className="font-bold text-sm lg:text-lg">{step.id}</span>
-                    )}
-                  </div>
-                  
+                  <Checkbox
+                    checked={isCompleted}
+                    readOnly
+                    className="w-5 h-5 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                  />
                   <div className="text-center px-1">
                     <div className={`font-semibold text-[10px] lg:text-xs leading-tight ${isCurrent ? 'text-white' : ''}`}>
-                      {step.title}
-                    </div>
-                    <div className={`text-[9px] lg:text-xs mt-1 leading-tight ${
-                      isCurrent ? 'text-blue-100' : 
-                      isCompleted ? 'text-green-600' : 
-                      'text-gray-500'
-                    }`}
-                      style={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden'
-                      }}>
-                      {step.description}
+                      {step.shortTitle}
                     </div>
                   </div>
                 </Button>

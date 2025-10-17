@@ -24,7 +24,7 @@ export const Navbar = () => {
       
       <div className="hidden md:flex items-center gap-3">
         <Link to="/login">
-          <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+          <Button variant="outline" className="border-white/20 text-white bg-transparent hover:bg-white/10">
             Log in
           </Button>
         </Link>
