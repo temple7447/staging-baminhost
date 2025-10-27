@@ -35,8 +35,8 @@ interface Step {
 const steps: Step[] = [
   {
     id: 1,
-    title: "Sell & Serve 10 Customers",
-    shortTitle: "Sell & Serve 10",
+    title: "Get 10 Customers",
+    shortTitle: "10 Customers",
     description: "Prove your business with first 10 customers",
     icon: Target,
     color: "bg-pink-500",
