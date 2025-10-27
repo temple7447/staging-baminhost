@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, ThumbsUp, ThumbsDown, Minus } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { MessageSquare, ThumbsUp, ThumbsDown, Minus, PlusCircle } from "lucide-react";
 
 export const TheOneQuestionSurvey: React.FC = () => {
+  const [npsResponses, setNpsResponses] = useState('');
+  const [insights, setInsights] = useState('');
   return (
     <div className="space-y-6">
       <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50">
@@ -109,6 +114,65 @@ export const TheOneQuestionSurvey: React.FC = () => {
               </li>
             </ol>
           </div>
+
+          {/* Track Your NPS Responses */}
+          <Card className="border-indigo-200 bg-indigo-50">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2 text-indigo-900">
+                <PlusCircle className="w-5 h-5" />
+                Track Your NPS Responses
+              </CardTitle>
+              <p className="text-sm text-indigo-700 mt-2">
+                Use this space to track your customer responses and identify patterns.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="nps-responses" className="text-sm font-medium text-indigo-900">
+                  Customer Responses (e.g., "John - 9", "Sarah - 10", "Mike - 7")
+                </Label>
+                <Textarea
+                  id="nps-responses"
+                  placeholder="Track your NPS responses here...&#10;Example:&#10;John Smith - 10 (Would recommend immediately!)&#10;Sarah Johnson - 9 (Great service, minor delay)&#10;Mike Davis - 7 (Good but could improve communication)"
+                  value={npsResponses}
+                  onChange={(e) => setNpsResponses(e.target.value)}
+                  className="mt-2 min-h-[120px]"
+                />
+                <p className="text-xs text-indigo-600 mt-1">
+                  Tip: Record the score, name, and any feedback they give you.
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="nps-insights" className="text-sm font-medium text-indigo-900">
+                  What patterns are you seeing? What can you learn?
+                </Label>
+                <Textarea
+                  id="nps-insights"
+                  placeholder="Reflect on the responses...&#10;- What do promoters love most?&#10;- What concerns do passives/detractors have?&#10;- What improvements should you make?"
+                  value={insights}
+                  onChange={(e) => setInsights(e.target.value)}
+                  className="mt-2 min-h-[100px]"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    setNpsResponses('');
+                    setInsights('');
+                  }}
+                >
+                  Clear
+                </Button>
+                <p className="text-xs text-indigo-600 flex items-center">
+                  💡 This data is for your reference. Don't forget to log responses in the "Getting Your First 10" tab!
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </CardContent>
       </Card>
     </div>

@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Target, AlertTriangle, Trophy, Rocket, Lightbulb } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Target, AlertTriangle, Trophy, Rocket, Lightbulb, Pen } from "lucide-react";
 
 export const DoThisFirst: React.FC = () => {
+  const [commitment, setCommitment] = useState('');
+  const [agreedToStart, setAgreedToStart] = useState(false);
   return (
     <div className="space-y-6">
       <Card className="border-2 border-pink-200 bg-gradient-to-r from-pink-50 to-purple-50">
@@ -150,6 +155,56 @@ export const DoThisFirst: React.FC = () => {
               These are the two things you need if you're going to succeed and scale to Level 2 and beyond.
             </p>
           </div>
+
+          {/* Commitment Section */}
+          <Card className="border-rose-200 bg-rose-50">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2 text-rose-900">
+                <Pen className="w-5 h-5" />
+                Make Your Commitment
+              </CardTitle>
+              <p className="text-sm text-rose-700 mt-2">
+                Write down your commitment to completing Level 1. Make it real by putting it in writing.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="commitment" className="text-sm font-medium text-rose-900">
+                  I commit to selling and serving 10 customers by:
+                </Label>
+                <Textarea
+                  id="commitment"
+                  placeholder="Write your commitment here...\n\nExample:\n'I commit to getting my first 10 customers by December 31st. I will focus on solving [specific problem] for [specific customer type]. I will not waste time on logos, office space, or perfecting my website until I have proven this with real customers.'\n\nTarget Date: _________\nFirst 3 Customers I Will Reach Out To: _________"
+                  value={commitment}
+                  onChange={(e) => setCommitment(e.target.value)}
+                  className="mt-2 min-h-[150px] bg-white"
+                />
+              </div>
+
+              <div className="flex items-start space-x-3 p-4 bg-white rounded-lg border border-rose-300">
+                <Checkbox
+                  id="agreed-to-start"
+                  checked={agreedToStart}
+                  onCheckedChange={(checked) => setAgreedToStart(checked as boolean)}
+                  className="mt-1"
+                />
+                <Label htmlFor="agreed-to-start" className="text-sm cursor-pointer text-rose-900">
+                  <strong>I understand:</strong> I will NOT move to Level 2 until I have completed Level 1. 
+                  I will focus on getting 10 customers FIRST before worrying about scaling, systems, or perfection.
+                </Label>
+              </div>
+
+              {agreedToStart && commitment.trim().length > 20 && (
+                <Alert className="border-green-200 bg-green-50">
+                  <Trophy className="h-4 w-4 text-green-600" />
+                  <AlertDescription className="text-green-800 text-sm">
+                    <strong>Excellent!</strong> You've made your commitment. Now go make it happen. 
+                    Head to the <strong>"Getting Your First 10"</strong> tab to start your checklist.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Final message */}
           <Alert className="border-slate-200 bg-slate-50">

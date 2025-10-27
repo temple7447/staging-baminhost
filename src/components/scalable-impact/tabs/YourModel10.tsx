@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, DollarSign, Megaphone, Star } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Users, DollarSign, Megaphone, Star, Target } from "lucide-react";
 
 export const YourModel10: React.FC = () => {
+  const [commonalities, setCommonalities] = useState('');
+  const [bestOffer, setBestOffer] = useState('');
+  const [findMore, setFindMore] = useState('');
   return (
     <div className="space-y-6">
       <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50">
@@ -113,6 +118,79 @@ export const YourModel10: React.FC = () => {
               and make it your mission to find more like them.
             </p>
           </div>
+
+          {/* Reflection Exercise */}
+          <Card className="border-teal-200 bg-teal-50">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2 text-teal-900">
+                <Target className="w-5 h-5" />
+                Model 10 Reflection Exercise
+              </CardTitle>
+              <p className="text-sm text-teal-700 mt-2">
+                Answer these questions to clarify who your ideal customer is and where to find more.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div>
+                <Label htmlFor="commonalities" className="text-sm font-medium text-teal-900">
+                  1. What do your best customers have in common?
+                </Label>
+                <p className="text-xs text-teal-700 mb-2">
+                  (Industry, size, problem, budget, location, behavior patterns?)
+                </p>
+                <Textarea
+                  id="commonalities"
+                  placeholder="Example: All are service-based businesses with 5-20 employees, struggling with client management, budget $500-2000/month..."
+                  value={commonalities}
+                  onChange={(e) => setCommonalities(e.target.value)}
+                  className="mt-1 min-h-[100px] bg-white"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="best-offer" className="text-sm font-medium text-teal-900">
+                  2. What specific offer/solution did they buy from you?
+                </Label>
+                <p className="text-xs text-teal-700 mb-2">
+                  (What problem did you solve? What result did you deliver?)
+                </p>
+                <Textarea
+                  id="best-offer"
+                  placeholder="Example: They bought our 'Fast Start Package' that helped them automate their client onboarding process, saving them 10+ hours per week..."
+                  value={bestOffer}
+                  onChange={(e) => setBestOffer(e.target.value)}
+                  className="mt-1 min-h-[100px] bg-white"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="find-more" className="text-sm font-medium text-teal-900">
+                  3. Where can you find more customers like these?
+                </Label>
+                <p className="text-xs text-teal-700 mb-2">
+                  (Communities, associations, referrals, marketing channels?)
+                </p>
+                <Textarea
+                  id="find-more"
+                  placeholder="Example: Industry Facebook groups, local chamber of commerce, LinkedIn groups for service business owners, asking current clients for referrals..."
+                  value={findMore}
+                  onChange={(e) => setFindMore(e.target.value)}
+                  className="mt-1 min-h-[100px] bg-white"
+                />
+              </div>
+
+              <div className="rounded-lg border-l-4 border-teal-600 bg-white p-4">
+                <p className="text-sm font-semibold text-teal-900 mb-2">
+                  🎯 Your Next Action:
+                </p>
+                <p className="text-sm text-teal-800">
+                  Based on your answers above, you now have a clear picture of your ideal customer. 
+                  Use this to focus your marketing, sales, and product development efforts on attracting more 
+                  customers who look exactly like your Model 10.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </CardContent>
       </Card>
     </div>
