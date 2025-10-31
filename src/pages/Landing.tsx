@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
@@ -62,6 +63,14 @@ const productShots = [
   "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=1600&q=80",
   "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80",
   "https://images.unsplash.com/photo-1551281044-8c3f1e82b6df?auto=format&fit=crop&w=1600&q=80",
+];
+
+const estateShots = [
+  "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1920&q=70",
+  "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1920&q=70",
+  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=70",
+  "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1920&q=70",
+  "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=1920&q=70",
 ];
 
 const Landing = () => {
@@ -124,26 +133,63 @@ const Landing = () => {
 
           {/* Right Column - Visuals */}
           <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            {/* Device Mock */}
-            <div className="relative overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-3xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
-              <div className="relative flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/5">
-                <span className="h-3 w-3 rounded-full bg-red-400 shadow-lg shadow-red-400/50" />
-                <span className="h-3 w-3 rounded-full bg-yellow-400 shadow-lg shadow-yellow-400/50" />
-                <span className="h-3 w-3 rounded-full bg-green-400 shadow-lg shadow-green-400/50" />
-                <div className="ml-3 text-xs text-slate-300 font-medium">bamihustle.com/app</div>
+            {/* Estate Carousel */}
+            <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/10 to-pink-500/10" />
+              <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/5">
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full bg-fuchsia-400 shadow-lg shadow-fuchsia-400/50" />
+                  <span className="h-3 w-3 rounded-full bg-pink-400 shadow-lg shadow-pink-400/50" />
+                  <span className="h-3 w-3 rounded-full bg-purple-400 shadow-lg shadow-purple-400/50" />
+                </div>
+                <div className="text-xs text-slate-300 font-medium">Featured Estates</div>
               </div>
               <div className="p-4">
-                <AspectRatio ratio={16/10}>
-                  <img
-                    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1920&q=80"
-                    alt="Portfolio dashboards overview"
-                    className="h-full w-full object-cover rounded-xl border border-white/10 shadow-xl"
-                    loading="lazy"
-                  />
-                </AspectRatio>
+                <Carousel className="relative" opts={{ loop: true, align: "start" }}>
+                  <CarouselContent>
+                    {estateShots.map((src, i) => (
+                      <CarouselItem key={i}>
+                        <AspectRatio ratio={16/9}>
+                          <img
+                            src={src}
+                            alt={`Estate ${i+1}`}
+                            className="h-full w-full object-cover rounded-xl border border-white/10 shadow-xl"
+                            loading="lazy"
+                          />
+                        </AspectRatio>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="-left-4 top-1/2 -translate-y-1/2 bg-white/20 border-white/30 text-white hover:bg-white/30" />
+                  <CarouselNext className="-right-4 top-1/2 -translate-y-1/2 bg-white/20 border-white/30 text-white hover:bg-white/30" />
+                </Carousel>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Estate Renting Focus */}
+      <section className="container mx-auto px-6 py-16">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+          <div className="space-y-6">
+            <div className="inline-block bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white font-bold text-sm px-4 py-2 rounded-full">Estate Renting</div>
+            <h2 className="text-3xl md:text-4xl font-bold">Find, manage, and rent estates seamlessly</h2>
+            <p className="text-slate-300">Showcase your properties with beautiful galleries, manage availability and leads, and streamline tenant communications—all in one place.</p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link to="/dashboard/estate">
+                <Button size="lg" className="bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white">Go to Estate Dashboard</Button>
+              </Link>
+              <Link to="/login">
+                <Button size="lg" variant="outline" className="bg-white/10 text-white hover:bg-white/20 border-white/30">Sign in to list a property</Button>
+              </Link>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <img src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=60" alt="Modern apartment exterior" className="rounded-2xl h-48 w-full object-cover border border-white/10" loading="lazy" />
+            <img src="https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=60" alt="Cozy living room" className="rounded-2xl h-48 w-full object-cover border border-white/10" loading="lazy" />
+            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=60" alt="Kitchen interior" className="rounded-2xl h-48 w-full object-cover border border-white/10" loading="lazy" />
+            <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=60" alt="Bedroom design" className="rounded-2xl h-48 w-full object-cover border border-white/10" loading="lazy" />
           </div>
         </div>
       </section>

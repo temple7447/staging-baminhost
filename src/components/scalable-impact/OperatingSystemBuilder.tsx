@@ -39,10 +39,74 @@ export interface OperatingSystemData {
   commonLanguage?: string; // dashboards, scorecards, meeting rhythm
   desiredOutputs?: string; // goals, OKRs, mission/vision
 
-  // Basics to install
+  // Basics to install (legacy flat fields kept for compatibility)
   meetingRhythm?: string; // weekly, monthly, quarterly cadence
   scorecards?: string; // list of scorecards/KPIs
   sopBacklog?: string; // list of SOPs to document next
+
+  // Structured configs for Communication tab
+  scorecardConfig?: {
+    evergreen: string[]; // up to 3
+    northstar: { name: string; monthlyTarget?: string }[]; // up to 3
+    teams: { name: string; metrics: string[] }[]; // up to 3 metrics per team
+    manualPolicyAcknowledged?: boolean;
+    weeklyTracking?: boolean;
+  };
+  meetingRhythmConfig?: {
+    quarterlyPlanningDate?: string; // YYYY-MM-DD
+    monthlyReviewDay?: string; // 1-28
+    weeklyTeamDay?: string; // Monday..Sunday
+    weeklyTeamTime?: string; // HH:MM
+    allHandsFrequency?: 'weekly' | 'monthly' | '';
+    allHandsDay?: string;
+    allHandsTime?: string;
+    notes?: string;
+  };
+
+  // Structured config for Desired Outputs tab
+  desiredOutputsConfig?: {
+    threeYear: { revenue: string; profit: string; valuation: string };
+    purpose: { contribution: string; impact: string; statement?: string };
+    coreValues: { value: string; type?: 'core' | 'aspirational' | 'accidental' | 'permission' }[];
+    strategicAnchors: string[];
+  };
+
+  // Structured config for Installing tab
+  installationConfig?: {
+    clarityDayDate?: string;
+    sprintPlanningDate?: string;
+    leadershipTeam?: string; // free-form list or emails
+    allHandsDate?: string;
+    allHandsTime?: string;
+    osDashboardUrl?: string;
+    links?: {
+      clarityCompass?: string;
+      scorecard?: string;
+      valueEngines?: string;
+      playbookVault?: string;
+      hotCanvas?: string;
+    };
+    checklist?: {
+      clarityDayDone?: boolean;
+      sprintPlanDone?: boolean;
+      allHandsDone?: boolean;
+      dashboardBuilt?: boolean;
+      sharedWithTeam?: boolean;
+    };
+    notes?: string;
+  };
+
+  // Ready to Level Up checklist
+  readinessChecklist?: {
+    valueEngineDone?: boolean;
+    playbooksDone?: boolean;
+    accountabilityDone?: boolean;
+    scorecardBuilt?: boolean;
+    meetingRhythmDefined?: boolean;
+    offsitesScheduled?: boolean;
+    clarityCompassPublished?: boolean;
+    osInstalled?: boolean;
+  };
 
   isCompleted?: boolean;
 }
@@ -109,19 +173,35 @@ export const OperatingSystemBuilder: React.FC<Props> = ({ data, onDataChange, on
         </TabsContent>
 
         <TabsContent value="communication" className="mt-6">
-          <DefiningYourCommunicationArchitecture />
+          <DefiningYourCommunicationArchitecture 
+            data={data}
+            onDataChange={onDataChange}
+            onSave={onSave}
+          />
         </TabsContent>
 
         <TabsContent value="outputs" className="mt-6">
-          <ClarifyingYourDesiredOutputs />
+          <ClarifyingYourDesiredOutputs 
+            data={data}
+            onDataChange={onDataChange}
+            onSave={onSave}
+          />
         </TabsContent>
 
         <TabsContent value="installing" className="mt-6">
-          <InstallingYourOS />
+          <InstallingYourOS 
+            data={data}
+            onDataChange={onDataChange}
+            onSave={onSave}
+          />
         </TabsContent>
 
         <TabsContent value="ready" className="mt-6">
-          <ReadyToLevelUpOS />
+          <ReadyToLevelUpOS 
+            data={data}
+            onDataChange={onDataChange}
+            onSave={onSave}
+          />
         </TabsContent>
       </Tabs>
     </div>

@@ -26,6 +26,9 @@ import WhySection from './WhySection';
 import HowSection from './HowSection';
 import TakingActionSection from './TakingActionSection';
 import OperatingSystemBuilder, { OperatingSystemData } from './OperatingSystemBuilder';
+import DoubleYourTakeHome, { DoubleTakeHomeData } from './DoubleYourTakeHome';
+import BuildYourBoard, { BuildYourBoardData } from './BuildYourBoard';
+import ExpandThroughAcquisition, { AcquisitionData } from './ExpandThroughAcquisition';
 
 // Import shared types
 import type { 
@@ -78,6 +81,15 @@ const ScalableImpactPlanner: React.FC = () => {
 
   // Step 3 (OS) state – declared early so effects can reference it safely
   const [osData, setOsData] = useState<OperatingSystemData>({});
+
+  // Step 4 (Double Take-Home)
+  const [doubleTakeHome, setDoubleTakeHome] = useState<DoubleTakeHomeData>({ isCompleted: false });
+
+  // Step 5 (Build Your Board)
+  const [buildBoard, setBuildBoard] = useState<BuildYourBoardData>({ isCompleted: false });
+
+  // Step 6 (Acquisition)
+  const [acqData, setAcqData] = useState<AcquisitionData>({ isCompleted: false });
   
   // Step 2: Starting Point  
   const [startingPoint, setStartingPoint] = useState<StartingPoint>({
@@ -197,6 +209,9 @@ const ScalableImpactPlanner: React.FC = () => {
       const savedHow = loadFromLocalStorage('scalable_impact_how');
       const savedTakingAction = loadFromLocalStorage('scalable_impact_taking_action');
       const savedOS = loadFromLocalStorage('scalable_impact_os');
+      const savedDYTH = loadFromLocalStorage('scalable_impact_double_take_home');
+      const savedBoard = loadFromLocalStorage('scalable_impact_build_board');
+      const savedAcq = loadFromLocalStorage('scalable_impact_acquisition');
       
       if (savedStep) setCurrentStep(savedStep);
       if (savedCompleted) setCompletedSteps(savedCompleted);
@@ -210,6 +225,9 @@ const ScalableImpactPlanner: React.FC = () => {
       if (savedHow) setHowStatement(savedHow);
       if (savedTakingAction) setTakingActionItems(savedTakingAction);
       if (savedOS) setOsData(savedOS);
+      if (savedDYTH) setDoubleTakeHome(savedDYTH);
+      if (savedBoard) setBuildBoard(savedBoard);
+      if (savedAcq) setAcqData(savedAcq);
     }
   }, [user?.id]);
 
@@ -228,8 +246,11 @@ const ScalableImpactPlanner: React.FC = () => {
       saveToLocalStorage('scalable_impact_how', howStatement);
       saveToLocalStorage('scalable_impact_taking_action', takingActionItems);
       saveToLocalStorage('scalable_impact_os', osData);
+      saveToLocalStorage('scalable_impact_double_take_home', doubleTakeHome);
+      saveToLocalStorage('scalable_impact_build_board', buildBoard);
+      saveToLocalStorage('scalable_impact_acquisition', acqData);
     }
-  }, [currentStep, completedSteps, level1Data, growthFlywheel, startingPoint, startingPointData, endingPoint, endGameData, whyStatement, howStatement, takingActionItems, osData, user?.id]);
+  }, [currentStep, completedSteps, level1Data, growthFlywheel, startingPoint, startingPointData, endingPoint, endGameData, whyStatement, howStatement, takingActionItems, osData, doubleTakeHome, buildBoard, acqData, user?.id]);
 
   // Step navigation handlers
   const handleStepChange = (step: number) => {
@@ -295,8 +316,8 @@ const ScalableImpactPlanner: React.FC = () => {
   const handleStep4Complete = () => {
     handleNextStep();
     toast({
-      title: "End Game Defined! 🎯",
-      description: "Excellent! Now let's codify your WHY.",
+      title: "Pay Raise Activated! 💸",
+      description: "Cash discipline installed. You're ready to scale profitably.",
     });
   };
 
@@ -328,6 +349,39 @@ const ScalableImpactPlanner: React.FC = () => {
             onDataChange={setOsData}
             onComplete={handleOsComplete}
             onSave={() => saveToLocalStorage('scalable_impact_os', osData)}
+          />
+        );
+      case 4:
+        return (
+          <DoubleYourTakeHome
+            data={doubleTakeHome}
+            onDataChange={setDoubleTakeHome}
+            onComplete={handleStep4Complete}
+            onSave={() => saveToLocalStorage('scalable_impact_double_take_home', doubleTakeHome)}
+          />
+        );
+      case 5:
+        return (
+          <BuildYourBoard
+            data={buildBoard}
+            onDataChange={setBuildBoard}
+            onComplete={() => {
+              handleNextStep();
+              toast({ title: 'Board Established 👥', description: 'You are now surrounded by mentors and peers—onward to acquisitions.' });
+            }}
+            onSave={() => saveToLocalStorage('scalable_impact_build_board', buildBoard)}
+          />
+        );
+      case 6:
+        return (
+          <ExpandThroughAcquisition
+            data={acqData}
+            onDataChange={setAcqData}
+            onComplete={() => {
+              handleNextStep();
+              toast({ title: 'Acquisition Complete 🧩', description: 'You’ve integrated your first expansion acquisition.' });
+            }}
+            onSave={() => saveToLocalStorage('scalable_impact_acquisition', acqData)}
           />
         );
       
@@ -392,7 +446,10 @@ const ScalableImpactPlanner: React.FC = () => {
               disabled={
                 (currentStep === 1 && !level1Data.isCompleted) ||
                 (currentStep === 2 && !growthFlywheel.isCompleted) ||
-                (currentStep === 3 && !osData.isCompleted)
+                (currentStep === 3 && !osData.isCompleted) ||
+                (currentStep === 4 && !doubleTakeHome.isCompleted) ||
+                (currentStep === 5 && !buildBoard.isCompleted) ||
+                (currentStep === 6 && !acqData.isCompleted)
               }
               className="gap-2"
             >
