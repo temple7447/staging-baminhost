@@ -11,6 +11,7 @@ import { CustomerDashboard } from '@/components/dashboard/CustomerDashboard';
 import { WalletDashboard } from '@/components/dashboard/WalletDashboard';
 import { EstateManagement } from '@/components/dashboard/business/EstateManagement';
 import { EstateDetailPage } from '@/components/dashboard/business/EstateDetailPage';
+import { TenantDetailPage } from '@/components/dashboard/business/TenantDetailPage';
 import { FillingStationManagement } from '@/components/dashboard/business/FillingStationManagement';
 import { EquipmentManagement } from '@/components/dashboard/business/EquipmentManagement';
 import { CRMDashboard } from '@/components/dashboard/CRMDashboard';
@@ -388,6 +389,20 @@ const DashboardRouter: React.FC = () => {
 
         {/* People */}
         <Route path="/people" element={<AdminPeople />} />
+
+        {/* Tenant Detail */}
+        <Route 
+          path="/tenant/:tenantId" 
+          element={
+            <ProtectedRoute
+              element={<TenantDetailPage />}
+              requiredPermissions={['view_estate']}
+              feature="Estate Management"
+              showUpgradePrompt={true}
+              viewName="estate"
+            />
+          } 
+        />
 
         {/* Redirect unknown paths to overview */}
         <Route path="*" element={<Navigate to="/dashboard/overview" replace />} />

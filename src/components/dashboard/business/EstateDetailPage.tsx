@@ -8,13 +8,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useGetEstateQuery, useGetEstateTenantsQuery, useCreateEstateTenantMutation } from '@/services/estatesApi';
+import { useGetEstateQuery, useGetEstateTenantsQuery, useCreateEstateTenantMutation, useGetEstateOverviewQuery } from '@/services/estatesApi';
 import { toast } from '@/components/ui/use-toast';
 
 export const EstateDetailPage = () => {
   const { estateId } = useParams();
   const navigate = useNavigate();
   const { data: estate, isLoading } = useGetEstateQuery(estateId as string, { skip: !estateId });
+  const { data: overviewData } = useGetEstateOverviewQuery(estateId as string, { skip: !estateId });
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [tenantSearch, setTenantSearch] = useState('');
@@ -67,32 +68,54 @@ const [tenantType, setTenantType] = useState<'new' | 'existing' | 'renewal' | 't
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>{estate?.name || '—'}</span>
-            {typeof estate?.totalUnits === 'number' && (
-              <Badge variant="secondary">{estate?.totalUnits} units</Badge>
+            <span>{overviewData?.data?.estate?.name || estate?.name || '—'}</span>
+            {typeof (overviewData?.data?.estate?.totalUnits ?? estate?.totalUnits) === 'number' && (
+              <Badge variant="secondary">{(overviewData?.data?.estate?.totalUnits ?? estate?.totalUnits) as number} units</Badge>
             )}
           </CardTitle>
-          {estate?.description && <CardDescription>{estate.description}</CardDescription>}
+          {overviewData?.data?.estate?.createdAt && (
+            <CardDescription>Created: {new Date(overviewData.data.estate.createdAt).toLocaleDateString()}</CardDescription>
+          )}
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="text-sm text-muted-foreground">Loading...</div>
-          ) : !estate ? (
-            <div className="text-sm text-muted-foreground">Estate not found.</div>
+          ) : !overviewData ? (
+            <div className="text-sm text-muted-foreground">No overview.</div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div>
-                <div className="text-muted-foreground">ID</div>
-                <div className="font-mono break-all">{estate.id}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Name</div>
-                <div className="font-medium">{estate.name}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Total Units</div>
-                <div className="font-medium">{estate.totalUnits ?? '—'}</div>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">Occupancy</CardTitle>
+                  <CardDescription>Total vs. occupied</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xl font-bold">{overviewData.data.occupancy.occupancyRate}%</div>
+                  <div className="text-xs text-muted-foreground">
+                    {overviewData.data.occupancy.occupiedUnits}/{overviewData.data.occupancy.totalUnits} occupied, {overviewData.data.occupancy.vacantUnits} vacant
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">Upcoming Billing</CardTitle>
+                  <CardDescription>Due soon</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xl font-bold">{overviewData.data.billing.upcomingDueCount}</div>
+                  <div className="text-xs text-muted-foreground">tenants with upcoming due</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">Last 30 days</CardTitle>
+                  <CardDescription>Revenue & transactions</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xl font-bold">₦{overviewData.data.billing.last30d.revenue.toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground">{overviewData.data.billing.last30d.transactions} transactions</div>
+                </CardContent>
+              </Card>
             </div>
           )}
         </CardContent>
@@ -199,9 +222,13 @@ const [tenantType, setTenantType] = useState<'new' | 'existing' | 'renewal' | 't
                 </TableHeader>
                 <TableBody>
                   {(Array.isArray(tenants) ? tenants : tenants.data).map((t) => (
-                    <TableRow key={t.id}>
+                    <TableRow key={(t.id || t._id) as string}>
                       <TableCell>{t.unitLabel || '—'}</TableCell>
-                      <TableCell className="font-medium">{t.tenantName}</TableCell>
+                      <TableCell className="font-medium">
+                        <button className="underline text-primary" onClick={()=>navigate(`/dashboard/tenant/${(t.id || t._id) as string}`)}>
+                          {t.tenantName}
+                        </button>
+                      </TableCell>
                       <TableCell>{typeof t.rentAmount === 'number' ? `₦${t.rentAmount.toLocaleString()}` : '—'}</TableCell>
                       <TableCell>{t.electricMeterNumber || '—'}</TableCell>
                       <TableCell>{t.status || '—'}</TableCell>

@@ -32,7 +32,8 @@ export interface PaginatedResponse<T> {
 }
 
 export interface Tenant {
-  id: string;
+  id?: string;
+  _id?: string;
   unitLabel?: string;
   tenantName: string;
   tenantEmail?: string;
@@ -42,6 +43,57 @@ export interface Tenant {
   electricMeterNumber?: string;
   status?: 'occupied' | 'vacant' | 'maintenance';
   nextDueDate?: string; // ISO YYYY-MM-DD
+}
+
+export interface TenantHistoryEntry {
+  id: string;
+  date: string; // ISO
+  action: string; // e.g., 'moved_in', 'renewed', 'transferred', 'updated_rent'
+  notes?: string;
+}
+
+export interface TenantTransactionEntry {
+  id: string;
+  date: string; // ISO
+  amount: number;
+  type: 'rent' | 'service' | 'misc';
+  status?: 'pending' | 'completed' | 'failed';
+  description?: string;
+}
+
+export interface TenantOverview {
+  name: string;
+  unit: string;
+  email?: string;
+  phone?: string;
+  rent?: number;
+  nextDue?: string; // ISO
+  meter?: string;
+  type?: 'new' | 'existing' | 'renewal' | 'transfer';
+  typeBadge?: string;
+  status?: string;
+}
+
+export interface TenantDetailResponse {
+  success: boolean;
+  data: {
+    tenant: Tenant;
+    overview: TenantOverview;
+    history?: TenantHistoryEntry[];
+    transactions?: TenantTransactionEntry[];
+    page?: number;
+    limit?: number;
+    total?: number;
+  };
+}
+
+export interface EstateOverviewResponse {
+  success: boolean;
+  data: {
+    estate: { _id: string; name: string; totalUnits: number; createdAt: string };
+    occupancy: { totalUnits: number; occupiedUnits: number; vacantUnits: number; occupancyRate: number };
+    billing: { upcomingDueCount: number; last30d: { revenue: number; transactions: number } };
+  };
 }
 
 export interface CreateTenantPayload {
@@ -111,6 +163,10 @@ export const estatesApi = createApi({
         { type: 'EstateList', id: 'LIST' },
       ],
     }),
+    getEstateOverview: builder.query<EstateOverviewResponse, string>({
+      query: (id) => `/api/estates/${id}/overview`,
+      providesTags: (result, error, id) => [{ type: 'Estate', id }],
+    }),
     createEstateTenant: builder.mutation<Tenant, { estateId: string; body: CreateTenantPayload }>({
       query: ({ estateId, body }) => ({ url: `/api/estates/${estateId}/tenants`, method: 'POST', body }),
       invalidatesTags: (result, error, { estateId }) => [
@@ -127,8 +183,18 @@ export const estatesApi = createApi({
         return `/api/tenants${qs.toString() ? `?${qs.toString()}` : ''}`;
       },
     }),
-    getTenant: builder.query<Tenant, string>({
-      query: (tenantId) => `/api/tenants/${tenantId}`,
+    getTenant: builder.query<TenantDetailResponse | { success: boolean; data: { tenant: Tenant; overview: TenantOverview } }, string | { id: string; expand?: string; page?: number; limit?: number }>({
+      query: (arg) => {
+        const id = typeof arg === 'string' ? arg : arg.id;
+        const qs = new URLSearchParams();
+        if (typeof arg !== 'string') {
+          if (arg.expand) qs.set('expand', arg.expand);
+          if (arg.page != null) qs.set('page', String(arg.page));
+          if (arg.limit != null) qs.set('limit', String(arg.limit));
+        }
+        const query = qs.toString();
+        return `/api/tenants/${id}${query ? `?${query}` : ''}`;
+      },
     }),
     updateTenant: builder.mutation<Tenant, { tenantId: string; rentAmount?: number; nextDueDate?: string } & Partial<Tenant>>({
       query: ({ tenantId, ...body }) => ({ url: `/api/tenants/${tenantId}`, method: 'PUT', body }),
@@ -136,6 +202,18 @@ export const estatesApi = createApi({
     }),
     deleteTenant: builder.mutation<{ success?: boolean }, string>({
       query: (tenantId) => ({ url: `/api/tenants/${tenantId}`, method: 'DELETE' }),
+    }),
+    getTenantHistory: builder.query<TenantHistoryEntry[], string>({
+      query: (tenantId) => `/api/tenants/${tenantId}/history`,
+    }),
+    getTenantTransactions: builder.query<TenantTransactionEntry[], { tenantId: string; page?: number; limit?: number } | string>({
+      query: (arg) => {
+        if (typeof arg === 'string') return `/api/tenants/${arg}/transactions`;
+        const qs = new URLSearchParams();
+        if (arg.page != null) qs.set('page', String(arg.page));
+        if (arg.limit != null) qs.set('limit', String(arg.limit));
+        return `/api/tenants/${arg.tenantId}/transactions${qs.toString() ? `?${qs.toString()}` : ''}`;
+      },
     }),
   }),
 });
@@ -147,9 +225,12 @@ export const {
   useCreateEstateMutation,
   useUpdateEstateMutation,
   useDeleteEstateMutation,
+  useGetEstateOverviewQuery,
   useCreateEstateTenantMutation,
   useGetTenantsQuery,
   useGetTenantQuery,
   useUpdateTenantMutation,
   useDeleteTenantMutation,
+  useGetTenantHistoryQuery,
+  useGetTenantTransactionsQuery,
 } = estatesApi;
