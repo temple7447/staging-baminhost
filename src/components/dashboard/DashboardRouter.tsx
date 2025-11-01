@@ -10,6 +10,7 @@ import { VendorDashboard } from '@/components/dashboard/VendorDashboard';
 import { CustomerDashboard } from '@/components/dashboard/CustomerDashboard';
 import { WalletDashboard } from '@/components/dashboard/WalletDashboard';
 import { EstateManagement } from '@/components/dashboard/business/EstateManagement';
+import { EstateDetailPage } from '@/components/dashboard/business/EstateDetailPage';
 import { FillingStationManagement } from '@/components/dashboard/business/FillingStationManagement';
 import { EquipmentManagement } from '@/components/dashboard/business/EquipmentManagement';
 import { CRMDashboard } from '@/components/dashboard/CRMDashboard';
@@ -180,6 +181,18 @@ const DashboardRouter: React.FC = () => {
           element={
             <ProtectedRoute
               element={<EstateManagement />}
+              requiredPermissions={['view_estate']}
+              feature="Estate Management"
+              showUpgradePrompt={true}
+              viewName="estate"
+            />
+          } 
+        />
+        <Route 
+          path="/estate/:estateId" 
+          element={
+            <ProtectedRoute
+              element={<EstateDetailPage />}
               requiredPermissions={['view_estate']}
               feature="Estate Management"
               showUpgradePrompt={true}

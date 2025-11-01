@@ -20,3 +20,12 @@ export {
   useUpdateMaterialViewMutation,
   useDownloadMaterialMutation,
 } from './materialsApi';
+export { estatesApi,
+  useGetEstatesQuery,
+  useGetEstateQuery,
+  useGetEstateTenantsQuery,
+  useCreateEstateMutation,
+  useUpdateEstateMutation,
+  useDeleteEstateMutation,
+  useCreateEstateTenantMutation,
+} from './estatesApi';

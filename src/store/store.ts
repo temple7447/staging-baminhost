@@ -3,6 +3,7 @@ import { authApi } from '../services/authApi';
 import { categoriesApi } from '../services/categoriesApi';
 import { materialsApi } from '../services/materialsApi';
 import { foldersApi } from '../services/foldersApi';
+import { estatesApi } from '../services/estatesApi';
 import authReducer from './authSlice';
 
 export const store = configureStore({
@@ -13,6 +14,7 @@ export const store = configureStore({
     [categoriesApi.reducerPath]: categoriesApi.reducer,
     [materialsApi.reducerPath]: materialsApi.reducer,
     [foldersApi.reducerPath]: foldersApi.reducer,
+    [estatesApi.reducerPath]: estatesApi.reducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
@@ -21,7 +23,8 @@ export const store = configureStore({
       authApi.middleware,
       categoriesApi.middleware,
       materialsApi.middleware,
-      foldersApi.middleware
+      foldersApi.middleware,
+      estatesApi.middleware
     ),
 });
 
