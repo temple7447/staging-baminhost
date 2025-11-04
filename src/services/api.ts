@@ -1,5 +1,5 @@
-// export const BASE_API_URL = 'http://localhost:5000';
-export const BASE_API_URL = 'https://bamihustle-backend-1.onrender.com';
+export const BASE_API_URL = 'http://localhost:5000';
+// export const BASE_API_URL = 'https://bamihustle-backend-1.onrender.com';
 
 // Simple API utility for non-RTK Query requests
 export const api = {
