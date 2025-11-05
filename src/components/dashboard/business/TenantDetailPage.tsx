@@ -1,9 +1,14 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useGetTenantQuery } from '@/services/estatesApi';
+import { TenantDetailSkeleton, TableSkeleton, PropertyMediaSkeleton } from '@/components/ui/skeletons';
+import { MediaUpload } from '@/components/ui/MediaUpload';
+import { PropertyMediaDisplay } from '@/components/ui/PropertyMediaDisplay';
+import { ComplaintSubmission } from '@/components/ui/ComplaintSubmission';
 
 export const TenantDetailPage = () => {
   const { tenantId } = useParams();
@@ -20,6 +25,36 @@ export const TenantDetailPage = () => {
   const historyLoading = isLoading && history.length === 0;
   const txLoading = isLoading && transactions.length === 0;
 
+  // Mock property media state (replace with actual API call)
+  const [propertyMedia, setPropertyMedia] = useState<any[]>([]);
+  const [mediaLoading, setMediaLoading] = useState(false);
+
+  const handleMediaUpload = async (files: any[]) => {
+    // Handle the uploaded files (integrate with your API)
+    console.log('Uploaded files:', files);
+    // For demo, we'll simulate adding to the media list
+    const newMedia = files.map(file => ({
+      id: Math.random().toString(36).substr(2, 9),
+      url: file.preview, // In real app, this would be the uploaded URL
+      type: file.type,
+      filename: file.file.name,
+      uploadedAt: new Date().toISOString()
+    }));
+    setPropertyMedia(prev => [...prev, ...newMedia]);
+  };
+
+  const handleComplaintSubmit = (complaint: any) => {
+    // Handle the submitted complaint (integrate with your API)
+    console.log('Complaint submitted:', complaint);
+    // In a real app, you would send this to your API
+    // Example: await submitComplaintMutation({ tenantId, complaint }).unwrap();
+  };
+
+  // Show full page skeleton while main data is loading
+  if (isLoading && !tenant) {
+    return <TenantDetailSkeleton />;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -32,16 +67,19 @@ export const TenantDetailPage = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>{overview?.name || tenant?.tenantName || '—'}</span>
-            {(overview?.typeBadge || tenant?.tenantType) && <Badge variant="secondary">{overview?.typeBadge || tenant?.tenantType}</Badge>}
-          </CardTitle>
-          {(overview?.unit || tenant?.unitLabel) && <CardDescription>Unit: {overview?.unit || tenant?.unitLabel}</CardDescription>}
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <CardTitle className="flex items-center gap-2 mb-1">
+                <span>{overview?.name || tenant?.tenantName || '—'}</span>
+                {(overview?.typeBadge || tenant?.tenantType) && <Badge variant="secondary">{overview?.typeBadge || tenant?.tenantType}</Badge>}
+              </CardTitle>
+              {(overview?.unit || tenant?.unitLabel) && <CardDescription>Unit: {overview?.unit || tenant?.unitLabel}</CardDescription>}
+            </div>
+            <ComplaintSubmission onSubmit={handleComplaintSubmit} />
+          </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="text-sm text-muted-foreground">Loading...</div>
-          ) : !tenant ? (
+          {!tenant ? (
             <div className="text-sm text-muted-foreground">Tenant not found.</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
@@ -76,12 +114,34 @@ export const TenantDetailPage = () => {
 
       <Card>
         <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Property Media</CardTitle>
+              <CardDescription>Initial property state documentation</CardDescription>
+            </div>
+            <MediaUpload onUpload={handleMediaUpload} maxImages={12} maxVideos={1} />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <PropertyMediaDisplay 
+            media={propertyMedia} 
+            isLoading={mediaLoading}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Tenancy History</CardTitle>
           <CardDescription>Lifecycle events for this tenant</CardDescription>
         </CardHeader>
         <CardContent>
           {historyLoading ? (
-            <div className="text-sm text-muted-foreground">Loading history...</div>
+            <TableSkeleton 
+              rows={3}
+              columns={3}
+              headers={["Date", "Action", "Notes"]}
+            />
           ) : history && history.length > 0 ? (
             <div className="rounded-md border overflow-hidden">
               <Table>
@@ -116,7 +176,11 @@ export const TenantDetailPage = () => {
         </CardHeader>
         <CardContent>
           {txLoading ? (
-            <div className="text-sm text-muted-foreground">Loading transactions...</div>
+            <TableSkeleton 
+              rows={4}
+              columns={5}
+              headers={["Date", "Type", "Status", "Amount", "Description"]}
+            />
           ) : transactions && transactions.length > 0 ? (
             <div className="rounded-md border overflow-hidden">
               <Table>

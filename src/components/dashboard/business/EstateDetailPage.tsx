@@ -10,18 +10,16 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGetEstateQuery, useGetEstateTenantsQuery, useCreateEstateTenantMutation, useGetEstateOverviewQuery } from '@/services/estatesApi';
 import { toast } from '@/components/ui/use-toast';
+import { EstateDetailSkeleton, TableSkeleton } from '@/components/ui/skeletons';
 
 export const EstateDetailPage = () => {
   const { estateId } = useParams();
   const navigate = useNavigate();
-  const { data: estate, isLoading } = useGetEstateQuery(estateId as string, { skip: !estateId });
-  const { data: overviewData } = useGetEstateOverviewQuery(estateId as string, { skip: !estateId });
+  
+  // All useState hooks must be called before any conditional returns
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [tenantSearch, setTenantSearch] = useState('');
-  const { data: tenants, isLoading: tenantsLoading } = useGetEstateTenantsQuery({ estateId: estateId as string, page, limit, search: tenantSearch || undefined }, { skip: !estateId });
-  const [createTenant, { isLoading: creating }] = useCreateEstateTenantMutation();
-
   // Add Tenant form state
   const [addOpen, setAddOpen] = useState(false);
   const [unitLabel, setUnitLabel] = useState('');
@@ -29,9 +27,20 @@ export const EstateDetailPage = () => {
   const [tenantEmail, setTenantEmail] = useState('');
   const [tenantPhone, setTenantPhone] = useState('');
   const [rentAmount, setRentAmount] = useState('');
-const [tenantType, setTenantType] = useState<'new' | 'existing' | 'renewal' | 'transfer'>('new');
+  const [tenantType, setTenantType] = useState<'new' | 'existing' | 'renewal' | 'transfer'>('new');
   const [meter, setMeter] = useState('');
   const [nextDue, setNextDue] = useState('');
+
+  // API hooks
+  const { data: estate, isLoading } = useGetEstateQuery(estateId as string, { skip: !estateId });
+  const { data: overviewData, isLoading: overviewLoading } = useGetEstateOverviewQuery(estateId as string, { skip: !estateId });
+  const { data: tenants, isLoading: tenantsLoading } = useGetEstateTenantsQuery({ estateId: estateId as string, page, limit, search: tenantSearch || undefined }, { skip: !estateId });
+  const [createTenant, { isLoading: creating }] = useCreateEstateTenantMutation();
+
+  // Show full page skeleton while main data is loading
+  if (isLoading || overviewLoading) {
+    return <EstateDetailSkeleton />;
+  }
 
   const submitTenant = async () => {
     if (!estateId || !tenantName.trim() || !unitLabel.trim() || !rentAmount) return;
@@ -78,9 +87,7 @@ const [tenantType, setTenantType] = useState<'new' | 'existing' | 'renewal' | 't
           )}
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="text-sm text-muted-foreground">Loading...</div>
-          ) : !overviewData ? (
+          {!overviewData ? (
             <div className="text-sm text-muted-foreground">No overview.</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -205,7 +212,11 @@ const [tenantType, setTenantType] = useState<'new' | 'existing' | 'renewal' | 't
         </CardHeader>
         <CardContent>
           {tenantsLoading ? (
-            <div className="text-sm text-muted-foreground">Loading tenants...</div>
+            <TableSkeleton 
+              rows={5}
+              columns={7}
+              headers={["Unit", "Tenant", "Rent", "Meter", "Status", "Next Due", "Contact"]}
+            />
           ) : tenants && ((Array.isArray(tenants) ? tenants.length : (tenants.data?.length || 0)) > 0) ? (
             <div className="rounded-md border overflow-hidden">
               <Table>
@@ -252,8 +263,8 @@ const [tenantType, setTenantType] = useState<'new' | 'existing' | 'renewal' | 't
               Page {Array.isArray(tenants) ? page : (tenants?.page ?? page)} of {Array.isArray(tenants) ? '-' : (tenants?.total && tenants?.limit ? Math.ceil(tenants.total / tenants.limit) : '-')}
             </div>
             <div className="space-x-2">
-              <Button variant="outline" size="sm" onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1 || tenantsLoading}>Previous</Button>
-              <Button variant="outline" size="sm" onClick={()=>setPage(p=>p+1)} disabled={tenantsLoading || (!Array.isArray(tenants) && tenants?.total ? page * (tenants?.limit ?? limit) >= tenants.total : false)}>Next</Button>
+              <Button variant="outline" size="sm" onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1}>Previous</Button>
+              <Button variant="outline" size="sm" onClick={()=>setPage(p=>p+1)} disabled={!Array.isArray(tenants) && tenants?.total ? page * (tenants?.limit ?? limit) >= tenants.total : false}>Next</Button>
             </div>
           </div>
         </CardContent>

@@ -10,6 +10,7 @@ import { useCreateEstateMutation, useGetEstatesQuery, useDeleteEstateMutation } 
 import { toast } from "@/components/ui/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
+import { EstateManagementSkeleton } from "@/components/ui/skeletons";
 
 
 interface Estate { id: string; name: string; description?: string }
@@ -36,6 +37,11 @@ export const EstateManagement = () => {
 
   // Estates options from API
   const estateOptions = estatesPage?.data ?? [];
+
+  // Show skeleton while loading
+  if (estatesLoading) {
+    return <EstateManagementSkeleton />;
+  }
 
 
   const handleCreateEstate = async () => {
@@ -136,9 +142,7 @@ export const EstateManagement = () => {
             />
           </div>
 
-          {estatesLoading ? (
-            <div className="text-sm text-muted-foreground">Loading estates...</div>
-          ) : estateOptions.length === 0 ? (
+          {estateOptions.length === 0 ? (
             <div className="text-sm text-muted-foreground">No estates found.</div>
           ) : (
             <div className="rounded-md border overflow-hidden">
@@ -205,7 +209,7 @@ export const EstateManagement = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1 || estatesLoading}
+                disabled={page <= 1}
               >
                 Previous
               </Button>
@@ -213,7 +217,7 @@ export const EstateManagement = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => setPage((p) => p + 1)}
-                disabled={estatesLoading || (estatesPage?.total ? page * (estatesPage?.limit ?? limit) >= estatesPage.total : false)}
+                disabled={estatesPage?.total ? page * (estatesPage?.limit ?? limit) >= estatesPage.total : false}
               >
                 Next
               </Button>
