@@ -23,9 +23,11 @@ export const EstateDetailPage = () => {
   // Add Tenant form state
   const [addOpen, setAddOpen] = useState(false);
   const [unitLabel, setUnitLabel] = useState('');
-  const [tenantName, setTenantName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [surname, setSurname] = useState('');
+  const [otherNames, setOtherNames] = useState('');
   const [tenantEmail, setTenantEmail] = useState('');
-  const [tenantPhone, setTenantPhone] = useState('');
+  const [whatsappNumber, setWhatsappNumber] = useState('');
   const [rentAmount, setRentAmount] = useState('');
   const [tenantType, setTenantType] = useState<'new' | 'existing' | 'renewal' | 'transfer'>('new');
   const [meter, setMeter] = useState('');
@@ -43,22 +45,34 @@ export const EstateDetailPage = () => {
   }
 
   const submitTenant = async () => {
-    if (!estateId || !tenantName.trim() || !unitLabel.trim() || !rentAmount) return;
+    if (!estateId || !firstName.trim() || !surname.trim() || !unitLabel.trim() || !rentAmount) return;
+    
+    // Format date from YYYY-MM-DD to DD/MM/YYYY
+    const formatDateForAPI = (dateStr: string) => {
+      if (!dateStr) return undefined;
+      const date = new Date(dateStr);
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
+    
     try {
       await createTenant({ estateId, body: {
         unitLabel: unitLabel.trim(),
-        tenantName: tenantName.trim(),
-        tenantEmail: tenantEmail || undefined,
-        tenantPhone: tenantPhone || undefined,
+        firstName: firstName.trim(),
+        surname: surname.trim(), 
+        otherNames: otherNames.trim() || undefined,
+        email: tenantEmail || undefined,
+        whatsapp: whatsappNumber || undefined,
         rentAmount: Number(rentAmount),
         tenantType,
         electricMeterNumber: meter || undefined,
-        nextDueDate: nextDue || undefined,
-        status: 'occupied',
+        nextDueDate: formatDateForAPI(nextDue),
       }}).unwrap();
       toast({ title: 'Tenant added' });
       setAddOpen(false);
-      setUnitLabel(''); setTenantName(''); setTenantEmail(''); setTenantPhone(''); setRentAmount(''); setTenantType('new'); setMeter(''); setNextDue('');
+      setUnitLabel(''); setFirstName(''); setSurname(''); setOtherNames(''); setTenantEmail(''); setWhatsappNumber(''); setRentAmount(''); setTenantType('new'); setMeter(''); setNextDue('');
     } catch (e) {
       toast({ title: 'Failed to add tenant', variant: 'destructive' });
     }
@@ -159,16 +173,24 @@ export const EstateDetailPage = () => {
                       <Input value={unitLabel} onChange={(e) => setUnitLabel(e.target.value)} placeholder="e.g. Unit 12" />
                     </div>
                     <div className="grid gap-2">
-                      <Label>Tenant name</Label>
-                      <Input value={tenantName} onChange={(e) => setTenantName(e.target.value)} />
+                      <Label>First name *</Label>
+                      <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First name" />
                     </div>
                     <div className="grid gap-2">
-                      <Label>Tenant email</Label>
-                      <Input type="email" value={tenantEmail} onChange={(e) => setTenantEmail(e.target.value)} />
+                      <Label>Surname *</Label>
+                      <Input value={surname} onChange={(e) => setSurname(e.target.value)} placeholder="Surname/Last name" />
                     </div>
                     <div className="grid gap-2">
-                      <Label>Tenant phone</Label>
-                      <Input type="tel" value={tenantPhone} onChange={(e) => setTenantPhone(e.target.value)} />
+                      <Label>Other names</Label>
+                      <Input value={otherNames} onChange={(e) => setOtherNames(e.target.value)} placeholder="Middle name(s)" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Email address</Label>
+                      <Input type="email" value={tenantEmail} onChange={(e) => setTenantEmail(e.target.value)} placeholder="email@example.com" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>WhatsApp number</Label>
+                      <Input type="tel" value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} placeholder="+234 801 234 5678" />
                     </div>
                     <div className="grid gap-2">
                       <Label>Rent amount (₦)</Label>
@@ -215,7 +237,7 @@ export const EstateDetailPage = () => {
             <TableSkeleton 
               rows={5}
               columns={7}
-              headers={["Unit", "Tenant", "Rent", "Meter", "Status", "Next Due", "Contact"]}
+              headers={["Unit", "Tenant", "Rent", "Meter", "Status", "Next Due", "WhatsApp"]}
             />
           ) : tenants && ((Array.isArray(tenants) ? tenants.length : (tenants.data?.length || 0)) > 0) ? (
             <div className="rounded-md border overflow-hidden">
@@ -228,7 +250,7 @@ export const EstateDetailPage = () => {
                     <TableHead>Meter</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Next Due</TableHead>
-                    <TableHead>Contact</TableHead>
+                    <TableHead>WhatsApp</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -237,7 +259,7 @@ export const EstateDetailPage = () => {
                       <TableCell>{t.unitLabel || '—'}</TableCell>
                       <TableCell className="font-medium">
                         <button className="underline text-primary" onClick={()=>navigate(`/dashboard/tenant/${(t.id || t._id) as string}`)}>
-                          {t.tenantName}
+                          {t.tenantName || `${t.firstName || ''} ${t.otherNames || ''} ${t.surname || ''}`.trim() || '—'}
                         </button>
                       </TableCell>
                       <TableCell>{typeof t.rentAmount === 'number' ? `₦${t.rentAmount.toLocaleString()}` : '—'}</TableCell>
@@ -245,9 +267,8 @@ export const EstateDetailPage = () => {
                       <TableCell>{t.status || '—'}</TableCell>
                       <TableCell>{t.nextDueDate || '—'}</TableCell>
                       <TableCell>
-                        <div className="text-xs text-muted-foreground space-y-0.5">
-                          <div>{t.tenantEmail || '—'}</div>
-                          <div>{t.tenantPhone || '—'}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {t.whatsapp || t.whatsappNumber || t.tenantPhone || '—'}
                         </div>
                       </TableCell>
                     </TableRow>

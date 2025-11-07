@@ -50,6 +50,27 @@ export const TenantDetailPage = () => {
     // Example: await submitComplaintMutation({ tenantId, complaint }).unwrap();
   };
 
+  // Extract media from tenant history
+  const getHistoryMedia = () => {
+    const movedInEntries = history.filter(h => h.action === 'moved_in' || (h as any).event === 'moved_in');
+    const photos: { url: string; public_id: string }[] = [];
+    const videos: { url: string; public_id: string }[] = [];
+    
+    movedInEntries.forEach(entry => {
+      const meta = (entry as any).meta;
+      if (meta?.photos) {
+        photos.push(...meta.photos);
+      }
+      if (meta?.videos) {
+        videos.push(...meta.videos);
+      }
+    });
+    
+    return { photos, videos };
+  };
+
+  const historyMedia = getHistoryMedia();
+
   // Show full page skeleton while main data is loading
   if (isLoading && !tenant) {
     return <TenantDetailSkeleton />;
@@ -70,7 +91,7 @@ export const TenantDetailPage = () => {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <CardTitle className="flex items-center gap-2 mb-1">
-                <span>{overview?.name || tenant?.tenantName || '—'}</span>
+                <span>{overview?.name || tenant?.tenantName || `${tenant?.firstName || ''} ${tenant?.otherNames || ''} ${tenant?.surname || ''}`.trim() || '—'}</span>
                 {(overview?.typeBadge || tenant?.tenantType) && <Badge variant="secondary">{overview?.typeBadge || tenant?.tenantType}</Badge>}
               </CardTitle>
               {(overview?.unit || tenant?.unitLabel) && <CardDescription>Unit: {overview?.unit || tenant?.unitLabel}</CardDescription>}
@@ -89,11 +110,11 @@ export const TenantDetailPage = () => {
               </div>
               <div>
                 <div className="text-muted-foreground">Email</div>
-                <div>{overview?.email || tenant?.tenantEmail || '—'}</div>
+                <div>{tenant?.email || overview?.email || tenant?.tenantEmail || '—'}</div>
               </div>
               <div>
-                <div className="text-muted-foreground">Phone</div>
-                <div>{overview?.phone || tenant?.tenantPhone || '—'}</div>
+                <div className="text-muted-foreground">WhatsApp</div>
+                <div>{tenant?.whatsapp || tenant?.whatsappNumber || overview?.phone || tenant?.tenantPhone || '—'}</div>
               </div>
               <div>
                 <div className="text-muted-foreground">Rent</div>
@@ -119,12 +140,18 @@ export const TenantDetailPage = () => {
               <CardTitle>Property Media</CardTitle>
               <CardDescription>Initial property state documentation</CardDescription>
             </div>
-            <MediaUpload onUpload={handleMediaUpload} maxImages={12} maxVideos={1} />
+            <MediaUpload 
+              tenantId={tenantId}
+              onUpload={handleMediaUpload} 
+              maxImages={12} 
+              maxVideos={1} 
+            />
           </div>
         </CardHeader>
         <CardContent>
           <PropertyMediaDisplay 
             media={propertyMedia} 
+            historyMedia={historyMedia}
             isLoading={mediaLoading}
           />
         </CardContent>
