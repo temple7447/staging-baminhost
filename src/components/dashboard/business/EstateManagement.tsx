@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { useCreateEstateMutation, useGetEstatesQuery, useDeleteEstateMutation } from "@/services/estatesApi";
+import { useCreateEstateMutation, useGetEstatesQuery, useDeleteEstateMutation, useUpdateEstateMutation } from "@/services/estatesApi";
 import { toast } from "@/components/ui/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +34,14 @@ export const EstateManagement = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [createEstate] = useCreateEstateMutation();
   const [deleteEstate] = useDeleteEstateMutation();
+  
+  // Edit Estate state
+  const [editOpen, setEditOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDesc, setEditDesc] = useState("");
+  const [editUnits, setEditUnits] = useState("");
+  const [updateEstate, { isLoading: updating }] = useUpdateEstateMutation();
 
   // Estates options from API
   const estateOptions = estatesPage?.data ?? [];
@@ -123,6 +131,45 @@ export const EstateManagement = () => {
         </div>
       </div>
 
+      {/* Edit Estate Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Estate</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-2">
+            <div className="grid gap-2">
+              <Label htmlFor="edit-estate-name">Estate name</Label>
+              <Input id="edit-estate-name" value={editName} onChange={(e)=>setEditName(e.target.value)} />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-estate-desc">Description (optional)</Label>
+              <Input id="edit-estate-desc" value={editDesc} onChange={(e)=>setEditDesc(e.target.value)} />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-estate-units">Total units</Label>
+              <Input id="edit-estate-units" type="number" min={1} value={editUnits} onChange={(e)=>setEditUnits(e.target.value)} />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="ghost" onClick={()=>setEditOpen(false)}>Cancel</Button>
+              <Button onClick={async()=>{
+                if (!editId) return;
+                const name = editName.trim();
+                const unitsNum = Number(editUnits);
+                if (!name || !Number.isFinite(unitsNum) || unitsNum <= 0) return;
+                try {
+                  await updateEstate({ id: editId, name, description: editDesc || undefined, totalUnits: unitsNum }).unwrap();
+                  toast({ title: 'Estate updated' });
+                  setEditOpen(false);
+                } catch (e) {
+                  toast({ title: 'Failed to update estate', variant: 'destructive' });
+                }
+              }} disabled={updating}>{updating ? 'Saving...' : 'Save'}</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Estates (from API) */}
       <Card>
         <CardHeader>
@@ -152,7 +199,7 @@ export const EstateManagement = () => {
                     <TableHead className="w-[40%]">Name</TableHead>
                     <TableHead className="w-[15%]">Total Units</TableHead>
                     <TableHead>Description</TableHead>
-                    <TableHead className="w-[140px] text-right">Actions</TableHead>
+                    <TableHead className="w-[220px] text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -170,8 +217,21 @@ export const EstateManagement = () => {
                         {est.description || <span className="text-muted-foreground">—</span>}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end items-center gap-2">
+                        <div className="flex flex-wrap justify-end items-center gap-2">
                           <Button variant="outline" size="sm" onClick={() => navigate(`/dashboard/estate/${est.id}`)}>View</Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setEditId(est.id);
+                              setEditName(est.name);
+                              setEditDesc(est.description || "");
+                              setEditUnits(typeof est.totalUnits === 'number' ? String(est.totalUnits) : "");
+                              setEditOpen(true);
+                            }}
+                          >
+                            Edit
+                          </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="destructive" size="sm" disabled={deletingId === est.id}>
