@@ -35,14 +35,20 @@ export interface Tenant {
   id?: string;
   _id?: string;
   unitLabel?: string;
-  tenantName: string;
-  tenantEmail?: string;
-  tenantPhone?: string;
+  tenantName?: string;  // Combined name for display (computed from firstName + otherNames + surname)
+  firstName?: string;
+  surname?: string;
+  otherNames?: string;
+  email?: string;
+  tenantEmail?: string;  // Legacy field
+  whatsapp?: string;
+  tenantPhone?: string;  // Legacy field  
+  whatsappNumber?: string;  // Legacy field
   rentAmount?: number;
   tenantType?: 'new' | 'existing' | 'renewal' | 'transfer';
   electricMeterNumber?: string;
   status?: 'occupied' | 'vacant' | 'maintenance';
-  nextDueDate?: string; // ISO YYYY-MM-DD
+  nextDueDate?: string;
 }
 
 export interface TenantHistoryEntry {
@@ -66,8 +72,9 @@ export interface TenantOverview {
   unit: string;
   email?: string;
   phone?: string;
+  whatsapp?: string;
   rent?: number;
-  nextDue?: string; // ISO
+  nextDue?: string;
   meter?: string;
   type?: 'new' | 'existing' | 'renewal' | 'transfer';
   typeBadge?: string;
@@ -98,14 +105,15 @@ export interface EstateOverviewResponse {
 
 export interface CreateTenantPayload {
   unitLabel: string;
-  tenantName: string;
-  tenantEmail?: string;
-  tenantPhone?: string;
+  firstName: string;
+  surname: string;
+  otherNames?: string;
+  email?: string;
+  whatsapp?: string;
   rentAmount: number;
   tenantType?: 'new' | 'existing' | 'renewal' | 'transfer';
   electricMeterNumber?: string;
-  status?: 'occupied' | 'vacant' | 'maintenance';
-  nextDueDate?: string; // ISO YYYY-MM-DD
+  nextDueDate?: string; // DD/MM/YYYY format
 }
 
 export const estatesApi = createApi({

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/components/ui/use-toast';
 import { X, Upload, Image, Video, Eye } from 'lucide-react';
+import { useUploadImageMutation, useUploadVideoMutation, useAddTenantHistoryMutation, MediaItem } from '@/services/uploadApi';
 
 interface MediaFile {
   id: string;
@@ -16,6 +17,7 @@ interface MediaFile {
 }
 
 interface MediaUploadProps {
+  tenantId?: string;
   onUpload?: (files: MediaFile[]) => void;
   maxImages?: number;
   maxVideos?: number;
@@ -23,6 +25,7 @@ interface MediaUploadProps {
 }
 
 export const MediaUpload = ({ 
+  tenantId,
   onUpload, 
   maxImages = 12, 
   maxVideos = 1,
@@ -31,8 +34,14 @@ export const MediaUpload = ({
   const [isOpen, setIsOpen] = useState(false);
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<string>('');
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
+  
+  // Upload mutations
+  const [uploadImage] = useUploadImageMutation();
+  const [uploadVideo] = useUploadVideoMutation();
+  const [addTenantHistory] = useAddTenantHistoryMutation();
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -116,11 +125,63 @@ export const MediaUpload = ({
       return;
     }
 
+    if (!tenantId) {
+      toast({
+        title: "No tenant selected",
+        description: "Unable to upload media without tenant ID.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setUploading(true);
     
     try {
-      // Simulate upload delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const uploadedPhotos: MediaItem[] = [];
+      const uploadedVideos: MediaItem[] = [];
+      
+      // Step 1: Upload all files to Cloudinary
+      for (let i = 0; i < mediaFiles.length; i++) {
+        const mediaFile = mediaFiles[i];
+        setUploadProgress(`Uploading ${i + 1}/${mediaFiles.length}: ${mediaFile.file.name}`);
+        
+        try {
+          if (mediaFile.type === 'image') {
+            const response = await uploadImage(mediaFile.file).unwrap();
+            uploadedPhotos.push({
+              url: response.data.secure_url,
+              public_id: response.data.public_id
+            });
+          } else if (mediaFile.type === 'video') {
+            const response = await uploadVideo(mediaFile.file).unwrap();
+            uploadedVideos.push({
+              url: response.data.secure_url,
+              public_id: response.data.public_id
+            });
+          }
+        } catch (uploadError) {
+          console.error(`Failed to upload ${mediaFile.file.name}:`, uploadError);
+          throw new Error(`Failed to upload ${mediaFile.file.name}`);
+        }
+      }
+      
+      // Step 2: Add to tenant history if we have uploads
+      if (uploadedPhotos.length > 0 || uploadedVideos.length > 0) {
+        setUploadProgress('Saving to tenant record...');
+        
+        const historyEntry = {
+          event: "moved_in",
+          note: "Initial condition before letting",
+          meta: {
+            condition: "initial",
+            takenAt: new Date().toISOString(),
+            ...(uploadedPhotos.length > 0 && { photos: uploadedPhotos }),
+            ...(uploadedVideos.length > 0 && { videos: uploadedVideos })
+          }
+        };
+        
+        await addTenantHistory({ tenantId, entry: historyEntry }).unwrap();
+      }
       
       if (onUpload) {
         onUpload(mediaFiles);
@@ -128,19 +189,21 @@ export const MediaUpload = ({
       
       toast({
         title: "Media uploaded successfully",
-        description: `${mediaFiles.length} file(s) uploaded for initial property state.`
+        description: `${mediaFiles.length} file(s) uploaded and attached to tenant record.`
       });
       
       setMediaFiles([]);
       setIsOpen(false);
     } catch (error) {
+      console.error('Upload error:', error);
       toast({
         title: "Upload failed",
-        description: "Failed to upload media files. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to upload media files. Please try again.",
         variant: "destructive"
       });
     } finally {
       setUploading(false);
+      setUploadProgress('');
     }
   };
 
@@ -301,7 +364,7 @@ export const MediaUpload = ({
               onClick={handleUpload}
               disabled={uploading || mediaFiles.length === 0}
             >
-              {uploading ? 'Uploading...' : `Upload ${mediaFiles.length} file(s)`}
+              {uploading ? (uploadProgress || 'Uploading...') : `Upload ${mediaFiles.length} file(s)`}
             </Button>
           </div>
         </div>

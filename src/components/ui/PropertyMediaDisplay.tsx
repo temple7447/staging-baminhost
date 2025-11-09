@@ -8,21 +8,27 @@ import { PropertyMediaSkeleton } from '@/components/ui/skeletons';
 import { Image, Video, ZoomIn, Play } from 'lucide-react';
 
 interface MediaItem {
-  id: string;
+  id?: string;
   url: string;
   type: 'image' | 'video';
   filename?: string;
   uploadedAt?: string;
+  public_id?: string;
 }
 
 interface PropertyMediaDisplayProps {
   media?: MediaItem[];
+  historyMedia?: {
+    photos?: { url: string; public_id: string }[];
+    videos?: { url: string; public_id: string }[];
+  };
   isLoading?: boolean;
   className?: string;
 }
 
 export const PropertyMediaDisplay = ({ 
   media = [], 
+  historyMedia,
   isLoading = false,
   className = "" 
 }: PropertyMediaDisplayProps) => {
@@ -32,7 +38,28 @@ export const PropertyMediaDisplay = ({
     return <PropertyMediaSkeleton />;
   }
 
-  if (media.length === 0) {
+  // Combine legacy media with history media
+  const allImages = [
+    ...media.filter(item => item.type === 'image'),
+    ...(historyMedia?.photos?.map(photo => ({
+      url: photo.url,
+      type: 'image' as const,
+      public_id: photo.public_id,
+      id: photo.public_id
+    })) || [])
+  ];
+  
+  const allVideos = [
+    ...media.filter(item => item.type === 'video'),
+    ...(historyMedia?.videos?.map(video => ({
+      url: video.url,
+      type: 'video' as const,
+      public_id: video.public_id,
+      id: video.public_id
+    })) || [])
+  ];
+
+  if (allImages.length === 0 && allVideos.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
         <div className="flex flex-col items-center space-y-2">
@@ -44,8 +71,8 @@ export const PropertyMediaDisplay = ({
     );
   }
 
-  const images = media.filter(item => item.type === 'image');
-  const videos = media.filter(item => item.type === 'video');
+  const images = allImages;
+  const videos = allVideos;
 
   return (
     <div className={`space-y-6 ${className}`}>
