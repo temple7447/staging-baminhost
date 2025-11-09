@@ -10,6 +10,8 @@ import { useCreateEstateMutation, useGetEstatesQuery, useDeleteEstateMutation, u
 import { toast } from "@/components/ui/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
 import { EstateManagementSkeleton } from "@/components/ui/skeletons";
 
 
@@ -199,7 +201,7 @@ export const EstateManagement = () => {
                     <TableHead className="w-[40%]">Name</TableHead>
                     <TableHead className="w-[15%]">Total Units</TableHead>
                     <TableHead>Description</TableHead>
-                    <TableHead className="w-[220px] text-right">Actions</TableHead>
+                    <TableHead className="w-[80px] text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -217,41 +219,50 @@ export const EstateManagement = () => {
                         {est.description || <span className="text-muted-foreground">—</span>}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex flex-wrap justify-end items-center gap-2">
-                          <Button variant="outline" size="sm" onClick={() => navigate(`/dashboard/estate/${est.id}`)}>View</Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setEditId(est.id);
-                              setEditName(est.name);
-                              setEditDesc(est.description || "");
-                              setEditUnits(typeof est.totalUnits === 'number' ? String(est.totalUnits) : "");
-                              setEditOpen(true);
-                            }}
-                          >
-                            Edit
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="destructive" size="sm" disabled={deletingId === est.id}>
-                                {deletingId === est.id ? 'Deleting...' : 'Delete'}
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete estate?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently delete the estate "{est.name}".
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDeleteEstate(est.id)}>Confirm</AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <MoreVertical className="h-4 w-4" />
+                              <span className="sr-only">Actions</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => navigate(`/dashboard/estate/${est.id}`)}>
+                              View
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setEditId(est.id);
+                                setEditName(est.name);
+                                setEditDesc(est.description || "");
+                                setEditUnits(typeof est.totalUnits === 'number' ? String(est.totalUnits) : "");
+                                setEditOpen(true);
+                              }}
+                            >
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} disabled={deletingId === est.id}>
+                                  {deletingId === est.id ? 'Deleting...' : 'Delete'}
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete estate?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete the estate "{est.name}".
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDeleteEstate(est.id)}>Confirm</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))}
