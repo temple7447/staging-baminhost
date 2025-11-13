@@ -67,6 +67,26 @@ export interface TenantTransactionEntry {
   description?: string;
 }
 
+// Payments
+export type PaymentType = 'deposit' | 'rent' | 'service-charge' | 'security-charge' | 'caution-fee' | 'legal-fee';
+export interface InitiatePaymentBody {
+  tenantId: string;
+  amount: number;
+  description?: string;
+}
+export interface InitiatePaymentResponse {
+  success: boolean;
+  message: string;
+  data: {
+    paymentId: string;
+    paymentLink: string;
+    reference: string;
+    accessCode: string;
+    amount: number;
+    tenant?: { name: string; unit: string };
+  };
+}
+
 export interface TenantOverview {
   name: string;
   unit: string;
@@ -103,17 +123,25 @@ export interface EstateOverviewResponse {
   };
 }
 
+// Units
+export interface EstateUnitFeature { name: string; value: string }
+export interface EstateUnit {
+  id?: string;
+  _id?: string;
+  label: string;
+  monthlyPrice: number;
+  meterNumber?: string;
+  description?: string;
+  features?: EstateUnitFeature[];
+}
+
 export interface CreateTenantPayload {
-  unitLabel: string;
-  firstName: string;
-  surname: string;
-  otherNames?: string;
-  email?: string;
-  whatsapp?: string;
-  rentAmount: number;
+  unitId: string;
+  tenantName: string;
+  tenantEmail?: string;
+  tenantPhone?: string;
   tenantType?: 'new' | 'existing' | 'renewal' | 'transfer';
-  electricMeterNumber?: string;
-  nextDueDate?: string; // DD/MM/YYYY format
+  nextDueDate?: string; // ISO YYYY-MM-DD
 }
 
 export const estatesApi = createApi({
@@ -179,6 +207,16 @@ export const estatesApi = createApi({
       query: ({ estateId, body }) => ({ url: `/api/estates/${estateId}/tenants`, method: 'POST', body }),
       invalidatesTags: (result, error, { estateId }) => [
         { type: 'EstateTenants', id: estateId },
+        { type: 'Estate', id: estateId },
+      ],
+    }),
+    createEstateUnit: builder.mutation<
+      EstateUnit | { success?: boolean },
+      { estateId: string; body: { label: string; monthlyPrice: number; meterNumber?: string; description?: string; features?: { name: string; value: string }[] } }
+    >({
+      query: ({ estateId, body }) => ({ url: `/api/estates/${estateId}/units`, method: 'POST', body }),
+      invalidatesTags: (result, error, { estateId }) => [
+        { type: 'Estate', id: estateId },
       ],
     }),
     // Global tenants endpoints
@@ -223,6 +261,16 @@ export const estatesApi = createApi({
         return `/api/tenants/${arg.tenantId}/transactions${qs.toString() ? `?${qs.toString()}` : ''}`;
       },
     }),
+    // Vacant units for an estate
+    getEstateVacantUnits: builder.query<{ success: boolean; data: { unitId: string; label: string; monthlyPrice: number; meterNumber?: string; status?: string; description?: string }[]; total?: number }, string>({
+      query: (estateId) => `/api/estates/${estateId}/units/vacant`,
+    }),
+    initiatePayment: builder.mutation<InitiatePaymentResponse, { type: PaymentType; body: InitiatePaymentBody }>({
+      query: ({ type, body }) => ({ url: `/api/payments/${type}`, method: 'POST', body }),
+    }),
+    verifyPayment: builder.query<{ success: boolean; message?: string; data?: any }, string>({
+      query: (reference) => `/api/payments/verify/${reference}`,
+    }),
   }),
 });
 
@@ -235,10 +283,14 @@ export const {
   useDeleteEstateMutation,
   useGetEstateOverviewQuery,
   useCreateEstateTenantMutation,
+  useCreateEstateUnitMutation,
+  useGetEstateVacantUnitsQuery,
   useGetTenantsQuery,
   useGetTenantQuery,
   useUpdateTenantMutation,
   useDeleteTenantMutation,
   useGetTenantHistoryQuery,
   useGetTenantTransactionsQuery,
+  useInitiatePaymentMutation,
+  useVerifyPaymentQuery,
 } = estatesApi;

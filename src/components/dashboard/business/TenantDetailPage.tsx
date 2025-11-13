@@ -4,7 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { useGetTenantQuery } from '@/services/estatesApi';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from '@/components/ui/use-toast';
+import { useGetTenantQuery, useInitiatePaymentMutation } from '@/services/estatesApi';
 import { TenantDetailSkeleton, TableSkeleton, PropertyMediaSkeleton } from '@/components/ui/skeletons';
 import { MediaUpload } from '@/components/ui/MediaUpload';
 import { PropertyMediaDisplay } from '@/components/ui/PropertyMediaDisplay';
@@ -24,6 +29,13 @@ export const TenantDetailPage = () => {
     : []) as { id: string; date: string; amount: number; type: string; status?: string; description?: string }[];
   const historyLoading = isLoading && history.length === 0;
   const txLoading = isLoading && transactions.length === 0;
+
+  // Payments state
+  const [payOpen, setPayOpen] = useState(false);
+  const [payType, setPayType] = useState<'deposit' | 'rent' | 'service-charge' | 'security-charge' | 'caution-fee' | 'legal-fee'>('rent');
+  const [payAmount, setPayAmount] = useState('');
+  const [payDesc, setPayDesc] = useState('');
+  const [initiatePayment, { isLoading: paying }] = useInitiatePaymentMutation();
 
   // Mock property media state (replace with actual API call)
   const [propertyMedia, setPropertyMedia] = useState<any[]>([]);
@@ -198,8 +210,76 @@ export const TenantDetailPage = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Transactions</CardTitle>
-          <CardDescription>Payments and charges</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Transactions</CardTitle>
+              <CardDescription>Payments and charges</CardDescription>
+            </div>
+            <Dialog open={payOpen} onOpenChange={setPayOpen}>
+              <DialogTrigger asChild>
+                <Button>Collect Payment</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Collect Payment</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-2">
+                  <div className="grid gap-2">
+                    <Label>Payment type</Label>
+                    <Select value={payType} onValueChange={(v: any)=>setPayType(v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="rent">Rent</SelectItem>
+                        <SelectItem value="deposit">Deposit</SelectItem>
+                        <SelectItem value="service-charge">Service Charge</SelectItem>
+                        <SelectItem value="security-charge">Security Charge</SelectItem>
+                        <SelectItem value="caution-fee">Caution Fee</SelectItem>
+                        <SelectItem value="legal-fee">Legal Fee</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Amount (₦)</Label>
+                    <Input type="number" value={payAmount} onChange={(e)=>setPayAmount(e.target.value)} placeholder="e.g. 150000" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Description (optional)</Label>
+                    <Input value={payDesc} onChange={(e)=>setPayDesc(e.target.value)} placeholder="Custom description" />
+                  </div>
+                  <div className="flex justify-end gap-2 pt-2">
+                    <Button variant="ghost" onClick={()=>setPayOpen(false)}>Cancel</Button>
+                    <Button
+                      onClick={async()=>{
+                        if (!tenantId) return;
+                        const amt = Number(payAmount);
+                        if (!Number.isFinite(amt) || amt <= 0) return;
+                        try {
+                          const res = await initiatePayment({ type: payType, body: { tenantId, amount: amt, description: payDesc || undefined } }).unwrap();
+                          toast({ title: 'Payment initiated', description: res.message || 'Redirecting to checkout...' });
+                          if (res?.data?.paymentLink) window.open(res.data.paymentLink, '_blank');
+                          // Navigate to success tracking page using reference so user can verify after completing checkout
+                          if (res?.data?.reference) {
+                            const ref = res.data.reference;
+                            navigate(`/dashboard/payment/success?reference=${encodeURIComponent(ref)}`);
+                          }
+                          setPayOpen(false);
+                          setPayAmount('');
+                          setPayDesc('');
+                        } catch (e) {
+                          toast({ title: 'Failed to initiate payment', variant: 'destructive' });
+                        }
+                      }}
+                      disabled={paying}
+                    >
+                      {paying ? 'Processing...' : 'Proceed to Pay'}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </CardHeader>
         <CardContent>
           {txLoading ? (

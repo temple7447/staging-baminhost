@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useGetEstateQuery, useGetEstateTenantsQuery, useCreateEstateTenantMutation, useGetEstateOverviewQuery } from '@/services/estatesApi';
+import { useGetEstateQuery, useGetEstateTenantsQuery, useCreateEstateTenantMutation, useGetEstateOverviewQuery, useCreateEstateUnitMutation, useGetEstateVacantUnitsQuery } from '@/services/estatesApi';
 import { toast } from '@/components/ui/use-toast';
 import { EstateDetailSkeleton, TableSkeleton } from '@/components/ui/skeletons';
 
@@ -22,57 +22,59 @@ export const EstateDetailPage = () => {
   const [tenantSearch, setTenantSearch] = useState('');
   // Add Tenant form state
   const [addOpen, setAddOpen] = useState(false);
-  const [unitLabel, setUnitLabel] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [surname, setSurname] = useState('');
-  const [otherNames, setOtherNames] = useState('');
+  const [selectedUnitId, setSelectedUnitId] = useState('');
+  const [tenantName, setTenantName] = useState('');
   const [tenantEmail, setTenantEmail] = useState('');
-  const [whatsappNumber, setWhatsappNumber] = useState('');
-  const [rentAmount, setRentAmount] = useState('');
+  const [tenantPhone, setTenantPhone] = useState('');
   const [tenantType, setTenantType] = useState<'new' | 'existing' | 'renewal' | 'transfer'>('new');
-  const [meter, setMeter] = useState('');
   const [nextDue, setNextDue] = useState('');
 
-  // API hooks
-  const { data: estate, isLoading } = useGetEstateQuery(estateId as string, { skip: !estateId });
-  const { data: overviewData, isLoading: overviewLoading } = useGetEstateOverviewQuery(estateId as string, { skip: !estateId });
-  const { data: tenants, isLoading: tenantsLoading } = useGetEstateTenantsQuery({ estateId: estateId as string, page, limit, search: tenantSearch || undefined }, { skip: !estateId });
-  const [createTenant, { isLoading: creating }] = useCreateEstateTenantMutation();
+  // Add Unit form state
+  const [unitOpen, setUnitOpen] = useState(false);
+  const [newUnitLabel, setNewUnitLabel] = useState('');
+  const [newUnitPrice, setNewUnitPrice] = useState('');
+  const [newUnitMeter, setNewUnitMeter] = useState('');
+  const [newUnitDesc, setNewUnitDesc] = useState('');
+  const [newUnitFeatures, setNewUnitFeatures] = useState<{ name: string; value: string }[]>([]);
 
-  // Show full page skeleton while main data is loading
-  if (isLoading || overviewLoading) {
+  // API hooks
+  const { data: estate, isLoading, isError: estateError, error: estateErrObj, refetch: refetchEstate } = useGetEstateQuery(estateId as string, { skip: !estateId });
+  const { data: overviewData, isLoading: overviewLoading, isError: overviewError } = useGetEstateOverviewQuery(estateId as string, { skip: !estateId });
+  const { data: tenants, isLoading: tenantsLoading, isError: tenantsError } = useGetEstateTenantsQuery({ estateId: estateId as string, page, limit, search: tenantSearch || undefined }, { skip: !estateId });
+  const { data: vacantUnits } = useGetEstateVacantUnitsQuery(estateId as string, { skip: !estateId });
+  const [createTenant, { isLoading: creating }] = useCreateEstateTenantMutation();
+  const [createUnit, { isLoading: savingUnit }] = useCreateEstateUnitMutation();
+
+  console.log(estate,estateId,  isLoading, "you are here");
+  // Show full page skeleton while main estate data is loading
+  if (isLoading) {
     return <EstateDetailSkeleton />;
+  }
+  // If estate failed to load, show a friendly error with retry
+  if (estateError || !estate) {
+    return (
+      <div className="max-w-3xl mx-auto py-12 text-center">
+        <h1 className="text-2xl font-semibold mb-2">Failed to load estate</h1>
+        <p className="text-muted-foreground mb-4">Please check the estate ID or try again.</p>
+        <Button onClick={() => refetchEstate()}>Retry</Button>
+      </div>
+    );
   }
 
   const submitTenant = async () => {
-    if (!estateId || !firstName.trim() || !surname.trim() || !unitLabel.trim() || !rentAmount) return;
-    
-    // Format date from YYYY-MM-DD to DD/MM/YYYY
-    const formatDateForAPI = (dateStr: string) => {
-      if (!dateStr) return undefined;
-      const date = new Date(dateStr);
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const year = date.getFullYear();
-      return `${day}/${month}/${year}`;
-    };
-    
+    if (!estateId || !tenantName.trim() || !selectedUnitId) return;
     try {
       await createTenant({ estateId, body: {
-        unitLabel: unitLabel.trim(),
-        firstName: firstName.trim(),
-        surname: surname.trim(), 
-        otherNames: otherNames.trim() || undefined,
-        email: tenantEmail || undefined,
-        whatsapp: whatsappNumber || undefined,
-        rentAmount: Number(rentAmount),
+        unitId: selectedUnitId,
+        tenantName: tenantName.trim(),
+        tenantEmail: tenantEmail || undefined,
+        tenantPhone: tenantPhone || undefined,
         tenantType,
-        electricMeterNumber: meter || undefined,
-        nextDueDate: formatDateForAPI(nextDue),
+        nextDueDate: nextDue || undefined,
       }}).unwrap();
       toast({ title: 'Tenant added' });
       setAddOpen(false);
-      setUnitLabel(''); setFirstName(''); setSurname(''); setOtherNames(''); setTenantEmail(''); setWhatsappNumber(''); setRentAmount(''); setTenantType('new'); setMeter(''); setNextDue('');
+      setSelectedUnitId(''); setTenantName(''); setTenantEmail(''); setTenantPhone(''); setTenantType('new'); setNextDue('');
     } catch (e) {
       toast({ title: 'Failed to add tenant', variant: 'destructive' });
     }
@@ -102,7 +104,7 @@ export const EstateDetailPage = () => {
         </CardHeader>
         <CardContent>
           {!overviewData ? (
-            <div className="text-sm text-muted-foreground">No overview.</div>
+            <div className="text-sm text-muted-foreground">{overviewError ? 'Failed to load overview.' : 'No overview.'}</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
@@ -111,7 +113,14 @@ export const EstateDetailPage = () => {
                   <CardDescription>Total vs. occupied</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl font-bold">{overviewData.data.occupancy.occupancyRate}%</div>
+                  <div className="text-xl font-bold">
+                    {(() => {
+                      const r = overviewData.data.occupancy.occupancyRate;
+                      if (typeof r !== 'number' || Number.isNaN(r)) return '—';
+                      const pct = Math.round(r * 100);
+                      return `${pct}%`;
+                    })()}
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     {overviewData.data.occupancy.occupiedUnits}/{overviewData.data.occupancy.totalUnits} occupied, {overviewData.data.occupancy.vacantUnits} vacant
                   </div>
@@ -159,6 +168,79 @@ export const EstateDetailPage = () => {
                 }}
                 className="w-48"
               />
+              <Dialog open={unitOpen} onOpenChange={setUnitOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Add Unit</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Unit</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
+                    <div className="grid gap-2">
+                      <Label>Unit label</Label>
+                      <Input value={newUnitLabel} onChange={(e)=>setNewUnitLabel(e.target.value)} placeholder="e.g. Unit 12" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Monthly price (₦)</Label>
+                      <Input type="number" value={newUnitPrice} onChange={(e)=>setNewUnitPrice(e.target.value)} placeholder="e.g. 150000" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Meter number (optional)</Label>
+                      <Input value={newUnitMeter} onChange={(e)=>setNewUnitMeter(e.target.value)} placeholder="e.g. EM-12345" />
+                    </div>
+                    <div className="grid gap-2 md:col-span-2">
+                      <Label>Unit description (optional)</Label>
+                      <Input value={newUnitDesc} onChange={(e)=>setNewUnitDesc(e.target.value)} placeholder="Short description of this unit" />
+                    </div>
+                    <div className="md:col-span-2 grid gap-2">
+                      <div className="flex items-center justify-between">
+                        <Label>Features (optional)</Label>
+                        <Button type="button" variant="outline" size="sm" onClick={()=>setNewUnitFeatures(f=>[...f,{ name:'', value:'' }])}>Add Feature</Button>
+                      </div>
+                      <div className="grid gap-2">
+                        {newUnitFeatures.length === 0 ? (
+                          <div className="text-sm text-muted-foreground">No features added.</div>
+                        ) : (
+                          newUnitFeatures.map((f, idx) => (
+                            <div key={idx} className="grid grid-cols-1 md:grid-cols-5 gap-2 items-center">
+                              <Input className="md:col-span-2" placeholder="Feature name (e.g. Bedrooms)" value={f.name} onChange={(e)=>{
+                                const v = e.target.value; setNewUnitFeatures(arr=>arr.map((it,i)=>i===idx?{...it,name:v}:it));
+                              }} />
+                              <Input className="md:col-span-2" placeholder="Value (e.g. 2)" value={f.value} onChange={(e)=>{
+                                const v = e.target.value; setNewUnitFeatures(arr=>arr.map((it,i)=>i===idx?{...it,value:v}:it));
+                              }} />
+                              <Button type="button" variant="ghost" onClick={()=>setNewUnitFeatures(arr=>arr.filter((_,i)=>i!==idx))}>Remove</Button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button variant="ghost" onClick={()=>setUnitOpen(false)}>Cancel</Button>
+                    <Button onClick={async()=>{
+                      if (!estateId) return;
+                      const label = newUnitLabel.trim();
+                      const price = Number(newUnitPrice);
+                      if (!label || !Number.isFinite(price) || price <= 0) return;
+                      try {
+                        await createUnit({ estateId, body: { label, monthlyPrice: price, meterNumber: newUnitMeter || undefined, description: newUnitDesc || undefined, features: newUnitFeatures.filter(f=>f.name.trim() && f.value.trim()).map(f=>({ name: f.name.trim(), value: f.value.trim() })) } }).unwrap();
+                        toast({ title: 'Unit added' });
+                        setUnitOpen(false);
+                        setNewUnitLabel('');
+                        setNewUnitPrice('');
+                        setNewUnitMeter('');
+                        setNewUnitDesc('');
+                        setNewUnitFeatures([]);
+                      } catch (e) {
+                        toast({ title: 'Failed to add unit', variant: 'destructive' });
+                      }
+                    }} disabled={savingUnit}>{savingUnit ? 'Saving...' : 'Save'}</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
               <Dialog open={addOpen} onOpenChange={setAddOpen}>
                 <DialogTrigger asChild>
                   <Button>Add Tenant</Button>
@@ -169,50 +251,43 @@ export const EstateDetailPage = () => {
                   </DialogHeader>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
                     <div className="grid gap-2">
-                      <Label>Unit label</Label>
-                      <Input value={unitLabel} onChange={(e) => setUnitLabel(e.target.value)} placeholder="e.g. Unit 12" />
+                      <Label>Unit</Label>
+                      <Select value={selectedUnitId} onValueChange={(v)=>setSelectedUnitId(v)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder={vacantUnits?.data?.length ? 'Select unit' : 'No vacant units'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(vacantUnits?.data ?? []).map((u)=> (
+                            <SelectItem key={u.unitId} value={u.unitId}>{u.label} — ₦{u.monthlyPrice.toLocaleString()}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="grid gap-2">
-                      <Label>First name *</Label>
-                      <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First name" />
+                      <Label>Tenant name</Label>
+                      <Input value={tenantName} onChange={(e) => setTenantName(e.target.value)} />
                     </div>
                     <div className="grid gap-2">
-                      <Label>Surname *</Label>
-                      <Input value={surname} onChange={(e) => setSurname(e.target.value)} placeholder="Surname/Last name" />
+                      <Label>Tenant email</Label>
+                      <Input type="email" value={tenantEmail} onChange={(e) => setTenantEmail(e.target.value)} />
                     </div>
                     <div className="grid gap-2">
-                      <Label>Other names</Label>
-                      <Input value={otherNames} onChange={(e) => setOtherNames(e.target.value)} placeholder="Middle name(s)" />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>Email address</Label>
-                      <Input type="email" value={tenantEmail} onChange={(e) => setTenantEmail(e.target.value)} placeholder="email@example.com" />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>WhatsApp number</Label>
-                      <Input type="tel" value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} placeholder="+234 801 234 5678" />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>Rent amount (₦)</Label>
-                      <Input type="number" value={rentAmount} onChange={(e) => setRentAmount(e.target.value)} />
+                      <Label>Tenant phone</Label>
+                      <Input type="tel" value={tenantPhone} onChange={(e) => setTenantPhone(e.target.value)} />
                     </div>
                     <div className="grid gap-2">
                       <Label>Tenant type</Label>
-<Select value={tenantType} onValueChange={(v: 'new' | 'existing' | 'renewal' | 'transfer') => setTenantType(v)}>
+                      <Select value={tenantType} onValueChange={(v: 'new' | 'existing' | 'renewal' | 'transfer') => setTenantType(v)}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                         <SelectContent>
-<SelectItem value="new">new</SelectItem>
+                          <SelectItem value="new">new</SelectItem>
                           <SelectItem value="existing">existing</SelectItem>
                           <SelectItem value="renewal">renewal</SelectItem>
                           <SelectItem value="transfer">transfer</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>Electric meter number</Label>
-                      <Input value={meter} onChange={(e) => setMeter(e.target.value)} />
                     </div>
                     <div className="grid gap-2">
                       <Label>Next due date</Label>
@@ -239,6 +314,8 @@ export const EstateDetailPage = () => {
               columns={7}
               headers={["Unit", "Tenant", "Rent", "Meter", "Status", "Next Due", "WhatsApp"]}
             />
+          ) : tenantsError ? (
+            <div className="text-sm text-destructive">Failed to load tenants.</div>
           ) : tenants && ((Array.isArray(tenants) ? tenants.length : (tenants.data?.length || 0)) > 0) ? (
             <div className="rounded-md border overflow-hidden">
               <Table>
