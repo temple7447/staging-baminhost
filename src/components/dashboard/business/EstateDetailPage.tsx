@@ -12,6 +12,15 @@ import { useGetEstateQuery, useGetEstateTenantsQuery, useCreateEstateTenantMutat
 import { toast } from '@/components/ui/use-toast';
 import { EstateDetailSkeleton, TableSkeleton } from '@/components/ui/skeletons';
 
+const formatDate = (value?: string | null) => {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return date.toLocaleDateString();
+};
+
 export const EstateDetailPage = () => {
   const { estateId } = useParams();
   const navigate = useNavigate();
@@ -27,12 +36,16 @@ export const EstateDetailPage = () => {
   const [tenantEmail, setTenantEmail] = useState('');
   const [tenantPhone, setTenantPhone] = useState('');
   const [tenantType, setTenantType] = useState<'new' | 'existing' | 'renewal' | 'transfer'>('new');
+  const [entryDate, setEntryDate] = useState('');
   const [nextDue, setNextDue] = useState('');
 
   // Add Unit form state
   const [unitOpen, setUnitOpen] = useState(false);
   const [newUnitLabel, setNewUnitLabel] = useState('');
   const [newUnitPrice, setNewUnitPrice] = useState('');
+  const [newUnitServiceCharge, setNewUnitServiceCharge] = useState('');
+  const [newUnitCautionFee, setNewUnitCautionFee] = useState('');
+  const [newUnitLegalFee, setNewUnitLegalFee] = useState('');
   const [newUnitMeter, setNewUnitMeter] = useState('');
   const [newUnitDesc, setNewUnitDesc] = useState('');
   const [newUnitFeatures, setNewUnitFeatures] = useState<{ name: string; value: string }[]>([]);
@@ -70,11 +83,12 @@ export const EstateDetailPage = () => {
         tenantEmail: tenantEmail || undefined,
         tenantPhone: tenantPhone || undefined,
         tenantType,
+        entryDate: entryDate || undefined,
         nextDueDate: nextDue || undefined,
       }}).unwrap();
       toast({ title: 'Tenant added' });
       setAddOpen(false);
-      setSelectedUnitId(''); setTenantName(''); setTenantEmail(''); setTenantPhone(''); setTenantType('new'); setNextDue('');
+      setSelectedUnitId(''); setTenantName(''); setTenantEmail(''); setTenantPhone(''); setTenantType('new'); setEntryDate(''); setNextDue('');
     } catch (e) {
       toast({ title: 'Failed to add tenant', variant: 'destructive' });
     }
@@ -179,19 +193,31 @@ export const EstateDetailPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
                     <div className="grid gap-2">
                       <Label>Unit label</Label>
-                      <Input value={newUnitLabel} onChange={(e)=>setNewUnitLabel(e.target.value)} placeholder="e.g. Unit 12" />
+                      <Input value={newUnitLabel} onChange={(e)=>setNewUnitLabel(e.target.value)} placeholder="e.g. Flat 2B" />
                     </div>
                     <div className="grid gap-2">
                       <Label>Monthly price (₦)</Label>
-                      <Input type="number" value={newUnitPrice} onChange={(e)=>setNewUnitPrice(e.target.value)} placeholder="e.g. 150000" />
+                      <Input type="number" value={newUnitPrice} onChange={(e)=>setNewUnitPrice(e.target.value)} placeholder="e.g. 80000" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Service charge (yearly, ₦)</Label>
+                      <Input type="number" value={newUnitServiceCharge} onChange={(e)=>setNewUnitServiceCharge(e.target.value)} placeholder="e.g. 60000" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Caution fee (₦)</Label>
+                      <Input type="number" value={newUnitCautionFee} onChange={(e)=>setNewUnitCautionFee(e.target.value)} placeholder="e.g. 50000" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Legal fee (₦)</Label>
+                      <Input type="number" value={newUnitLegalFee} onChange={(e)=>setNewUnitLegalFee(e.target.value)} placeholder="e.g. 30000" />
                     </div>
                     <div className="grid gap-2">
                       <Label>Meter number (optional)</Label>
-                      <Input value={newUnitMeter} onChange={(e)=>setNewUnitMeter(e.target.value)} placeholder="e.g. EM-12345" />
+                      <Input value={newUnitMeter} onChange={(e)=>setNewUnitMeter(e.target.value)} placeholder="e.g. MTR-123456" />
                     </div>
                     <div className="grid gap-2 md:col-span-2">
                       <Label>Unit description (optional)</Label>
-                      <Input value={newUnitDesc} onChange={(e)=>setNewUnitDesc(e.target.value)} placeholder="Short description of this unit" />
+                      <Input value={newUnitDesc} onChange={(e)=>setNewUnitDesc(e.target.value)} placeholder="2-bedroom flat upstairs" />
                     </div>
                     <div className="md:col-span-2 grid gap-2">
                       <div className="flex items-center justify-between">
@@ -223,13 +249,33 @@ export const EstateDetailPage = () => {
                       if (!estateId) return;
                       const label = newUnitLabel.trim();
                       const price = Number(newUnitPrice);
+                      const serviceCharge = Number(newUnitServiceCharge);
+                      const cautionFee = Number(newUnitCautionFee);
+                      const legalFee = Number(newUnitLegalFee);
                       if (!label || !Number.isFinite(price) || price <= 0) return;
                       try {
-                        await createUnit({ estateId, body: { label, monthlyPrice: price, meterNumber: newUnitMeter || undefined, description: newUnitDesc || undefined, features: newUnitFeatures.filter(f=>f.name.trim() && f.value.trim()).map(f=>({ name: f.name.trim(), value: f.value.trim() })) } }).unwrap();
+                        await createUnit({ 
+                          estateId, 
+                          body: { 
+                            label, 
+                            monthlyPrice: price, 
+                            serviceChargeYearly: Number.isFinite(serviceCharge) && serviceCharge > 0 ? serviceCharge : undefined,
+                            cautionFee: Number.isFinite(cautionFee) && cautionFee > 0 ? cautionFee : undefined,
+                            legalFee: Number.isFinite(legalFee) && legalFee > 0 ? legalFee : undefined,
+                            meterNumber: newUnitMeter || undefined, 
+                            description: newUnitDesc || undefined, 
+                            features: newUnitFeatures
+                              .filter(f=>f.name.trim() && f.value.trim())
+                              .map(f=>({ name: f.name.trim(), value: f.value.trim() })),
+                          } 
+                        }).unwrap();
                         toast({ title: 'Unit added' });
                         setUnitOpen(false);
                         setNewUnitLabel('');
                         setNewUnitPrice('');
+                        setNewUnitServiceCharge('');
+                        setNewUnitCautionFee('');
+                        setNewUnitLegalFee('');
                         setNewUnitMeter('');
                         setNewUnitDesc('');
                         setNewUnitFeatures([]);
@@ -290,6 +336,10 @@ export const EstateDetailPage = () => {
                       </Select>
                     </div>
                     <div className="grid gap-2">
+                      <Label>Entry date</Label>
+                      <Input type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} />
+                    </div>
+                    <div className="grid gap-2">
                       <Label>Next due date</Label>
                       <Input type="date" value={nextDue} onChange={(e) => setNextDue(e.target.value)} />
                     </div>
@@ -342,7 +392,7 @@ export const EstateDetailPage = () => {
                       <TableCell>{typeof t.rentAmount === 'number' ? `₦${t.rentAmount.toLocaleString()}` : '—'}</TableCell>
                       <TableCell>{t.electricMeterNumber || '—'}</TableCell>
                       <TableCell>{t.status || '—'}</TableCell>
-                      <TableCell>{t.nextDueDate || '—'}</TableCell>
+                      <TableCell>{t.nextDueDate ? formatDate(t.nextDueDate as string) : '—'}</TableCell>
                       <TableCell>
                         <div className="text-xs text-muted-foreground">
                           {t.whatsapp || t.whatsappNumber || t.tenantPhone || '—'}

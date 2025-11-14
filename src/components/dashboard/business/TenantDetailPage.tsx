@@ -9,16 +9,27 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
-import { useGetTenantQuery, useInitiatePaymentMutation } from '@/services/estatesApi';
+import { useGetTenantQuery, useGetTenantBillingQuery, useInitiatePaymentMutation } from '@/services/estatesApi';
 import { TenantDetailSkeleton, TableSkeleton, PropertyMediaSkeleton } from '@/components/ui/skeletons';
 import { MediaUpload } from '@/components/ui/MediaUpload';
 import { PropertyMediaDisplay } from '@/components/ui/PropertyMediaDisplay';
 import { ComplaintSubmission } from '@/components/ui/ComplaintSubmission';
 
+const formatDate = (value?: string | null) => {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    // Fallback to original value if parsing fails
+    return value;
+  }
+  return date.toLocaleDateString();
+};
+
 export const TenantDetailPage = () => {
   const { tenantId } = useParams();
   const navigate = useNavigate();
   const { data: detail, isLoading } = useGetTenantQuery(tenantId ? { id: tenantId as string, expand: 'history,transactions' } : ('' as unknown as { id: string }), { skip: !tenantId });
+  const { data: billingData } = useGetTenantBillingQuery(tenantId as string, { skip: !tenantId });
   const tenant = detail?.data?.tenant;
   const overview = detail?.data?.overview;
   const history = (detail && typeof (detail as { data?: { history?: { id: string; date: string; action: string; notes?: string }[] } }).data?.history !== 'undefined'
@@ -30,11 +41,27 @@ export const TenantDetailPage = () => {
   const historyLoading = isLoading && history.length === 0;
   const txLoading = isLoading && transactions.length === 0;
 
+  const billingItems = billingData?.data?.items ?? [];
+  const getBillingItemForType = (
+    type: 'deposit' | 'rent' | 'service-charge' | 'security-charge' | 'caution-fee' | 'legal-fee'
+  ) => {
+    switch (type) {
+      case 'rent':
+        return billingItems.find((i) => i.code === 'rent');
+      case 'service-charge':
+        return billingItems.find((i) => i.code === 'service_charge');
+      case 'caution-fee':
+        return billingItems.find((i) => i.code === 'caution_fee');
+      case 'legal-fee':
+        return billingItems.find((i) => i.code === 'legal_fee');
+      default:
+        return undefined;
+    }
+  };
+
   // Payments state
   const [payOpen, setPayOpen] = useState(false);
   const [payType, setPayType] = useState<'deposit' | 'rent' | 'service-charge' | 'security-charge' | 'caution-fee' | 'legal-fee'>('rent');
-  const [payAmount, setPayAmount] = useState('');
-  const [payDesc, setPayDesc] = useState('');
   const [initiatePayment, { isLoading: paying }] = useInitiatePaymentMutation();
 
   // Mock property media state (replace with actual API call)
@@ -134,7 +161,7 @@ export const TenantDetailPage = () => {
               </div>
               <div>
                 <div className="text-muted-foreground">Next Due</div>
-                <div>{overview?.nextDue || tenant?.nextDueDate || '—'}</div>
+                <div>{formatDate((overview as any)?.nextDue || tenant?.nextDueDate)}</div>
               </div>
               <div>
                 <div className="text-muted-foreground">Meter</div>
@@ -191,15 +218,15 @@ export const TenantDetailPage = () => {
                     <TableHead>Notes</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
+                  <TableBody>
                   {history.map((h) => (
                     <TableRow key={h.id}>
-                      <TableCell>{h.date}</TableCell>
+                      <TableCell>{formatDate(h.date)}</TableCell>
                       <TableCell className="font-medium">{h.action}</TableCell>
                       <TableCell>{h.notes || '—'}</TableCell>
                     </TableRow>
                   ))}
-                </TableBody>
+                  </TableBody>
               </Table>
             </div>
           ) : (
@@ -232,7 +259,6 @@ export const TenantDetailPage = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="rent">Rent</SelectItem>
-                        <SelectItem value="deposit">Deposit</SelectItem>
                         <SelectItem value="service-charge">Service Charge</SelectItem>
                         <SelectItem value="security-charge">Security Charge</SelectItem>
                         <SelectItem value="caution-fee">Caution Fee</SelectItem>
@@ -240,23 +266,19 @@ export const TenantDetailPage = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="grid gap-2">
-                    <Label>Amount (₦)</Label>
-                    <Input type="number" value={payAmount} onChange={(e)=>setPayAmount(e.target.value)} placeholder="e.g. 150000" />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>Description (optional)</Label>
-                    <Input value={payDesc} onChange={(e)=>setPayDesc(e.target.value)} placeholder="Custom description" />
-                  </div>
                   <div className="flex justify-end gap-2 pt-2">
                     <Button variant="ghost" onClick={()=>setPayOpen(false)}>Cancel</Button>
                     <Button
                       onClick={async()=>{
                         if (!tenantId) return;
-                        const amt = Number(payAmount);
-                        if (!Number.isFinite(amt) || amt <= 0) return;
+                        const item = getBillingItemForType(payType);
+                        if (!item) {
+                          toast({ title: 'Billing info not available for this payment type', variant: 'destructive' });
+                          return;
+                        }
+                        const amt = item.amount;
                         try {
-                          const res = await initiatePayment({ type: payType, body: { tenantId, amount: amt, description: payDesc || undefined } }).unwrap();
+                          const res = await initiatePayment({ type: payType, body: { tenantId, amount: amt, description: item.label } }).unwrap();
                           toast({ title: 'Payment initiated', description: res.message || 'Redirecting to checkout...' });
                           if (res?.data?.paymentLink) window.open(res.data.paymentLink, '_blank');
                           // Navigate to success tracking page using reference so user can verify after completing checkout
@@ -265,8 +287,6 @@ export const TenantDetailPage = () => {
                             navigate(`/dashboard/payment/success?reference=${encodeURIComponent(ref)}`);
                           }
                           setPayOpen(false);
-                          setPayAmount('');
-                          setPayDesc('');
                         } catch (e) {
                           toast({ title: 'Failed to initiate payment', variant: 'destructive' });
                         }
@@ -303,7 +323,7 @@ export const TenantDetailPage = () => {
                 <TableBody>
                   {transactions.map((t) => (
                     <TableRow key={t.id}>
-                      <TableCell>{t.date}</TableCell>
+                      <TableCell>{formatDate(t.date)}</TableCell>
                       <TableCell className="font-medium">{t.type}</TableCell>
                       <TableCell>{t.status || '—'}</TableCell>
                       <TableCell className="text-right">₦{t.amount.toLocaleString()}</TableCell>

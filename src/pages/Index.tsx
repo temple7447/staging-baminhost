@@ -31,10 +31,19 @@ import ScalableImpactPlanner from "@/components/scalable-impact/ScalableImpactPl
 import DashboardRouter from "@/components/dashboard/DashboardRouter";
 
 const Index = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isInitializing } = useAuth();
   const { canAccessNavigation, hasPermission } = usePermissions();
   const [currentView, setCurrentView] = useState("overview");
   const location = useLocation();
+
+  // Wait for auth initialization to complete before deciding
+  if (isInitializing) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-sm text-muted-foreground">Loading your dashboard...</p>
+      </div>
+    );
+  }
 
   // Redirect to login if not authenticated
   if (!isAuthenticated || !user) {

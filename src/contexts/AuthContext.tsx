@@ -20,6 +20,7 @@ interface AuthContextType {
   login: (token: string, user: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  isInitializing: boolean;
 }
 
 // Token management utilities
@@ -49,6 +50,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const [token, setToken] = useState<string | null>(() => getStoredToken());
+  const [isInitializing, setIsInitializing] = useState(true);
 
   // Initialize auth state from localStorage
   useEffect(() => {
@@ -70,6 +72,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         logout();
       }
     }
+
+    setIsInitializing(false);
   }, []);
 
   const login = (token: string, user: User) => {
@@ -92,7 +96,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       token,
       login,
       logout,
-      isAuthenticated: !!user && !!token
+      isAuthenticated: !!user && !!token,
+      isInitializing,
     }}>
       {children}
     </AuthContext.Provider>

@@ -67,6 +67,28 @@ export interface TenantTransactionEntry {
   description?: string;
 }
 
+// Tenant billing
+export interface TenantBillingItem {
+  code: string; // e.g. 'rent', 'service_charge', 'caution_fee', 'legal_fee'
+  label: string;
+  amount: number;
+  frequency: string; // 'monthly' | 'once'
+  type: string; // 'recurring' | 'one_time'
+}
+
+export interface TenantBillingResponse {
+  success: boolean;
+  data: {
+    tenant: {
+      id: string;
+      name: string;
+      type: string;
+      unit: string;
+    };
+    items: TenantBillingItem[];
+  };
+}
+
 // Payments
 export type PaymentType = 'deposit' | 'rent' | 'service-charge' | 'security-charge' | 'caution-fee' | 'legal-fee';
 export interface InitiatePaymentBody {
@@ -212,7 +234,16 @@ export const estatesApi = createApi({
     }),
     createEstateUnit: builder.mutation<
       EstateUnit | { success?: boolean },
-      { estateId: string; body: { label: string; monthlyPrice: number; meterNumber?: string; description?: string; features?: { name: string; value: string }[] } }
+      { estateId: string; body: { 
+        label: string; 
+        monthlyPrice: number; 
+        serviceChargeYearly?: number;
+        cautionFee?: number;
+        legalFee?: number;
+        meterNumber?: string; 
+        description?: string; 
+        features?: { name: string; value: string }[]; 
+      } }
     >({
       query: ({ estateId, body }) => ({ url: `/api/estates/${estateId}/units`, method: 'POST', body }),
       invalidatesTags: (result, error, { estateId }) => [
@@ -261,6 +292,9 @@ export const estatesApi = createApi({
         return `/api/tenants/${arg.tenantId}/transactions${qs.toString() ? `?${qs.toString()}` : ''}`;
       },
     }),
+    getTenantBilling: builder.query<TenantBillingResponse, string>({
+      query: (tenantId) => `/api/tenants/${tenantId}/billing`,
+    }),
     // Vacant units for an estate
     getEstateVacantUnits: builder.query<{ success: boolean; data: { unitId: string; label: string; monthlyPrice: number; meterNumber?: string; status?: string; description?: string }[]; total?: number }, string>({
       query: (estateId) => `/api/estates/${estateId}/units/vacant`,
@@ -291,6 +325,7 @@ export const {
   useDeleteTenantMutation,
   useGetTenantHistoryQuery,
   useGetTenantTransactionsQuery,
+  useGetTenantBillingQuery,
   useInitiatePaymentMutation,
   useVerifyPaymentQuery,
 } = estatesApi;
