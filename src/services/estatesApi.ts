@@ -177,7 +177,7 @@ export const estatesApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Estate', 'EstateList', 'EstateTenants'],
+  tagTypes: ['Estate', 'EstateList', 'EstateTenants', 'EstateUnits', 'Tenant', 'TenantList'],
   endpoints: (builder) => ({
     getEstates: builder.query<PaginatedResponse<Estate>, EstateListParams | void>({
       query: (params = {}) => {
@@ -230,6 +230,7 @@ export const estatesApi = createApi({
       invalidatesTags: (result, error, { estateId }) => [
         { type: 'EstateTenants', id: estateId },
         { type: 'Estate', id: estateId },
+        { type: 'TenantList', id: 'LIST' },
       ],
     }),
     createEstateUnit: builder.mutation<
@@ -237,7 +238,7 @@ export const estatesApi = createApi({
       { estateId: string; body: { 
         label: string; 
         monthlyPrice: number; 
-        serviceChargeYearly?: number;
+        serviceChargeMonthly?: number;
         cautionFee?: number;
         legalFee?: number;
         meterNumber?: string; 
@@ -259,6 +260,13 @@ export const estatesApi = createApi({
         if (params?.search) qs.set('search', params.search);
         return `/api/tenants${qs.toString() ? `?${qs.toString()}` : ''}`;
       },
+      providesTags: (result) =>
+        result && Array.isArray(result.data)
+          ? [
+              ...result.data.map((t) => ({ type: 'Tenant' as const, id: (t.id || t._id) as string })),
+              { type: 'TenantList' as const, id: 'LIST' },
+            ]
+          : [{ type: 'TenantList' as const, id: 'LIST' }],
     }),
     getTenant: builder.query<TenantDetailResponse | { success: boolean; data: { tenant: Tenant; overview: TenantOverview } }, string | { id: string; expand?: string; page?: number; limit?: number }>({
       query: (arg) => {
@@ -272,16 +280,32 @@ export const estatesApi = createApi({
         const query = qs.toString();
         return `/api/tenants/${id}${query ? `?${query}` : ''}`;
       },
+      providesTags: (result, error, arg) => {
+        const id = typeof arg === 'string' ? arg : arg.id;
+        return [
+          { type: 'Tenant' as const, id },
+          { type: 'TenantList' as const, id: 'LIST' },
+        ];
+      },
     }),
     updateTenant: builder.mutation<Tenant, { tenantId: string; rentAmount?: number; nextDueDate?: string } & Partial<Tenant>>({
       query: ({ tenantId, ...body }) => ({ url: `/api/tenants/${tenantId}`, method: 'PUT', body }),
-      invalidatesTags: (result, error, { tenantId }) => [{ type: 'EstateTenants', id: tenantId }],
+      invalidatesTags: (result, error, { tenantId }) => [
+        { type: 'EstateTenants', id: tenantId },
+        { type: 'Tenant', id: tenantId },
+        { type: 'TenantList', id: 'LIST' },
+      ],
     }),
     deleteTenant: builder.mutation<{ success?: boolean }, string>({
       query: (tenantId) => ({ url: `/api/tenants/${tenantId}`, method: 'DELETE' }),
+      invalidatesTags: (result, error, tenantId) => [
+        { type: 'Tenant', id: tenantId },
+        { type: 'TenantList', id: 'LIST' },
+      ],
     }),
     getTenantHistory: builder.query<TenantHistoryEntry[], string>({
       query: (tenantId) => `/api/tenants/${tenantId}/history`,
+      providesTags: (result, error, tenantId) => [{ type: 'Tenant' as const, id: tenantId }],
     }),
     getTenantTransactions: builder.query<TenantTransactionEntry[], { tenantId: string; page?: number; limit?: number } | string>({
       query: (arg) => {
@@ -291,16 +315,39 @@ export const estatesApi = createApi({
         if (arg.limit != null) qs.set('limit', String(arg.limit));
         return `/api/tenants/${arg.tenantId}/transactions${qs.toString() ? `?${qs.toString()}` : ''}`;
       },
+      providesTags: (result, error, arg) => {
+        const tenantId = typeof arg === 'string' ? arg : arg.tenantId;
+        return [{ type: 'Tenant' as const, id: tenantId }];
+      },
     }),
     getTenantBilling: builder.query<TenantBillingResponse, string>({
       query: (tenantId) => `/api/tenants/${tenantId}/billing`,
+      providesTags: (result, error, tenantId) => [{ type: 'Tenant' as const, id: tenantId }],
     }),
     // Vacant units for an estate
     getEstateVacantUnits: builder.query<{ success: boolean; data: { unitId: string; label: string; monthlyPrice: number; meterNumber?: string; status?: string; description?: string }[]; total?: number }, string>({
       query: (estateId) => `/api/estates/${estateId}/units/vacant`,
+      providesTags: (result, error, estateId) => [
+        { type: 'EstateUnits' as const, id: estateId },
+      ],
+    }),
+    clearEstateUnitTenant: builder.mutation<{ success?: boolean }, { estateId: string; unitId: string }>({
+      query: ({ estateId, unitId }) => ({
+        url: `/api/estates/${estateId}/units/${unitId}/remove-tenant`,
+        method: 'POST',
+      }),
+      invalidatesTags: (result, error, { estateId }) => [
+        { type: 'EstateTenants', id: estateId },
+        { type: 'EstateUnits', id: estateId },
+        { type: 'Estate', id: estateId },
+        { type: 'TenantList', id: 'LIST' },
+      ],
     }),
     initiatePayment: builder.mutation<InitiatePaymentResponse, { type: PaymentType; body: InitiatePaymentBody }>({
       query: ({ type, body }) => ({ url: `/api/payments/${type}`, method: 'POST', body }),
+      invalidatesTags: (result, error, { body }) => [
+        { type: 'Tenant' as const, id: body.tenantId },
+      ],
     }),
     verifyPayment: builder.query<{ success: boolean; message?: string; data?: any }, string>({
       query: (reference) => `/api/payments/verify/${reference}`,
@@ -319,6 +366,7 @@ export const {
   useCreateEstateTenantMutation,
   useCreateEstateUnitMutation,
   useGetEstateVacantUnitsQuery,
+  useClearEstateUnitTenantMutation,
   useGetTenantsQuery,
   useGetTenantQuery,
   useUpdateTenantMutation,

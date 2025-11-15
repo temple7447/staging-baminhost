@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useGetEstateQuery, useGetEstateTenantsQuery, useCreateEstateTenantMutation, useGetEstateOverviewQuery, useCreateEstateUnitMutation, useGetEstateVacantUnitsQuery } from '@/services/estatesApi';
+import { useGetEstateQuery, useGetEstateTenantsQuery, useCreateEstateTenantMutation, useGetEstateOverviewQuery, useCreateEstateUnitMutation, useGetEstateVacantUnitsQuery, useDeleteTenantMutation, useClearEstateUnitTenantMutation } from '@/services/estatesApi';
 import { toast } from '@/components/ui/use-toast';
 import { EstateDetailSkeleton, TableSkeleton } from '@/components/ui/skeletons';
 
@@ -57,6 +57,8 @@ export const EstateDetailPage = () => {
   const { data: vacantUnits } = useGetEstateVacantUnitsQuery(estateId as string, { skip: !estateId });
   const [createTenant, { isLoading: creating }] = useCreateEstateTenantMutation();
   const [createUnit, { isLoading: savingUnit }] = useCreateEstateUnitMutation();
+  const [deleteTenant, { isLoading: deletingTenant }] = useDeleteTenantMutation();
+  const [clearUnitTenant, { isLoading: clearingUnit }] = useClearEstateUnitTenantMutation();
 
   console.log(estate,estateId,  isLoading, "you are here");
   // Show full page skeleton while main estate data is loading
@@ -200,8 +202,8 @@ export const EstateDetailPage = () => {
                       <Input type="number" value={newUnitPrice} onChange={(e)=>setNewUnitPrice(e.target.value)} placeholder="e.g. 80000" />
                     </div>
                     <div className="grid gap-2">
-                      <Label>Service charge (yearly, ₦)</Label>
-                      <Input type="number" value={newUnitServiceCharge} onChange={(e)=>setNewUnitServiceCharge(e.target.value)} placeholder="e.g. 60000" />
+                      <Label>Service charge (monthly,  a5)</Label>
+                      <Input type="number" value={newUnitServiceCharge} onChange={(e)=>setNewUnitServiceCharge(e.target.value)} placeholder="e.g. 5000" />
                     </div>
                     <div className="grid gap-2">
                       <Label>Caution fee (₦)</Label>
@@ -259,7 +261,7 @@ export const EstateDetailPage = () => {
                           body: { 
                             label, 
                             monthlyPrice: price, 
-                            serviceChargeYearly: Number.isFinite(serviceCharge) && serviceCharge > 0 ? serviceCharge : undefined,
+                            serviceChargeMonthly: Number.isFinite(serviceCharge) && serviceCharge > 0 ? serviceCharge : undefined,
                             cautionFee: Number.isFinite(cautionFee) && cautionFee > 0 ? cautionFee : undefined,
                             legalFee: Number.isFinite(legalFee) && legalFee > 0 ? legalFee : undefined,
                             meterNumber: newUnitMeter || undefined, 
@@ -378,6 +380,7 @@ export const EstateDetailPage = () => {
                     <TableHead>Status</TableHead>
                     <TableHead>Next Due</TableHead>
                     <TableHead>WhatsApp</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -396,6 +399,43 @@ export const EstateDetailPage = () => {
                       <TableCell>
                         <div className="text-xs text-muted-foreground">
                           {t.whatsapp || t.whatsappNumber || t.tenantPhone || '—'}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate(`/dashboard/tenant/${(t.id || t._id) as string}`)}
+                          >
+                            View
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            disabled={clearingUnit || !estateId}
+                            onClick={async () => {
+                              if (!estateId) return;
+                              const unitId = ((t as any).unit && (t as any).unit._id)
+                                || (t as any).unitId
+                                || undefined;
+                              if (!unitId) {
+                                toast({ title: 'No unitId found for this tenant', variant: 'destructive' });
+                                return;
+                              }
+                              try {
+                                await clearUnitTenant({
+                                  estateId: estateId as string,
+                                  unitId,
+                                }).unwrap();
+                                toast({ title: 'Unit vacated, tenant cleared' });
+                              } catch (e) {
+                                toast({ title: 'Failed to vacate unit', variant: 'destructive' });
+                              }
+                            }}
+                          >
+                            {clearingUnit ? 'Vacating...' : 'Vacate Unit'}
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>

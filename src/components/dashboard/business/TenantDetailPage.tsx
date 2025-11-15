@@ -122,7 +122,9 @@ export const TenantDetailPage = () => {
           <h1 className="text-3xl font-bold">Tenant Overview</h1>
           <p className="text-muted-foreground">Profile, history, and transactions</p>
         </div>
-        <Button variant="outline" onClick={() => navigate(-1)}>Back</Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => navigate(-1)}>Back</Button>
+        </div>
       </div>
 
       <Card>
