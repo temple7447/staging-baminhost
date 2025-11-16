@@ -32,6 +32,7 @@ export const TenantDetailPage = () => {
   const { data: billingData } = useGetTenantBillingQuery(tenantId as string, { skip: !tenantId });
   const tenant = detail?.data?.tenant;
   const overview = detail?.data?.overview;
+  console.log('Tenant detail data:', detail, tenant, overview);
   const history = (detail && typeof (detail as { data?: { history?: { id: string; date: string; action: string; notes?: string }[] } }).data?.history !== 'undefined'
     ? ((detail as { data: { history: { id: string; date: string; action: string; notes?: string }[] } }).data.history)
     : []) as { id: string; date: string; action: string; notes?: string }[];
@@ -168,6 +169,51 @@ export const TenantDetailPage = () => {
               <div>
                 <div className="text-muted-foreground">Meter</div>
                 <div>{overview?.meter || tenant?.electricMeterNumber || '—'}</div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Pricing Breakdown</CardTitle>
+          <CardDescription>Rent and associated fees</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!overview && !tenant ? (
+            <div className="text-sm text-muted-foreground">No pricing info.</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <div className="text-muted-foreground">Rent (tenant)</div>
+                <div>{typeof (overview?.rent ?? tenant?.rentAmount) === 'number'
+                  ? `₦${(overview?.rent ?? tenant?.rentAmount)!.toLocaleString()}`
+                  : '—'}</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground">Unit monthly price</div>
+                <div>{typeof overview?.unitMonthlyPrice === 'number'
+                  ? `₦${overview.unitMonthlyPrice.toLocaleString()}`
+                  : '—'}</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground">Service charge (monthly)</div>
+                <div>{typeof overview?.serviceChargeMonthly === 'number'
+                  ? `₦${overview.serviceChargeMonthly.toLocaleString()}`
+                  : '—'}</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground">Caution fee</div>
+                <div>{typeof overview?.cautionFee === 'number'
+                  ? `₦${overview.cautionFee.toLocaleString()}`
+                  : '—'}</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground">Legal fee</div>
+                <div>{typeof overview?.legalFee === 'number'
+                  ? `₦${overview.legalFee.toLocaleString()}`
+                  : '—'}</div>
               </div>
             </div>
           )}

@@ -37,7 +37,7 @@ export const EstateDetailPage = () => {
   const [tenantPhone, setTenantPhone] = useState('');
   const [tenantType, setTenantType] = useState<'new' | 'existing' | 'renewal' | 'transfer'>('new');
   const [entryDate, setEntryDate] = useState('');
-  const [nextDue, setNextDue] = useState('');
+  const [durationMonths, setDurationMonths] = useState('');
 
   // Add Unit form state
   const [unitOpen, setUnitOpen] = useState(false);
@@ -79,6 +79,7 @@ export const EstateDetailPage = () => {
   const submitTenant = async () => {
     if (!estateId || !tenantName.trim() || !selectedUnitId) return;
     try {
+      const duration = Number(durationMonths);
       await createTenant({ estateId, body: {
         unitId: selectedUnitId,
         tenantName: tenantName.trim(),
@@ -86,11 +87,12 @@ export const EstateDetailPage = () => {
         tenantPhone: tenantPhone || undefined,
         tenantType,
         entryDate: entryDate || undefined,
-        nextDueDate: nextDue || undefined,
+        durationMonths: Number.isFinite(duration) && duration > 0 ? duration : undefined,
+        // nextDueDate will be computed by the backend when durationMonths is provided
       }}).unwrap();
       toast({ title: 'Tenant added' });
       setAddOpen(false);
-      setSelectedUnitId(''); setTenantName(''); setTenantEmail(''); setTenantPhone(''); setTenantType('new'); setEntryDate(''); setNextDue('');
+      setSelectedUnitId(''); setTenantName(''); setTenantEmail(''); setTenantPhone(''); setTenantType('new'); setEntryDate(''); setDurationMonths('');
     } catch (e) {
       toast({ title: 'Failed to add tenant', variant: 'destructive' });
     }
@@ -342,8 +344,14 @@ export const EstateDetailPage = () => {
                       <Input type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} />
                     </div>
                     <div className="grid gap-2">
-                      <Label>Next due date</Label>
-                      <Input type="date" value={nextDue} onChange={(e) => setNextDue(e.target.value)} />
+                      <Label>Duration (months)</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        value={durationMonths}
+                        onChange={(e) => setDurationMonths(e.target.value)}
+                        placeholder="e.g. 4"
+                      />
                     </div>
                   </div>
                   <div className="flex justify-end gap-2">

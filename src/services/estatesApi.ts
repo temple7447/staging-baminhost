@@ -115,7 +115,12 @@ export interface TenantOverview {
   email?: string;
   phone?: string;
   whatsapp?: string;
-  rent?: number;
+  // Pricing breakdown
+  rent?: number;                 // tenant.rentAmount (what you actually charge this tenant)
+  unitMonthlyPrice?: number;     // unit.monthlyPrice (base unit price)
+  serviceChargeMonthly?: number; // unit.serviceChargeMonthly
+  cautionFee?: number;           // unit.cautionFee
+  legalFee?: number;             // unit.legalFee
   nextDue?: string;
   meter?: string;
   type?: 'new' | 'existing' | 'renewal' | 'transfer';
@@ -163,7 +168,10 @@ export interface CreateTenantPayload {
   tenantEmail?: string;
   tenantPhone?: string;
   tenantType?: 'new' | 'existing' | 'renewal' | 'transfer';
-  nextDueDate?: string; // ISO YYYY-MM-DD
+  entryDate?: string; // ISO YYYY-MM-DD (when tenant moves in)
+  durationMonths?: number; // how many months until next rent is due
+  // nextDueDate is now computed by the backend when durationMonths is provided
+  nextDueDate?: string; // ISO YYYY-MM-DD (optional override if durationMonths is not provided)
 }
 
 export const estatesApi = createApi({
