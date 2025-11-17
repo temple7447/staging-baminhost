@@ -351,6 +351,16 @@ export const estatesApi = createApi({
         { type: 'TenantList', id: 'LIST' },
       ],
     }),
+    updateEstateUnit: builder.mutation<
+      { success?: boolean },
+      { unitId: string; body: { monthlyPrice?: number; serviceChargeMonthly?: number; cautionFee?: number; legalFee?: number } }
+    >({
+      query: ({ unitId, body }) => ({ url: `/api/estates/unit/${unitId}`, method: 'PUT', body }),
+      invalidatesTags: (result, error, { unitId }) => [
+        { type: 'EstateUnits', id: unitId },
+        { type: 'TenantList', id: 'LIST' },
+      ],
+    }),
     initiatePayment: builder.mutation<InitiatePaymentResponse, { type: PaymentType; body: InitiatePaymentBody }>({
       query: ({ type, body }) => ({ url: `/api/payments/${type}`, method: 'POST', body }),
       invalidatesTags: (result, error, { body }) => [
@@ -375,6 +385,7 @@ export const {
   useCreateEstateUnitMutation,
   useGetEstateVacantUnitsQuery,
   useClearEstateUnitTenantMutation,
+  useUpdateEstateUnitMutation,
   useGetTenantsQuery,
   useGetTenantQuery,
   useUpdateTenantMutation,

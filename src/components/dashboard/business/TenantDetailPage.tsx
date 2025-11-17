@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
-import { useGetTenantQuery, useGetTenantBillingQuery, useInitiatePaymentMutation } from '@/services/estatesApi';
+import { useGetTenantQuery, useGetTenantBillingQuery, useInitiatePaymentMutation, useUpdateTenantMutation, useUpdateEstateUnitMutation } from '@/services/estatesApi';
 import { TenantDetailSkeleton, TableSkeleton, PropertyMediaSkeleton } from '@/components/ui/skeletons';
 import { MediaUpload } from '@/components/ui/MediaUpload';
 import { PropertyMediaDisplay } from '@/components/ui/PropertyMediaDisplay';
@@ -32,7 +32,8 @@ export const TenantDetailPage = () => {
   const { data: billingData } = useGetTenantBillingQuery(tenantId as string, { skip: !tenantId });
   const tenant = detail?.data?.tenant;
   const overview = detail?.data?.overview;
-  console.log('Tenant detail data:', detail, tenant, overview);
+  const [updateTenant, { isLoading: updatingTenant }] = useUpdateTenantMutation();
+  const [updateUnit, { isLoading: updatingUnit }] = useUpdateEstateUnitMutation();
   const history = (detail && typeof (detail as { data?: { history?: { id: string; date: string; action: string; notes?: string }[] } }).data?.history !== 'undefined'
     ? ((detail as { data: { history: { id: string; date: string; action: string; notes?: string }[] } }).data.history)
     : []) as { id: string; date: string; action: string; notes?: string }[];
@@ -62,6 +63,24 @@ export const TenantDetailPage = () => {
 
   // Payments state
   const [payOpen, setPayOpen] = useState(false);
+  const [editTenantOpen, setEditTenantOpen] = useState(false);
+  const [editPricingOpen, setEditPricingOpen] = useState(false);
+
+  // Tenant edit state
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editType, setEditType] = useState<'new' | 'existing' | 'renewal' | 'transfer'>('new');
+  const [editRent, setEditRent] = useState('');
+  const [editEntryDate, setEditEntryDate] = useState('');
+  const [editNextDue, setEditNextDue] = useState('');
+  const [editMeter, setEditMeter] = useState('');
+
+  // Unit pricing edit state
+  const [editMonthlyPrice, setEditMonthlyPrice] = useState('');
+  const [editServiceCharge, setEditServiceCharge] = useState('');
+  const [editCautionFee, setEditCautionFee] = useState('');
+  const [editLegalFee, setEditLegalFee] = useState('');
   const [payType, setPayType] = useState<'deposit' | 'rent' | 'service-charge' | 'security-charge' | 'caution-fee' | 'legal-fee'>('rent');
   const [initiatePayment, { isLoading: paying }] = useInitiatePaymentMutation();
 
@@ -124,6 +143,104 @@ export const TenantDetailPage = () => {
           <p className="text-muted-foreground">Profile, history, and transactions</p>
         </div>
         <div className="flex items-center gap-2">
+          <Dialog
+            open={editTenantOpen}
+            onOpenChange={(open) => {
+              setEditTenantOpen(open);
+              if (open && tenant) {
+                setEditName(overview?.name || tenant.tenantName || '');
+                setEditEmail(tenant.email || overview?.email || tenant.tenantEmail || '');
+                setEditPhone(tenant.whatsapp || tenant.whatsappNumber || overview?.phone || tenant.tenantPhone || '');
+                setEditType((tenant.tenantType as any) || 'new');
+                setEditRent(tenant.rentAmount != null ? String(tenant.rentAmount) : '');
+                setEditEntryDate((tenant as any).entryDate || '');
+                setEditNextDue(tenant.nextDueDate || (overview as any)?.nextDue || '');
+                setEditMeter(overview?.meter || tenant.electricMeterNumber || '');
+              }
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">Edit Tenant</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Tenant</DialogTitle>
+              </DialogHeader>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2 text-sm">
+                <div className="grid gap-2">
+                  <Label>Name</Label>
+                  <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Email</Label>
+                  <Input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Phone / WhatsApp</Label>
+                  <Input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Tenant type</Label>
+                  <Select value={editType} onValueChange={(v: any) => setEditType(v)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="new">new</SelectItem>
+                      <SelectItem value="existing">existing</SelectItem>
+                      <SelectItem value="renewal">renewal</SelectItem>
+                      <SelectItem value="transfer">transfer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label>Rent amount (₦)</Label>
+                  <Input type="number" value={editRent} onChange={(e) => setEditRent(e.target.value)} />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Entry date</Label>
+                  <Input type="date" value={editEntryDate} onChange={(e) => setEditEntryDate(e.target.value)} />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Next due date</Label>
+                  <Input type="date" value={editNextDue} onChange={(e) => setEditNextDue(e.target.value)} />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Meter</Label>
+                  <Input value={editMeter} onChange={(e) => setEditMeter(e.target.value)} />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="ghost" onClick={() => setEditTenantOpen(false)}>Cancel</Button>
+                <Button
+                  onClick={async () => {
+                    if (!tenantId) return;
+                    try {
+                      const rentNum = Number(editRent);
+                      await updateTenant({
+                        tenantId: tenantId as string,
+                        tenantName: editName || undefined,
+                        tenantEmail: editEmail || undefined,
+                        tenantPhone: editPhone || undefined,
+                        tenantType: editType,
+                        rentAmount: Number.isFinite(rentNum) && rentNum > 0 ? rentNum : undefined,
+                        entryDate: editEntryDate || undefined,
+                        nextDueDate: editNextDue || undefined,
+                        electricMeterNumber: editMeter || undefined,
+                      } as any).unwrap();
+                      toast({ title: 'Tenant updated' });
+                      setEditTenantOpen(false);
+                    } catch (e) {
+                      toast({ title: 'Failed to update tenant', variant: 'destructive' });
+                    }
+                  }}
+                  disabled={updatingTenant}
+                >
+                  {updatingTenant ? 'Saving...' : 'Save changes'}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
           <Button variant="outline" onClick={() => navigate(-1)}>Back</Button>
         </div>
       </div>
@@ -177,8 +294,86 @@ export const TenantDetailPage = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Pricing Breakdown</CardTitle>
-          <CardDescription>Rent and associated fees</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Pricing Breakdown</CardTitle>
+              <CardDescription>Rent and associated fees</CardDescription>
+            </div>
+            <Dialog
+              open={editPricingOpen}
+              onOpenChange={(open) => {
+                setEditPricingOpen(open);
+                if (open && (overview || tenant)) {
+                  const o: any = overview || {};
+                  setEditMonthlyPrice(o.unitMonthlyPrice != null ? String(o.unitMonthlyPrice) : '');
+                  setEditServiceCharge(o.serviceChargeMonthly != null ? String(o.serviceChargeMonthly) : '');
+                  setEditCautionFee(o.cautionFee != null ? String(o.cautionFee) : '');
+                  setEditLegalFee(o.legalFee != null ? String(o.legalFee) : '');
+                }
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">Edit Pricing</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Edit Unit Pricing</DialogTitle>
+                </DialogHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2 text-sm">
+                  <div className="grid gap-2">
+                    <Label>Unit monthly price (₦)</Label>
+                    <Input type="number" value={editMonthlyPrice} onChange={(e) => setEditMonthlyPrice(e.target.value)} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Service charge (monthly, ₦)</Label>
+                    <Input type="number" value={editServiceCharge} onChange={(e) => setEditServiceCharge(e.target.value)} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Caution fee (₦)</Label>
+                    <Input type="number" value={editCautionFee} onChange={(e) => setEditCautionFee(e.target.value)} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Legal fee (₦)</Label>
+                    <Input type="number" value={editLegalFee} onChange={(e) => setEditLegalFee(e.target.value)} />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button variant="ghost" onClick={() => setEditPricingOpen(false)}>Cancel</Button>
+                  <Button
+                    onClick={async () => {
+                      const unitId = (tenant && (tenant as any).unit && (tenant as any).unit._id) || (detail as any)?.data?.unit?._id;
+                      if (!unitId) {
+                        toast({ title: 'No unitId available for this tenant', variant: 'destructive' });
+                        return;
+                      }
+                      try {
+                        const price = Number(editMonthlyPrice);
+                        const svc = Number(editServiceCharge);
+                        const caution = Number(editCautionFee);
+                        const legal = Number(editLegalFee);
+                        await updateUnit({
+                          unitId,
+                          body: {
+                            monthlyPrice: Number.isFinite(price) && price > 0 ? price : undefined,
+                            serviceChargeMonthly: Number.isFinite(svc) && svc >= 0 ? svc : undefined,
+                            cautionFee: Number.isFinite(caution) && caution >= 0 ? caution : undefined,
+                            legalFee: Number.isFinite(legal) && legal >= 0 ? legal : undefined,
+                          },
+                        }).unwrap();
+                        toast({ title: 'Unit pricing updated' });
+                        setEditPricingOpen(false);
+                      } catch (e) {
+                        toast({ title: 'Failed to update pricing', variant: 'destructive' });
+                      }
+                    }}
+                    disabled={updatingUnit}
+                  >
+                    {updatingUnit ? 'Saving...' : 'Save changes'}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </CardHeader>
         <CardContent>
           {!overview && !tenant ? (
