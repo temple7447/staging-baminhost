@@ -22,7 +22,10 @@ const formatDate = (value?: string | null) => {
     // Fallback to original value if parsing fails
     return value;
   }
-  return date.toLocaleDateString();
+  const day = date.getDate();
+  const month = date.toLocaleString('en-US', { month: 'long' }).toLowerCase();
+  const year = date.getFullYear();
+  return `${day} ${month}, ${year}`;
 };
 
 export const TenantDetailPage = () => {

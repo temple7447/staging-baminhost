@@ -365,11 +365,12 @@ export const CustomerDashboard = () => {
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    const d = new Date(dateString);
+    if (Number.isNaN(d.getTime())) return dateString;
+    const day = d.getDate();
+    const month = d.toLocaleString('en-US', { month: 'long' }).toLowerCase();
+    const year = d.getFullYear();
+    return `${day} ${month}, ${year}`;
   };
 
   const getStatusBadge = (status: string) => {
