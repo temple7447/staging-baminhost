@@ -1,6 +1,8 @@
-export { authApi, useLoginMutation } from './authApi';
-export { 
-  categoriesApi, 
+export { authApi, useLoginMutation, useUpdateSuperadminEmailMutation, useUpdatePasswordMutation } from './authApi';
+
+
+export {
+  categoriesApi,
   useGetCategoriesQuery,
   useGetCategoryQuery,
   useCreateCategoryMutation,
@@ -20,7 +22,8 @@ export {
   useUpdateMaterialViewMutation,
   useDownloadMaterialMutation,
 } from './materialsApi';
-export { estatesApi,
+export {
+  estatesApi,
   useGetEstatesQuery,
   useGetEstateQuery,
   useGetEstateTenantsQuery,
@@ -36,3 +39,24 @@ export { estatesApi,
   useGetTenantHistoryQuery,
   useGetTenantTransactionsQuery,
 } from './estatesApi';
+
+export {
+  scalableImpactApi,
+  useGetNotificationsQuery,
+  useGetNotificationPreferencesQuery,
+  useCreateNotificationMutation,
+  useSendEmailNotificationMutation,
+  useSendPushNotificationMutation,
+  useMarkNotificationAsReadMutation,
+  useUpdateNotificationPreferencesMutation,
+  useScheduleRemindersMutation,
+  useDeleteNotificationsMutation,
+  useGetProgressQuery,
+  useGetWalletQuery,
+  useGetBig5Query,
+  useGetContactsQuery,
+  useGetLibraryQuery,
+  useGetPortfolioQuery,
+  useGetReportsQuery,
+  useUpdateProgressMutation,
+} from './scalableImpactApi';

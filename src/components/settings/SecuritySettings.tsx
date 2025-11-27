@@ -7,6 +7,9 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUpdatePasswordMutation } from "@/services";
 import {
   Shield,
   Key,
@@ -20,10 +23,14 @@ import {
   Unlock,
   History,
   Globe,
-  UserX
+  UserX,
+  Loader2
 } from "lucide-react";
 
 export const SecuritySettings = () => {
+  const { toast } = useToast();
+  const { user, login } = useAuth();
+  const [updatePassword, { isLoading: isUpdatingPassword }] = useUpdatePasswordMutation();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -33,7 +40,7 @@ export const SecuritySettings = () => {
     newPassword: "",
     confirmPassword: ""
   });
-  
+
   // Privacy settings state
   const [privacySettings, setPrivacySettings] = useState({
     profileVisibility: true,
@@ -51,14 +58,77 @@ export const SecuritySettings = () => {
     { id: 3, device: "Chrome - Windows", location: "Abuja, Nigeria", lastActive: "1 day ago", current: false },
   ];
 
-  const handlePasswordChange = () => {
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert("New passwords don't match!");
+  const validatePassword = (password: string): string[] => {
+    const errors: string[] = [];
+    if (password.length < 6) errors.push("At least 6 characters");
+    if (!/[A-Z]/.test(password)) errors.push("One uppercase letter");
+    if (!/[a-z]/.test(password)) errors.push("One lowercase letter");
+    if (!/[0-9]/.test(password)) errors.push("One number");
+    return errors;
+  };
+
+  const handlePasswordChange = async () => {
+    // Validation
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all password fields",
+        variant: "destructive",
+      });
       return;
     }
-    console.log("Password change requested");
-    // Reset form
-    setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast({
+        title: "Passwords Don't Match",
+        description: "New password and confirmation must match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const validationErrors = validatePassword(passwordForm.newPassword);
+    if (validationErrors.length > 0) {
+      toast({
+        title: "Password Requirements Not Met",
+        description: "Password must have: " + validationErrors.join(", "),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const result = await updatePassword({
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      }).unwrap();
+
+      if (result.success) {
+        // Update token in auth context
+        if (result.token && user) {
+          login(result.token, result.user);
+        }
+
+        toast({
+          title: "✅ Password Updated Successfully!",
+          description: "Your password has been changed. Please use your new password for future logins.",
+        });
+
+        // Reset form
+        setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      }
+    } catch (error: any) {
+      const errorMessage =
+        error?.data?.message ||
+        error?.message ||
+        "Failed to update password. Please check your current password and try again.";
+
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
   };
 
   const handlePrivacyChange = (setting: keyof typeof privacySettings) => {
@@ -188,19 +258,25 @@ export const SecuritySettings = () => {
               </div>
 
               <div className="pt-4">
-                <Button onClick={handlePasswordChange} disabled={
-                  !passwordForm.currentPassword || 
-                  !passwordForm.newPassword || 
-                  !passwordForm.confirmPassword
-                }>
-                  Update Password
+                <Button
+                  onClick={handlePasswordChange}
+                  disabled={isUpdatingPassword || !passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword}
+                >
+                  {isUpdatingPassword ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Updating Password...
+                    </>
+                  ) : (
+                    "Update Password"
+                  )}
                 </Button>
               </div>
 
               <Alert>
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  Use at least 8 characters with a mix of letters, numbers, and symbols for a strong password.
+                  Password must be at least 6 characters and contain: uppercase letter, lowercase letter, and number.
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -236,8 +312,8 @@ export const SecuritySettings = () => {
                       {twoFactorEnabled ? "2FA Enabled" : "2FA Disabled"}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {twoFactorEnabled 
-                        ? "Your account is protected with 2FA" 
+                      {twoFactorEnabled
+                        ? "Your account is protected with 2FA"
                         : "Enable 2FA for additional security"
                       }
                     </p>

@@ -22,3 +22,25 @@ export interface LoginRequest {
   email: string;
   password: string;
 }
+
+export interface UpdateEmailRequest {
+  email: string;
+  password: string;
+}
+
+export interface UpdateEmailResponse {
+  success: boolean;
+  message: string;
+  user: User;
+}
+
+export interface UpdatePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface UpdatePasswordResponse {
+  success: boolean;
+  token: string;
+  user: User;
+}

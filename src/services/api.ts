@@ -14,6 +14,12 @@ export const api = {
       },
       ...options,
     });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      throw error;
+    }
+
     return { data: await response.json() };
   },
   post: async (url: string, data?: any, options?: RequestInit) => {
@@ -28,6 +34,12 @@ export const api = {
       body: JSON.stringify(data),
       ...options,
     });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      throw error;
+    }
+
     return { data: await response.json() };
   },
   put: async (url: string, data?: any, options?: RequestInit) => {
@@ -42,6 +54,12 @@ export const api = {
       body: JSON.stringify(data),
       ...options,
     });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      throw error;
+    }
+
     return { data: await response.json() };
   },
   patch: async (url: string, data?: any, options?: RequestInit) => {
@@ -56,6 +74,12 @@ export const api = {
       body: data ? JSON.stringify(data) : undefined,
       ...options,
     });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      throw error;
+    }
+
     return { data: await response.json() };
   },
   delete: async (url: string, options?: RequestInit) => {
@@ -69,6 +93,12 @@ export const api = {
       },
       ...options,
     });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      throw error;
+    }
+
     return { data: await response.json() };
   },
 };

@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { SecuritySettings } from "../settings/SecuritySettings";
 import { NotificationSettings } from "../settings/NotificationSettings";
 import { AppearanceSettings } from "../settings/AppearanceSettings";
+import { ChangeEmailModal } from "./ChangeEmailModal";
 import "./settings-responsive.css";
 import {
   Settings,
@@ -26,9 +27,9 @@ import {
   X
 } from "lucide-react";
 
-type SettingSection = 
+type SettingSection =
   | 'profile'
-  | 'security' 
+  | 'security'
   | 'notifications'
   | 'appearance'
   | 'billing'
@@ -42,6 +43,8 @@ export const SettingsPage = () => {
   const { user } = useAuth();
   const [activeSection, setActiveSection] = useState<SettingSection>('profile');
   const [showSidebar, setShowSidebar] = useState(false); // Start with false on mobile
+  const [showEmailModal, setShowEmailModal] = useState(false);
+
 
   const settingsSections = [
     {
@@ -146,7 +149,7 @@ export const SettingsPage = () => {
                 Back to Profile
               </Button>
             </div>
-            
+
             <Card className="backdrop-blur-sm bg-white/90 shadow-xl border-white/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
@@ -171,7 +174,7 @@ export const SettingsPage = () => {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen relative"
       style={{
         backgroundImage: `linear-gradient(rgba(248, 250, 252, 0.95), rgba(248, 250, 252, 0.95)), url('https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2126&q=80')`,
@@ -197,15 +200,15 @@ export const SettingsPage = () => {
             {showSidebar ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
-        
+
         {/* Mobile Overlay */}
         {showSidebar && (
-          <div 
-            className="fixed inset-0 bg-black/50 z-40 md:hidden" 
+          <div
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
             onClick={() => setShowSidebar(false)}
           />
         )}
-        
+
         {/* Sidebar */}
         <div className={`
           settings-sidebar mobile-sidebar
@@ -214,129 +217,142 @@ export const SettingsPage = () => {
           fixed top-0 left-0 z-50 h-full transition-transform duration-300 ease-in-out
           ${showSidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}>
-            <div className="space-y-6">
-              {/* Header */}
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <Settings className="h-6 w-6" />
-                  <h1 className="text-2xl font-bold">Settings</h1>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Manage your account and system preferences
-                </p>
+          <div className="space-y-6">
+            {/* Header */}
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <Settings className="h-6 w-6" />
+                <h1 className="text-2xl font-bold">Settings</h1>
               </div>
+              <p className="text-sm text-muted-foreground">
+                Manage your account and system preferences
+              </p>
+            </div>
 
-              {/* User Info */}
-              <Card className="backdrop-blur-sm bg-white/90 shadow-lg border-white/20">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                      <User className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate">{user?.name}</div>
-                      <div className="text-sm text-muted-foreground truncate">{user?.email}</div>
-                    </div>
+            {/* User Info */}
+            <Card className="backdrop-blur-sm bg-white/90 shadow-lg border-white/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+                    <User className="w-5 h-5 text-white" />
                   </div>
-                  <div className="mt-3">
-                    <Badge variant="outline" className="text-xs">
-                      {user?.role?.charAt(0).toUpperCase()}{user?.role?.slice(1)} Account
-                    </Badge>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium truncate">{user?.name}</div>
+                    <div className="text-sm text-muted-foreground truncate">{user?.email}</div>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Settings Navigation */}
-              <div className="space-y-1">
-                <div className="text-sm font-medium text-muted-foreground mb-3">
-                  Account Settings
                 </div>
-                {availableSections.slice(0, 4).map((section) => (
-                  <Button
-                    key={section.id}
-                    variant={activeSection === section.id ? "secondary" : "ghost"}
-                    className="settings-button w-full justify-start h-auto p-3 min-w-0"
-                    onClick={() => {
-                      setActiveSection(section.id);
-                      // Close sidebar on mobile after selection
-                      if (window.innerWidth < 768) {
-                        setShowSidebar(false);
-                      }
-                    }}
-                  >
-                    <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
-                    <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
-                      <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
-                      <div className="settings-description text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
-                    </div>
-                    <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
-                  </Button>
-                ))}
-              </div>
-
-              {/* Advanced Settings */}
-              <div className="space-y-1">
-                <div className="text-sm font-medium text-muted-foreground mb-3">
-                  Advanced Settings
+                <div className="mt-3 space-y-2">
+                  <Badge variant="outline" className="text-xs">
+                    {user?.role?.charAt(0).toUpperCase()}{user?.role?.slice(1)} Account
+                  </Badge>
+                  {user?.role === 'super_admin' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full mt-2"
+                      onClick={() => setShowEmailModal(true)}
+                    >
+                      Change Email
+                    </Button>
+                  )}
                 </div>
-                {availableSections.slice(4, 7).map((section) => (
-                  <Button
-                    key={section.id}
-                    variant={activeSection === section.id ? "secondary" : "ghost"}
-                    className="settings-button w-full justify-start h-auto p-3 min-w-0"
-                    onClick={() => {
-                      setActiveSection(section.id);
-                      // Close sidebar on mobile after selection
-                      if (window.innerWidth < 768) {
-                        setShowSidebar(false);
-                      }
-                    }}
-                  >
-                    <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
-                    <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
-                      <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
-                      <div className="settings-description text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
-                    </div>
-                    <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
-                  </Button>
-                ))}
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* Support & Legal */}
-              <div className="space-y-1">
-                <div className="text-sm font-medium text-muted-foreground mb-3">
-                  Support & Legal
-                </div>
-                {availableSections.slice(7).map((section) => (
-                  <Button
-                    key={section.id}
-                    variant={activeSection === section.id ? "secondary" : "ghost"}
-                    className="settings-button w-full justify-start h-auto p-3 min-w-0"
-                    onClick={() => {
-                      setActiveSection(section.id);
-                      // Close sidebar on mobile after selection
-                      if (window.innerWidth < 768) {
-                        setShowSidebar(false);
-                      }
-                    }}
-                  >
-                    <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
-                    <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
-                      <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
-                      <div className="settings-description text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
-                    </div>
-                    <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
-                  </Button>
-                ))}
+            {/* Settings Navigation */}
+            <div className="space-y-1">
+              <div className="text-sm font-medium text-muted-foreground mb-3">
+                Account Settings
               </div>
+              {availableSections.slice(0, 4).map((section) => (
+                <Button
+                  key={section.id}
+                  variant={activeSection === section.id ? "secondary" : "ghost"}
+                  className="settings-button w-full justify-start h-auto p-3 min-w-0"
+                  onClick={() => {
+                    setActiveSection(section.id);
+                    // Close sidebar on mobile after selection
+                    if (window.innerWidth < 768) {
+                      setShowSidebar(false);
+                    }
+                  }}
+                >
+                  <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
+                  <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
+                    <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
+                    <div className="settings-description text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
+                </Button>
+              ))}
+            </div>
+
+            {/* Advanced Settings */}
+            <div className="space-y-1">
+              <div className="text-sm font-medium text-muted-foreground mb-3">
+                Advanced Settings
+              </div>
+              {availableSections.slice(4, 7).map((section) => (
+                <Button
+                  key={section.id}
+                  variant={activeSection === section.id ? "secondary" : "ghost"}
+                  className="settings-button w-full justify-start h-auto p-3 min-w-0"
+                  onClick={() => {
+                    setActiveSection(section.id);
+                    // Close sidebar on mobile after selection
+                    if (window.innerWidth < 768) {
+                      setShowSidebar(false);
+                    }
+                  }}
+                >
+                  <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
+                  <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
+                    <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
+                    <div className="settings-description text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
+                </Button>
+              ))}
+            </div>
+
+            {/* Support & Legal */}
+            <div className="space-y-1">
+              <div className="text-sm font-medium text-muted-foreground mb-3">
+                Support & Legal
+              </div>
+              {availableSections.slice(7).map((section) => (
+                <Button
+                  key={section.id}
+                  variant={activeSection === section.id ? "secondary" : "ghost"}
+                  className="settings-button w-full justify-start h-auto p-3 min-w-0"
+                  onClick={() => {
+                    setActiveSection(section.id);
+                    // Close sidebar on mobile after selection
+                    if (window.innerWidth < 768) {
+                      setShowSidebar(false);
+                    }
+                  }}
+                >
+                  <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
+                  <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
+                    <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
+                    <div className="settings-description text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
+                </Button>
+              ))}
             </div>
           </div>
+        </div>
 
         {/* Main Content */}
         <div className="flex-1 p-4 md:p-6 overflow-auto">
           {renderContent()}
         </div>
       </div>
+
+      {/* Email Change Modal */}
+      <ChangeEmailModal open={showEmailModal} onOpenChange={setShowEmailModal} />
     </div>
   );
 };
