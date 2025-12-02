@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  hasPermission, 
-  hasAnyPermission, 
-  hasAllPermissions, 
-  getUserPermissions, 
+import {
+  hasPermission,
+  hasAnyPermission,
+  hasAllPermissions,
+  getUserPermissions,
   getPermissionsByCategory,
   getRoleConfig,
   NAVIGATION_PERMISSIONS,
-  Permission 
+  Permission
 } from '@/lib/permissions';
 
 /**
@@ -54,24 +54,25 @@ export const usePermissions = () => {
       user,
       userRole,
       roleInfo: getRoleInfo(),
-      
+
       // Permission checking functions
       hasPermission: checkPermission,
       hasAnyPermission: checkAnyPermission,
       hasAllPermissions: checkAllPermissions,
       canAccessNavigation: checkNavigationAccess,
-      
+
       // Permission data retrieval
       permissions: getAvailablePermissions(),
       getPermissionsByCategory: getPermissionsByCat,
-      
+
       // Convenience computed values
       isOwner: userRole === 'super_admin',
+      isBusinessOwner: userRole === 'business_owner',
       isBig7: userRole === 'big7',
       isManager: userRole === 'manager',
       isVendor: userRole === 'vendor',
       isCustomer: userRole === 'customer',
-      
+
       // Role priority (for UI layering/restrictions)
       rolePriority: getRoleInfo()?.priority || 0
     };
@@ -117,7 +118,7 @@ export const useFilteredNavigation = <T extends { id: string }>(
   navigationItems: T[]
 ): T[] => {
   const { canAccessNavigation } = usePermissions();
-  
+
   return useMemo(() => {
     return navigationItems.filter(item => canAccessNavigation(item.id));
   }, [navigationItems, canAccessNavigation]);
@@ -128,19 +129,19 @@ export const useFilteredNavigation = <T extends { id: string }>(
  */
 export const useRoleBasedAccess = () => {
   const permissions = usePermissions();
-  
+
   return {
     ...permissions,
-    
+
     // Render helpers
     renderForRoles: (allowedRoles: string[], component: React.ReactNode) => {
       return allowedRoles.includes(permissions.userRole) ? component : null;
     },
-    
+
     renderForPermissions: (requiredPermissions: string[], component: React.ReactNode) => {
       return permissions.hasAnyPermission(requiredPermissions) ? component : null;
     },
-    
+
     // Access level helpers
     hasFullAccess: permissions.isOwner,
     hasAdminAccess: permissions.isOwner || permissions.isBig7,

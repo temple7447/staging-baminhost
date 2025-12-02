@@ -4,7 +4,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'super_admin' | 'big7' | 'manager' | 'vendor' | 'customer';
+  role: 'super_admin' | 'business_owner' | 'admin' | 'big7' | 'manager' | 'vendor' | 'customer';
   phone?: string;
   department?: string;
   hourlyRate?: number;
@@ -12,6 +12,9 @@ export interface User {
   emailVerified: boolean;
   lastLogin: string;
   createdAt: string;
+  // Role-specific fields
+  assignedEstates?: string[];
+  permissions?: string[];
 }
 
 interface AuthContextType {
@@ -56,7 +59,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const storedToken = getStoredToken();
     const storedUser = localStorage.getItem('user');
-    
+
     if (storedToken && storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser) as any;

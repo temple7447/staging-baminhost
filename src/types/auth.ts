@@ -2,7 +2,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'super_admin' | 'big7' | 'manager' | 'vendor' | 'customer';
+  role: 'super_admin' | 'business_owner' | 'admin' | 'big7' | 'manager' | 'vendor' | 'customer';
   phone?: string;
   department?: string;
   hourlyRate?: number;
@@ -10,6 +10,9 @@ export interface User {
   emailVerified: boolean;
   lastLogin: string;
   createdAt: string;
+  // Role-specific fields
+  assignedEstates?: string[]; // For business_owner role
+  permissions?: string[];     // For super_admin role (e.g., ["all"])
 }
 
 export interface LoginResponse {
@@ -43,4 +46,80 @@ export interface UpdatePasswordResponse {
   success: boolean;
   token: string;
   user: User;
+}
+
+export interface OnboardBusinessOwnerRequest {
+  name: string;
+  email: string;
+  phone: string;
+  estateIds: string[];
+  sendCredentials?: boolean;
+}
+
+export interface OnboardBusinessOwnerResponse {
+  success: boolean;
+  message: string;
+  data: {
+    id: string;
+    name: string;
+    email: string;
+    role: 'business_owner';
+    assignedEstates: Array<{
+      _id: string;
+      name: string;
+    }>;
+    isActive: boolean;
+    createdAt: string;
+  };
+}
+
+export interface BusinessOwner {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: 'business_owner';
+  assignedEstates: Array<{
+    _id: string;
+    name: string;
+    totalUnits?: number;
+  }>;
+  isActive: boolean;
+  emailVerified: boolean;
+  lastLogin?: string;
+  createdBy?: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GetBusinessOwnersResponse {
+  success: boolean;
+  count: number;
+  data: BusinessOwner[];
+}
+
+export interface UpdateBusinessOwnerRequest {
+  name?: string;
+  email?: string;
+  phone?: string;
+  estateIds?: string[];
+}
+
+export interface UpdateBusinessOwnerStatusRequest {
+  isActive: boolean;
+}
+
+export interface UpdateBusinessOwnerResponse {
+  success: boolean;
+  message: string;
+  data: BusinessOwner;
+}
+
+export interface DeleteBusinessOwnerResponse {
+  success: boolean;
+  message: string;
 }

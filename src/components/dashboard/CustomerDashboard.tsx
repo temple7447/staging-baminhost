@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { 
-  CreditCard, 
-  Calendar, 
-  AlertCircle, 
-  CheckCircle, 
-  Receipt, 
+import {
+  CreditCard,
+  Calendar,
+  AlertCircle,
+  CheckCircle,
+  Receipt,
   Upload,
   Download,
   Eye,
@@ -60,7 +60,7 @@ const customerData = {
     creditLimit: 1500000,
     nextPaymentDate: "2024-02-15"
   },
-  
+
   // Active Contracts with Payment Options and Delivery Tracking
   contracts: [
     {
@@ -70,7 +70,7 @@ const customerData = {
       vendorId: "ven_789",
       totalAmount: 1200000,
       paymentOption: "installment",
-      
+
       // Installment Details
       upfrontDeposit: 480000, // 40%
       remainingBalance: 720000,
@@ -81,7 +81,7 @@ const customerData = {
       nextPaymentDue: "2024-02-15",
       latePenaltyPerDay: 300,
       cancellationFee: 240000, // 20% of contract value
-      
+
       // Delivery Stages (1/3rd, 1/3rd, 1/3rd)
       deliveryStages: [
         {
@@ -98,7 +98,7 @@ const customerData = {
               description: "Foundation work completed as per specifications"
             },
             {
-              id: "proof_002", 
+              id: "proof_002",
               type: "video",
               fileName: "foundation_walkthrough.mp4",
               uploadDate: "2024-01-21",
@@ -144,22 +144,22 @@ const customerData = {
           paymentReleaseDate: null
         }
       ],
-      
+
       status: "active",
       startDate: "2024-01-15",
       expectedCompletionDate: "2024-04-15",
       escrowAccount: "OPAY_ESC_001",
       escrowBalance: 864000
     },
-    
+
     {
-      id: "contract_002", 
+      id: "contract_002",
       projectName: "Equipment Rental - Excavator",
       vendorName: "Heavy Equipment Rentals",
       vendorId: "ven_456",
       totalAmount: 800000,
       paymentOption: "one_time",
-      
+
       // One-time Payment Details
       upfrontDeposit: 800000, // 100%
       remainingBalance: 0,
@@ -170,7 +170,7 @@ const customerData = {
       nextPaymentDue: null,
       latePenaltyPerDay: 0,
       cancellationFee: 160000, // 20% of contract value
-      
+
       // Delivery Stages
       deliveryStages: [
         {
@@ -226,15 +226,15 @@ const customerData = {
           paymentReleaseDate: null
         }
       ],
-      
+
       status: "active",
       startDate: "2024-02-01",
       expectedCompletionDate: "2024-02-28",
-      escrowAccount: "OPAY_ESC_002", 
+      escrowAccount: "OPAY_ESC_002",
       escrowBalance: 266666
     }
   ],
-  
+
   // Payment History
   paymentHistory: [
     {
@@ -250,7 +250,7 @@ const customerData = {
     },
     {
       id: "pay_002",
-      contractId: "contract_001", 
+      contractId: "contract_001",
       date: "2024-01-22",
       description: "Stage 1 Payment Release to Vendor",
       amount: 400000,
@@ -283,7 +283,7 @@ const customerData = {
       penalty: 0
     }
   ],
-  
+
   installmentPlans: [
     {
       id: '1',
@@ -335,7 +335,7 @@ export const CustomerDashboard = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('wallet');
   const [localCustomerData, setCustomerData] = useState(customerData as any);
   const [loading, setLoading] = useState(false);
-  
+
   // Simulate real-time updates
   useEffect(() => {
     const interval = setInterval(() => {
@@ -348,7 +348,7 @@ export const CustomerDashboard = () => {
         }
       }));
     }, 30000); // Update every 30 seconds
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -413,11 +413,11 @@ export const CustomerDashboard = () => {
 
   const handlePayment = async () => {
     setLoading(true);
-    
+
     try {
       // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       const amount = parseFloat(paymentAmount);
       if (amount > 0) {
         // Update customer data
@@ -443,7 +443,7 @@ export const CustomerDashboard = () => {
             ...prev.paymentHistory
           ]
         }));
-        
+
         toast.success(`Payment of ${formatNaira(amount)} processed successfully!`);
         setPaymentModalOpen(false);
         setPaymentAmount('');
@@ -454,36 +454,36 @@ export const CustomerDashboard = () => {
       setLoading(false);
     }
   };
-  
+
   const acknowledgeStage = async (contractId: string, stageIndex: number) => {
     setLoading(true);
-    
+
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       setCustomerData((prev: any) => ({
         ...prev,
-        contracts: prev.contracts.map((contract: any) => 
-          contract.id === contractId 
+        contracts: prev.contracts.map((contract: any) =>
+          contract.id === contractId
             ? {
-                ...contract,
-                deliveryStages: contract.deliveryStages.map((stage: any, index: number) => 
-                  index === stageIndex
-                    ? {
-                        ...stage,
-                        customerAcknowledged: true,
-                        acknowledgedDate: new Date().toISOString().split('T')[0],
-                        customerNotes: 'Work approved and acknowledged by customer',
-                        paymentReleased: true,
-                        paymentReleaseDate: new Date().toISOString().split('T')[0]
-                      }
-                    : stage
-                )
-              }
+              ...contract,
+              deliveryStages: contract.deliveryStages.map((stage: any, index: number) =>
+                index === stageIndex
+                  ? {
+                    ...stage,
+                    customerAcknowledged: true,
+                    acknowledgedDate: new Date().toISOString().split('T')[0],
+                    customerNotes: 'Work approved and acknowledged by customer',
+                    paymentReleased: true,
+                    paymentReleaseDate: new Date().toISOString().split('T')[0]
+                  }
+                  : stage
+              )
+            }
             : contract
         )
       }));
-      
+
       toast.success('Stage acknowledged successfully! Payment released to vendor.');
     } catch (error) {
       toast.error('Failed to acknowledge stage. Please try again.');
@@ -491,35 +491,16 @@ export const CustomerDashboard = () => {
       setLoading(false);
     }
   };
-  
+
   const downloadStatement = () => {
     toast.success('Statement download started. Check your downloads folder.');
   };
-  
+
   const creditUtilization = (localCustomerData.customer.totalBalance / localCustomerData.customer.creditLimit) * 100;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <BamiHustleLogo variant="compact" showTagline={false} />
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Customer Portal</h1>
-            <p className="text-muted-foreground">Welcome back, {user?.name || 'Customer'}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <div className="text-sm text-muted-foreground">Account Number</div>
-            <div className="text-lg font-bold text-green-600">{localCustomerData.customer.accountNumber}</div>
-          </div>
-          <Badge className="bg-green-500 hover:bg-green-600 text-white">
-            <Star className="w-3 h-3 mr-1" />
-            Premium
-          </Badge>
-        </div>
-      </div>
+
 
       {/* Key Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
@@ -603,15 +584,15 @@ export const CustomerDashboard = () => {
                 </Button>
               </DialogTrigger>
             </Dialog>
-            
+
             <Button variant="outline" className="gap-2 h-auto p-3 md:p-4 flex-col text-xs md:text-sm hover:bg-blue-50">
               <Calendar className="w-5 h-5 md:w-6 md:h-6" />
               <span>Schedule Payment</span>
               <span className="text-xs opacity-75 hidden md:block">Set up auto-pay</span>
             </Button>
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               className="gap-2 h-auto p-3 md:p-4 flex-col text-xs md:text-sm hover:bg-gray-50"
               onClick={downloadStatement}
             >
@@ -619,7 +600,7 @@ export const CustomerDashboard = () => {
               <span>Download Statement</span>
               <span className="text-xs opacity-75 hidden md:block">Get monthly report</span>
             </Button>
-            
+
             <Button variant="outline" className="gap-2 h-auto p-3 md:p-4 flex-col text-xs md:text-sm hover:bg-purple-50">
               <MessageCircle className="w-5 h-5 md:w-6 md:h-6" />
               <span>Contact Support</span>
@@ -660,7 +641,7 @@ export const CustomerDashboard = () => {
                     {getStatusBadge(plan.status)}
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Progress</span>
@@ -670,7 +651,7 @@ export const CustomerDashboard = () => {
                   </div>
                   <Progress value={(plan.paidAmount / plan.totalAmount) * 100} className="h-2" />
                 </div>
-                
+
                 {plan.status === 'active' && (
                   <div className="mt-3 flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 rounded-lg bg-primary/5 border border-primary/20 gap-3">
                     <div>
@@ -709,7 +690,7 @@ export const CustomerDashboard = () => {
                     <div className="text-xs md:text-sm text-muted-foreground">{formatDate(payment.date)}</div>
                   </div>
                 </div>
-                
+
                 <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
                   <div className="text-left sm:text-right">
                     <div className={`financial-amount font-semibold text-sm md:text-base ${payment.status === 'paid' ? 'text-success' : 'text-destructive'}`}>
@@ -728,7 +709,7 @@ export const CustomerDashboard = () => {
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Active Contracts with Delivery Tracking */}
       <Card className="financial-card">
         <CardHeader>
@@ -761,7 +742,7 @@ export const CustomerDashboard = () => {
                   </div>
                   {getStatusBadge(contract.status)}
                 </div>
-                
+
                 {/* Delivery Stages */}
                 <div className="space-y-3">
                   <h4 className="font-medium text-sm">Delivery Stages</h4>
@@ -775,7 +756,7 @@ export const CustomerDashboard = () => {
                         </div>
                         {getStatusBadge(stage.status)}
                       </div>
-                      
+
                       {/* Vendor Proof Uploads */}
                       {stage.vendorProofUploads.length > 0 && (
                         <div className="mt-3">
@@ -798,13 +779,13 @@ export const CustomerDashboard = () => {
                           </div>
                         </div>
                       )}
-                      
+
                       {/* Customer Acknowledgment */}
                       {stage.status === 'in_progress' && stage.vendorProofUploads.length > 0 && !stage.customerAcknowledged && (
                         <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
                           <p className="text-sm mb-2">Please review the vendor submissions and acknowledge if the work is completed satisfactorily.</p>
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             className="bg-green-600 hover:bg-green-700"
                             onClick={() => acknowledgeStage(contract.id, stageIndex)}
                             disabled={loading}
@@ -813,7 +794,7 @@ export const CustomerDashboard = () => {
                           </Button>
                         </div>
                       )}
-                      
+
                       {/* Acknowledgment Status */}
                       {stage.customerAcknowledged && (
                         <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded">
@@ -852,7 +833,7 @@ export const CustomerDashboard = () => {
               </div>
             </div>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             {/* Payment Type */}
             <div className="space-y-2">
@@ -868,7 +849,7 @@ export const CustomerDashboard = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             {/* Amount */}
             <div className="space-y-2">
               <Label>Amount</Label>
@@ -882,7 +863,7 @@ export const CustomerDashboard = () => {
                 Current due: {formatNaira(localCustomerData.customer.currentDue)}
               </div>
             </div>
-            
+
             {/* Payment Method */}
             <div className="space-y-2">
               <Label>Payment Method</Label>
@@ -898,7 +879,7 @@ export const CustomerDashboard = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             {/* Payment Summary */}
             <div className="p-4 bg-gray-50 rounded-lg space-y-2">
               <div className="flex justify-between text-sm">
@@ -915,7 +896,7 @@ export const CustomerDashboard = () => {
                 <span className="text-green-600">{paymentAmount ? formatNaira(parseFloat(paymentAmount)) : '₦0'}</span>
               </div>
             </div>
-            
+
             <Alert>
               <Shield className="w-4 h-4" />
               <AlertDescription>
@@ -923,13 +904,13 @@ export const CustomerDashboard = () => {
               </AlertDescription>
             </Alert>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setPaymentModalOpen(false)}>
               Cancel
             </Button>
-            <Button 
-              className="bg-green-600 hover:bg-green-700" 
+            <Button
+              className="bg-green-600 hover:bg-green-700"
               onClick={handlePayment}
               disabled={loading || !paymentAmount || parseFloat(paymentAmount) <= 0}
             >

@@ -25,14 +25,15 @@ export const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const result = await login({ email, password }).unwrap();
-      
+
+      console.log(result);
       if (result.success) {
         // Store token and user data
         authLogin(result.token, result.user);
-        
+
         toast({
           title: "Login successful",
           description: `Welcome back, ${result.user.name}!`,
@@ -54,7 +55,7 @@ export const LoginPage = () => {
   // Handle different auth views
   if (authView === 'forgot-password') {
     return (
-      <div 
+      <div
         className="min-h-screen flex items-center justify-center p-4 relative"
         style={{
           backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2026&q=80')`,
@@ -70,7 +71,7 @@ export const LoginPage = () => {
 
   if (authView === 'reset-password') {
     return (
-      <div 
+      <div
         className="min-h-screen flex items-center justify-center p-4 relative"
         style={{
           backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`,
@@ -79,9 +80,9 @@ export const LoginPage = () => {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <ResetPasswordForm 
-          onSuccess={() => setAuthView('reset-success')} 
-          onBack={() => setAuthView('login')} 
+        <ResetPasswordForm
+          onSuccess={() => setAuthView('reset-success')}
+          onBack={() => setAuthView('login')}
         />
       </div>
     );
@@ -89,7 +90,7 @@ export const LoginPage = () => {
 
   if (authView === 'reset-success') {
     return (
-      <div 
+      <div
         className="min-h-screen flex items-center justify-center p-4 relative"
         style={{
           backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2787&q=80')`,
@@ -105,7 +106,7 @@ export const LoginPage = () => {
 
   // Main login view
   return (
-    <div 
+    <div
       className="min-h-screen flex items-center justify-center p-4 relative"
       style={{
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`,
@@ -121,7 +122,7 @@ export const LoginPage = () => {
             <Building className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold">Eyituoyo Portfolio System</h1>
-          
+
         </div>
 
         {/* Login Form */}
@@ -145,7 +146,7 @@ export const LoginPage = () => {
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -173,9 +174,9 @@ export const LoginPage = () => {
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full" 
+              <Button
+                type="submit"
+                className="w-full"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -186,20 +187,20 @@ export const LoginPage = () => {
                   "Sign In"
                 )}
               </Button>
-              
+
               {loginError && (
                 <p className="text-sm text-destructive text-center mt-2">
-                  {typeof loginError === 'object' && 'data' in loginError && loginError.data 
+                  {typeof loginError === 'object' && 'data' in loginError && loginError.data
                     ? (loginError.data as any)?.message || "Invalid credentials"
                     : "Invalid credentials"}
                 </p>
               )}
 
               <div className="text-center">
-                <Button 
-                  type="button" 
-                  variant="link" 
-                  className="text-sm" 
+                <Button
+                  type="button"
+                  variant="link"
+                  className="text-sm"
                   onClick={() => setAuthView('forgot-password')}
                 >
                   Forgot your password?
@@ -209,9 +210,9 @@ export const LoginPage = () => {
           </CardContent>
         </Card>
 
-      
 
-     
+
+
       </div>
     </div>
   );

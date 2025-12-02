@@ -275,6 +275,24 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
     ]
   },
 
+  business_owner: {
+    id: 'business_owner',
+    name: 'Business Owner',
+    description: 'Estate owner with access to assigned properties',
+    priority: 85,
+    permissions: [
+      'view_overview',
+
+      'view_settings',
+      'view_estate',
+      'manage_estate',
+
+      'view_assistant',
+      'view_payment_history',
+      'make_payments',
+    ]
+  },
+
   big7: {
     id: 'big7',
     name: 'Big 7 Member',
@@ -317,7 +335,7 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
     description: 'System administration and oversight',
     priority: 80,
     permissions: [
-'view_overview',
+      'view_overview',
       'view_big5',
       'view_scalable_impact',
       'view_wallet',
@@ -353,7 +371,7 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
     name: 'Manager',
     description: 'Departmental management and operations',
     priority: 60,
-permissions: [
+    permissions: [
       'view_overview',
       'view_big5',
       'view_scalable_impact',
@@ -386,7 +404,7 @@ permissions: [
     description: 'Service delivery and proof submission',
     priority: 40,
     permissions: [
-'view_overview', // Limited overview showing only relevant info
+      'view_overview', // Limited overview showing only relevant info
       'view_big5',
       'view_contacts', // Can see contact info for coordination
       'view_settings', // Can manage their own account settings
@@ -403,7 +421,7 @@ permissions: [
     description: 'Service consumption and payment management',
     priority: 20,
     permissions: [
-'view_overview', // Limited overview showing account summary
+      'view_overview', // Limited overview showing account summary
       'view_big5',
       'view_settings', // Can manage their own account settings
       'manage_payment_plans',
@@ -435,7 +453,7 @@ export const hasAllPermissions = (userRole: string, permissions: string[]): bool
 export const getUserPermissions = (userRole: string): Permission[] => {
   const roleConfig = getRoleConfig(userRole);
   if (!roleConfig) return [];
-  
+
   return roleConfig.permissions
     .map(permissionId => PERMISSIONS[permissionId])
     .filter(Boolean);
@@ -447,8 +465,8 @@ export const getPermissionsByCategory = (userRole: string, category: Permission[
 
 // Navigation items with their required permissions
 export const NAVIGATION_PERMISSIONS: Record<string, string[]> = {
-'overview': ['view_overview'],
-'defining-your-number': ['view_big5'],
+  'overview': ['view_overview'],
+  'defining-your-number': ['view_big5'],
   'scalable-impact-planner': ['view_scalable_impact'],
   'wallet': ['view_wallet'],
   'portfolio': ['view_portfolio'],
@@ -465,7 +483,7 @@ export const NAVIGATION_PERMISSIONS: Record<string, string[]> = {
   // Strategic Hiring Navigation
   'strategic-hiring-planner': ['view_strategic_hiring', 'view_hiring_triggers'],
   'candidate-management': ['view_strategic_hiring', 'manage_candidates'],
-'reports': ['view_reports'],
+  'reports': ['view_reports'],
   'transactions': ['view_all_data'],
   'theme-showcase': ['view_overview'], // Available to everyone who can view overview
   'admin': ['manage_users', 'manage_system'],

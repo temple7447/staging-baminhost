@@ -42,6 +42,8 @@ const DashboardRouter: React.FC = () => {
     switch (user?.role) {
       case 'super_admin':
         return <OwnerDashboard />;
+      case 'business_owner':
+        return <ManagerDashboard />; // Business owners see manager-level dashboard
       case 'big7':
         return <Big7Dashboard />;
       case 'manager':
@@ -115,15 +117,15 @@ const DashboardRouter: React.FC = () => {
   };
 
   return (
-    <DashboardLayout currentView={getCurrentView()} onViewChange={() => {}}>
+    <DashboardLayout currentView={getCurrentView()} onViewChange={() => { }}>
       <Routes>
         {/* Dashboard Overview */}
         <Route path="/" element={renderDashboard()} />
         <Route path="/overview" element={renderDashboard()} />
 
         {/* Scalable Impact Planner */}
-        <Route 
-          path="/ScalableImpactPlanner" 
+        <Route
+          path="/ScalableImpactPlanner"
           element={
             <ProtectedRoute
               element={<ScalableImpactPlanner />}
@@ -132,12 +134,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="scalable-impact-planner"
             />
-          } 
+          }
         />
 
         {/* Wallet */}
-        <Route 
-          path="/wallet" 
+        <Route
+          path="/wallet"
           element={
             <ProtectedRoute
               element={<WalletDashboard />}
@@ -146,12 +148,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="wallet"
             />
-          } 
+          }
         />
 
         {/* Portfolio */}
-        <Route 
-          path="/portfolio" 
+        <Route
+          path="/portfolio"
           element={
             <ProtectedRoute
               element={<PortfolioDashboard />}
@@ -160,12 +162,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="portfolio"
             />
-          } 
+          }
         />
 
         {/* Split Tracker */}
-        <Route 
-          path="/split-tracker" 
+        <Route
+          path="/split-tracker"
           element={
             <ProtectedRoute
               element={<SplitTracker />}
@@ -174,12 +176,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="split-tracker"
             />
-          } 
+          }
         />
 
         {/* Estate Management */}
-        <Route 
-          path="/estate" 
+        <Route
+          path="/estate"
           element={
             <ProtectedRoute
               element={<EstateManagement />}
@@ -188,10 +190,10 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="estate"
             />
-          } 
+          }
         />
-        <Route 
-          path="/estate/:estateId" 
+        <Route
+          path="/estate/:estateId"
           element={
             <ProtectedRoute
               element={<EstateDetailPage />}
@@ -200,12 +202,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="estate"
             />
-          } 
+          }
         />
 
         {/* Filling Station */}
-        <Route 
-          path="/filling-station" 
+        <Route
+          path="/filling-station"
           element={
             <ProtectedRoute
               element={<FillingStationManagement />}
@@ -214,12 +216,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="filling-station"
             />
-          } 
+          }
         />
 
         {/* Equipment */}
-        <Route 
-          path="/equipment" 
+        <Route
+          path="/equipment"
           element={
             <ProtectedRoute
               element={<EquipmentManagement />}
@@ -228,12 +230,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="equipment"
             />
-          } 
+          }
         />
 
         {/* Personal Portfolios */}
-        <Route 
-          path="/personal-portfolios" 
+        <Route
+          path="/personal-portfolios"
           element={
             <ProtectedRoute
               element={<PersonalLifePortfolios />}
@@ -242,12 +244,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="personal-portfolios"
             />
-          } 
+          }
         />
 
         {/* Goals */}
-        <Route 
-          path="/goals" 
+        <Route
+          path="/goals"
           element={
             <ProtectedRoute
               element={<GoalsDashboard />}
@@ -256,12 +258,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="goals"
             />
-          } 
+          }
         />
 
         {/* Defining Your Number */}
-        <Route 
-          path="/defining-your-number" 
+        <Route
+          path="/defining-your-number"
           element={
             <ProtectedRoute
               element={<Big5Dashboard />}
@@ -270,12 +272,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={false}
               viewName="defining-your-number"
             />
-          } 
+          }
         />
 
         {/* Strategic Hiring Planner */}
-        <Route 
-          path="/strategic-hiring-planner" 
+        <Route
+          path="/strategic-hiring-planner"
           element={
             <ProtectedRoute
               element={<StrategicHiringPlanner />}
@@ -284,12 +286,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={false}
               viewName="strategic-hiring-planner"
             />
-          } 
+          }
         />
 
         {/* Candidate Management */}
-        <Route 
-          path="/candidate-management" 
+        <Route
+          path="/candidate-management"
           element={
             <ProtectedRoute
               element={<CandidateManagement />}
@@ -298,12 +300,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={false}
               viewName="candidate-management"
             />
-          } 
+          }
         />
 
         {/* CRM/Contacts */}
-        <Route 
-          path="/contacts" 
+        <Route
+          path="/contacts"
           element={
             <ProtectedRoute
               element={<CRMDashboard />}
@@ -312,12 +314,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="contacts"
             />
-          } 
+          }
         />
 
         {/* Library */}
-        <Route 
-          path="/library" 
+        <Route
+          path="/library"
           element={
             <ProtectedRoute
               element={<LibraryDashboard />}
@@ -326,12 +328,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="library"
             />
-          } 
+          }
         />
 
         {/* Assistant */}
-        <Route 
-          path="/assistant" 
+        <Route
+          path="/assistant"
           element={
             <ProtectedRoute
               element={<AssistantDashboard />}
@@ -340,12 +342,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="assistant"
             />
-          } 
+          }
         />
 
         {/* Reports */}
-        <Route 
-          path="/reports" 
+        <Route
+          path="/reports"
           element={
             <ProtectedRoute
               element={<ReportsDashboard />}
@@ -354,12 +356,12 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="reports"
             />
-          } 
+          }
         />
 
         {/* Transactions */}
-        <Route 
-          path="/transactions" 
+        <Route
+          path="/transactions"
           element={
             <ProtectedRoute
               element={<SuperAdminTransactions />}
@@ -368,15 +370,15 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={false}
               viewName="transactions"
             />
-          } 
+          }
         />
 
         {/* Payment success (callback) */}
         <Route path="/payment/success" element={<PaymentSuccessPage />} />
 
         {/* Settings */}
-        <Route 
-          path="/settings" 
+        <Route
+          path="/settings"
           element={
             <ProtectedRoute
               element={<SettingsPage />}
@@ -385,7 +387,7 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="settings"
             />
-          } 
+          }
         />
 
         {/* Theme Showcase */}
@@ -395,8 +397,8 @@ const DashboardRouter: React.FC = () => {
         <Route path="/people" element={<AdminPeople />} />
 
         {/* Tenant Detail */}
-        <Route 
-          path="/tenant/:tenantId" 
+        <Route
+          path="/tenant/:tenantId"
           element={
             <ProtectedRoute
               element={<TenantDetailPage />}
@@ -405,7 +407,7 @@ const DashboardRouter: React.FC = () => {
               showUpgradePrompt={true}
               viewName="estate"
             />
-          } 
+          }
         />
 
         {/* Redirect unknown paths to overview */}

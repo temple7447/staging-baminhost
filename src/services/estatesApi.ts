@@ -163,6 +163,43 @@ export interface EstateThreeMonthRentResponse {
   };
 }
 
+export interface AllEstatesOverviewResponse {
+  success: boolean;
+  data: {
+    estates: {
+      totalEstates: number;
+      activeEstates: number;
+    };
+    units: {
+      totalUnits: number;
+      occupiedUnits: number;
+      vacantUnits: number;
+      maintenanceUnits: number;
+      reservedUnits: number;
+      occupancyRate: number;
+    };
+    tenants: {
+      totalActiveTenants: number;
+      dueSoon7Days: number;
+      dueSoon30Days: number;
+    };
+    revenue: {
+      last30Days: {
+        amount: number;
+        transactionCount: number;
+      };
+      last90Days: {
+        amount: number;
+        transactionCount: number;
+      };
+    };
+    payments: {
+      pendingCount: number;
+      completedLast30Days: number;
+    };
+  };
+}
+
 // Units
 export interface EstateUnitFeature { name: string; value: string }
 export interface EstateUnit {
@@ -258,6 +295,10 @@ export const estatesApi = createApi({
       },
       providesTags: (result, error, { estateId }) => [{ type: 'Estate', id: estateId }],
     }),
+    getAllEstatesOverview: builder.query<AllEstatesOverviewResponse, void>({
+      query: () => '/api/estates/overview/all',
+      providesTags: [{ type: 'EstateList', id: 'LIST' }],
+    }),
     createEstateTenant: builder.mutation<Tenant, { estateId: string; body: CreateTenantPayload }>({
       query: ({ estateId, body }) => ({ url: `/api/estates/${estateId}/tenants`, method: 'POST', body }),
       invalidatesTags: (result, error, { estateId }) => [
@@ -268,16 +309,18 @@ export const estatesApi = createApi({
     }),
     createEstateUnit: builder.mutation<
       EstateUnit | { success?: boolean },
-      { estateId: string; body: { 
-        label: string; 
-        monthlyPrice: number; 
-        serviceChargeMonthly?: number;
-        cautionFee?: number;
-        legalFee?: number;
-        meterNumber?: string; 
-        description?: string; 
-        features?: { name: string; value: string }[]; 
-      } }
+      {
+        estateId: string; body: {
+          label: string;
+          monthlyPrice: number;
+          serviceChargeMonthly?: number;
+          cautionFee?: number;
+          legalFee?: number;
+          meterNumber?: string;
+          description?: string;
+          features?: { name: string; value: string }[];
+        }
+      }
     >({
       query: ({ estateId, body }) => ({ url: `/api/estates/${estateId}/units`, method: 'POST', body }),
       invalidatesTags: (result, error, { estateId }) => [
@@ -296,9 +339,9 @@ export const estatesApi = createApi({
       providesTags: (result) =>
         result && Array.isArray(result.data)
           ? [
-              ...result.data.map((t) => ({ type: 'Tenant' as const, id: (t.id || t._id) as string })),
-              { type: 'TenantList' as const, id: 'LIST' },
-            ]
+            ...result.data.map((t) => ({ type: 'Tenant' as const, id: (t.id || t._id) as string })),
+            { type: 'TenantList' as const, id: 'LIST' },
+          ]
           : [{ type: 'TenantList' as const, id: 'LIST' }],
     }),
     getTenant: builder.query<TenantDetailResponse | { success: boolean; data: { tenant: Tenant; overview: TenantOverview } }, string | { id: string; expand?: string; page?: number; limit?: number }>({
@@ -407,6 +450,7 @@ export const {
   useDeleteEstateMutation,
   useGetEstateOverviewQuery,
   useGetEstateThreeMonthRentQuery,
+  useGetAllEstatesOverviewQuery,
   useCreateEstateTenantMutation,
   useCreateEstateUnitMutation,
   useGetEstateVacantUnitsQuery,

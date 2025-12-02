@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { LoginRequest, LoginResponse, UpdateEmailRequest, UpdateEmailResponse, UpdatePasswordRequest, UpdatePasswordResponse } from '../types/auth';
+import type { LoginRequest, LoginResponse, UpdateEmailRequest, UpdateEmailResponse, UpdatePasswordRequest, UpdatePasswordResponse, OnboardBusinessOwnerRequest, OnboardBusinessOwnerResponse, GetBusinessOwnersResponse, UpdateBusinessOwnerRequest, UpdateBusinessOwnerStatusRequest, UpdateBusinessOwnerResponse, DeleteBusinessOwnerResponse } from '../types/auth';
 import { BASE_API_URL } from './api';
 
 // Define a service using a base URL and expected endpoints
@@ -43,9 +43,65 @@ export const authApi = createApi({
       }),
       invalidatesTags: ['Auth'],
     }),
+    onboardBusinessOwner: builder.mutation<OnboardBusinessOwnerResponse, OnboardBusinessOwnerRequest>({
+      query: (data) => ({
+        url: '/api/auth/onboard-business-owner',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Auth'],
+    }),
+    getBusinessOwners: builder.query<GetBusinessOwnersResponse, void>({
+      query: () => '/api/auth/business-owners',
+      providesTags: (result) =>
+        result
+          ? [
+            ...result.data.map(({ _id }) => ({ type: 'Auth' as const, id: _id })),
+            { type: 'Auth', id: 'LIST' },
+          ]
+          : [{ type: 'Auth', id: 'LIST' }],
+    }),
+    updateBusinessOwner: builder.mutation<UpdateBusinessOwnerResponse, { id: string; data: UpdateBusinessOwnerRequest }>({
+      query: ({ id, data }) => ({
+        url: `/api/auth/business-owner/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Auth', id },
+        { type: 'Auth', id: 'LIST' },
+      ],
+    }),
+    updateBusinessOwnerStatus: builder.mutation<UpdateBusinessOwnerResponse, { id: string; isActive: boolean }>({
+      query: ({ id, isActive }) => ({
+        url: `/api/auth/business-owner/${id}/status`,
+        method: 'PUT',
+        body: { isActive },
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Auth', id },
+        { type: 'Auth', id: 'LIST' },
+      ],
+    }),
+    deleteBusinessOwner: builder.mutation<DeleteBusinessOwnerResponse, string>({
+      query: (id) => ({
+        url: `/api/auth/business-owner/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: [{ type: 'Auth', id: 'LIST' }],
+    }),
   }),
 });
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useLoginMutation, useUpdateSuperadminEmailMutation, useUpdatePasswordMutation } = authApi;
+export const {
+  useLoginMutation,
+  useUpdateSuperadminEmailMutation,
+  useUpdatePasswordMutation,
+  useOnboardBusinessOwnerMutation,
+  useGetBusinessOwnersQuery,
+  useUpdateBusinessOwnerMutation,
+  useUpdateBusinessOwnerStatusMutation,
+  useDeleteBusinessOwnerMutation,
+} = authApi;
