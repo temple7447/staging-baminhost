@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
-import { useGetTenantQuery, useGetTenantBillingQuery, useInitiatePaymentMutation, useUpdateTenantMutation, useUpdateEstateUnitMutation } from '@/services/estatesApi';
+import { useGetTenantQuery, useGetTenantBillingQuery, useInitiatePaymentMutation, useUpdateTenantMutation, useUpdateEstateUnitMutation, useShiftTenantDueDateMutation } from '@/services/estatesApi';
 import { TenantDetailSkeleton, TableSkeleton, PropertyMediaSkeleton } from '@/components/ui/skeletons';
 import { MediaUpload } from '@/components/ui/MediaUpload';
 import { PropertyMediaDisplay } from '@/components/ui/PropertyMediaDisplay';
@@ -87,6 +87,12 @@ export const TenantDetailPage = () => {
   const [payType, setPayType] = useState<'deposit' | 'rent' | 'service-charge' | 'security-charge' | 'caution-fee' | 'legal-fee'>('rent');
   const [initiatePayment, { isLoading: paying }] = useInitiatePaymentMutation();
 
+  // Shift due date state
+  const [shiftDueDateOpen, setShiftDueDateOpen] = useState(false);
+  const [rentMonths, setRentMonths] = useState('');
+  const [serviceMonths, setServiceMonths] = useState('');
+  const [shiftDueDate, { isLoading: shiftingDueDate }] = useShiftTenantDueDateMutation();
+
   // Mock property media state (replace with actual API call)
   const [propertyMedia, setPropertyMedia] = useState<any[]>([]);
   const [mediaLoading, setMediaLoading] = useState(false);
@@ -117,7 +123,7 @@ export const TenantDetailPage = () => {
     const movedInEntries = history.filter(h => h.action === 'moved_in' || (h as any).event === 'moved_in');
     const photos: { url: string; public_id: string }[] = [];
     const videos: { url: string; public_id: string }[] = [];
-    
+
     movedInEntries.forEach(entry => {
       const meta = (entry as any).meta;
       if (meta?.photos) {
@@ -127,7 +133,7 @@ export const TenantDetailPage = () => {
         videos.push(...meta.videos);
       }
     });
-    
+
     return { photos, videos };
   };
 
@@ -425,17 +431,17 @@ export const TenantDetailPage = () => {
               <CardTitle>Property Media</CardTitle>
               <CardDescription>Initial property state documentation</CardDescription>
             </div>
-            <MediaUpload 
+            <MediaUpload
               tenantId={tenantId}
-              onUpload={handleMediaUpload} 
-              maxImages={12} 
-              maxVideos={1} 
+              onUpload={handleMediaUpload}
+              maxImages={12}
+              maxVideos={1}
             />
           </div>
         </CardHeader>
         <CardContent>
-          <PropertyMediaDisplay 
-            media={propertyMedia} 
+          <PropertyMediaDisplay
+            media={propertyMedia}
             historyMedia={historyMedia}
             isLoading={mediaLoading}
           />
@@ -449,7 +455,7 @@ export const TenantDetailPage = () => {
         </CardHeader>
         <CardContent>
           {historyLoading ? (
-            <TableSkeleton 
+            <TableSkeleton
               rows={3}
               columns={3}
               headers={["Date", "Action", "Notes"]}
@@ -464,7 +470,7 @@ export const TenantDetailPage = () => {
                     <TableHead>Notes</TableHead>
                   </TableRow>
                 </TableHeader>
-                  <TableBody>
+                <TableBody>
                   {history.map((h) => (
                     <TableRow key={h.id}>
                       <TableCell>{formatDate(h.date)}</TableCell>
@@ -472,7 +478,7 @@ export const TenantDetailPage = () => {
                       <TableCell>{h.notes || '—'}</TableCell>
                     </TableRow>
                   ))}
-                  </TableBody>
+                </TableBody>
               </Table>
             </div>
           ) : (
@@ -499,7 +505,7 @@ export const TenantDetailPage = () => {
                 <div className="grid gap-4 py-2">
                   <div className="grid gap-2">
                     <Label>Payment type</Label>
-                    <Select value={payType} onValueChange={(v: any)=>setPayType(v)}>
+                    <Select value={payType} onValueChange={(v: any) => setPayType(v)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
@@ -513,9 +519,9 @@ export const TenantDetailPage = () => {
                     </Select>
                   </div>
                   <div className="flex justify-end gap-2 pt-2">
-                    <Button variant="ghost" onClick={()=>setPayOpen(false)}>Cancel</Button>
+                    <Button variant="ghost" onClick={() => setPayOpen(false)}>Cancel</Button>
                     <Button
-                      onClick={async()=>{
+                      onClick={async () => {
                         if (!tenantId) return;
                         const item = getBillingItemForType(payType);
                         if (!item) {
@@ -549,7 +555,7 @@ export const TenantDetailPage = () => {
         </CardHeader>
         <CardContent>
           {txLoading ? (
-            <TableSkeleton 
+            <TableSkeleton
               rows={4}
               columns={5}
               headers={["Date", "Type", "Status", "Amount", "Description"]}
@@ -584,6 +590,122 @@ export const TenantDetailPage = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Shift Due Date Dialog */}
+      <Dialog open={shiftDueDateOpen} onOpenChange={(open) => {
+        setShiftDueDateOpen(open);
+        if (!open) {
+          setRentMonths('');
+          setServiceMonths('');
+        }
+      }}>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            className="fixed bottom-6 right-6 shadow-lg"
+            onClick={() => setShiftDueDateOpen(true)}
+          >
+            Shift Due Date
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Shift Tenant Due Date</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-2">
+            <div className="text-sm text-muted-foreground">
+              Pay for rent and/or service charges for a specified number of months. The due date will shift by the maximum of both values.
+            </div>
+            <div className="grid gap-2">
+              <Label>Rent Months (optional)</Label>
+              <Input
+                type="number"
+                min="1"
+                max="24"
+                placeholder="e.g., 12"
+                value={rentMonths}
+                onChange={(e) => setRentMonths(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>Service Months (optional)</Label>
+              <Input
+                type="number"
+                min="1"
+                max="24"
+                placeholder="e.g., 6"
+                value={serviceMonths}
+                onChange={(e) => setServiceMonths(e.target.value)}
+              />
+            </div>
+            {(rentMonths || serviceMonths) && (
+              <div className="p-3 bg-muted rounded-md text-sm">
+                <div className="font-medium mb-1">Due Date Shift Preview:</div>
+                <div>Due date will be shifted by <span className="font-bold">{Math.max(Number(rentMonths) || 0, Number(serviceMonths) || 0)} months</span></div>
+                {rentMonths && <div>• Rent: {rentMonths} month{Number(rentMonths) > 1 ? 's' : ''}</div>}
+                {serviceMonths && <div>• Service: {serviceMonths} month{Number(serviceMonths) > 1 ? 's' : ''}</div>}
+              </div>
+            )}
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="ghost" onClick={() => setShiftDueDateOpen(false)}>Cancel</Button>
+              <Button
+                onClick={async () => {
+                  if (!tenantId) return;
+                  const rent = Number(rentMonths);
+                  const service = Number(serviceMonths);
+
+                  if (!rentMonths && !serviceMonths) {
+                    toast({
+                      title: 'Validation Error',
+                      description: 'Please enter at least one payment duration (rent or service months).',
+                      variant: 'destructive'
+                    });
+                    return;
+                  }
+
+                  if ((rentMonths && (!Number.isInteger(rent) || rent < 1 || rent > 24)) ||
+                    (serviceMonths && (!Number.isInteger(service) || service < 1 || service > 24))) {
+                    toast({
+                      title: 'Validation Error',
+                      description: 'Months must be whole numbers between 1 and 24.',
+                      variant: 'destructive'
+                    });
+                    return;
+                  }
+
+                  try {
+                    const payload: any = {};
+                    if (rentMonths) payload.rentMonths = rent;
+                    if (serviceMonths) payload.serviceMonths = service;
+
+                    const result = await shiftDueDate({
+                      tenantId: tenantId as string,
+                      payload
+                    }).unwrap();
+
+                    toast({
+                      title: 'Due Date Shifted Successfully',
+                      description: `New due date: ${formatDate(result.data.newDueDate)}. Shifted by ${result.data.totalMonthsShifted} month(s).`
+                    });
+                    setShiftDueDateOpen(false);
+                    setRentMonths('');
+                    setServiceMonths('');
+                  } catch (e: any) {
+                    toast({
+                      title: 'Failed to Shift Due Date',
+                      description: e?.data?.message || 'An error occurred while shifting the due date.',
+                      variant: 'destructive'
+                    });
+                  }
+                }}
+                disabled={shiftingDueDate}
+              >
+                {shiftingDueDate ? 'Processing...' : 'Shift Due Date'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
