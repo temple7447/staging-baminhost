@@ -467,6 +467,12 @@ export const estatesApi = createApi({
         { type: 'TenantList', id: 'LIST' },
       ],
     }),
+    sendTenantReceipt: builder.mutation<{ success: boolean; message?: string }, string>({
+      query: (tenantId) => ({
+        url: `/api/payments/tenant/${tenantId}/receipt`,
+        method: 'POST',
+      }),
+    }),
   }),
 });
 
@@ -495,4 +501,5 @@ export const {
   useInitiatePaymentMutation,
   useVerifyPaymentQuery,
   useShiftTenantDueDateMutation,
+  useSendTenantReceiptMutation,
 } = estatesApi;

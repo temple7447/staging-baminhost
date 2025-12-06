@@ -31,6 +31,7 @@ import CandidateManagement from '@/components/hiring/CandidateManagement';
 import { AdminPeople } from '@/components/dashboard/AdminPeople';
 import { SuperAdminTransactions } from '@/components/dashboard/SuperAdminTransactions';
 import ScalableImpactPlanner from '@/components/scalable-impact/ScalableImpactPlanner';
+import { Subscription } from '@/components/dashboard/Subscription';
 
 const DashboardRouter: React.FC = () => {
   const { user } = useAuth();
@@ -80,6 +81,7 @@ const DashboardRouter: React.FC = () => {
     if (pathname.includes('settings')) return 'settings';
     if (pathname.includes('theme-showcase')) return 'theme-showcase';
     if (pathname.includes('people')) return 'people';
+    if (pathname.includes('subscription')) return 'subscription';
     return 'overview';
   };
 
@@ -369,6 +371,19 @@ const DashboardRouter: React.FC = () => {
               feature="Transactions"
               showUpgradePrompt={false}
               viewName="transactions"
+            />
+          }
+        />
+
+        {/* Subscription */}
+        <Route
+          path="/subscription"
+          element={
+            <ProtectedRoute
+              element={<Subscription />}
+              feature="Subscription"
+              showUpgradePrompt={false}
+              viewName="subscription"
             />
           }
         />

@@ -1,10 +1,10 @@
-import { 
-  LayoutDashboard, 
-  Wallet, 
-  TrendingUp, 
-  Users, 
-  FileText, 
-  MessageSquare, 
+import {
+  LayoutDashboard,
+  Wallet,
+  TrendingUp,
+  Users,
+  FileText,
+  MessageSquare,
   Settings,
   PieChart,
   Target,
@@ -18,7 +18,8 @@ import {
   DollarSign,
   UserCheck,
   TrendingDown,
-  Scale
+  Scale,
+  CreditCard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,17 +47,17 @@ interface SidebarItem {
 }
 
 const sidebarItems: SidebarItem[] = [
-  { 
-    id: "overview", 
-    label: "Overview", 
+  {
+    id: "overview",
+    label: "Overview",
     icon: LayoutDashboard,
     category: 'core',
     requiredPermissions: ['view_overview'],
     path: '/dashboard/overview'
   },
-  { 
-    id: "defining-your-number", 
-    label: "Defining Your Number", 
+  {
+    id: "defining-your-number",
+    label: "Defining Your Number",
     icon: ListChecks,
     category: 'core',
     requiredPermissions: ['view_big5'],
@@ -71,45 +72,45 @@ const sidebarItems: SidebarItem[] = [
     isPremium: true,
     path: '/dashboard/ScalableImpactPlanner'
   },
-  { 
-    id: "wallet", 
-    label: "Wallet", 
+  {
+    id: "wallet",
+    label: "Wallet",
     icon: Wallet,
     category: 'financial',
     requiredPermissions: ['view_wallet'],
     isPremium: true,
     path: '/dashboard/wallet'
   },
-  { 
-    id: "portfolio", 
-    label: "Investment Portfolio", 
+  {
+    id: "portfolio",
+    label: "Investment Portfolio",
     icon: TrendingUp,
     category: 'financial',
     requiredPermissions: ['view_portfolio'],
     isPremium: true,
     path: '/dashboard/portfolio'
   },
-  { 
-    id: "split-tracker", 
-    label: "50/30/20 Split", 
+  {
+    id: "split-tracker",
+    label: "50/30/20 Split",
     icon: PieChart,
     category: 'financial',
     requiredPermissions: ['view_split_tracker'],
     isPremium: true,
     path: '/dashboard/split-tracker'
   },
-  { 
-    id: "goals", 
-    label: "Financial Goals", 
+  {
+    id: "goals",
+    label: "Financial Goals",
     icon: Target,
     category: 'financial',
     requiredPermissions: ['view_goals'],
     isPremium: true,
     path: '/dashboard/goals'
   },
-  { 
-    id: "contacts", 
-    label: "Contacts", 
+  {
+    id: "contacts",
+    label: "Contacts",
     icon: Users,
     category: 'system',
     requiredPermissions: ['view_contacts'],
@@ -141,25 +142,25 @@ const sidebarItems: SidebarItem[] = [
     category: 'system',
     path: '/dashboard/people'
   },
-  { 
-    id: "library", 
-    label: "Library", 
+  {
+    id: "library",
+    label: "Library",
     icon: FileText,
     category: 'system',
     requiredPermissions: ['view_library'],
     path: '/dashboard/library'
   },
-  { 
-    id: "assistant", 
-    label: "Assistant", 
+  {
+    id: "assistant",
+    label: "Assistant",
     icon: MessageSquare,
     category: 'system',
     requiredPermissions: ['view_assistant'],
     path: '/dashboard/assistant'
   },
-  { 
-    id: "settings", 
-    label: "Settings", 
+  {
+    id: "settings",
+    label: "Settings",
     icon: Settings,
     category: 'core',
     requiredPermissions: ['view_settings'],
@@ -218,6 +219,13 @@ const sidebarItems: SidebarItem[] = [
     category: 'financial',
     requiredPermissions: ['view_all_data'],
     path: '/dashboard/transactions'
+  },
+  {
+    id: "subscription",
+    label: "Subscription",
+    icon: CreditCard,
+    category: 'system',
+    path: '/dashboard/subscription'
   }
 ];
 
@@ -227,14 +235,14 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
   const navigate = useNavigate();
   const location = useLocation();
   console.log("User Role:", userRole, user);
-  
+
   // Filter sidebar items based on user permissions
   const filteredItems = useFilteredNavigation(sidebarItems);
-  
+
   // Handle navigation
   const handleNavigation = (item: SidebarItem) => {
     if (!canAccessNavigation(item.id)) return;
-    
+
     if (item.path) {
       // Use URL navigation for new routing system
       navigate(item.path);
@@ -242,11 +250,11 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
       // Fallback to old state-based navigation
       onViewChange(item.id);
     }
-    
+
     // Close mobile sidebar after navigation
     onClose?.();
   };
-  
+
   // Group items by category for better organization
   const groupedItems = {
     core: filteredItems.filter(item => item.category === 'core'),
@@ -260,7 +268,7 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
     const hasAccess = canAccessNavigation(item.id);
     // Check if current URL matches the item's path or if item id matches currentView (fallback)
     const isActive = (item.path && location.pathname === item.path) || currentView === item.id;
-    
+
     const button = (
       <Button
         key={item.id}
@@ -282,7 +290,7 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
           hasAccess && !isActive && "group-hover:text-blue-400 group-hover:scale-105"
         )} />
         <span className="flex-1 font-medium">{item.label}</span>
-        
+
         {/* Access indicators */}
         {!hasAccess && <Lock className="w-3 h-3 text-slate-500" />}
         {item.isPremium && hasAccess && rolePriority >= 60 && (
@@ -323,7 +331,7 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
 
   const renderSection = (title: string, items: SidebarItem[]) => {
     if (items.length === 0) return null;
-    
+
     return (
       <div className="mb-6">
         <div className="px-2 py-2 mb-3">
@@ -342,12 +350,12 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
     <>
       {/* Mobile Overlay */}
       {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 md:hidden" 
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
           onClick={onClose}
         />
       )}
-      
+
       {/* Sidebar */}
       <aside className={cn(
         "w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/50 transition-transform duration-300 ease-in-out",
@@ -357,83 +365,83 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
         isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}>
         <div className="p-4 h-full flex flex-col">
-        {/* Mobile Close Button */}
-        <div className="md:hidden mb-4 flex justify-end">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="p-2 hover:bg-slate-700/50"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
-
-        {/* User Role Badge */}
-        <div className="mb-6 p-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-xl border border-blue-500/20">
-          <div className="flex items-center gap-2 mb-2">
-            <Crown className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm font-medium text-slate-100">Access Level</span>
+          {/* Mobile Close Button */}
+          <div className="md:hidden mb-4 flex justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="p-2 hover:bg-slate-700/50"
+            >
+              <X className="w-4 h-4" />
+            </Button>
           </div>
-          <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 font-medium">
-            {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
-          </Badge>
-        </div>
 
-        <nav className="flex-1 space-y-4 overflow-y-auto">
-          {renderSection("Dashboard", groupedItems.core)}
-          {renderSection("Financial Management", groupedItems.financial)}
-          {renderSection("Business Operations", groupedItems.business)}
-          {renderSection("System Tools", groupedItems.system)}
-        </nav>
+          {/* User Role Badge */}
+          <div className="mb-6 p-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-xl border border-blue-500/20">
+            <div className="flex items-center gap-2 mb-2">
+              <Crown className="w-4 h-4 text-yellow-400" />
+              <span className="text-sm font-medium text-slate-100">Access Level</span>
+            </div>
+            <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 font-medium">
+              {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
+            </Badge>
+          </div>
 
-        {/* Mobile User Info & Logout */}
-        <div className="md:hidden mt-6 p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-xl border border-slate-600/30 flex-shrink-0">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
-                <span className="text-white text-sm font-medium">
-                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-                </span>
-              </div>
-              <div>
-                <div className="text-sm font-medium text-slate-100">{user?.name}</div>
-                <div className="text-xs text-slate-400">{userRole} Account</div>
+          <nav className="flex-1 space-y-4 overflow-y-auto">
+            {renderSection("Dashboard", groupedItems.core)}
+            {renderSection("Financial Management", groupedItems.financial)}
+            {renderSection("Business Operations", groupedItems.business)}
+            {renderSection("System Tools", groupedItems.system)}
+          </nav>
+
+          {/* Mobile User Info & Logout */}
+          <div className="md:hidden mt-6 p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-xl border border-slate-600/30 flex-shrink-0">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
+                  <span className="text-white text-sm font-medium">
+                    {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </span>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-slate-100">{user?.name}</div>
+                  <div className="text-xs text-slate-400">{userRole} Account</div>
+                </div>
               </div>
             </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                logout();
+                onClose?.();
+              }}
+              className="w-full justify-start gap-2 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Sign Out</span>
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              logout();
-              onClose?.();
-            }}
-            className="w-full justify-start gap-2 text-red-400 hover:text-red-300 hover:bg-red-500/10"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Sign Out</span>
-          </Button>
-        </div>
 
-        {/* Access Summary */}
-        <div className="mt-6 p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-xl border border-slate-600/30 flex-shrink-0">
-          <div className="flex justify-between items-center text-xs">
-            <span className="text-slate-300 font-medium">Available Features</span>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="font-bold text-green-400">{filteredItems.length} / {sidebarItems.length}</span>
+          {/* Access Summary */}
+          <div className="mt-6 p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-xl border border-slate-600/30 flex-shrink-0">
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-slate-300 font-medium">Available Features</span>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span className="font-bold text-green-400">{filteredItems.length} / {sidebarItems.length}</span>
+              </div>
+            </div>
+            <div className="mt-2 w-full bg-slate-600 rounded-full h-1.5 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full transition-all duration-300"
+                style={{ width: `${(filteredItems.length / sidebarItems.length) * 100}%` }}
+              />
             </div>
           </div>
-          <div className="mt-2 w-full bg-slate-600 rounded-full h-1.5 overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full transition-all duration-300"
-              style={{ width: `${(filteredItems.length / sidebarItems.length) * 100}%` }}
-            />
-          </div>
-        </div>
         </div>
       </aside>
     </>
-    );
+  );
 };
