@@ -60,3 +60,12 @@ export {
   useGetReportsQuery,
   useUpdateProgressMutation,
 } from './scalableImpactApi';
+
+export {
+  subscriptionsApi,
+  useGetSubscriptionsQuery,
+  useGetSubscriptionQuery,
+  useCreateSubscriptionMutation,
+  useUpdateSubscriptionMutation,
+  useDeleteSubscriptionMutation,
+} from './subscriptionsApi';
