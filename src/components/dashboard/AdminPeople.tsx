@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { DEMO_USERS, BUSINESSES } from "@/data/demoData";
@@ -15,9 +16,13 @@ import { Building, Users as UsersIcon, UserCog, MoreVertical, UserPlus, Shield, 
 import { useAuth } from "@/contexts/AuthContext";
 import { useGetBusinessOwnersQuery, useUpdateBusinessOwnerMutation, useUpdateBusinessOwnerStatusMutation, useDeleteBusinessOwnerMutation } from "@/services/authApi";
 import { useGetEstatesQuery } from "@/services/estatesApi";
+import { useGetVendorsQuery, useUpdateVendorMutation, useUpdateVendorStatusMutation, useDeleteVendorMutation } from "@/services/vendorsApi";
+import { useGetBusinessTypesQuery } from "@/services/businessTypesApi";
 import { BusinessOwnerOnboarding } from "./BusinessOwnerOnboarding";
+import { VendorOnboarding } from "./VendorOnboarding";
 import { toast } from "@/components/ui/use-toast";
 import type { BusinessOwner } from "@/types/auth";
+import type { Vendor } from "@/services/vendorsApi";
 
 interface DemoUser {
   id: string;
@@ -66,15 +71,41 @@ export const AdminPeople = () => {
   const [updateBusinessOwnerStatus, { isLoading: togglingStatus }] = useUpdateBusinessOwnerStatusMutation();
   const [deleteBusinessOwner, { isLoading: deleting }] = useDeleteBusinessOwnerMutation();
 
-  // Managers and Vendors (from demo data)
+  // Vendors (from API)
+  const { data: vendorsData, isLoading: vendorsLoading } = useGetVendorsQuery();
+  const { data: businessTypesData } = useGetBusinessTypesQuery({ activeOnly: true });
+  const [updateVendor, { isLoading: updatingVendor }] = useUpdateVendorMutation();
+  const [updateVendorStatus, { isLoading: togglingVendorStatus }] = useUpdateVendorStatusMutation();
+  const [deleteVendor, { isLoading: deletingVendor }] = useDeleteVendorMutation();
+
+  // Managers (from demo data)
   const managers = useMemo(
     () => (DEMO_USERS as DemoUser[]).filter((u) => u.role === 'manager'),
     []
   );
-  const vendors = useMemo(
+
+  // Combine API vendors with demo vendors
+  const apiVendors = vendorsData?.data ?? [];
+  const demoVendors = useMemo(
     () => (DEMO_USERS as DemoUser[]).filter((u) => u.role === 'vendor'),
     []
   );
+  const allVendors = useMemo(() => {
+    // Convert API vendors to match DemoUser interface for display
+    const convertedApiVendors = apiVendors.map((v) => ({
+      id: v.id || v._id || '',
+      name: v.name,
+      email: v.email,
+      role: 'vendor' as const,
+      isApiVendor: true,
+      isActive: v.isActive,
+      businessType: v.businessType,
+      businessName: v.businessName,
+      specialization: v.specialization,
+      phone: v.phone,
+    }));
+    return [...convertedApiVendors, ...demoVendors];
+  }, [apiVendors, demoVendors]);
 
   const [search, setSearch] = useState("");
   const [detailOpen, setDetailOpen] = useState(false);
@@ -92,8 +123,23 @@ export const AdminPeople = () => {
   const [statusOpen, setStatusOpen] = useState(false);
   const [statusOwner, setStatusOwner] = useState<BusinessOwner | null>(null);
 
+  // Vendor Status Toggle State
+  const [vendorStatusOpen, setVendorStatusOpen] = useState(false);
+  const [statusVendor, setStatusVendor] = useState<Vendor | null>(null);
+
+  // Vendor Edit State
+  const [editVendorOpen, setEditVendorOpen] = useState(false);
+  const [editingVendor, setEditingVendor] = useState<Vendor | null>(null);
+  const [editVendorName, setEditVendorName] = useState('');
+  const [editVendorEmail, setEditVendorEmail] = useState('');
+  const [editVendorPhone, setEditVendorPhone] = useState('');
+  const [editVendorBusinessTypeId, setEditVendorBusinessTypeId] = useState('');
+  const [editVendorBusinessName, setEditVendorBusinessName] = useState('');
+  const [editVendorSpecialization, setEditVendorSpecialization] = useState('');
+
   const businessOwners = businessOwnersData?.data ?? [];
   const estates = estatesPage?.data ?? [];
+  const businessTypes = businessTypesData?.data ?? [];
 
   const filteredBusinessOwners = businessOwners.filter(
     (bo) =>
@@ -103,7 +149,7 @@ export const AdminPeople = () => {
   const filteredManagers = managers.filter(
     (m) => m.name.toLowerCase().includes(search.toLowerCase()) || m.email.toLowerCase().includes(search.toLowerCase())
   );
-  const filteredVendors = vendors.filter(
+  const filteredVendors = allVendors.filter(
     (v) => v.name.toLowerCase().includes(search.toLowerCase()) || v.email.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -186,6 +232,81 @@ export const AdminPeople = () => {
     setEditEstateIds((prev) =>
       prev.includes(estateId) ? prev.filter((id) => id !== estateId) : [...prev, estateId]
     );
+  };
+
+  // Vendor handlers
+  const openVendorStatusToggle = (vendor: Vendor) => {
+    setStatusVendor(vendor);
+    setVendorStatusOpen(true);
+  };
+
+  const handleVendorStatusToggle = async () => {
+    if (!statusVendor) return;
+    try {
+      await updateVendorStatus({
+        id: statusVendor.id || statusVendor._id || '',
+        isActive: !statusVendor.isActive,
+      }).unwrap();
+      toast({
+        title: `Vendor ${!statusVendor.isActive ? 'activated' : 'deactivated'} successfully`,
+      });
+      setVendorStatusOpen(false);
+    } catch (error: any) {
+      toast({
+        title: 'Failed to update vendor status',
+        description: error?.data?.message || 'An error occurred',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const openVendorEdit = (vendor: Vendor) => {
+    setEditingVendor(vendor);
+    setEditVendorName(vendor.name);
+    setEditVendorEmail(vendor.email);
+    setEditVendorPhone(vendor.phone || '');
+    setEditVendorBusinessTypeId(vendor.businessTypeId || '');
+    setEditVendorBusinessName(vendor.businessName || '');
+    setEditVendorSpecialization(vendor.specialization || '');
+    setEditVendorOpen(true);
+  };
+
+  const handleVendorEdit = async () => {
+    if (!editingVendor) return;
+    try {
+      await updateVendor({
+        id: editingVendor.id || editingVendor._id || '',
+        data: {
+          name: editVendorName.trim(),
+          email: editVendorEmail.trim(),
+          phone: editVendorPhone.trim(),
+          businessTypeId: editVendorBusinessTypeId || undefined,
+          businessName: editVendorBusinessName.trim(),
+          specialization: editVendorSpecialization.trim(),
+        },
+      }).unwrap();
+      toast({ title: 'Vendor updated successfully' });
+      setEditVendorOpen(false);
+    } catch (error: any) {
+      toast({
+        title: 'Failed to update vendor',
+        description: error?.data?.message || 'An error occurred',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleVendorDelete = async (vendorId: string) => {
+    try {
+      await deleteVendor(vendorId).unwrap();
+      toast({ title: 'Vendor deleted successfully' });
+    } catch (error: any) {
+      toast({
+        title: 'Failed to delete vendor',
+        description: error?.data?.message || 'An error occurred',
+        variant: 'destructive',
+      });
+    }
   };
 
   const assigned = selected ? getAssignedBusiness(selected) : null;
@@ -399,45 +520,118 @@ export const AdminPeople = () => {
                 <UsersIcon className="h-4 w-4" />
                 <CardTitle>Vendors</CardTitle>
               </div>
-              <Badge variant="outline">{filteredVendors.length}</Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline">{filteredVendors.length}</Badge>
+                <VendorOnboarding />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Commission</TableHead>
-                      <TableHead>Earnings</TableHead>
-                      <TableHead>Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredVendors.map((u) => (
-                      <TableRow key={u.id}>
-                        <TableCell className="font-medium">{u.name}</TableCell>
-                        <TableCell>{u.email}</TableCell>
-                        <TableCell>
-                          {u.commissionRate != null ? (
-                            <span>{u.commissionRate}%</span>
-                          ) : (
-                            '—'
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {u.totalEarnings != null ? `₦${u.totalEarnings.toLocaleString()}` : '—'}
-                        </TableCell>
-                        <TableCell>
-                          <Button size="sm" variant="outline" onClick={() => openDetails(u)}>
-                            View
-                          </Button>
-                        </TableCell>
+              {vendorsLoading ? (
+                <div className="text-sm text-muted-foreground">Loading vendors...</div>
+              ) : (
+                <div className="rounded-md border overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Business</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Action</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredVendors.map((v: any) => (
+                        <TableRow key={v.id}>
+                          <TableCell className="font-medium">{v.name}</TableCell>
+                          <TableCell>{v.email}</TableCell>
+                          <TableCell>
+                            {v.businessName || v.businessType || v.commissionRate != null ? (
+                              <div className="text-sm">
+                                {v.businessName && <div>{v.businessName}</div>}
+                                {v.businessType && <div className="text-muted-foreground text-xs">{v.businessType}</div>}
+                                {v.commissionRate != null && <span>{v.commissionRate}%</span>}
+                              </div>
+                            ) : (
+                              '—'
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {v.isApiVendor ? (
+                              <Badge variant={v.isActive ? "default" : "destructive"} className="flex items-center gap-1 w-fit">
+                                {v.isActive ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                                {v.isActive ? "Active" : "Inactive"}
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary">Demo</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {v.isApiVendor ? (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => openVendorEdit(v)}>
+                                    <Pencil className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => openVendorStatusToggle(v)}>
+                                    {v.isActive ? (
+                                      <>
+                                        <XCircle className="h-4 w-4 mr-2" />
+                                        Deactivate
+                                      </>
+                                    ) : (
+                                      <>
+                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        Activate
+                                      </>
+                                    )}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                        <Trash2 className="h-4 w-4 mr-2 text-destructive" />
+                                        <span className="text-destructive">Delete</span>
+                                      </DropdownMenuItem>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Delete Vendor?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          This will permanently delete {v.name}. This action cannot be undone.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() => handleVendorDelete(v.id)}
+                                          className="bg-destructive hover:bg-destructive/90"
+                                        >
+                                          {deletingVendor ? "Deleting..." : "Delete"}
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            ) : (
+                              <Button size="sm" variant="outline" onClick={() => openDetails(v)}>
+                                View
+                              </Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -598,6 +792,107 @@ export const AdminPeople = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleStatusToggle} disabled={togglingStatus}>
               {togglingStatus ? 'Updating...' : 'Confirm'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Vendor Dialog */}
+      <Dialog open={editVendorOpen} onOpenChange={setEditVendorOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Vendor</DialogTitle>
+            <DialogDescription>Update vendor information</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="edit-vendor-name">Full Name</Label>
+              <Input
+                id="edit-vendor-name"
+                value={editVendorName}
+                onChange={(e) => setEditVendorName(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-vendor-email">Email</Label>
+              <Input
+                id="edit-vendor-email"
+                type="email"
+                value={editVendorEmail}
+                onChange={(e) => setEditVendorEmail(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-vendor-phone">Phone</Label>
+              <Input
+                id="edit-vendor-phone"
+                type="tel"
+                value={editVendorPhone}
+                onChange={(e) => setEditVendorPhone(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-vendor-business-type">Business Type</Label>
+              <Select value={editVendorBusinessTypeId} onValueChange={setEditVendorBusinessTypeId}>
+                <SelectTrigger id="edit-vendor-business-type">
+                  <SelectValue placeholder="Select business type (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {businessTypes.map((type) => (
+                    <SelectItem key={type._id} value={type._id}>
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-vendor-business-name">Business Name</Label>
+                <Input
+                  id="edit-vendor-business-name"
+                  value={editVendorBusinessName}
+                  onChange={(e) => setEditVendorBusinessName(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-vendor-specialization">Specialization</Label>
+                <Input
+                  id="edit-vendor-specialization"
+                  value={editVendorSpecialization}
+                  onChange={(e) => setEditVendorSpecialization(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button variant="outline" onClick={() => setEditVendorOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleVendorEdit} disabled={updatingVendor}>
+              {updatingVendor ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Vendor Status Toggle Dialog */}
+      <AlertDialog open={vendorStatusOpen} onOpenChange={setVendorStatusOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {statusVendor?.isActive ? 'Deactivate' : 'Activate'} Vendor?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {statusVendor?.isActive
+                ? `This will deactivate ${statusVendor?.name}. They will not be able to access the system.`
+                : `This will activate ${statusVendor?.name}. They will be able to access the system again.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleVendorStatusToggle} disabled={togglingVendorStatus}>
+              {togglingVendorStatus ? 'Updating...' : 'Confirm'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

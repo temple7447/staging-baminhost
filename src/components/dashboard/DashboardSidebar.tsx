@@ -19,7 +19,8 @@ import {
   UserCheck,
   TrendingDown,
   Scale,
-  CreditCard
+  CreditCard,
+  Briefcase
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -141,6 +142,13 @@ const sidebarItems: SidebarItem[] = [
     icon: Users,
     category: 'system',
     path: '/dashboard/people'
+  },
+  {
+    id: "business-types",
+    label: "Business Types",
+    icon: Briefcase,
+    category: 'system',
+    path: '/dashboard/business-types'
   },
   {
     id: "library",

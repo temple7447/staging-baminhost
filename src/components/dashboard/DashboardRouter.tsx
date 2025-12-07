@@ -29,6 +29,7 @@ import { Big5Dashboard } from '@/components/big5/Big5Dashboard';
 import StrategicHiringPlanner from '@/components/hiring/StrategicHiringPlanner';
 import CandidateManagement from '@/components/hiring/CandidateManagement';
 import { AdminPeople } from '@/components/dashboard/AdminPeople';
+import { BusinessTypeManagement } from '@/components/dashboard/BusinessTypeManagement';
 import { SuperAdminTransactions } from '@/components/dashboard/SuperAdminTransactions';
 import ScalableImpactPlanner from '@/components/scalable-impact/ScalableImpactPlanner';
 import { Subscription } from '@/components/dashboard/Subscription';
@@ -81,6 +82,7 @@ const DashboardRouter: React.FC = () => {
     if (pathname.includes('settings')) return 'settings';
     if (pathname.includes('theme-showcase')) return 'theme-showcase';
     if (pathname.includes('people')) return 'people';
+    if (pathname.includes('business-types')) return 'business-types';
     if (pathname.includes('subscription')) return 'subscription';
     return 'overview';
   };
@@ -410,6 +412,9 @@ const DashboardRouter: React.FC = () => {
 
         {/* People */}
         <Route path="/people" element={<AdminPeople />} />
+
+        {/* Business Types */}
+        <Route path="/business-types" element={<BusinessTypeManagement />} />
 
         {/* Tenant Detail */}
         <Route

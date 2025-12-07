@@ -69,3 +69,21 @@ export {
   useUpdateSubscriptionMutation,
   useDeleteSubscriptionMutation,
 } from './subscriptionsApi';
+
+export {
+  vendorsApi,
+  useGetVendorsQuery,
+  useOnboardVendorMutation,
+  useUpdateVendorMutation,
+  useUpdateVendorStatusMutation,
+  useDeleteVendorMutation,
+} from './vendorsApi';
+
+export {
+  businessTypesApi,
+  useGetBusinessTypesQuery,
+  useGetBusinessTypeQuery,
+  useCreateBusinessTypeMutation,
+  useUpdateBusinessTypeMutation,
+  useDeleteBusinessTypeMutation,
+} from './businessTypesApi';
