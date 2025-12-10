@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { LoginRequest, LoginResponse, UpdateEmailRequest, UpdateEmailResponse, UpdatePasswordRequest, UpdatePasswordResponse, OnboardBusinessOwnerRequest, OnboardBusinessOwnerResponse, GetBusinessOwnersResponse, UpdateBusinessOwnerRequest, UpdateBusinessOwnerStatusRequest, UpdateBusinessOwnerResponse, DeleteBusinessOwnerResponse } from '../types/auth';
+import type { LoginRequest, LoginResponse, UpdateEmailRequest, UpdateEmailResponse, UpdatePasswordRequest, UpdatePasswordResponse, OnboardBusinessOwnerRequest, OnboardBusinessOwnerResponse, GetBusinessOwnersResponse, UpdateBusinessOwnerRequest, UpdateBusinessOwnerStatusRequest, UpdateBusinessOwnerResponse, DeleteBusinessOwnerResponse, OnboardManagerRequest, OnboardManagerResponse, GetManagersResponse, UpdateManagerRequest, UpdateManagerResponse, DeleteManagerResponse } from '../types/auth';
 import { BASE_API_URL } from './api';
 
 // Define a service using a base URL and expected endpoints
@@ -90,6 +90,54 @@ export const authApi = createApi({
       }),
       invalidatesTags: [{ type: 'Auth', id: 'LIST' }],
     }),
+    // Manager endpoints
+    onboardManager: builder.mutation<OnboardManagerResponse, OnboardManagerRequest>({
+      query: (data) => ({
+        url: '/api/auth/onboard-manager',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Auth'],
+    }),
+    getManagers: builder.query<GetManagersResponse, void>({
+      query: () => '/api/auth/managers',
+      providesTags: (result) =>
+        result
+          ? [
+            ...result.data.map(({ _id }) => ({ type: 'Auth' as const, id: _id })),
+            { type: 'Auth', id: 'MANAGER_LIST' },
+          ]
+          : [{ type: 'Auth', id: 'MANAGER_LIST' }],
+    }),
+    updateManager: builder.mutation<UpdateManagerResponse, { id: string; data: UpdateManagerRequest }>({
+      query: ({ id, data }) => ({
+        url: `/api/auth/manager/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Auth', id },
+        { type: 'Auth', id: 'MANAGER_LIST' },
+      ],
+    }),
+    updateManagerStatus: builder.mutation<UpdateManagerResponse, { id: string; isActive: boolean }>({
+      query: ({ id, isActive }) => ({
+        url: `/api/auth/manager/${id}/status`,
+        method: 'PUT',
+        body: { isActive },
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Auth', id },
+        { type: 'Auth', id: 'MANAGER_LIST' },
+      ],
+    }),
+    deleteManager: builder.mutation<DeleteManagerResponse, string>({
+      query: (id) => ({
+        url: `/api/auth/manager/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: [{ type: 'Auth', id: 'MANAGER_LIST' }],
+    }),
   }),
 });
 
@@ -104,4 +152,9 @@ export const {
   useUpdateBusinessOwnerMutation,
   useUpdateBusinessOwnerStatusMutation,
   useDeleteBusinessOwnerMutation,
+  useOnboardManagerMutation,
+  useGetManagersQuery,
+  useUpdateManagerMutation,
+  useUpdateManagerStatusMutation,
+  useDeleteManagerMutation,
 } = authApi;

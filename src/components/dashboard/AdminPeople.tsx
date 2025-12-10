@@ -14,14 +14,15 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { DEMO_USERS, BUSINESSES } from "@/data/demoData";
 import { Building, Users as UsersIcon, UserCog, MoreVertical, UserPlus, Shield, CheckCircle, XCircle, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useGetBusinessOwnersQuery, useUpdateBusinessOwnerMutation, useUpdateBusinessOwnerStatusMutation, useDeleteBusinessOwnerMutation } from "@/services/authApi";
+import { useGetBusinessOwnersQuery, useUpdateBusinessOwnerMutation, useUpdateBusinessOwnerStatusMutation, useDeleteBusinessOwnerMutation, useGetManagersQuery, useUpdateManagerMutation, useUpdateManagerStatusMutation, useDeleteManagerMutation } from "@/services/authApi";
 import { useGetEstatesQuery } from "@/services/estatesApi";
 import { useGetVendorsQuery, useUpdateVendorMutation, useUpdateVendorStatusMutation, useDeleteVendorMutation } from "@/services/vendorsApi";
 import { useGetBusinessTypesQuery } from "@/services/businessTypesApi";
 import { BusinessOwnerOnboarding } from "./BusinessOwnerOnboarding";
 import { VendorOnboarding } from "./VendorOnboarding";
+import { ManagerOnboarding } from "./ManagerOnboarding";
 import { toast } from "@/components/ui/use-toast";
-import type { BusinessOwner } from "@/types/auth";
+import type { BusinessOwner, Manager } from "@/types/auth";
 import type { Vendor } from "@/services/vendorsApi";
 
 interface DemoUser {
@@ -78,11 +79,11 @@ export const AdminPeople = () => {
   const [updateVendorStatus, { isLoading: togglingVendorStatus }] = useUpdateVendorStatusMutation();
   const [deleteVendor, { isLoading: deletingVendor }] = useDeleteVendorMutation();
 
-  // Managers (from demo data)
-  const managers = useMemo(
-    () => (DEMO_USERS as DemoUser[]).filter((u) => u.role === 'manager'),
-    []
-  );
+  // Managers (from API)
+  const { data: managersData, isLoading: managersLoading } = useGetManagersQuery();
+  const [updateManager, { isLoading: updatingManager }] = useUpdateManagerMutation();
+  const [updateManagerStatus, { isLoading: togglingManagerStatus }] = useUpdateManagerStatusMutation();
+  const [deleteManager, { isLoading: deletingManager }] = useDeleteManagerMutation();
 
   // Combine API vendors with demo vendors
   const apiVendors = vendorsData?.data ?? [];
@@ -137,9 +138,22 @@ export const AdminPeople = () => {
   const [editVendorBusinessName, setEditVendorBusinessName] = useState('');
   const [editVendorSpecialization, setEditVendorSpecialization] = useState('');
 
+  // Manager Edit State
+  const [editManagerOpen, setEditManagerOpen] = useState(false);
+  const [editingManager, setEditingManager] = useState<Manager | null>(null);
+  const [editManagerName, setEditManagerName] = useState('');
+  const [editManagerEmail, setEditManagerEmail] = useState('');
+  const [editManagerPhone, setEditManagerPhone] = useState('');
+  const [editManagerEstateIds, setEditManagerEstateIds] = useState<string[]>([]);
+
+  // Manager Status Toggle State
+  const [managerStatusOpen, setManagerStatusOpen] = useState(false);
+  const [statusManager, setStatusManager] = useState<Manager | null>(null);
+
   const businessOwners = businessOwnersData?.data ?? [];
   const estates = estatesPage?.data ?? [];
   const businessTypes = businessTypesData?.data ?? [];
+  const managers = managersData?.data ?? [];
 
   const filteredBusinessOwners = businessOwners.filter(
     (bo) =>
@@ -307,6 +321,83 @@ export const AdminPeople = () => {
         variant: 'destructive',
       });
     }
+  };
+
+  // Manager handlers
+  const openManagerEdit = (manager: Manager) => {
+    setEditingManager(manager);
+    setEditManagerName(manager.name);
+    setEditManagerEmail(manager.email);
+    setEditManagerPhone(manager.phone);
+    setEditManagerEstateIds(manager.assignedEstates.map((e) => e._id));
+    setEditManagerOpen(true);
+  };
+
+  const handleManagerEdit = async () => {
+    if (!editingManager) return;
+    try {
+      await updateManager({
+        id: editingManager._id,
+        data: {
+          name: editManagerName.trim(),
+          email: editManagerEmail.trim(),
+          phone: editManagerPhone.trim(),
+          estateIds: editManagerEstateIds,
+        },
+      }).unwrap();
+      toast({ title: 'Manager updated successfully' });
+      setEditManagerOpen(false);
+    } catch (error: any) {
+      toast({
+        title: 'Failed to update manager',
+        description: error?.data?.message || 'An error occurred',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const openManagerStatusToggle = (manager: Manager) => {
+    setStatusManager(manager);
+    setManagerStatusOpen(true);
+  };
+
+  const handleManagerStatusToggle = async () => {
+    if (!statusManager) return;
+    try {
+      await updateManagerStatus({
+        id: statusManager._id,
+        isActive: !statusManager.isActive,
+      }).unwrap();
+      toast({
+        title: `Manager ${!statusManager.isActive ? 'activated' : 'deactivated'} successfully`,
+      });
+      setManagerStatusOpen(false);
+    } catch (error: any) {
+      toast({
+        title: 'Failed to update manager status',
+        description: error?.data?.message || 'An error occurred',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleManagerDelete = async (managerId: string) => {
+    try {
+      await deleteManager(managerId).unwrap();
+      toast({ title: 'Manager deleted successfully' });
+    } catch (error: any) {
+      toast({
+        title: 'Failed to delete manager',
+        description: error?.data?.message || 'An error occurred',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const toggleManagerEstateSelection = (estateId: string) => {
+    setEditManagerEstateIds((prev) =>
+      prev.includes(estateId) ? prev.filter((id) => id !== estateId) : [...prev, estateId]
+    );
   };
 
   const assigned = selected ? getAssignedBusiness(selected) : null;
@@ -477,37 +568,117 @@ export const AdminPeople = () => {
                 <UserCog className="h-4 w-4" />
                 <CardTitle>Managers</CardTitle>
               </div>
-              <Badge variant="outline">{filteredManagers.length}</Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline">{filteredManagers.length}</Badge>
+                <ManagerOnboarding />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Department</TableHead>
-                      <TableHead>Rate</TableHead>
-                      <TableHead>Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredManagers.map((u) => (
-                      <TableRow key={u.id}>
-                        <TableCell className="font-medium">{u.name}</TableCell>
-                        <TableCell>{u.email}</TableCell>
-                        <TableCell className="capitalize">{u.department?.replace('_', ' ') || '—'}</TableCell>
-                        <TableCell>{u.hourlyRate ? `₦${u.hourlyRate.toLocaleString()}/hr` : '—'}</TableCell>
-                        <TableCell>
-                          <Button size="sm" variant="outline" onClick={() => openDetails(u)}>
-                            View
-                          </Button>
-                        </TableCell>
+              {managersLoading ? (
+                <div className="text-sm text-muted-foreground">Loading managers...</div>
+              ) : filteredManagers.length === 0 ? (
+                <div className="text-sm text-muted-foreground">No managers found.</div>
+              ) : (
+                <div className="rounded-md border overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Phone</TableHead>
+                        <TableHead>Assigned Estates</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Last Login</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredManagers.map((manager) => (
+                        <TableRow key={manager._id}>
+                          <TableCell className="font-medium">{manager.name}</TableCell>
+                          <TableCell>{manager.email}</TableCell>
+                          <TableCell>{manager.phone}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-1 flex-wrap">
+                              {manager.assignedEstates.map((estate) => (
+                                <Badge key={estate._id} variant="secondary" className="text-xs">
+                                  {estate.name}
+                                </Badge>
+                              ))}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={manager.isActive ? "default" : "destructive"} className="flex items-center gap-1 w-fit">
+                              {manager.isActive ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                              {manager.isActive ? "Active" : "Inactive"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {manager.lastLogin
+                              ? new Date(manager.lastLogin).toLocaleDateString()
+                              : "Never"}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => openManagerEdit(manager)}>
+                                  <Pencil className="h-4 w-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => openManagerStatusToggle(manager)}>
+                                  {manager.isActive ? (
+                                    <>
+                                      <XCircle className="h-4 w-4 mr-2" />
+                                      Deactivate
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCircle className="h-4 w-4 mr-2" />
+                                      Activate
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                      <Trash2 className="h-4 w-4 mr-2 text-destructive" />
+                                      <span className="text-destructive">Delete</span>
+                                    </DropdownMenuItem>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Delete Manager?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        This will permanently delete {manager.name}. Their assigned estates will not be deleted.
+                                        This action cannot be undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => handleManagerDelete(manager._id)}
+                                        className="bg-destructive hover:bg-destructive/90"
+                                      >
+                                        {deletingManager ? "Deleting..." : "Delete"}
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -893,6 +1064,108 @@ export const AdminPeople = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleVendorStatusToggle} disabled={togglingVendorStatus}>
               {togglingVendorStatus ? 'Updating...' : 'Confirm'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Manager Dialog */}
+      <Dialog open={editManagerOpen} onOpenChange={setEditManagerOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Manager</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-6 py-4">
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-manager-name">Full Name</Label>
+                <Input
+                  id="edit-manager-name"
+                  value={editManagerName}
+                  onChange={(e) => setEditManagerName(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-manager-email">Email</Label>
+                <Input
+                  id="edit-manager-email"
+                  type="email"
+                  value={editManagerEmail}
+                  onChange={(e) => setEditManagerEmail(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-manager-phone">Phone</Label>
+                <Input
+                  id="edit-manager-phone"
+                  type="tel"
+                  value={editManagerPhone}
+                  onChange={(e) => setEditManagerPhone(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Estate Selection */}
+            <div className="grid gap-2">
+              <Label>Assigned Estates</Label>
+              <div className="border rounded-md p-4 max-h-60 overflow-y-auto">
+                <div className="space-y-3">
+                  {estates.map((estate) => (
+                    <div
+                      key={estate.id}
+                      className="flex items-center space-x-3 p-2 hover:bg-muted rounded-md cursor-pointer"
+                      onClick={() => toggleManagerEstateSelection(estate.id)}
+                    >
+                      <Checkbox
+                        checked={editManagerEstateIds.includes(estate.id)}
+                        onCheckedChange={() => toggleManagerEstateSelection(estate.id)}
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium">{estate.name}</div>
+                        {estate.description && (
+                          <div className="text-xs text-muted-foreground">{estate.description}</div>
+                        )}
+                      </div>
+                      {typeof estate.totalUnits === 'number' && (
+                        <Badge variant="secondary" className="text-xs">
+                          {estate.totalUnits} units
+                        </Badge>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4 border-t">
+              <Button variant="outline" onClick={() => setEditManagerOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleManagerEdit} disabled={updatingManager}>
+                {updatingManager ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Manager Status Toggle Dialog */}
+      <AlertDialog open={managerStatusOpen} onOpenChange={setManagerStatusOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {statusManager?.isActive ? 'Deactivate' : 'Activate'} Manager?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {statusManager?.isActive
+                ? `This will deactivate ${statusManager?.name}. They will not be able to access the system.`
+                : `This will activate ${statusManager?.name}. They will be able to access the system again.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleManagerStatusToggle} disabled={togglingManagerStatus}>
+              {togglingManagerStatus ? 'Updating...' : 'Confirm'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

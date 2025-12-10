@@ -123,3 +123,78 @@ export interface DeleteBusinessOwnerResponse {
   success: boolean;
   message: string;
 }
+
+// Manager Types
+export interface OnboardManagerRequest {
+  name: string;
+  email: string;
+  phone: string;
+  estateIds: string[];
+  sendCredentials?: boolean;
+}
+
+export interface OnboardManagerResponse {
+  success: boolean;
+  message: string;
+  data: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    role: 'manager';
+    assignedEstates: Array<{
+      _id: string;
+      name: string;
+      totalUnits?: number;
+    }>;
+    isActive: boolean;
+    createdAt: string;
+  };
+}
+
+export interface Manager {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: 'manager';
+  assignedEstates: Array<{
+    _id: string;
+    name: string;
+    totalUnits?: number;
+  }>;
+  isActive: boolean;
+  emailVerified: boolean;
+  lastLogin?: string;
+  createdBy?: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GetManagersResponse {
+  success: boolean;
+  count: number;
+  data: Manager[];
+}
+
+export interface UpdateManagerRequest {
+  name?: string;
+  email?: string;
+  phone?: string;
+  estateIds?: string[];
+}
+
+export interface UpdateManagerResponse {
+  success: boolean;
+  message: string;
+  data: Manager;
+}
+
+export interface DeleteManagerResponse {
+  success: boolean;
+  message: string;
+}
