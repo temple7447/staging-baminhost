@@ -37,17 +37,17 @@ const DoubleYourTakeHome: React.FC<Props> = ({ data, onDataChange, onComplete, o
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-2 border-rose-200 bg-gradient-to-r from-rose-50 to-pink-50">
+      <Card className="border border-slate-200 bg-slate-50/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Wallet className="w-6 h-6" />
+          <CardTitle className="flex items-center gap-2 text-slate-900">
+            <Wallet className="w-6 h-6 text-slate-700" />
             Level 4: Double Your Take-Home
-            <Badge variant="outline" className="bg-white">Turn the business into a cash machine</Badge>
+            <Badge variant="outline" className="bg-white text-slate-600">Turn the business into a cash machine</Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-slate-700">
-          <Alert className="border-rose-200 bg-white">
-            <Lightbulb className="h-4 w-4 text-rose-600" />
+        <CardContent className="space-y-3 text-slate-600">
+          <Alert className="border-slate-200 bg-white">
+            <Lightbulb className="h-4 w-4 text-slate-600" />
             <AlertDescription>
               Cash fuels scale. This module increases profitability so the business can richly serve you and everyone it impacts.
             </AlertDescription>

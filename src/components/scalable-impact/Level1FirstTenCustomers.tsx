@@ -44,14 +44,14 @@ export const Level1FirstTenCustomers: React.FC<Level1FirstTenCustomersProps> = (
   return (
     <div className="space-y-4">
       {/* Main Header */}
-      <Card className="border-2 border-pink-200 bg-gradient-to-r from-pink-50 to-purple-50">
+      <Card className="border border-slate-200 bg-slate-50/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-3 text-2xl md:text-3xl text-pink-900">
-            <Target className="w-7 h-7 md:w-8 md:h-8" />
+          <CardTitle className="flex items-center gap-3 text-2xl md:text-3xl text-slate-900">
+            <Target className="w-7 h-7 md:w-8 md:h-8 text-slate-700" />
             Level 1: Get Your First 10 Customers
-            <Badge className="bg-red-500 text-white text-xs md:text-sm">DO THIS FIRST!</Badge>
+            <Badge className="bg-slate-600 text-white text-xs md:text-sm">MANDATORY</Badge>
           </CardTitle>
-          <p className="text-slate-700 text-sm md:text-base mt-2">
+          <p className="text-slate-600 text-sm md:text-base mt-2">
             Navigate through the tabs below to understand, complete, and verify Level 1 requirements.
           </p>
         </CardHeader>

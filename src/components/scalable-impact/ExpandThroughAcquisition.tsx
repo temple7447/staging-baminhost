@@ -27,17 +27,17 @@ const ExpandThroughAcquisition: React.FC<Props> = ({ data, onDataChange, onCompl
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-2 border-violet-200 bg-gradient-to-r from-violet-50 to-fuchsia-50">
+      <Card className="border border-slate-200 bg-slate-50/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="w-6 h-6" />
+          <CardTitle className="flex items-center gap-2 text-slate-900">
+            <Building2 className="w-6 h-6 text-slate-700" />
             Level 6: Expanding Through Acquisition
-            <Badge variant="outline" className="bg-white">Fastest path to scale (when done right)</Badge>
+            <Badge variant="outline" className="bg-white text-slate-600">Fastest path to scale (when done right)</Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-slate-700">
-          <Alert className="border-violet-200 bg-white">
-            <Lightbulb className="h-4 w-4 text-violet-600" />
+        <CardContent className="space-y-3 text-slate-600">
+          <Alert className="border-slate-200 bg-white">
+            <Lightbulb className="h-4 w-4 text-slate-600" />
             <AlertDescription>
               Every business eventually caps out organically. Learning acquisitions gives you options to grow leads, talent, margin, market share, and enterprise value.
             </AlertDescription>

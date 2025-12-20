@@ -2,6 +2,9 @@ import { Users, Target, TrendingUp, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Crown, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Mock data for Manager
 const managerData = {
@@ -33,6 +36,7 @@ const managerData = {
 };
 
 export const ManagerDashboard = () => {
+  const navigate = useNavigate();
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -128,6 +132,29 @@ export const ManagerDashboard = () => {
         </Card>
       </div>
 
+      {/* Hire Like a Boss Call to Action */}
+      <Card className="financial-card bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-blue-600/10 border-blue-500/20 shadow-lg">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-900/40">
+                <Crown className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-foreground">Hire Like a Boss</h3>
+                <p className="text-sm text-muted-foreground italic">"You're not paying people to be on your team. You're buying back your own time."</p>
+              </div>
+            </div>
+            <Button
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8"
+              onClick={() => navigate('/dashboard/strategic-hiring-planner')}
+            >
+              Open Hiring Planner <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Team Performance */}
       <Card className="financial-card">
         <CardHeader>
@@ -148,7 +175,7 @@ export const ManagerDashboard = () => {
                     <div className="text-sm text-muted-foreground">{member.role}</div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-4">
                   <div className="text-right">
                     <div className="financial-amount font-semibold">
@@ -187,7 +214,7 @@ export const ManagerDashboard = () => {
               </div>
               <Progress value={60} className="h-3" />
             </div>
-            
+
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium">Manager Share (20%)</span>
@@ -197,7 +224,7 @@ export const ManagerDashboard = () => {
               </div>
               <Progress value={20} className="h-3" />
             </div>
-            
+
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium">Company Share (20%)</span>
@@ -251,7 +278,7 @@ export const ManagerDashboard = () => {
               </div>
               <div className="text-xs text-muted-foreground mt-1">Living expenses & savings</div>
             </div>
-            
+
             <div className="p-4 rounded-lg bg-gradient-to-br from-success-light/10 to-success-light/5 border border-success-light/20">
               <div className="text-sm font-medium text-success">Business Growth (1/3)</div>
               <div className="financial-amount text-xl font-bold mt-1">
@@ -259,7 +286,7 @@ export const ManagerDashboard = () => {
               </div>
               <div className="text-xs text-muted-foreground mt-1">Team development & tools</div>
             </div>
-            
+
             <div className="p-4 rounded-lg bg-gradient-to-br from-warning-light/10 to-warning-light/5 border border-warning-light/20">
               <div className="text-sm font-medium text-warning">Future Investments (1/3)</div>
               <div className="financial-amount text-xl font-bold mt-1">

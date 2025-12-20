@@ -124,19 +124,19 @@ export const OperatingSystemBuilder: React.FC<Props> = ({ data, onDataChange, on
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50">
+      <Card className="border border-slate-200 bg-slate-50/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Settings className="w-6 h-6" />
+          <CardTitle className="flex items-center gap-2 text-slate-900">
+            <Settings className="w-6 h-6 text-slate-700" />
             Level 3: Upgrade Your Operating System
-            <Badge variant="outline" className="bg-white">Make the business run without you</Badge>
+            <Badge variant="outline" className="bg-white text-slate-600">Make the business run without you</Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-slate-700">
-          <Alert className="border-amber-200 bg-white">
-            <Lightbulb className="h-4 w-4 text-amber-600" />
+        <CardContent className="space-y-3 text-slate-600">
+          <Alert className="border-slate-200 bg-white">
+            <Lightbulb className="h-4 w-4 text-slate-600" />
             <AlertDescription>
-              Most companies stall because they run on a "You OS". This step replaces it with a scalable operating system: 
+              Most companies stall because they run on a "You OS". This step replaces it with a scalable operating system:
               Algorithms (SOPs), Common Language (dashboards & meetings), Desired Outputs (goals).
             </AlertDescription>
           </Alert>
@@ -173,7 +173,7 @@ export const OperatingSystemBuilder: React.FC<Props> = ({ data, onDataChange, on
         </TabsContent>
 
         <TabsContent value="communication" className="mt-6">
-          <DefiningYourCommunicationArchitecture 
+          <DefiningYourCommunicationArchitecture
             data={data}
             onDataChange={onDataChange}
             onSave={onSave}
@@ -181,7 +181,7 @@ export const OperatingSystemBuilder: React.FC<Props> = ({ data, onDataChange, on
         </TabsContent>
 
         <TabsContent value="outputs" className="mt-6">
-          <ClarifyingYourDesiredOutputs 
+          <ClarifyingYourDesiredOutputs
             data={data}
             onDataChange={onDataChange}
             onSave={onSave}
@@ -189,7 +189,7 @@ export const OperatingSystemBuilder: React.FC<Props> = ({ data, onDataChange, on
         </TabsContent>
 
         <TabsContent value="installing" className="mt-6">
-          <InstallingYourOS 
+          <InstallingYourOS
             data={data}
             onDataChange={onDataChange}
             onSave={onSave}
@@ -197,7 +197,7 @@ export const OperatingSystemBuilder: React.FC<Props> = ({ data, onDataChange, on
         </TabsContent>
 
         <TabsContent value="ready" className="mt-6">
-          <ReadyToLevelUpOS 
+          <ReadyToLevelUpOS
             data={data}
             onDataChange={onDataChange}
             onSave={onSave}

@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { LoginRequest, LoginResponse, UpdateEmailRequest, UpdateEmailResponse, UpdatePasswordRequest, UpdatePasswordResponse, OnboardBusinessOwnerRequest, OnboardBusinessOwnerResponse, GetBusinessOwnersResponse, UpdateBusinessOwnerRequest, UpdateBusinessOwnerStatusRequest, UpdateBusinessOwnerResponse, DeleteBusinessOwnerResponse, OnboardManagerRequest, OnboardManagerResponse, GetManagersResponse, UpdateManagerRequest, UpdateManagerResponse, DeleteManagerResponse } from '../types/auth';
+import type { LoginRequest, LoginResponse, UpdateEmailRequest, UpdateEmailResponse, UpdatePasswordRequest, UpdatePasswordResponse, OnboardBusinessOwnerRequest, OnboardBusinessOwnerResponse, GetBusinessOwnersResponse, UpdateBusinessOwnerRequest, UpdateBusinessOwnerStatusRequest, UpdateBusinessOwnerResponse, DeleteBusinessOwnerResponse, OnboardManagerRequest, OnboardManagerResponse, GetManagersResponse, UpdateManagerRequest, UpdateManagerResponse, DeleteManagerResponse, RequestOtpRequest, VerifyOtpRequest, ResetPasswordOtpRequest, AuthResponse } from '../types/auth';
 import { BASE_API_URL } from './api';
 
 // Define a service using a base URL and expected endpoints
@@ -138,6 +138,28 @@ export const authApi = createApi({
       }),
       invalidatesTags: [{ type: 'Auth', id: 'MANAGER_LIST' }],
     }),
+    requestOtp: builder.mutation<AuthResponse, RequestOtpRequest>({
+      query: (data) => ({
+        url: '/api/auth/forgotpassword-otp',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    verifyOtp: builder.mutation<AuthResponse, VerifyOtpRequest>({
+      query: (data) => ({
+        url: '/api/auth/verify-otp',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    resetPasswordWithOtp: builder.mutation<AuthResponse, ResetPasswordOtpRequest>({
+      query: (data) => ({
+        url: '/api/auth/resetpassword-otp',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Auth'],
+    }),
   }),
 });
 
@@ -157,4 +179,7 @@ export const {
   useUpdateManagerMutation,
   useUpdateManagerStatusMutation,
   useDeleteManagerMutation,
+  useRequestOtpMutation,
+  useVerifyOtpMutation,
+  useResetPasswordWithOtpMutation
 } = authApi;

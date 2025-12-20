@@ -5,10 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { 
-  Target, 
-  TrendingUp, 
-  Users, 
+import {
+  Target,
+  TrendingUp,
+  Users,
   Zap,
   CheckCircle2,
   ArrowLeft,
@@ -31,22 +31,22 @@ import BuildYourBoard, { BuildYourBoardData } from './BuildYourBoard';
 import ExpandThroughAcquisition, { AcquisitionData } from './ExpandThroughAcquisition';
 
 // Import shared types
-import type { 
-  StartingPoint, 
-  EndingPoint, 
-  WhyStatement, 
-  HowStatement, 
-  TakingActionItems 
+import type {
+  StartingPoint,
+  EndingPoint,
+  WhyStatement,
+  HowStatement,
+  TakingActionItems
 } from './types';
 
 const ScalableImpactPlanner: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
-  
+
   // Step navigation state (limited to initial 2 steps on this page)
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [completedSteps, setCompletedSteps] = useState<boolean[]>([false, false, false, false, false, false, false]);
-  
+
   // Step 1: Level 1 - First 10 Customers (MANDATORY GATING STEP)
   const [level1Data, setLevel1Data] = useState({
     hasMadeSale: false,
@@ -62,7 +62,7 @@ const ScalableImpactPlanner: React.FC = () => {
     salesProof: '',
     isCompleted: false
   });
-  
+
   // Step 2 (Level 2): Growth Flywheel builder data
   const [growthFlywheel, setGrowthFlywheel] = useState<GrowthFlywheelData>({
     growthPattern: '',
@@ -90,7 +90,7 @@ const ScalableImpactPlanner: React.FC = () => {
 
   // Step 6 (Acquisition)
   const [acqData, setAcqData] = useState<AcquisitionData>({ isCompleted: false });
-  
+
   // Step 2: Starting Point  
   const [startingPoint, setStartingPoint] = useState<StartingPoint>({
     currentRevenue: '',
@@ -101,7 +101,7 @@ const ScalableImpactPlanner: React.FC = () => {
     revenueSource: '',
     businessStage: 'startup'
   });
-  
+
   // Step 2: Starting Point (new format for component)
   const [startingPointData, setStartingPointData] = useState({
     currentRevenue: '',
@@ -112,7 +112,7 @@ const ScalableImpactPlanner: React.FC = () => {
     revenueSource: '',
     businessStage: 'owner-dependent' as 'owner-dependent' | 'professionalized'
   });
-  
+
   // Step 3 (later steps): Ending Point (new format for component)
   const [endGameData, setEndGameData] = useState({
     targetRevenue: '',
@@ -123,7 +123,7 @@ const ScalableImpactPlanner: React.FC = () => {
     selectedBenchmark: '',
     targetProfitMargin: ''
   });
-  
+
   // Step 3: Ending Point (old format for compatibility)
   const [endingPoint, setEndingPoint] = useState<EndingPoint>({
     targetRevenue: '',
@@ -137,7 +137,7 @@ const ScalableImpactPlanner: React.FC = () => {
       year3Revenue: ''
     }
   });
-  
+
   // Step 4: WHY Statement
   const [whyStatement, setWhyStatement] = useState<WhyStatement>({
     me: {
@@ -159,7 +159,7 @@ const ScalableImpactPlanner: React.FC = () => {
       externalWhy: ''
     }
   });
-  
+
   // Step 5: HOW Statement (Focus 5)
   const [howStatement, setHowStatement] = useState<HowStatement>({
     action1: '',
@@ -168,7 +168,7 @@ const ScalableImpactPlanner: React.FC = () => {
     action4: '',
     action5: ''
   });
-  
+
   // Step 6: Taking Action
   const [takingActionItems, setTakingActionItems] = useState<TakingActionItems>({
     currentAction1: '',
@@ -212,7 +212,7 @@ const ScalableImpactPlanner: React.FC = () => {
       const savedDYTH = loadFromLocalStorage('scalable_impact_double_take_home');
       const savedBoard = loadFromLocalStorage('scalable_impact_build_board');
       const savedAcq = loadFromLocalStorage('scalable_impact_acquisition');
-      
+
       if (savedStep) setCurrentStep(savedStep);
       if (savedCompleted) setCompletedSteps(savedCompleted);
       if (savedLevel1) setLevel1Data(savedLevel1);
@@ -332,7 +332,7 @@ const ScalableImpactPlanner: React.FC = () => {
             onComplete={handleLevel1Complete}
           />
         );
-      
+
       case 2:
         return (
           <GrowthFlywheelBuilder
@@ -384,7 +384,7 @@ const ScalableImpactPlanner: React.FC = () => {
             onSave={() => saveToLocalStorage('scalable_impact_acquisition', acqData)}
           />
         );
-      
+
       default:
         return (
           <Card>
@@ -407,7 +407,7 @@ const ScalableImpactPlanner: React.FC = () => {
       </div>
 
       {/* Step Navigator */}
-      <StepNavigator 
+      <StepNavigator
         currentStep={currentStep}
         onStepChange={handleStepChange}
         completedSteps={completedSteps}
@@ -422,8 +422,8 @@ const ScalableImpactPlanner: React.FC = () => {
       <Card className="bg-card border">
         <CardContent className="p-4">
           <div className="flex justify-between items-center">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handlePreviousStep}
               disabled={currentStep === 1}
               className="gap-2"
@@ -431,17 +431,17 @@ const ScalableImpactPlanner: React.FC = () => {
               <ArrowLeft className="w-4 h-4" />
               Previous Step
             </Button>
-            
+
             <div className="text-center">
-              <Badge variant="outline" className="bg-blue-50 text-blue-700">
+              <Badge variant="outline" className="bg-slate-50 text-slate-700">
                 Step {currentStep} of 7
               </Badge>
               <p className="text-sm text-gray-600 mt-1">
                 Progress: {Math.round((completedSteps.filter(Boolean).length / Math.max(1, completedSteps.length)) * 100)}%
               </p>
             </div>
-            
-            <Button 
+
+            <Button
               onClick={handleNextStep}
               disabled={
                 (currentStep === 1 && !level1Data.isCompleted) ||
@@ -459,13 +459,13 @@ const ScalableImpactPlanner: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Completion Alert */}
       {completedSteps.every(Boolean) && (
         <Alert className="mt-6 border-green-200 bg-green-50">
           <CheckCircle2 className="h-4 w-4 text-green-600" />
           <AlertDescription className="text-green-700">
-            <strong>Congratulations! 🎉</strong> You've completed all 7 steps of your Scalable Impact Plan. 
+            <strong>Congratulations! 🎉</strong> You've completed all 7 steps of your Scalable Impact Plan.
             From Level 1 foundation to your action plan, you're ready to scale systematically!
           </AlertDescription>
         </Alert>

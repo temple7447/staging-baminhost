@@ -117,11 +117,10 @@ const sidebarItems: SidebarItem[] = [
     requiredPermissions: ['view_contacts'],
     path: '/dashboard/contacts'
   },
-  // Strategic Hiring - For Owner/Manager roles
   {
     id: "strategic-hiring-planner",
-    label: "Strategic Hiring",
-    icon: TrendingDown,
+    label: "Hire Like a Boss",
+    icon: Crown,
     category: 'business',
     requiredPermissions: ['view_strategic_hiring', 'view_hiring_triggers'],
     isPremium: true,

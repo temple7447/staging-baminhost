@@ -279,6 +279,7 @@ const DashboardRouter: React.FC = () => {
           }
         />
 
+
         {/* Strategic Hiring Planner */}
         <Route
           path="/strategic-hiring-planner"

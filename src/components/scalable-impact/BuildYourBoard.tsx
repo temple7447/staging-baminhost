@@ -30,17 +30,17 @@ const BuildYourBoard: React.FC<Props> = ({ data, onDataChange, onComplete, onSav
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-2 border-sky-200 bg-gradient-to-r from-sky-50 to-indigo-50">
+      <Card className="border border-slate-200 bg-slate-50/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <UsersRound className="w-6 h-6" />
+          <CardTitle className="flex items-center gap-2 text-slate-900">
+            <UsersRound className="w-6 h-6 text-slate-700" />
             Level 5: Build Your Board
-            <Badge variant="outline" className="bg-white">Mentors + peers for scale and accountability</Badge>
+            <Badge variant="outline" className="bg-white text-slate-600">Mentors + peers for scale and accountability</Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-slate-700">
-          <Alert className="border-sky-200 bg-white">
-            <Lightbulb className="h-4 w-4 text-sky-600" />
+        <CardContent className="space-y-3 text-slate-600">
+          <Alert className="border-slate-200 bg-white">
+            <Lightbulb className="h-4 w-4 text-slate-600" />
             <AlertDescription>
               Entrepreneurship is lonely. A Board of Advisors surrounds you with insight, accountability, and support so you don’t fly blind.
             </AlertDescription>

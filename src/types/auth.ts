@@ -124,6 +124,26 @@ export interface DeleteBusinessOwnerResponse {
   message: string;
 }
 
+export interface RequestOtpRequest {
+  email: string;
+}
+
+export interface VerifyOtpRequest {
+  email: string;
+  code: string;
+}
+
+export interface ResetPasswordOtpRequest {
+  email: string;
+  code: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  success: boolean;
+  message: string;
+}
+
 // Manager Types
 export interface OnboardManagerRequest {
   name: string;
