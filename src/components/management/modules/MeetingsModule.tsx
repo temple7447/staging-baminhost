@@ -97,7 +97,7 @@ const MeetingsModule: React.FC<MeetingsModuleProps> = ({ data, onUpdate, isAppro
                         </p>
                         <Card className="bg-slate-900 text-white overflow-hidden shadow-2xl">
                             <CardHeader className="bg-slate-800 border-b border-white/5">
-                                <CardTitle className="text-xs font-black uppercase tracking-widest text-blue-400">Meeting Mission</CardTitle>
+                                <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400">Meeting Mission</CardTitle>
                             </CardHeader>
                             <CardContent className="p-6 space-y-4">
                                 <p className="text-xs text-slate-400 font-medium leading-relaxed italic">
@@ -125,12 +125,12 @@ const MeetingsModule: React.FC<MeetingsModuleProps> = ({ data, onUpdate, isAppro
                                     <div
                                         key={step.key}
                                         onClick={() => toggleChecklist(step.key as keyof typeof data.checklist)}
-                                        className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${data.checklist[step.key as keyof typeof data.checklist] ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-100 hover:border-slate-900'}`}
+                                        className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${data.checklist[step.key as keyof typeof data.checklist] ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-slate-50 border-slate-100 hover:border-slate-900'}`}
                                     >
-                                        <div className={`mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${data.checklist[step.key as keyof typeof data.checklist] ? 'bg-blue-600 border-blue-600' : 'border-slate-300 bg-white group-hover:border-slate-900'}`}>
+                                        <div className={`mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${data.checklist[step.key as keyof typeof data.checklist] ? 'bg-slate-400 border-slate-400' : 'border-slate-300 bg-white group-hover:border-slate-900'}`}>
                                             {data.checklist[step.key as keyof typeof data.checklist] && <Check className="w-2.5 h-2.5 text-white" />}
                                         </div>
-                                        <span className={`text-[10px] font-bold leading-tight ${data.checklist[step.key as keyof typeof data.checklist] ? 'text-blue-900' : 'text-slate-600 group-hover:text-slate-900'}`}>
+                                        <span className={`text-[10px] font-bold leading-tight ${data.checklist[step.key as keyof typeof data.checklist] ? 'text-white' : 'text-slate-600 group-hover:text-slate-900'}`}>
                                             {step.label}
                                         </span>
                                     </div>
@@ -160,7 +160,7 @@ const MeetingsModule: React.FC<MeetingsModuleProps> = ({ data, onUpdate, isAppro
                         <CardContent className="p-8 space-y-6 relative z-10">
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Badge className="bg-blue-500 text-white font-black uppercase text-[10px]">No PowerPoint</Badge>
+                                    <Badge className="bg-slate-900 text-white font-black uppercase text-[10px]">No PowerPoint</Badge>
                                     <p className="text-xs text-slate-600 font-medium leading-relaxed">Instead, somebody prepares a six page, narratively structured memo. It's real sentences, not just bullet points.</p>
                                 </div>
                                 <div className="space-y-2">
@@ -216,7 +216,7 @@ const MeetingsModule: React.FC<MeetingsModuleProps> = ({ data, onUpdate, isAppro
                         <p className="text-sm text-slate-600 leading-relaxed font-medium">
                             Developing your potential as a leader means recognizing the importance of zooming in and out. The Strategic Meeting Framework will help you make sure you have the right attention on both ends of the spectrum.
                         </p>
-                        <div className="flex gap-4 p-8 bg-blue-600 rounded-3xl text-white shadow-2xl relative overflow-hidden">
+                        <div className="flex gap-4 p-8 bg-slate-900 rounded-3xl text-white shadow-2xl relative overflow-hidden">
                             <div className="flex flex-col items-center justify-between py-4">
                                 <div className="flex flex-col items-center">
                                     <ChevronUp className="w-6 h-6 animate-bounce" />
@@ -240,7 +240,7 @@ const MeetingsModule: React.FC<MeetingsModuleProps> = ({ data, onUpdate, isAppro
                                 ].map((step, i) => (
                                     <div key={i} className="p-4 bg-white/10 border border-white/20 rounded-xl group hover:bg-white/20 transition-all">
                                         <div className="text-xs font-black uppercase tracking-widest mb-1">{step.level}</div>
-                                        <div className="text-[10px] font-medium text-blue-100">{step.desc}</div>
+                                        <div className="text-[10px] font-medium text-slate-400">{step.desc}</div>
                                     </div>
                                 ))}
                             </div>
@@ -348,7 +348,7 @@ const MeetingsModule: React.FC<MeetingsModuleProps> = ({ data, onUpdate, isAppro
                                     {/* Obstacle Check */}
                                     <div className="p-6 bg-slate-900 rounded-3xl shadow-xl border border-slate-800">
                                         <div className="flex items-center gap-3 mb-4">
-                                            <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                                            <AlertTriangle className="w-5 h-5 text-slate-400" />
                                             <h5 className="text-[10px] font-black text-white uppercase tracking-widest">Obstacle Check</h5>
                                         </div>
                                         <p className="text-[10px] text-slate-400 font-medium leading-relaxed mb-4 italic">
@@ -440,17 +440,17 @@ const MeetingsModule: React.FC<MeetingsModuleProps> = ({ data, onUpdate, isAppro
                                                                     key={item.key}
                                                                     onClick={() => togglePostMeetingChecklist(p.id, item.key as 'sendNotes' | 'followUp')}
                                                                     className={`flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer ${data.postMeeting[p.id]?.[item.key as 'sendNotes' | 'followUp']
-                                                                        ? 'bg-blue-50 border-blue-200 shadow-sm'
+                                                                        ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
                                                                         : 'bg-slate-50 border-slate-100 hover:border-slate-900'
                                                                         }`}
                                                                 >
                                                                     <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${data.postMeeting[p.id]?.[item.key as 'sendNotes' | 'followUp']
-                                                                        ? 'bg-blue-600 border-blue-600'
+                                                                        ? 'bg-slate-400 border-slate-400'
                                                                         : 'border-slate-300 bg-white'
                                                                         }`}>
                                                                         {data.postMeeting[p.id]?.[item.key as 'sendNotes' | 'followUp'] && <Check className="w-3 h-3 text-white" />}
                                                                     </div>
-                                                                    <span className={`text-[10px] font-bold tracking-tight ${data.postMeeting[p.id]?.[item.key as 'sendNotes' | 'followUp'] ? 'text-blue-900' : 'text-slate-600'
+                                                                    <span className={`text-[10px] font-bold tracking-tight ${data.postMeeting[p.id]?.[item.key as 'sendNotes' | 'followUp'] ? 'text-white' : 'text-slate-600'
                                                                         }`}>
                                                                         {item.label}
                                                                     </span>
@@ -483,10 +483,10 @@ const MeetingsModule: React.FC<MeetingsModuleProps> = ({ data, onUpdate, isAppro
                         </p>
                         <div className="grid grid-cols-2 gap-4">
                             {[
-                                { quadrant: "High Skill / High Will", label: "Delegate", color: "bg-green-500", text: "The Rockstar - Empower and give ownership." },
-                                { quadrant: "Low Skill / High Will", label: "Guide", color: "bg-blue-500", text: "The Student - Train and mentor closely." },
-                                { quadrant: "High Skill / Low Will", label: "Excite", color: "bg-orange-500", text: "The Grump - Re-engage and find the 'Why'." },
-                                { quadrant: "Low Skill / Low Will", label: "Direct", color: "bg-red-500", text: "The Liability - Close supervision or transition out." }
+                                { quadrant: "High Skill / High Will", label: "Delegate", color: "bg-slate-900", text: "The Rockstar - Empower and give ownership." },
+                                { quadrant: "Low Skill / High Will", label: "Guide", color: "bg-slate-400", text: "The Student - Train and mentor closely." },
+                                { quadrant: "High Skill / Low Will", label: "Excite", color: "bg-slate-200", text: "The Grump - Re-engage and find the 'Why'." },
+                                { quadrant: "Low Skill / Low Will", label: "Direct", color: "bg-slate-100 border border-slate-200", text: "The Liability - Close supervision or transition out." }
                             ].map((q, i) => (
                                 <div key={i} className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm space-y-2">
                                     <div className="flex items-center gap-2">
@@ -503,10 +503,10 @@ const MeetingsModule: React.FC<MeetingsModuleProps> = ({ data, onUpdate, isAppro
                     {/* Matrix Visual */}
                     <div className="relative aspect-square bg-white border-2 border-slate-900 rounded-3xl p-8 shadow-2xl overflow-hidden">
                         <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 font-black uppercase text-[10px] tracking-widest pointer-events-none opacity-50">
-                            <div className="border-r border-b border-slate-200 flex items-center justify-center bg-blue-50 text-blue-600 p-2 text-center">Guide<br />(Train)</div>
-                            <div className="border-b border-slate-200 flex items-center justify-center bg-green-50 text-green-600 p-2 text-center">Delegate<br />(Empower)</div>
-                            <div className="border-r border-slate-200 flex items-center justify-center bg-red-50 text-red-600 p-2 text-center">Direct<br />(Supervise)</div>
-                            <div className="flex items-center justify-center bg-orange-50 text-orange-600 p-2 text-center">Excite<br />(Re-engage)</div>
+                            <div className="border-r border-b border-slate-200 flex items-center justify-center bg-slate-100 text-slate-600 p-2 text-center">Guide<br />(Train)</div>
+                            <div className="border-b border-slate-200 flex items-center justify-center bg-slate-900 text-white p-2 text-center">Delegate<br />(Empower)</div>
+                            <div className="border-r border-slate-200 flex items-center justify-center bg-slate-50 text-slate-400 p-2 text-center">Direct<br />(Supervise)</div>
+                            <div className="flex items-center justify-center bg-slate-200 text-slate-800 p-2 text-center">Excite<br />(Re-engage)</div>
                         </div>
                         {/* Axes */}
                         <div className="absolute left-8 bottom-8 right-8 h-0.5 bg-slate-900">
@@ -524,7 +524,7 @@ const MeetingsModule: React.FC<MeetingsModuleProps> = ({ data, onUpdate, isAppro
 
             {/* 6. Mentorship & Direct Reports (1:1s) */}
             <section className="space-y-8 pt-8">
-                <div className="bg-blue-600 rounded-[2rem] p-10 text-white shadow-2xl relative overflow-hidden">
+                <div className="bg-slate-900 rounded-[2rem] p-10 text-white shadow-2xl relative overflow-hidden">
                     <Quote className="absolute top-[-20px] right-[-20px] w-64 h-64 text-white/10" />
                     <div className="relative z-10 max-w-3xl space-y-6">
                         <p className="text-xl md:text-2xl font-black italic leading-tight tracking-tighter">
@@ -551,7 +551,7 @@ const MeetingsModule: React.FC<MeetingsModuleProps> = ({ data, onUpdate, isAppro
                             Your team meetings, no matter the length or format, are meant to keep your company on track. Craft every agenda carefully and spend your team's time wisely!
                         </p>
                         <div className="p-6 bg-slate-900 rounded-3xl text-white space-y-4 shadow-xl">
-                            <h4 className="text-xs font-black uppercase tracking-[0.2em] text-blue-400">Parting Shots</h4>
+                            <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Parting Shots</h4>
                             <p className="text-xs text-slate-400 font-medium italic leading-relaxed">
                                 Don't let meetings become a habit that replaces actual execution. If the meeting doesn't serve the goal, cancel it.
                             </p>
@@ -569,12 +569,12 @@ const MeetingsModule: React.FC<MeetingsModuleProps> = ({ data, onUpdate, isAppro
                                 <div
                                     key={step.key}
                                     onClick={() => toggleActionStep(step.key as keyof typeof data.actionSteps)}
-                                    className={`flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer group ${data.actionSteps[step.key as keyof typeof data.actionSteps] ? 'bg-green-50 border-green-200' : 'bg-slate-50 border-slate-100 hover:border-slate-900'}`}
+                                    className={`flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer group ${data.actionSteps[step.key as keyof typeof data.actionSteps] ? 'bg-slate-900 text-white border-slate-900 shadow-xl' : 'bg-slate-50 border-slate-100 hover:border-slate-900'}`}
                                 >
-                                    <div className={`mt-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${data.actionSteps[step.key as keyof typeof data.actionSteps] ? 'bg-green-600 border-green-600' : 'border-slate-300 bg-white group-hover:border-slate-900'}`}>
+                                    <div className={`mt-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${data.actionSteps[step.key as keyof typeof data.actionSteps] ? 'bg-slate-400 border-slate-400' : 'border-slate-300 bg-white group-hover:border-slate-900'}`}>
                                         {data.actionSteps[step.key as keyof typeof data.actionSteps] && <Check className="w-3 h-3 text-white" />}
                                     </div>
-                                    <span className={`text-xs font-bold leading-relaxed ${data.actionSteps[step.key as keyof typeof data.actionSteps] ? 'text-green-900' : 'text-slate-600 group-hover:text-slate-900'}`}>
+                                    <span className={`text-xs font-bold leading-relaxed ${data.actionSteps[step.key as keyof typeof data.actionSteps] ? 'text-white' : 'text-slate-600 group-hover:text-slate-900'}`}>
                                         {step.label}
                                     </span>
                                 </div>

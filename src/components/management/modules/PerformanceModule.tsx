@@ -71,7 +71,7 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
                             Regardless of how big or small your company is, everyone should have an org chart. Roles, not people, are the foundation of your organization.
                         </p>
 
-                        <div className="bg-blue-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                        <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-8 opacity-10">
                                 <Users className="w-24 h-24" />
                             </div>
@@ -141,11 +141,11 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
 
                     <div className="grid md:grid-cols-5 gap-4">
                         {[
-                            { id: 'marketing', label: 'Marketing', icon: Zap, color: 'text-orange-500', bg: 'bg-orange-50' },
-                            { id: 'sales', label: 'Sales', icon: Target, color: 'text-blue-500', bg: 'bg-blue-50' },
-                            { id: 'delivery', label: 'Delivery', icon: Users, color: 'text-green-500', bg: 'bg-green-50' },
-                            { id: 'operations', label: 'Operations', icon: LayoutGrid, color: 'text-purple-500', bg: 'bg-purple-50' },
-                            { id: 'finance', label: 'Finance', icon: Scale, color: 'text-slate-500', bg: 'bg-slate-50' }
+                            { id: 'marketing', label: 'Marketing', icon: Zap, color: 'text-slate-900', bg: 'bg-slate-100' },
+                            { id: 'sales', label: 'Sales', icon: Target, color: 'text-slate-600', bg: 'bg-slate-50' },
+                            { id: 'delivery', label: 'Delivery', icon: Users, color: 'text-slate-900', bg: 'bg-slate-200' },
+                            { id: 'operations', label: 'Operations', icon: LayoutGrid, color: 'text-slate-500', bg: 'bg-slate-50' },
+                            { id: 'finance', label: 'Finance', icon: Scale, color: 'text-slate-400', bg: 'bg-slate-100' }
                         ].map((pillar) => (
                             <div key={pillar.id} className="space-y-3">
                                 <div className={`p-4 rounded-2xl border-2 border-slate-100 ${pillar.bg} flex flex-col items-center gap-2 group hover:border-slate-900 transition-all cursor-default h-24 justify-center`}>
@@ -179,11 +179,11 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
                 <div className="grid lg:grid-cols-2 gap-12 items-start">
                     <div className="space-y-6">
                         <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-xl space-y-4">
-                            <h4 className="text-xs font-black uppercase tracking-widest text-blue-400">Embrace Coaching</h4>
+                            <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">Embrace Coaching</h4>
                             <p className="text-sm text-slate-400 font-medium leading-relaxed italic">
                                 "Think about your favorite sports team. What kind of coach do they have? How well would they perform if the coach was never around? Or if the coach flew into a screaming rage whenever a mistake was made?"
                             </p>
-                            <p className="text-xs text-blue-300 font-bold uppercase tracking-widest border-t border-slate-800 pt-4">
+                            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest border-t border-slate-800 pt-4">
                                 Part of your job as a leader is to coach your team to better performance.
                             </p>
                         </div>
@@ -277,11 +277,11 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
                         <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                             <Zap className="w-24 h-24" />
                         </div>
-                        <CardHeader className="bg-blue-600 p-6">
+                        <CardHeader className="bg-slate-900 p-6">
                             <CardTitle className="text-sm font-black uppercase tracking-widest text-white italic">Process Goals (Regular Basics)</CardTitle>
                         </CardHeader>
                         <CardContent className="p-8 space-y-6 relative z-10">
-                            <p className="text-xs text-slate-600 font-medium leading-relaxed italic border-l-4 border-blue-200 pl-4">
+                            <p className="text-xs text-slate-600 font-medium leading-relaxed italic border-l-4 border-slate-200 pl-4">
                                 "Things we do on a regular basis to help us achieve our goals. These are things we have direct control over."
                             </p>
                             <div className="grid grid-cols-2 gap-4">
@@ -307,26 +307,26 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
                 </div>
 
                 {/* Jason Selk's 90% Rule */}
-                <div className="bg-blue-50 border-2 border-blue-200 rounded-3xl p-8 space-y-6">
+                <div className="bg-slate-900 border-2 border-slate-800 rounded-3xl p-8 space-y-6">
                     <div className="flex items-start gap-4">
-                        <div className="p-3 bg-blue-600 rounded-2xl shadow-lg">
+                        <div className="p-3 bg-slate-800 rounded-2xl shadow-lg border border-white/5">
                             <Zap className="w-6 h-6 text-white" />
                         </div>
                         <div className="space-y-2">
-                            <h4 className="text-sm font-black uppercase tracking-widest text-blue-900">Jason Selk's 90% Rule</h4>
-                            <p className="text-sm text-blue-800 font-medium leading-relaxed italic">
+                            <h4 className="text-sm font-black uppercase tracking-widest text-white">Jason Selk's 90% Rule</h4>
+                            <p className="text-sm text-slate-400 font-medium leading-relaxed italic">
                                 "If you commit to achieving your process goals at 90% or more over a 30 day period, you will see positive trends towards reaching your result goals."
                             </p>
                         </div>
                     </div>
                     <div className="space-y-4">
-                        <Label className="text-[10px] font-black uppercase text-blue-900 tracking-widest">Process Goal Commitment</Label>
+                        <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Process Goal Commitment</Label>
                         <Textarea
                             value={data.goals.commitment}
                             onChange={(e) => {
                                 onUpdate({ ...data, goals: { ...data.goals, commitment: e.target.value } });
                             }}
-                            className="min-h-[100px] border-blue-200 bg-white/50 focus:bg-white transition-all text-sm font-medium resize-none shadow-sm"
+                            className="min-h-[100px] border-white/10 bg-white/5 focus:bg-white/10 transition-all text-sm font-medium resize-none shadow-sm text-white"
                             placeholder="What process goals will you achieve at 90% or more this month? Define your daily/weekly habits."
                         />
                     </div>
@@ -356,24 +356,24 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
                                 <div className="h-[85%] w-px bg-slate-900/10" />
                             </div>
 
-                            <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[10px] font-black uppercase tracking-widest text-blue-600">High Ability</div>
+                            <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[10px] font-black uppercase tracking-widest text-slate-900">High Ability</div>
                             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] font-black uppercase tracking-widest text-slate-400">Low Ability</div>
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 -rotate-90 text-[10px] font-black uppercase tracking-widest text-slate-400">Low Willingness</div>
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-[10px] font-black uppercase tracking-widest text-blue-600">High Willingness</div>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-[10px] font-black uppercase tracking-widest text-slate-900">High Willingness</div>
 
                             <div className="grid grid-cols-2 grid-rows-2 h-full gap-4 relative z-10">
                                 <div className="flex flex-col items-center justify-center p-4 bg-white/80 border border-slate-200 rounded-xl shadow-sm text-center">
                                     <span className="text-[10px] font-black uppercase text-slate-900 leading-tight">Unwilling<br />Able</span>
                                 </div>
-                                <div className="flex flex-col items-center justify-center p-4 bg-blue-600 border border-blue-600 rounded-xl shadow-lg text-center transform scale-105">
+                                <div className="flex flex-col items-center justify-center p-4 bg-slate-900 border border-slate-900 rounded-xl shadow-lg text-center transform scale-105">
                                     <span className="text-[10px] font-black uppercase text-white leading-tight">Willing<br />Able</span>
-                                    <CheckCircle2 className="w-3 h-3 text-white mt-1" />
+                                    <CheckCircle2 className="w-3 h-3 text-slate-400 mt-1" />
                                 </div>
-                                <div className="flex flex-col items-center justify-center p-4 bg-white/80 border border-slate-200 rounded-xl shadow-sm text-center">
-                                    <span className="text-[10px] font-black uppercase text-slate-900 leading-tight">Unwilling<br />Unable</span>
+                                <div className="flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-200 rounded-xl shadow-sm text-center">
+                                    <span className="text-[10px] font-black uppercase text-slate-400 leading-tight">Unwilling<br />Unable</span>
                                 </div>
-                                <div className="flex flex-col items-center justify-center p-4 bg-white/80 border border-slate-200 rounded-xl shadow-sm text-center">
-                                    <span className="text-[10px] font-black uppercase text-slate-900 leading-tight">Willing<br />Unable</span>
+                                <div className="flex flex-col items-center justify-center p-4 bg-white border border-slate-200 rounded-xl shadow-sm text-center">
+                                    <span className="text-[10px] font-black uppercase text-slate-600 leading-tight">Willing<br />Unable</span>
                                 </div>
                             </div>
                         </div>
@@ -402,10 +402,10 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
 
                         <div className="aspect-square grid grid-cols-2 grid-rows-2 gap-px bg-slate-900 border-2 border-slate-900 rounded-2xl overflow-hidden shadow-inner">
                             {[
-                                { id: 'catalyst', label: 'Catalyst/ Energizer', icon: Zap, color: 'text-orange-500', bg: 'bg-orange-50' },
-                                { id: 'visionary', label: 'Visionary/ Architect', icon: Target, color: 'text-blue-500', bg: 'bg-blue-50' },
-                                { id: 'troubleshooter', label: 'Troubleshooter/ Firefighter', icon: Shield, color: 'text-red-500', bg: 'bg-red-50' },
-                                { id: 'traditional', label: 'Traditional/ Stabilizer', icon: Scale, color: 'text-slate-500', bg: 'bg-slate-50' }
+                                { id: 'catalyst', label: 'Catalyst/ Energizer', icon: Zap, color: 'text-slate-900', bg: 'bg-slate-50' },
+                                { id: 'visionary', label: 'Visionary/ Architect', icon: Target, color: 'text-slate-600', bg: 'bg-slate-100' },
+                                { id: 'troubleshooter', label: 'Troubleshooter/ Firefighter', icon: Shield, color: 'text-slate-400', bg: 'bg-slate-50' },
+                                { id: 'traditional', label: 'Traditional/ Stabilizer', icon: Scale, color: 'text-slate-500', bg: 'bg-slate-200' }
                             ].map((temp) => (
                                 <div key={temp.id} className={`${temp.bg} p-6 flex flex-col items-center justify-center text-center gap-3 hover:brightness-95 transition-all cursor-default`}>
                                     <temp.icon className={`w-6 h-6 ${temp.color}`} />
@@ -452,8 +452,8 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
                         </div>
 
                         <div className="space-y-6">
-                            <div className="flex items-center gap-4 border-l-4 border-blue-500 pl-6">
-                                <Clock className="w-5 h-5 text-blue-500" />
+                            <div className="flex items-center gap-4 border-l-4 border-slate-700 pl-6">
+                                <Clock className="w-5 h-5 text-slate-500" />
                                 <h5 className="font-black uppercase italic tracking-tighter text-xl text-white">Today's Organization</h5>
                             </div>
                             <div className="p-8 bg-slate-800/50 rounded-3xl border border-slate-700/50 backdrop-blur-sm space-y-4">
@@ -475,28 +475,28 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
                         </div>
 
                         <div className="space-y-6">
-                            <div className="flex items-center gap-4 border-l-4 border-green-500 pl-6">
-                                <TrendingUp className="w-5 h-5 text-green-500" />
+                            <div className="flex items-center gap-4 border-l-4 border-slate-400 pl-6">
+                                <TrendingUp className="w-5 h-5 text-slate-400" />
                                 <h5 className="font-black uppercase italic tracking-tighter text-xl text-white">Tomorrow's Organization</h5>
                             </div>
-                            <div className="p-8 bg-slate-800 rounded-3xl border border-blue-500/30 shadow-[0_0_30px_rgba(59,130,246,0.1)] space-y-4">
+                            <div className="p-8 bg-slate-800 rounded-3xl border border-white/10 shadow-2xl space-y-4">
                                 <div className="flex flex-col items-center gap-2 mb-8">
-                                    <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center shadow-lg shadow-green-900/40">
+                                    <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center shadow-lg">
                                         <Users className="w-6 h-6 text-white" />
                                     </div>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-green-400">CEO</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">CEO</span>
                                 </div>
                                 <div className="grid grid-cols-5 gap-2">
                                     {['MKT', 'SLS', 'DEL', 'FIN', 'OPS'].map(p => (
                                         <div key={p} className="space-y-1">
-                                            <div className="h-4 bg-blue-600/30 border border-blue-500/50 rounded-full" />
+                                            <div className="h-4 bg-white/20 border border-white/10 rounded-full" />
                                             <div className="h-2 bg-slate-600 rounded-full w-2/3 mx-auto" />
                                             <div className="h-2 bg-slate-700 rounded-full w-1/2 mx-auto opacity-50" />
                                         </div>
                                     ))}
                                 </div>
                                 <div className="pt-4 text-center">
-                                    <p className="text-[10px] font-bold text-blue-400 italic">Advanced roles & growth paths</p>
+                                    <p className="text-[10px] font-bold text-slate-400 italic">Advanced roles & growth paths</p>
                                 </div>
                             </div>
                         </div>
@@ -557,12 +557,12 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
 
                 <div className="grid lg:grid-cols-2 gap-12 items-start">
                     <div className="space-y-6">
-                        <div className="bg-blue-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-100 mb-4">Core Philosophy</p>
+                        <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">Core Philosophy</p>
                             <p className="text-lg font-black uppercase italic tracking-tighter leading-tight mb-6">
                                 "Tough conversations are only tough when there are things left unspoken."
                             </p>
-                            <p className="text-xs font-bold italic text-blue-100">
+                            <p className="text-xs font-bold italic text-slate-400">
                                 "Seek first to understand, then to be understood." — Stephen Covey
                             </p>
                         </div>
@@ -579,7 +579,7 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
                                     <React.Fragment key={i}>
                                         <div className="flex flex-col items-center gap-2 text-center flex-1">
                                             <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm">
-                                                <step.icon className="w-4 h-4 text-blue-600" />
+                                                <step.icon className="w-4 h-4 text-slate-900" />
                                             </div>
                                             <span className="text-[8px] font-black uppercase leading-tight text-slate-600">{step.label}</span>
                                         </div>
@@ -732,11 +732,11 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
                             </CardContent>
                         </Card>
 
-                        <div className="p-8 bg-blue-600 rounded-3xl shadow-xl text-white transform hover:scale-[1.02] transition-all">
+                        <div className="p-8 bg-slate-900 rounded-3xl shadow-xl text-white transform hover:scale-[1.02] transition-all border border-white/5">
                             <p className="text-xl font-black uppercase italic tracking-tighter leading-tight mb-4 text-center">
                                 "Intellectuals solve problems, geniuses prevent them."
                             </p>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-blue-200 text-center">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">
                                 — Albert Einstein
                             </p>
                         </div>
@@ -774,12 +774,12 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
                                 <div
                                     key={step.key}
                                     onClick={() => toggleChecklist(step.key as keyof typeof data.checklist)}
-                                    className={`flex items-start gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer group ${data.checklist[step.key as keyof typeof data.checklist] ? 'bg-green-50 border-green-500 shadow-sm' : 'bg-slate-50 border-slate-100 hover:border-slate-900'}`}
+                                    className={`flex items-start gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer group ${data.checklist[step.key as keyof typeof data.checklist] ? 'bg-slate-900 text-white border-slate-900 shadow-xl' : 'bg-slate-50 border-slate-100 hover:border-slate-900'}`}
                                 >
-                                    <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${data.checklist[step.key as keyof typeof data.checklist] ? 'bg-green-600 border-green-600 scale-110' : 'border-slate-300 bg-white group-hover:border-slate-900'}`}>
+                                    <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${data.checklist[step.key as keyof typeof data.checklist] ? 'bg-slate-400 border-slate-400 scale-110' : 'border-slate-300 bg-white group-hover:border-slate-900'}`}>
                                         {data.checklist[step.key as keyof typeof data.checklist] && <Check className="w-3 h-3 text-white" />}
                                     </div>
-                                    <span className={`text-xs font-black uppercase tracking-tight italic ${data.checklist[step.key as keyof typeof data.checklist] ? 'text-green-900' : 'text-slate-600 group-hover:text-slate-900'}`}>
+                                    <span className={`text-xs font-black uppercase tracking-tight italic ${data.checklist[step.key as keyof typeof data.checklist] ? 'text-white' : 'text-slate-600 group-hover:text-slate-900'}`}>
                                         {step.label}
                                     </span>
                                 </div>
@@ -790,7 +790,7 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
             </section>
 
             {/* 11. Afterword */}
-            <section className="space-y-8 pt-12 text-center max-w-4xl mx-auto">
+            < section className="space-y-8 pt-12 text-center max-w-4xl mx-auto" >
                 <div className="h-1 w-24 bg-slate-200 mx-auto mb-12" />
                 <h3 className="text-3xl font-black uppercase tracking-tighter text-slate-900 italic mb-8">Afterword</h3>
                 <div className="space-y-6 text-slate-600 font-medium leading-relaxed italic text-sm md:text-base px-8">
@@ -814,7 +814,7 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
             </section>
 
             {/* Boss Input Approval */}
-            <Card className={`border-2 transition-all duration-500 ${isApproved ? 'border-green-500 bg-green-50/50' : 'border-slate-900 bg-slate-50/50'} shadow-xl mt-12`}>
+            < Card className={`border-2 transition-all duration-500 ${isApproved ? 'border-green-500 bg-green-50/50' : 'border-slate-900 bg-slate-50/50'} shadow-xl mt-12`}>
                 <CardHeader className="py-6 border-b border-slate-200/50">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -849,8 +849,8 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
                         </p>
                     </div>
                 </CardContent>
-            </Card>
-        </div>
+            </Card >
+        </div >
     );
 };
 
