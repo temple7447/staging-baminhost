@@ -6,7 +6,9 @@ export const STORAGE_KEYS = {
     MANAGING_BOSS_PERFORMANCE: 'managing_boss_performance',
     MANAGING_BOSS_APPROVALS: 'managing_boss_approvals',
     STRATEGIC_HIRING_PLAN: 'strategic_hiring_planner_data',
-    STRATEGIC_HIRING_APPROVALS: 'strategic_hiring_approvals'
+    STRATEGIC_HIRING_APPROVALS: 'strategic_hiring_approvals',
+    HIRING_TASKS: 'hiring_tasks_v1',
+    HIRING_ORG_CHART: 'hiring_org_chart_v1'
 };
 
 export const loadFromStorage = <T>(key: string, defaultValue: T): T => {
