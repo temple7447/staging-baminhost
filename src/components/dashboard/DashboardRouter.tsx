@@ -27,6 +27,7 @@ import { SplitTracker } from '@/components/budget/SplitTracker';
 import { GoalsDashboard } from '@/components/goals/GoalsDashboard';
 import { Big5Dashboard } from '@/components/big5/Big5Dashboard';
 import StrategicHiringPlanner from '@/components/hiring/StrategicHiringPlanner';
+import ManagingLikeABoss from '@/components/management/ManagingLikeABoss';
 import CandidateManagement from '@/components/hiring/CandidateManagement';
 import { AdminPeople } from '@/components/dashboard/AdminPeople';
 import { BusinessTypeManagement } from '@/components/dashboard/BusinessTypeManagement';
@@ -73,6 +74,7 @@ const DashboardRouter: React.FC = () => {
     if (pathname.includes('goals')) return 'goals';
     if (pathname.includes('defining-your-number')) return 'defining-your-number';
     if (pathname.includes('strategic-hiring-planner')) return 'strategic-hiring-planner';
+    if (pathname.includes('managing-like-a-boss')) return 'managing-like-a-boss';
     if (pathname.includes('candidate-management')) return 'candidate-management';
     if (pathname.includes('contacts')) return 'contacts';
     if (pathname.includes('library')) return 'library';
@@ -290,6 +292,20 @@ const DashboardRouter: React.FC = () => {
               feature="Strategic Hiring Planner"
               showUpgradePrompt={false}
               viewName="strategic-hiring-planner"
+            />
+          }
+        />
+
+        {/* Managing Like a Boss */}
+        <Route
+          path="/managing-like-a-boss"
+          element={
+            <ProtectedRoute
+              element={<ManagingLikeABoss />}
+              requiredPermissions={['view_managing_like_a_boss']}
+              feature="Managing Like a Boss"
+              showUpgradePrompt={false}
+              viewName="managing-like-a-boss"
             />
           }
         />

@@ -20,7 +20,8 @@ import {
   TrendingDown,
   Scale,
   CreditCard,
-  Briefcase
+  Briefcase,
+  ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -125,6 +126,15 @@ const sidebarItems: SidebarItem[] = [
     requiredPermissions: ['view_strategic_hiring', 'view_hiring_triggers'],
     isPremium: true,
     path: '/dashboard/strategic-hiring-planner'
+  },
+  {
+    id: "managing-like-a-boss",
+    label: "Manage Like a Boss",
+    icon: ShieldCheck,
+    category: 'business',
+    requiredPermissions: ['view_managing_like_a_boss'],
+    isPremium: true,
+    path: '/dashboard/managing-like-a-boss'
   },
   {
     id: "candidate-management",

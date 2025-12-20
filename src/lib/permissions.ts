@@ -210,6 +210,12 @@ export const PERMISSIONS: Record<string, Permission> = {
     description: 'Monitor hiring triggers and productivity analysis',
     category: 'business'
   },
+  'view_managing_like_a_boss': {
+    id: 'view_managing_like_a_boss',
+    name: 'View Managing Like a Boss',
+    description: 'Access to the Managing Like a Boss planner and resources',
+    category: 'management'
+  },
   'manage_org_chart': {
     id: 'manage_org_chart',
     name: 'Manage Organization Chart',
@@ -307,6 +313,7 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
       'view_split_tracker',
       'view_goals',
       'view_contacts',
+      'view_managing_like_a_boss',
       'view_library',
       'view_assistant',
       'view_settings',
@@ -343,6 +350,7 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
       'view_split_tracker',
       'view_goals',
       'view_contacts',
+      'view_managing_like_a_boss',
       'view_library',
       'view_assistant',
       'view_settings',
@@ -377,6 +385,7 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
       'view_scalable_impact',
       'view_wallet',
       'view_contacts',
+      'view_managing_like_a_boss',
       'view_library',
       'view_assistant',
       'view_settings',
@@ -482,6 +491,7 @@ export const NAVIGATION_PERMISSIONS: Record<string, string[]> = {
   'personal-portfolios': ['view_personal_portfolios'],
   // Strategic Hiring Navigation
   'strategic-hiring-planner': ['view_strategic_hiring', 'view_hiring_triggers'],
+  'managing-like-a-boss': ['view_managing_like_a_boss'],
   'candidate-management': ['view_strategic_hiring', 'manage_candidates'],
   'reports': ['view_reports'],
   'transactions': ['view_all_data'],
