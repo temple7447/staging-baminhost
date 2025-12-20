@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import {
+    Shield,
     ShieldCheck,
     MessageSquare,
     Zap,
@@ -55,6 +56,7 @@ const ManagingLikeABoss: React.FC = () => {
         archetype: "",
         strengths: "",
         opportunities: "",
+        strategyExecutionValue: 50,
         checklist: {
             valuePeople: false,
             talentDevelopment: false,
@@ -62,14 +64,34 @@ const ManagingLikeABoss: React.FC = () => {
             createOwnership: false,
             takeResponsibility: false,
             directCommunication: false,
-            empowerTeam: false
+            empowerTeam: false,
+            // Action Steps
+            takeQuestionnaire: false,
+            pickAttribute: false,
+            plotGrid: false,
+            plotSpectrum: false,
+            seekFeedback: false
+        }
+    });
+
+    // State for Delegation Module
+    const [delegationPlan, setDelegationPlan] = useState({
+        bigFive: ["", "", "", "", ""],
+        daddTasks: [
+            { task: "", category: "" as "" | "Delete" | "Automate" | "Delegate" | "Do" }
+        ],
+        audit: {
+            bangForBuck: "",
+            timeFreeUp: "",
+            costEffectiveness: "",
+            eightyPercentChance: ""
         }
     });
 
     const [approvals, setApprovals] = useState({
         culture: false,
         leadership: false,
-        feedback: false,
+        delegation: false,
         review: false,
         meetings: false,
         performance: false
@@ -79,10 +101,12 @@ const ManagingLikeABoss: React.FC = () => {
     useEffect(() => {
         const savedCulture = loadFromStorage(STORAGE_KEYS.MANAGING_BOSS_CULTURE, null);
         const savedLeadership = loadFromStorage(STORAGE_KEYS.MANAGING_BOSS_LEADERSHIP, null);
+        const savedDelegation = loadFromStorage(STORAGE_KEYS.MANAGING_BOSS_DELEGATION, null);
         const savedApprovals = loadFromStorage(STORAGE_KEYS.MANAGING_BOSS_APPROVALS, null);
 
         if (savedCulture) setCulturePlan(savedCulture);
         if (savedLeadership) setLeadershipPlan(savedLeadership);
+        if (savedDelegation) setDelegationPlan(savedDelegation);
         if (savedApprovals) setApprovals(savedApprovals);
     }, []);
 
@@ -90,10 +114,12 @@ const ManagingLikeABoss: React.FC = () => {
     const saveAll = (
         updatedCulture = culturePlan,
         updatedLeadership = leadershipPlan,
+        updatedDelegation = delegationPlan,
         updatedApprovals = approvals
     ) => {
         saveToStorage(STORAGE_KEYS.MANAGING_BOSS_CULTURE, updatedCulture);
         saveToStorage(STORAGE_KEYS.MANAGING_BOSS_LEADERSHIP, updatedLeadership);
+        saveToStorage(STORAGE_KEYS.MANAGING_BOSS_DELEGATION, updatedDelegation);
         saveToStorage(STORAGE_KEYS.MANAGING_BOSS_APPROVALS, updatedApprovals);
     };
 
@@ -132,7 +158,7 @@ const ManagingLikeABoss: React.FC = () => {
     const handleApproval = (module: keyof typeof approvals) => {
         const updated = { ...approvals, [module]: !approvals[module] };
         setApprovals(updated);
-        saveAll(culturePlan, leadershipPlan, updated);
+        saveAll(culturePlan, leadershipPlan, delegationPlan, updated);
         toast({
             title: updated[module] ? "Module Approved" : "Approval Reset",
             description: updated[module] ? "The boss has authorized this module's strategy." : "Approval signature removed.",
@@ -494,21 +520,93 @@ const ManagingLikeABoss: React.FC = () => {
                         </div>
                     </div>
 
-                    <Card className="bg-slate-50 border-slate-200 shadow-none">
-                        <CardHeader className="p-6 pb-2">
-                            <div className="flex items-center gap-2 mb-2">
-                                <Quote className="w-5 h-5 text-slate-300" />
-                                <CardTitle className="text-sm font-black uppercase tracking-tight text-slate-600">Case Study: Sir Richard Branson</CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="p-6 pt-2 space-y-4">
-                            <div className="text-xs text-slate-500 leading-relaxed font-medium space-y-3">
-                                <p>While exploring a new resort site, Branson overheard two workers demolishing a shack on a scorching hot day.</p>
-                                <p className="italic font-bold text-slate-700">"We are going to build an amazing resort on this island... By demolishing this shack, you're taking the first step we need in order to build our dream. So thank you for performing this hard but important work."</p>
-                                <p>He connected their manual labor to the "Big Picture," demonstrating that he sincerely values his people and empowers them to do their job.</p>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <div className="space-y-6">
+                        <Card className="bg-slate-50 border-slate-200 shadow-none h-full">
+                            <CardHeader className="p-6 pb-2">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Quote className="w-5 h-5 text-slate-300" />
+                                    <CardTitle className="text-sm font-black uppercase tracking-tight text-slate-600">Case Study: Sir Richard Branson</CardTitle>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="p-6 pt-2 space-y-4">
+                                <div className="text-xs text-slate-500 leading-relaxed font-medium space-y-3">
+                                    <p>While exploring a new resort site, Branson overheard two workers demolishing a shack on a scorching hot day.</p>
+                                    <p className="italic font-bold text-slate-700">"We are going to build an amazing resort on this island... By demolishing this shack, you're taking the first step we need in order to build our dream. So thank you for performing this hard but important work."</p>
+                                    <p>He connected their manual labor to the "Big Picture," demonstrating that he sincerely values his people and empowers them to do their job.</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="bg-slate-900 border-slate-800 shadow-xl overflow-hidden group">
+                            <div className="bg-blue-600 h-1 w-full" />
+                            <CardHeader className="p-6 pb-2">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Shield className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
+                                    <CardTitle className="text-sm font-black uppercase tracking-tight text-slate-200">Case Study: Navy S.E.A.L. "Hell Week"</CardTitle>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="p-6 pt-2 space-y-4">
+                                <div className="text-[11px] text-slate-400 leading-relaxed font-medium space-y-3">
+                                    <p>Recruits were divided into teams for a grueling boat race. <span className="text-white font-bold italic">Team Alpha</span> kept winning, while <span className="text-white font-bold italic">Team Delta</span> was consistently last.</p>
+                                    <p>The leader of Team Delta blamed his men. The instructors swapped the leaders. <span className="text-blue-400 font-bold block mt-2 text-xs uppercase tracking-widest italic animate-pulse">The result?</span></p>
+                                    <p className="border-l-2 border-blue-500 pl-3 italic">"Team Delta, with the new leader, won the very next round. Strong leadership turned a losing team into a winning one."</p>
+                                    <div className="bg-blue-500/10 p-3 rounded-lg border border-blue-500/20 mt-4">
+                                        <p className="text-blue-300 font-black text-[10px] uppercase tracking-tighter">"Teams win or lose based on leadership. In business it's no different."</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </section>
+
+            {/* The 7 Shifts */}
+            <section className="space-y-8">
+                <div className="flex items-center gap-3 border-b-2 border-slate-900 pb-2 w-fit">
+                    <Zap className="w-6 h-6 text-slate-900" />
+                    <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 italic">2. Seven Shifts for Becoming an Engaged Leader</h3>
+                </div>
+
+                <div className="bg-white border-2 border-slate-900 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                        <Globe className="w-32 h-32 text-slate-900" />
+                    </div>
+
+                    <div className="max-w-3xl mx-auto space-y-8 relative z-10">
+                        <p className="text-sm text-slate-600 font-medium leading-relaxed italic text-center">
+                            Writing for <span className="font-bold border-b-2 border-slate-900">Harvard Business Review</span>, Michael Watkins highlights seven seismic shifts managers must make to become great leaders.
+                        </p>
+
+                        <div className="grid gap-4">
+                            {[
+                                { from: "Specialist", fromDesc: "Understands one function deeply", to: "Generalist", toDesc: "Understands the whole business" },
+                                { from: "Analyst", fromDesc: "Manages specific business activities", to: "Integrator", toDesc: "Makes decisions for the good of organization" },
+                                { from: "Tactician", fromDesc: "Focuses on details and results", to: "Strategist", toDesc: "Understands the big picture" },
+                                { from: "Bricklayer", fromDesc: "Manages distinct elements", to: "Architect", toDesc: "Designs organizational systems" },
+                                { from: "Problem Solver", fromDesc: "Masters skills and mobilises talent", to: "Agenda Setter", toDesc: "Defines which challenges to tackle" },
+                                { from: "Warrior", fromDesc: "Marshals the troops", to: "Diplomat", toDesc: "Engages external stakeholders" },
+                                { from: "Supporting Cast", fromDesc: "Sets a good example", to: "Lead Role", toDesc: "Inspires Everyone" }
+                            ].map((shift, idx) => (
+                                <div key={idx} className="group flex items-center gap-6 p-4 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all duration-300">
+                                    <div className="w-1/3 text-right">
+                                        <span className="block text-xs font-black uppercase tracking-widest text-slate-400 group-hover:text-slate-600">{shift.from}</span>
+                                        <span className="block text-[10px] text-slate-400 italic font-medium">{shift.fromDesc}</span>
+                                    </div>
+                                    <div className="flex-1 h-0.5 bg-slate-200 relative group-hover:bg-slate-900 transition-colors">
+                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 border-r-2 border-t-2 border-slate-200 rotate-45 group-hover:border-slate-900 transition-colors" />
+                                    </div>
+                                    <div className="w-1/3 text-left">
+                                        <span className="block text-xs font-black uppercase tracking-widest text-slate-900">{shift.to}</span>
+                                        <span className="block text-[10px] text-slate-500 italic font-medium">{shift.toDesc}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="bg-slate-900 text-white p-6 rounded-xl text-center space-y-2">
+                            <p className="text-xl font-black uppercase italic tracking-tighter">"To think like a leader, you need to think holistically."</p>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -599,6 +697,103 @@ const ManagingLikeABoss: React.FC = () => {
                 </div>
             </section>
 
+            {/* Strategy vs Execution */}
+            <section className="space-y-8">
+                <div className="flex items-center gap-3 border-b-2 border-slate-900 pb-2 w-fit">
+                    <Target className="w-6 h-6 text-slate-900" />
+                    <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 italic">4. Strategy vs. Execution</h3>
+                </div>
+
+                <div className="grid lg:grid-cols-2 gap-12 items-start">
+                    <div className="space-y-6">
+                        <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                            Most leaders tend to be stronger at either <span className="text-blue-600 font-bold">Strategy</span> (the what and why) or <span className="text-slate-900 font-bold">Execution</span> (the how and when).
+                            Only 8% of leaders are effective at both.
+                        </p>
+
+                        <div className="bg-white border-2 border-slate-900 rounded-2xl p-8 shadow-xl space-y-8">
+                            <div className="flex justify-between items-end mb-2">
+                                <div className="text-center">
+                                    <span className="block text-sm font-black uppercase tracking-tighter text-blue-600">Strategy</span>
+                                    <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">Answering the what and why</span>
+                                </div>
+                                <div className="text-center">
+                                    <span className="block text-sm font-black uppercase tracking-tighter text-slate-900">Execution</span>
+                                    <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">Answering the how and when</span>
+                                </div>
+                            </div>
+
+                            <div className="relative h-12 flex items-center group">
+                                <div className="absolute left-[-20px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-r-[15px] border-r-blue-600" />
+                                <div className="absolute right-[-20px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[15px] border-l-slate-900" />
+                                <div className="w-full h-8 bg-gradient-to-r from-blue-600 to-slate-900 rounded-md shadow-inner relative">
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="100"
+                                        value={leadershipPlan.strategyExecutionValue}
+                                        onChange={(e) => {
+                                            const updated = { ...leadershipPlan, strategyExecutionValue: parseInt(e.target.value) };
+                                            setLeadershipPlan(updated);
+                                            saveAll(culturePlan, updated, approvals);
+                                        }}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                    />
+                                    <div
+                                        className="absolute top-1/2 -translate-y-1/2 w-6 h-10 bg-white border-2 border-slate-900 rounded shadow-lg flex items-center justify-center pointer-events-none transition-all duration-75"
+                                        style={{ left: `calc(${leadershipPlan.strategyExecutionValue}% - 12px)` }}
+                                    >
+                                        <div className="w-0.5 h-4 bg-slate-900" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p className="text-[10px] text-slate-500 italic font-medium text-center pt-4">
+                                "Developing your potential as a leader means moving across this spectrum. Zoom in to the details and zoom out to the big picture."
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-8">
+                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-8 space-y-6">
+                            <h4 className="text-sm font-black uppercase tracking-widest text-slate-900 italic flex items-center gap-2">
+                                <CheckCircle2 className="w-5 h-5 text-slate-900" /> Final Commitment & Action Steps
+                            </h4>
+
+                            <div className="space-y-4">
+                                {[
+                                    { key: "takeQuestionnaire", label: "How engaged a leader are you? Take the questionnaire." },
+                                    { key: "pickAttribute", label: "Pick one attribute to focus on for the next 30 days." },
+                                    { key: "plotGrid", label: "Plot yourself on the conflict vs presence grid." },
+                                    { key: "plotSpectrum", label: "Where do you fall on the strategy vs execution spectrum?" },
+                                    { key: "seekFeedback", label: "Seek feedback from your team, friends and family." }
+                                ].map((step) => (
+                                    <div
+                                        key={step.key}
+                                        className={`flex items-start gap-4 p-4 rounded-xl border transition-all cursor-pointer group ${leadershipPlan.checklist[step.key as keyof typeof leadershipPlan.checklist] ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200 hover:border-slate-900'}`}
+                                        onClick={() => toggleLeadershipChecklist(step.key as keyof typeof leadershipPlan.checklist)}
+                                    >
+                                        <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${leadershipPlan.checklist[step.key as keyof typeof leadershipPlan.checklist] ? 'bg-green-600 border-green-600' : 'border-slate-300 bg-white group-hover:border-slate-900'}`}>
+                                            {leadershipPlan.checklist[step.key as keyof typeof leadershipPlan.checklist] && <Check className="w-3.5 h-3.5 text-white" />}
+                                        </div>
+                                        <span className={`text-xs font-bold leading-tight ${leadershipPlan.checklist[step.key as keyof typeof leadershipPlan.checklist] ? 'text-green-900' : 'text-slate-600 group-hover:text-slate-900'}`}>
+                                            {step.label}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="pt-6 border-t border-slate-200">
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2 italic">Parting Shots:</p>
+                                <p className="text-sm text-slate-600 italic leading-relaxed">
+                                    "Becoming a great leader is a process without a finish line. Practicing leadership needs to be part of who you are, day in and day out."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Admin/Boss Input Approval */}
             <Card className={`border-2 transition-all duration-500 ${approvals.leadership ? 'border-green-500 bg-green-50/50' : 'border-slate-900 bg-slate-50/50'} shadow-xl mt-12`}>
                 <CardHeader className="py-6 border-b border-slate-200/50">
@@ -639,6 +834,228 @@ const ManagingLikeABoss: React.FC = () => {
         </div>
     );
 
+    const renderDelegation = () => (
+        <div className="space-y-12 pb-20">
+            {/* Header section */}
+            <div className="text-center space-y-4 max-w-3xl mx-auto pt-4">
+                <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200 uppercase tracking-widest px-3 py-1 text-[10px] font-black">Module 3</Badge>
+                <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic text-slate-900 leading-none">
+                    Delegate with Confidence
+                </h2>
+                <div className="h-1.5 w-24 bg-slate-900 mx-auto" />
+                <p className="text-slate-500 text-sm md:text-base font-medium leading-relaxed italic pt-2">
+                    "Knowing what should be delegated and what shouldn't is critical to your leadership ability."
+                </p>
+            </div>
+
+            {/* DADD Framework */}
+            <section className="space-y-8">
+                <div className="flex items-center gap-3 border-b-2 border-slate-900 pb-2 w-fit">
+                    <LayoutGrid className="w-6 h-6 text-slate-900" />
+                    <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 italic">1. The DADD Framework</h3>
+                </div>
+
+                <div className="grid lg:grid-cols-2 gap-8 items-start">
+                    <div className="space-y-6">
+                        <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                            Determine what's on your plate using this framework. Stop doing everything and start leading.
+                        </p>
+                        <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-xl space-y-4">
+                            {[
+                                { question: "Does it need to be done? No?", action: "Delete it" },
+                                { question: "Is it a recurring task? Yes?", action: "Automate it" },
+                                { question: "Can someone else do it? Yes?", action: "Delegate it" },
+                                { question: "Are you the best person for it? Yes?", action: "Do it" }
+                            ].map((item, idx) => (
+                                <div key={idx} className="flex items-center gap-4 group">
+                                    <div className="flex-1 text-xs font-bold text-slate-500">{item.question}</div>
+                                    <div className="h-0.5 bg-slate-100 flex-1 relative group-hover:bg-slate-900 transition-colors">
+                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 border-r border-t border-slate-300 rotate-45 group-hover:border-slate-900" />
+                                    </div>
+                                    <div className="w-24 text-right">
+                                        <Badge className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest px-2">{item.action}</Badge>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <Card className="bg-slate-50 border-slate-200 shadow-none">
+                        <CardHeader className="p-6">
+                            <CardTitle className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
+                                <AlertTriangle className="w-4 h-4 text-slate-400" /> Reality Check
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-6 pt-0 space-y-4">
+                            <p className="text-xs text-slate-500 leading-relaxed font-medium italic">
+                                "Too many entrepreneurs struggle with perfectionism. They expect delegated tasks to get done in the exact same way as they would do them. Reality check: that's not going to happen!"
+                            </p>
+                            <div className="bg-white p-4 rounded-xl border border-slate-200">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Barriers to Delegation:</p>
+                                <ul className="space-y-2">
+                                    {["Fear of losing control", "Repeating past bad experiences", "Afraid of spending money", "Misunderstanding what delegation is"].map((b, i) => (
+                                        <li key={i} className="flex items-center gap-2 text-[10px] font-extrabold text-slate-600 uppercase">
+                                            <div className="w-1 h-1 bg-slate-400 rounded-full" /> {b}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </section>
+
+            {/* The Big 5 */}
+            <section className="space-y-8">
+                <div className="flex items-center gap-3 border-b-2 border-slate-900 pb-2 w-fit">
+                    <PieChart className="w-6 h-6 text-slate-900" />
+                    <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 italic">2. Focus on Your Highest Level Activities (The Big 5)</h3>
+                </div>
+
+                <div className="grid lg:grid-cols-2 gap-8 items-start">
+                    <div className="space-y-6">
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                            Your Big 5 are the five non-negotiable things that you know <span className="font-black underline italic uppercase">YOU</span> should be doing. These activities are the highest and best use of your time.
+                        </p>
+                        <div className="bg-blue-600 p-8 rounded-2xl text-white space-y-6 shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 opacity-10">
+                                <PieChart className="w-48 h-48 -mr-12 -mt-12" />
+                            </div>
+                            <h4 className="text-5xl font-black italic tracking-tighter opacity-20">BIG 5</h4>
+                            <div className="space-y-3 relative z-10">
+                                {delegationPlan.bigFive.map((v, i) => (
+                                    <div key={i} className="flex gap-4 items-center">
+                                        <span className="text-xl font-black opacity-40">{i + 1}</span>
+                                        <Input
+                                            value={v}
+                                            onChange={(e) => {
+                                                const newBigFive = [...delegationPlan.bigFive];
+                                                newBigFive[i] = e.target.value;
+                                                const updated = { ...delegationPlan, bigFive: newBigFive };
+                                                setDelegationPlan(updated);
+                                                saveAll(culturePlan, leadershipPlan, updated, approvals);
+                                            }}
+                                            className="bg-blue-500/50 border-blue-400 text-white placeholder:text-blue-200 font-bold"
+                                            placeholder={`Activity ${i + 1}`}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="pt-4 border-t border-blue-400">
+                                <p className="text-xs font-black uppercase tracking-widest text-blue-200">Everything else is a "Below the line task"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-6">
+                        <Card className="bg-slate-900 border-slate-800 text-white overflow-hidden shadow-2xl">
+                            <CardHeader className="bg-slate-800 border-b border-white/5">
+                                <CardTitle className="text-sm font-black uppercase tracking-widest italic text-blue-400">The 6-Inch Putt Philosophy</CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-8 space-y-6">
+                                <div className="flex items-center gap-6">
+                                    <div className="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center border-2 border-blue-500/50">
+                                        <CheckCircle2 className="w-8 h-8 text-blue-400" />
+                                    </div>
+                                    <p className="text-xs text-slate-400 font-medium leading-relaxed italic">
+                                        "In golf, the heavy lifting is getting the ball close to the cup. The easy part is tapping it in once it's within 6 inches. Your job is to ensure delegated tasks reach the cup."
+                                    </p>
+                                </div>
+                                <div className="grid gap-4">
+                                    {[
+                                        { title: "Who", desc: "Explicit accountability" },
+                                        { title: "What", desc: "Detailed set of instructions" },
+                                        { title: "When", desc: "Clear milestones & checkpoints" }
+                                    ].map((item, i) => (
+                                        <div key={i} className="bg-white/5 p-4 rounded-xl border border-white/10 flex justify-between items-center group hover:bg-white/10 transition-colors">
+                                            <span className="text-xs font-black uppercase tracking-widest text-blue-400">{item.title}</span>
+                                            <span className="text-[10px] font-bold text-slate-500 group-hover:text-slate-300">{item.desc}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </section>
+
+            {/* Delegation Audit */}
+            <section className="space-y-8 pt-8">
+                <div className="flex items-center gap-3 border-b-2 border-slate-900 pb-2 w-fit">
+                    <Quote className="w-6 h-6 text-slate-900" />
+                    <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 italic">3. Delegation Audit</h3>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                    {[
+                        { key: "bangForBuck", label: "Which tasks give you the biggest bang for your buck?", placeholder: "Identify high-value tasks..." },
+                        { key: "timeFreeUp", label: "How much of your own time would you free up?", placeholder: "Calculate hours saved..." },
+                        { key: "costEffectiveness", label: "How cost effectively can these be delegated?", placeholder: "Estimate delegation cost vs your rate..." },
+                        { key: "eightyPercentChance", label: "Can someone else perform at 80% effectiveness?", placeholder: "Identify potential delegates..." }
+                    ].map((idx) => (
+                        <div key={idx.key} className="space-y-2">
+                            <Label className="text-xs font-black uppercase text-slate-500">{idx.label}</Label>
+                            <Textarea
+                                value={delegationPlan.audit[idx.key as keyof typeof delegationPlan.audit]}
+                                onChange={(e) => {
+                                    const updated = {
+                                        ...delegationPlan,
+                                        audit: {
+                                            ...delegationPlan.audit,
+                                            [idx.key]: e.target.value
+                                        }
+                                    };
+                                    setDelegationPlan(updated);
+                                    saveAll(culturePlan, leadershipPlan, updated, approvals);
+                                }}
+                                className="bg-white border-slate-200 text-sm min-h-[80px]"
+                                placeholder={idx.placeholder}
+                            />
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Boss Input Approval */}
+            <Card className={`border-2 transition-all duration-500 ${approvals.delegation ? 'border-green-500 bg-green-50/50' : 'border-slate-900 bg-slate-50/50'} shadow-xl mt-12`}>
+                <CardHeader className="py-6 border-b border-slate-200/50">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className={`p-3 rounded-full ${approvals.delegation ? 'bg-green-500' : 'bg-slate-900'}`}>
+                                <ShieldCheck className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <CardTitle className="text-xl font-black text-slate-900 uppercase italic tracking-tighter">Boss Input: Delegation Audit</CardTitle>
+                                <CardDescription className="text-xs font-bold uppercase tracking-widest text-slate-500">Delegation Module Authorization</CardDescription>
+                            </div>
+                        </div>
+                        <Button
+                            onClick={() => handleApproval('delegation')}
+                            className={`${approvals.delegation ? 'bg-green-600 hover:bg-green-700' : 'bg-slate-900 hover:bg-slate-800'} text-white font-black uppercase tracking-widest text-xs px-8 h-12 shadow-lg hover:translate-y-[-2px] transition-all`}
+                        >
+                            {approvals.delegation ? (
+                                <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4" /> Finalized</span>
+                            ) : (
+                                "Confirm Delegation Alignment"
+                            )}
+                        </Button>
+                    </div>
+                </CardHeader>
+                <CardContent className="py-6">
+                    <div className="flex items-start gap-4">
+                        <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 ${approvals.delegation ? 'text-green-600' : 'text-slate-400'}`} />
+                        <p className="text-xs text-slate-600 font-medium leading-relaxed italic">
+                            {approvals.delegation
+                                ? "This delegation strategy has been signed off. You're now focused on your high-level activities (The Big 5)."
+                                : "Are you delegating with confidence, or are you stuck doing work that others should be handling? Sign off to finalize your delegation plan."
+                            }
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
+
     return (
         <div className="min-h-screen bg-slate-50/30 p-4 md:p-8">
             <div className="max-w-6xl mx-auto space-y-8">
@@ -661,12 +1078,12 @@ const ManagingLikeABoss: React.FC = () => {
                         {[
                             { value: "1. Culture", icon: Globe },
                             { value: "2. Leadership", icon: Users },
-                            { value: "3. Review", icon: TrendingUp },
+                            { value: "3. Delegation", icon: PieChart },
                             { value: "4. Meetings", icon: MessageSquare },
                             { value: "5. Performance", icon: Zap }
                         ].map((t) => {
                             const Icon = t.icon;
-                            const isEnabled = t.value === "1. Culture" || t.value === "2. Leadership";
+                            const isEnabled = t.value === "1. Culture" || t.value === "2. Leadership" || t.value === "3. Delegation";
                             return (
                                 <TabsTrigger
                                     key={t.value}
@@ -691,7 +1108,11 @@ const ManagingLikeABoss: React.FC = () => {
                         {renderLeadership()}
                     </TabsContent>
 
-                    {["3. Review", "4. Meetings", "5. Performance"].map(tab => (
+                    <TabsContent value="3. Delegation" className="focus-visible:ring-0 outline-none">
+                        {renderDelegation()}
+                    </TabsContent>
+
+                    {["4. Meetings", "5. Performance"].map(tab => (
                         <TabsContent key={tab} value={tab} className="mt-20 text-center space-y-4">
                             <CircleDashed className="w-12 h-12 text-slate-300 mx-auto animate-spin-slow" />
                             <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Section Under Construction</h3>
@@ -706,7 +1127,10 @@ const ManagingLikeABoss: React.FC = () => {
                         variant="ghost"
                         className="text-slate-400 font-black uppercase tracking-widest text-[10px]"
                         disabled={activeTab === "1. Culture"}
-                        onClick={() => setActiveTab("1. Culture")}
+                        onClick={() => {
+                            if (activeTab === "2. Leadership") setActiveTab("1. Culture");
+                            if (activeTab === "3. Delegation") setActiveTab("2. Leadership");
+                        }}
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         Previous Module
@@ -722,8 +1146,11 @@ const ManagingLikeABoss: React.FC = () => {
                     <Button
                         variant="ghost"
                         className="text-slate-900 font-black uppercase tracking-widest text-[10px]"
-                        disabled={activeTab === "2. Leadership" || activeTab === "5. Performance"}
-                        onClick={() => setActiveTab("2. Leadership")}
+                        disabled={activeTab === "3. Delegation" || activeTab === "5. Performance"}
+                        onClick={() => {
+                            if (activeTab === "1. Culture") setActiveTab("2. Leadership");
+                            else if (activeTab === "2. Leadership") setActiveTab("3. Delegation");
+                        }}
                     >
                         Next Module
                         <ArrowRight className="w-4 h-4 ml-2" />

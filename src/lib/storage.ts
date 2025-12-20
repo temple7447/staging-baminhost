@@ -1,6 +1,7 @@
 export const STORAGE_KEYS = {
     MANAGING_BOSS_CULTURE: 'managing_boss_culture',
     MANAGING_BOSS_LEADERSHIP: 'managing_boss_leadership',
+    MANAGING_BOSS_DELEGATION: 'managing_boss_delegation',
     MANAGING_BOSS_APPROVALS: 'managing_boss_approvals',
     STRATEGIC_HIRING_PLAN: 'strategic_hiring_planner_data',
     STRATEGIC_HIRING_APPROVALS: 'strategic_hiring_approvals'
