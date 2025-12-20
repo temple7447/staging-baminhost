@@ -35,7 +35,12 @@ import {
     FileText,
     Activity,
     ShieldAlert,
-    Gavel
+    Gavel,
+    LayoutGrid,
+    TableProperties,
+    Database,
+    BrainCircuit,
+    Shield
 } from "lucide-react";
 import {
     STORAGE_KEYS,
@@ -1084,124 +1089,225 @@ const StrategicHiringPlanner: React.FC = () => {
                 </CardHeader>
             </Card>
 
+            {/* MBTI Building Blocks */}
+            <section className="space-y-6">
+                <div className="flex items-center gap-3 border-b border-slate-100 pb-2">
+                    <LayoutGrid className="w-5 h-5 text-slate-400" />
+                    <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">MBTI Building Blocks</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[
+                        {
+                            title: 'Gain or Lose Energy',
+                            letters: '(I) OR (E)',
+                            desc: 'Introverts (I) recharge alone; Extroverts (E) charge via social interaction.'
+                        },
+                        {
+                            title: 'Take in Information',
+                            letters: '(S) OR (N)',
+                            desc: 'Sensing (S) focuses on facts/now; Intuitive (N) sees patterns/future.'
+                        },
+                        {
+                            title: 'Make Decisions',
+                            letters: '(T) OR (F)',
+                            desc: 'Thinking (T) is logic-based/practical; Feeling (F) is values/emotion-based.'
+                        },
+                        {
+                            title: 'Prefer to Live Lives',
+                            letters: '(J) OR (P)',
+                            desc: 'Judging (J) prefers closed loops/checklists; Prospecting (P) prefers open possibilities.'
+                        }
+                    ].map((item, idx) => (
+                        <Card key={idx} className="bg-white border-slate-100 shadow-none">
+                            <CardHeader className="p-4 pb-2">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.title}</p>
+                                <CardTitle className="text-lg font-black text-slate-900">{item.letters}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-4 pt-0">
+                                <p className="text-[11px] text-slate-500 leading-relaxed italic">{item.desc}</p>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </section>
+
+            {/* Leveraging Opposites */}
             <div className="grid md:grid-cols-2 gap-8">
-                <div className="space-y-8">
-                    <section className="space-y-4">
-                        <div className="flex items-center gap-3 border-b border-slate-100 pb-2">
-                            <Zap className="w-5 h-5 text-slate-400" />
-                            <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">Everyone Has a Superpower</h3>
-                        </div>
-                        <div className="p-6 bg-slate-50 border border-slate-100 rounded-xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-4 opacity-5">
-                                <Brain className="w-24 h-24" />
-                            </div>
-                            <blockquote className="space-y-4">
-                                <p className="text-sm font-medium text-slate-600 italic leading-relaxed">
-                                    "Everybody is a genius. But if you judge a fish by its ability to climb a tree, it will live its whole life believing that it is stupid."
-                                </p>
-                                <footer className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">— Albert Einstein</footer>
-                            </blockquote>
-                        </div>
-                        <div className="p-6 bg-slate-50 border border-slate-100 rounded-xl">
-                            <blockquote className="space-y-4">
-                                <p className="text-sm font-medium text-slate-600 italic leading-relaxed">
-                                    "Our job as business owners is to be the allocator of resources. Resources allocated incorrectly will produce inferior results."
-                                </p>
-                                <footer className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">— Warren Buffett</footer>
-                            </blockquote>
-                        </div>
-                    </section>
-
-                    <section className="space-y-4">
-                        <div className="flex items-center gap-3 border-b border-slate-100 pb-2">
-                            <Magnet className="w-5 h-5 text-slate-400" />
-                            <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">The Power of Delegation</h3>
-                        </div>
-                        <div className="p-6 bg-slate-900 border border-slate-800 rounded-xl relative overflow-hidden">
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.05),transparent)]" />
-                            <blockquote className="space-y-4 relative z-10">
-                                <p className="text-sm font-medium text-slate-300 italic leading-relaxed">
-                                    "All increase in wealth comes from the division of labor so that those who are good at a particular task can focus on just that."
-                                </p>
-                                <footer className="text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">— Adam Smith</footer>
-                            </blockquote>
-                        </div>
-                    </section>
-                </div>
-
-                <div className="space-y-8">
-                    <section className="space-y-4">
-                        <div className="flex items-center gap-3 border-b border-slate-100 pb-2">
-                            <Eye className="w-5 h-5 text-slate-400" />
-                            <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">Conducting the Orchestra</h3>
-                        </div>
-                        <div className="space-y-4">
-                            <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                                Like conducting an orchestra, place someone in the right seat and build them up to be the best they can be. Don't make the violinist play the clarinet!
-                            </p>
-                            <Card className="bg-white border-slate-200 shadow-sm border-l-4 border-l-slate-900">
-                                <CardContent className="p-5">
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Team Superpower Allocation</Label>
-                                            <Textarea
-                                                placeholder="Map out your team's natural strengths vs. their current tasks..."
-                                                className="bg-slate-50 border-slate-100 text-xs min-h-[120px]"
-                                                value={personalityPlan.superpowerAllocation}
-                                                onChange={(e) => setPersonalityPlan({ ...personalityPlan, superpowerAllocation: e.target.value })}
-                                            />
-                                        </div>
-                                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
-                                            <div className="flex items-center gap-2">
-                                                <div className={`w-4 h-4 rounded border flex items-center justify-center cursor-pointer transition-colors ${personalityPlan.alignmentChecked ? 'bg-slate-900 border-slate-900 text-white' : 'border-slate-300 bg-white'}`} onClick={() => setPersonalityPlan({ ...personalityPlan, alignmentChecked: !personalityPlan.alignmentChecked })}>
-                                                    {personalityPlan.alignmentChecked && <CheckCircle2 className="w-2.5 h-2.5" />}
-                                                </div>
-                                                <span className="text-[11px] font-bold text-slate-600">Superpower alignment confirmed</span>
-                                            </div>
-                                            <Button variant="ghost" size="sm" className="h-7 text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-colors">
-                                                Analyze Matrix
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <div className="p-6 bg-slate-50 border border-slate-100 rounded-xl">
-                                <blockquote className="space-y-4">
-                                    <p className="text-sm font-medium text-slate-600 italic leading-relaxed">
-                                        "To ask the right question is already half the solution of a problem."
-                                    </p>
-                                    <footer className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">— Carl Jung</footer>
-                                </blockquote>
-                            </div>
-                        </div>
-                    </section>
-
-                    <Card className="border-slate-200 bg-slate-50/50 shadow-none">
-                        <CardHeader className="py-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Zap className="w-5 h-5 text-slate-400" />
-                                    <CardTitle className="text-xs font-bold text-slate-600 uppercase tracking-widest">Boss Input: Alignment Audit</CardTitle>
+                <section className="space-y-6">
+                    <div className="flex items-center gap-3 border-b border-slate-100 pb-2">
+                        <Users className="w-5 h-5 text-slate-400" />
+                        <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">Leverage Opposites for Effectiveness</h3>
+                    </div>
+                    <div className="space-y-3">
+                        {[
+                            { title: 'Strong Messaging', pair: '(E) + (I)', desc: '(I) thinks about the world; (E) analyzes impact on people.' },
+                            { title: 'Complicated Problems', pair: '(S) + (N)', desc: '(S) focuses on right now; (N) connects dots and anticipates future.' },
+                            { title: 'Leadership & Persuasion', pair: '(T) + (F)', desc: 'Combine logic (T) with hearts and minds (F) for perfect persuasion.' },
+                            { title: 'Managing Change', pair: '(J) + (P)', desc: '(J) provides structure/clarity; (P) offers flexibility/possibility.' }
+                        ].map((item, idx) => (
+                            <div key={idx} className="p-4 rounded-xl border border-slate-100 bg-white flex items-center justify-between gap-4">
+                                <div className="space-y-1">
+                                    <h4 className="text-xs font-bold text-slate-900">{item.title}</h4>
+                                    <p className="text-[10px] text-slate-500 leading-relaxed font-medium">{item.desc}</p>
                                 </div>
-                                <Button
-                                    variant={approvals.bonus ? "default" : "outline"}
-                                    size="sm"
-                                    className={approvals.bonus ? "bg-slate-900 text-white" : "border-slate-200 text-slate-600"}
-                                    onClick={() => setApprovals({ ...approvals, bonus: !approvals.bonus })}
-                                >
-                                    {approvals.bonus ? "Audit Complete ✓" : "Finalize Audit"}
-                                </Button>
+                                <div className="px-3 py-1 bg-slate-100 rounded-full border border-slate-200">
+                                    <span className="text-[10px] font-black text-slate-600">{item.pair}</span>
+                                </div>
                             </div>
-                        </CardHeader>
-                        <CardContent className="pb-4">
-                            <p className="text-xs text-slate-500 font-medium">
-                                Ensure every team member is in a role that leverages their natural genius. This is the ultimate "Boss" move for leverage.
-                            </p>
-                        </CardContent>
-                    </Card>
-                </div>
+                        ))}
+                    </div>
+                </section>
+
+                <section className="space-y-6">
+                    <div className="flex items-center gap-3 border-b border-slate-100 pb-2">
+                        <TableProperties className="w-5 h-5 text-slate-400" />
+                        <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">The 4 Temperaments</h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        {[
+                            { type: 'SJ', title: 'Traditional', sub: 'Stabilizing', color: 'slate' },
+                            { type: 'NF', title: 'Catalyst', sub: 'Energizer', color: 'slate' },
+                            { type: 'SP', title: 'Troubleshooter', sub: 'Firefighter', color: 'slate' },
+                            { type: 'NT', title: 'Visionary', sub: 'Architect', color: 'slate' }
+                        ].map((item) => (
+                            <div key={item.type} className="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:scale-110 transition-transform">
+                                    <Shield className="w-8 h-8" />
+                                </div>
+                                <Badge className="bg-slate-900 text-white mb-2">{item.type}</Badge>
+                                <h4 className="text-xs font-bold text-slate-900 block">{item.title}</h4>
+                                <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black mt-1">{item.sub}</p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
             </div>
+
+            {/* Temperament Matrix Detail */}
+            <section className="space-y-6">
+                <div className="flex items-center gap-3 border-b border-slate-100 pb-2">
+                    <Database className="w-5 h-5 text-slate-400" />
+                    <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">Detailed Temperament Matrix</h3>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm">
+                        <thead>
+                            <tr className="bg-slate-900 text-white">
+                                <th className="p-4 text-[10px] font-black uppercase tracking-widest">Type</th>
+                                <th className="p-4 text-[10px] font-black uppercase tracking-widest">Seeks</th>
+                                <th className="p-4 text-[10px] font-black uppercase tracking-widest">Role</th>
+                                <th className="p-4 text-[10px] font-black uppercase tracking-widest">Appreciates</th>
+                                <th className="p-4 text-[10px] font-black uppercase tracking-widest">Irritated By</th>
+                            </tr>
+                        </thead>
+                        <tbody className="text-[11px] font-medium text-slate-600">
+                            {[
+                                { type: 'SJ', seeks: 'Consistency', role: 'Process/Organizer', appreciates: 'Responsibility', irritated: 'Rules not followed' },
+                                { type: 'NF', seeks: 'Emotional Consensus', role: 'Motivating/Morale', appreciates: 'High Energy/Others', irritated: 'Criticism/No feedback' },
+                                { type: 'SP', seeks: 'Moving Things Along', role: 'Short-term Problems', appreciates: 'Action and Change', irritated: 'Micromanagement' },
+                                { type: 'NT', seeks: 'Structure & Definition', role: 'Long-term Planning', appreciates: 'Principles/Intel', irritated: 'Redundancy/"Stupid" mistakes' }
+                            ].map((row, idx) => (
+                                <tr key={row.type} className={idx % 2 === 1 ? 'bg-slate-50/50' : 'bg-white'}>
+                                    <td className="p-4 font-black text-slate-900">{row.type}</td>
+                                    <td className="p-4">{row.seeks}</td>
+                                    <td className="p-4">{row.role}</td>
+                                    <td className="p-4">{row.appreciates}</td>
+                                    <td className="p-4 text-slate-400 italic">{row.irritated}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            {/* Better Decision Making Section */}
+            <section className="space-y-6">
+                <div className="flex items-center gap-3 border-b border-slate-100 pb-2">
+                    <BrainCircuit className="w-5 h-5 text-slate-400" />
+                    <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">Leveraging Types for Better Decision Making</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[
+                        {
+                            label: 'Sensing',
+                            questions: ['What has past experience shown us?', 'What facts can be verified?', 'What can we see and observe?', 'What is happening right now?']
+                        },
+                        {
+                            label: 'Intuition',
+                            questions: ['How do the facts relate to one another?', 'What can we interpret?', 'What patterns exist?', 'What is possible?']
+                        },
+                        {
+                            label: 'Thinking',
+                            questions: ['What are logical consequences?', 'What are the pros and cons?', 'What will be most effective?', 'What goal is being optimized for?']
+                        },
+                        {
+                            label: 'Feeling',
+                            questions: ['How much do I care?', 'How much do others care?', 'What exceptions need to be made?', 'What are other people feeling?']
+                        }
+                    ].map((section) => (
+                        <div key={section.label} className="space-y-3">
+                            <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">{section.label}</h4>
+                            <div className="space-y-2">
+                                {section.questions.map((q, qIdx) => (
+                                    <div key={qIdx} className="p-3 bg-white border border-slate-100 rounded text-[10px] text-slate-500 italic leading-snug">
+                                        "{q}"
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Final Summary Checklist */}
+            <Card className="border-slate-200 bg-slate-50/50 shadow-none">
+                <CardHeader className="pb-4">
+                    <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-slate-400" />
+                        <CardTitle className="text-xs font-bold text-slate-600 uppercase tracking-widest">In Summary</CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                    {[
+                        'MBTI is an INDICATOR - don\'t put people in a box!',
+                        'MBTI is a way to put yourself in other\'s shoes.',
+                        'Learn to APPRECIATE our differences!',
+                        'You\'re the conductor of your business\' symphony.',
+                        'Put people in a place where they can shine.',
+                        'Check out 16personalities.com for a free test!'
+                    ].map((item, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                            <span className="text-[11px] font-medium text-slate-600">{item}</span>
+                        </div>
+                    ))}
+                </CardContent>
+            </Card>
+
+            {/* Boss Input footer */}
+            <Card className="border-slate-200 bg-slate-50/50 shadow-none mt-8">
+                <CardHeader className="py-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Zap className="w-5 h-5 text-slate-400" />
+                            <CardTitle className="text-xs font-bold text-slate-600 uppercase tracking-widest">Boss Input: Alignment Audit</CardTitle>
+                        </div>
+                        <Button
+                            variant={approvals.bonus ? "default" : "outline"}
+                            size="sm"
+                            className={approvals.bonus ? "bg-slate-900 text-white" : "border-slate-200 text-slate-600"}
+                            onClick={() => setApprovals({ ...approvals, bonus: !approvals.bonus })}
+                        >
+                            {approvals.bonus ? "Audit Complete ✓" : "Finalize Audit"}
+                        </Button>
+                    </div>
+                </CardHeader>
+                <CardContent className="pb-4">
+                    <p className="text-xs text-slate-500 font-medium">
+                        Ensure every team member is in a role that leverages their natural genius. This is the ultimate "Boss" move for leverage.
+                    </p>
+                </CardContent>
+            </Card>
         </div>
     );
 
