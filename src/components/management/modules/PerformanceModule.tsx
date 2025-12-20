@@ -9,19 +9,18 @@ import {
     TrendingUp, ShieldCheck, CheckCircle, CheckCircle2,
     Check, AlertTriangle, UserPlus, Map, HeartPulse,
     ArrowRight, GraduationCap, MessageSquare, AlertCircle,
-    PenTool, Gavel, ScrollText, PieChart, Clock
+    PenTool, Gavel, ScrollText, PieChart, Clock, Sparkles
 } from "lucide-react";
-import { PerformancePlan } from './types';
+import { ModuleProps, PerformancePlan } from './types';
 
-interface PerformanceModuleProps {
-    data: PerformancePlan;
-    onUpdate: (updated: PerformancePlan) => void;
-    isApproved: boolean;
-    onApprove: () => void;
-    onSync?: () => void;
-}
-
-const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, isApproved, onApprove, onSync }) => {
+const PerformanceModule: React.FC<ModuleProps<PerformancePlan>> = ({
+    data,
+    onUpdate,
+    isApproved,
+    onApprove,
+    onSync,
+    syncAvailable
+}) => {
     const toggleChecklist = (key: keyof typeof data.checklist) => {
         onUpdate({
             ...data,
@@ -54,14 +53,22 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
                         <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 italic">1. Create an Org Chart</h3>
                     </div>
                     {onSync && (
-                        <Button
-                            onClick={onSync}
-                            variant="ghost"
-                            size="sm"
-                            className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-2"
-                        >
-                            <Zap className="w-3 h-3" /> Sync from Hiring Planner
-                        </Button>
+                        <div className="flex items-center gap-3">
+                            {syncAvailable && (
+                                <Badge variant="outline" className="animate-pulse bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-black uppercase tracking-widest px-3">
+                                    <Sparkles className="w-3 h-3 mr-1" />
+                                    Sync Available
+                                </Badge>
+                            )}
+                            <Button
+                                onClick={onSync}
+                                variant="ghost"
+                                size="sm"
+                                className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${syncAvailable ? 'text-emerald-600 hover:text-emerald-700 scale-110' : 'text-slate-400 hover:text-slate-900'}`}
+                            >
+                                <Zap className={`w-3 h-3 ${syncAvailable ? 'fill-emerald-600' : ''}`} /> Sync from Hiring Planner
+                            </Button>
+                        </div>
                     )}
                 </div>
 
@@ -790,7 +797,7 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
             </section>
 
             {/* 11. Afterword */}
-            < section className="space-y-8 pt-12 text-center max-w-4xl mx-auto" >
+            <section className="space-y-8 pt-12 text-center max-w-4xl mx-auto">
                 <div className="h-1 w-24 bg-slate-200 mx-auto mb-12" />
                 <h3 className="text-3xl font-black uppercase tracking-tighter text-slate-900 italic mb-8">Afterword</h3>
                 <div className="space-y-6 text-slate-600 font-medium leading-relaxed italic text-sm md:text-base px-8">
@@ -814,7 +821,7 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
             </section>
 
             {/* Boss Input Approval */}
-            < Card className={`border-2 transition-all duration-500 ${isApproved ? 'border-green-500 bg-green-50/50' : 'border-slate-900 bg-slate-50/50'} shadow-xl mt-12`}>
+            <Card className={`border-2 transition-all duration-500 ${isApproved ? 'border-green-500 bg-green-50/50' : 'border-slate-900 bg-slate-50/50'} shadow-xl mt-12`}>
                 <CardHeader className="py-6 border-b border-slate-200/50">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -849,8 +856,8 @@ const PerformanceModule: React.FC<PerformanceModuleProps> = ({ data, onUpdate, i
                         </p>
                     </div>
                 </CardContent>
-            </Card >
-        </div >
+            </Card>
+        </div>
     );
 };
 

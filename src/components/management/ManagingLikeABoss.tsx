@@ -31,6 +31,7 @@ import PerformanceModule from './modules/PerformanceModule';
 const ManagingLikeABoss: React.FC = () => {
     const { toast } = useToast();
     const [activeTab, setActiveTab] = useState("1. Culture");
+    const [syncNeeded, setSyncNeeded] = useState(false);
 
     // State for Culture Module
     const [culturePlan, setCulturePlan] = useState<CulturePlan>({
@@ -221,6 +222,39 @@ const ManagingLikeABoss: React.FC = () => {
         if (savedApprovals) setApprovals(prev => ({ ...prev, ...savedApprovals }));
     }, []);
 
+    // Check if sync is needed
+    useEffect(() => {
+        const hiringTasks = loadFromStorage(STORAGE_KEYS.HIRING_TASKS, []);
+        const hiringOrgChart = loadFromStorage(STORAGE_KEYS.HIRING_ORG_CHART, []);
+
+        if (hiringTasks.length === 0 && hiringOrgChart.length === 0) return;
+
+        // Check Big 5
+        const bigFiveTasks = hiringTasks
+            .filter((t: any) => t.category === 'big5')
+            .map((t: any) => t.title);
+
+        const hasUnsyncedTasks = bigFiveTasks.some((task: string) => !delegationPlan.bigFive.includes(task));
+
+        // Check Inventory (Below the Line)
+        const belowTheLineTasks = hiringTasks
+            .filter((t: any) => t.category === 'below-the-line')
+            .map((t: any) => t.title);
+
+        const hasUnsyncedInventory = belowTheLineTasks.some((task: string) =>
+            !delegationPlan.inventory.some(item => item.task === task)
+        );
+
+        // Check Org Chart
+        const rolesList = hiringOrgChart
+            .map((r: any) => `${r.title} (${r.department || 'No Dept'})`)
+            .join('\n');
+
+        const hasUnsyncedOrg = rolesList && performancePlan.orgChart.nextLevel !== rolesList && rolesList.length > 0;
+
+        setSyncNeeded(hasUnsyncedTasks || hasUnsyncedInventory || hasUnsyncedOrg);
+    }, [delegationPlan.bigFive, delegationPlan.inventory, performancePlan.orgChart.nextLevel]);
+
     // Save state helper
     const saveAll = ({
         updatedCulture = culturePlan,
@@ -258,31 +292,43 @@ const ManagingLikeABoss: React.FC = () => {
             return;
         }
 
-        let delegationUpdated = delegationPlan;
-        let performanceUpdated = performancePlan;
+        let delegationUpdated = { ...delegationPlan };
+        let performanceUpdated = { ...performancePlan };
 
         if (hiringTasks.length > 0) {
+            // Sync Big 5 - Avoid duplicates
             const bigFiveTasks = hiringTasks
                 .filter((t: any) => t.category === 'big5')
                 .map((t: any) => t.title);
 
-            const newBigFive = [...delegationPlan.bigFive];
-            bigFiveTasks.forEach((task: string, i: number) => {
-                if (i < 5) newBigFive[i] = task;
+            const newBigFive = [...delegationUpdated.bigFive];
+            bigFiveTasks.forEach((task: string) => {
+                if (!newBigFive.includes(task)) {
+                    // Find first empty slot
+                    const emptyIndex = newBigFive.findIndex(item => !item || item.trim() === "");
+                    if (emptyIndex !== -1) {
+                        newBigFive[emptyIndex] = task;
+                    }
+                }
             });
 
+            // Sync Inventory - Avoid duplicates
             const belowTheLineTasks = hiringTasks
                 .filter((t: any) => t.category === 'below-the-line');
 
-            const newInventory = [...delegationPlan.inventory];
-            belowTheLineTasks.forEach((t: any, i: number) => {
-                if (i < 10) {
-                    newInventory[i] = { task: t.title, action: 'Delegate' };
+            const newInventory = [...delegationUpdated.inventory];
+            belowTheLineTasks.forEach((t: any) => {
+                const alreadyExists = newInventory.some(item => item.task === t.title);
+                if (!alreadyExists) {
+                    const emptyIndex = newInventory.findIndex(item => !item.task || item.task.trim() === "");
+                    if (emptyIndex !== -1) {
+                        newInventory[emptyIndex] = { task: t.title, action: 'Delegate' };
+                    }
                 }
             });
 
             delegationUpdated = {
-                ...delegationPlan,
+                ...delegationUpdated,
                 bigFive: newBigFive,
                 inventory: newInventory
             };
@@ -293,10 +339,11 @@ const ManagingLikeABoss: React.FC = () => {
                 .map((r: any) => `${r.title} (${r.department || 'No Dept'})`)
                 .join('\n');
 
+            // Just replace nextLevel org chart as it's meant to be current and future
             performanceUpdated = {
-                ...performancePlan,
+                ...performanceUpdated,
                 orgChart: {
-                    ...performancePlan.orgChart,
+                    ...performanceUpdated.orgChart,
                     nextLevel: rolesList
                 }
             };
@@ -311,8 +358,9 @@ const ManagingLikeABoss: React.FC = () => {
 
         toast({
             title: "Data Synced",
-            description: "Successfully pulled strategic data from the Hiring Planner.",
+            description: "Successfully pulled strategic data from the Hiring Planner. New items added to empty slots.",
         });
+        setSyncNeeded(false);
     };
 
     const handleApproval = (module: keyof typeof approvals) => {
@@ -392,6 +440,7 @@ const ManagingLikeABoss: React.FC = () => {
                             isApproved={approvals.delegation}
                             onApprove={() => handleApproval('delegation')}
                             onSync={syncHiringData}
+                            syncAvailable={syncNeeded}
                         />
                     </TabsContent>
 
@@ -411,6 +460,7 @@ const ManagingLikeABoss: React.FC = () => {
                             isApproved={approvals.performance}
                             onApprove={() => handleApproval('performance')}
                             onSync={syncHiringData}
+                            syncAvailable={syncNeeded}
                         />
                     </TabsContent>
                 </Tabs>

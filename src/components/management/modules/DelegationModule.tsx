@@ -7,19 +7,18 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
     ListTodo, Zap, Users, PieChart, Quote, CheckCircle2,
-    Check, ShieldCheck, CheckCircle, AlertTriangle
+    Check, ShieldCheck, CheckCircle, AlertTriangle, Sparkles
 } from "lucide-react";
-import { DelegationPlan } from './types';
+import { ModuleProps, DelegationPlan } from './types';
 
-interface DelegationModuleProps {
-    data: DelegationPlan;
-    onUpdate: (updated: DelegationPlan) => void;
-    isApproved: boolean;
-    onApprove: () => void;
-    onSync: () => void;
-}
-
-const DelegationModule: React.FC<DelegationModuleProps> = ({ data, onUpdate, isApproved, onApprove, onSync }) => {
+const DelegationModule: React.FC<ModuleProps<DelegationPlan>> = ({
+    data,
+    onUpdate,
+    isApproved,
+    onApprove,
+    onSync,
+    syncAvailable
+}) => {
     const toggleChecklist = (key: keyof typeof data.checklist) => {
         onUpdate({
             ...data,
@@ -51,14 +50,22 @@ const DelegationModule: React.FC<DelegationModuleProps> = ({ data, onUpdate, isA
                         <ListTodo className="w-6 h-6 text-slate-900" />
                         <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 italic">Step 1: The DADD Task Inventory</h3>
                     </div>
-                    <Button
-                        onClick={onSync}
-                        variant="ghost"
-                        size="sm"
-                        className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-2"
-                    >
-                        <Zap className="w-3 h-3" /> Sync from Hiring Planner
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        {syncAvailable && (
+                            <Badge variant="outline" className="animate-pulse bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-black uppercase tracking-widest px-3">
+                                <Sparkles className="w-3 h-3 mr-1" />
+                                Sync Available
+                            </Badge>
+                        )}
+                        <Button
+                            onClick={onSync}
+                            variant="ghost"
+                            size="sm"
+                            className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${syncAvailable ? 'text-emerald-600 hover:text-emerald-700 scale-110' : 'text-slate-400 hover:text-slate-900'}`}
+                        >
+                            <Zap className={`w-3 h-3 ${syncAvailable ? 'fill-emerald-600' : ''}`} /> Sync from Hiring Planner
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="space-y-6">

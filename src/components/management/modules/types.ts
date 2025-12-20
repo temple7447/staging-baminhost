@@ -139,8 +139,11 @@ export interface PerformancePlan {
 
 export interface ModuleProps<T> {
     data: T;
-    updateData: (updated: Partial<T>) => void;
+    onUpdate: (updated: T) => void;
+    isApproved: boolean;
+    onApprove: () => void;
     onSync?: () => void;
+    syncAvailable?: boolean;
 }
 
 export interface ProtocolField {

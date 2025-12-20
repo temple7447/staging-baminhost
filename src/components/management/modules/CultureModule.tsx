@@ -9,16 +9,14 @@ import {
     Target, Globe, Building2, Scale, CheckCircle2, CheckCircle,
     ShieldCheck, AlertTriangle, Check
 } from "lucide-react";
-import { CulturePlan } from './types';
+import { ModuleProps, CulturePlan } from './types';
 
-interface CultureModuleProps {
-    data: CulturePlan;
-    onUpdate: (updated: CulturePlan) => void;
-    isApproved: boolean;
-    onApprove: () => void;
-}
-
-const CultureModule: React.FC<CultureModuleProps> = ({ data, onUpdate, isApproved, onApprove }) => {
+const CultureModule: React.FC<ModuleProps<CulturePlan>> = ({
+    data,
+    onUpdate,
+    isApproved,
+    onApprove
+}) => {
     const handleValueChange = (index: number, val: string) => {
         const newValues = [...data.values];
         newValues[index] = val;

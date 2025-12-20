@@ -8,17 +8,15 @@ import {
     CheckCircle2, CheckCircle, ShieldCheck, Check,
     Smile, Frown, TrendingUp, Globe
 } from "lucide-react";
-import { LeadershipPlan } from './types';
+import { ModuleProps, LeadershipPlan } from './types';
 import { LEADERSHIP_QUESTIONS } from './constants';
 
-interface LeadershipModuleProps {
-    data: LeadershipPlan;
-    onUpdate: (updated: LeadershipPlan) => void;
-    isApproved: boolean;
-    onApprove: () => void;
-}
-
-const LeadershipModule: React.FC<LeadershipModuleProps> = ({ data, onUpdate, isApproved, onApprove }) => {
+const LeadershipModule: React.FC<ModuleProps<LeadershipPlan>> = ({
+    data,
+    onUpdate,
+    isApproved,
+    onApprove
+}) => {
     const toggleChecklist = (key: keyof typeof data.checklist) => {
         onUpdate({
             ...data,

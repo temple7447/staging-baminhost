@@ -11,17 +11,15 @@ import {
     Check, ShieldCheck, CheckCircle, CheckCircle2,
     Zap, Quote, Globe, BarChart3, Users
 } from "lucide-react";
-import { MeetingsPlan, ProtocolData } from './types';
+import { ModuleProps, MeetingsPlan, ProtocolData } from './types';
 import { MEETING_PROTOCOLS } from './constants';
 
-interface MeetingsModuleProps {
-    data: MeetingsPlan;
-    onUpdate: (updated: MeetingsPlan) => void;
-    isApproved: boolean;
-    onApprove: () => void;
-}
-
-const MeetingsModule: React.FC<MeetingsModuleProps> = ({ data, onUpdate, isApproved, onApprove }) => {
+const MeetingsModule: React.FC<ModuleProps<MeetingsPlan>> = ({
+    data,
+    onUpdate,
+    isApproved,
+    onApprove
+}) => {
     const [activeMeetingType, setActiveMeetingType] = useState(MEETING_PROTOCOLS[0].id);
 
     const toggleChecklist = (key: keyof typeof data.checklist) => {
