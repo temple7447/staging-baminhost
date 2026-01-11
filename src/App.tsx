@@ -11,6 +11,8 @@ import About from "./pages/About";
 import Projects from "./pages/Projects";
 import Product from "./pages/Product";
 import EntrepreneurGuide from "./pages/EntrepreneurGuide";
+import EstateMarketplace from "./pages/EstateMarketplace";
+import PropertyDetails from "./pages/PropertyDetails";
 import { LoginPage } from "@/components/auth/LoginPage";
 import { RegistrationPage } from "@/components/auth/RegistrationPage";
 
@@ -32,6 +34,8 @@ const App = () => (
             <Route path="/projects" element={<Projects />} />
             <Route path="/product" element={<Product />} />
             <Route path="/entrepreneur-guide" element={<EntrepreneurGuide />} />
+            <Route path="/marketplace/estate" element={<EstateMarketplace />} />
+            <Route path="/marketplace/estate/:id" element={<PropertyDetails />} />
 
             {/* Authenticated app */}
             <Route path="/app" element={<Index />} />
