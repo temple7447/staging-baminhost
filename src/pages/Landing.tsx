@@ -1,3 +1,4 @@
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { cn } from "@/lib/utils";
 import {
   Building2,
   ShieldCheck,
@@ -59,6 +61,7 @@ const faqs = [
   { q: "Is my data secure?", a: "We use token-based auth and follow best practices. You control roles and access." },
 ];
 
+
 const productShots = [
   "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=1600&q=80",
   "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80",
@@ -74,98 +77,139 @@ const estateShots = [
 ];
 
 const Landing = () => {
-  return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white">
-      {/* Decorative animated blobs */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-24 -left-24 h-48 w-48 md:h-72 md:w-72 rounded-full bg-blue-600/30 blur-3xl animate-pulse" />
-        <div className="absolute -bottom-24 -right-24 h-48 w-48 md:h-72 md:w-72 rounded-full bg-purple-600/30 blur-3xl animate-pulse [animation-delay:300ms]" />
-        <div className="absolute top-1/3 -right-16 h-24 w-24 md:h-40 md:w-40 rounded-full bg-emerald-500/20 blur-2xl animate-[spin_18s_linear_infinite]" />
-      </div>
+  const [currentSlide, setCurrentSlide] = useState(0);
 
+  const heroSlides = useMemo(() => [
+    {
+      image: "/images/hero/hero_business_scaling_1768388722802.png",
+      badge: "Scale Systematically",
+      title: "While starting a business is hard, SCALING is even harder.",
+      description: "Break free from the entrepreneurial flatline. Our systematic approach helps you scale yourself so you can scale your company.",
+      cta: "Build My Level 7 Plan",
+      link: "https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog"
+    },
+    {
+      image: "/images/hero/hero_financial_freedom_1768388738721.png",
+      badge: "Financial Clarity",
+      title: "Take back control of your Personal & Business finances.",
+      description: "Track assets, budgets, and performance across life and business with 50/30/20 splits and real-time insights.",
+      cta: "Get Started Free",
+      link: "/register"
+    },
+    {
+      image: "/images/hero/hero_entrepreneur_lifestyle_1768388752631.png",
+      badge: "Master Your Time",
+      title: "Stronger founders create better teams and healthier families.",
+      description: "Our role-based dashboards and reports mean you stay at the helm—without burning out or losing control.",
+      cta: "Join 500+ Entrepreneurs",
+      link: "/login"
+    }
+  ], []);
+
+  // Preload images for better performance
+  useEffect(() => {
+    heroSlides.forEach((slide) => {
+      const img = new Image();
+      img.src = slide.image;
+    });
+  }, [heroSlides]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [heroSlides.length]);
+
+  const handleManualSlideChange = useCallback((idx: number) => {
+    setCurrentSlide(idx);
+  }, []);
+
+  return (
+    <div className="relative min-h-screen bg-slate-950 text-white overflow-x-hidden">
       <Navbar />
 
-      {/* Hero */}
-      <section className="container mx-auto px-6 py-20 md:py-32">
-        <div className="grid md:grid-cols-2 gap-16 items-center">
-          <div className="space-y-8">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm text-blue-200 backdrop-blur-sm animate-fade-in">
+      {/* Hero Section with Carousel */}
+      <section className="relative h-[85vh] md:h-[90vh] w-full flex items-center overflow-hidden">
+        {/* Background Slides */}
+        {heroSlides.map((slide, idx) => (
+          <div
+            key={idx}
+            className={cn(
+              "absolute inset-0 transition-opacity duration-1000 ease-in-out",
+              idx === currentSlide ? "opacity-100" : "opacity-0"
+            )}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent z-10" />
+            <img
+              src={slide.image}
+              alt={slide.badge}
+              className="h-full w-full object-cover scale-105 animate-[ken-burns_20s_ease-in-out_infinite]"
+            />
+          </div>
+        ))}
+
+        {/* Content Overlay */}
+        <div className="container mx-auto px-6 relative z-20">
+          <div className="max-w-3xl space-y-8">
+            <div
+              key={`badge-${currentSlide}`}
+              className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm text-blue-200 backdrop-blur-sm animate-in fade-in slide-in-from-left-4 duration-700"
+            >
               <Rocket className="h-4 w-4 text-blue-300" />
-              <span>New: Role-based dashboards and reports</span>
+              <span>{heroSlides[currentSlide].badge}</span>
             </div>
 
-            {/* Main Headline */}
-            <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight">
-                While <span className="text-blue-400">starting</span> a business is hard,{" "}
-                <span className="bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">
-                  SCALING
-                </span>{" "}
-                a business is even harder.
+            <div key={`content-${currentSlide}`} className="space-y-6">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight animate-in fade-in slide-in-from-left-8 duration-700 delay-100">
+                {heroSlides[currentSlide].title.split("SCALING").map((part, i, arr) => (
+                  <span key={i}>
+                    {part}
+                    {i < arr.length - 1 && (
+                      <span className="bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent italic">
+                        SCALING
+                      </span>
+                    )}
+                  </span>
+                ))}
               </h1>
-              <p className="text-lg md:text-xl text-slate-300 leading-relaxed">
-                Break free from the entrepreneurial flatline. Our systematic approach helps you 
-                scale <span className="text-green-400 font-semibold">yourself</span> so you can scale 
-                <span className="text-green-400 font-semibold">your company</span>—without burning out or losing control.
+              <p className="text-lg md:text-xl text-slate-300 leading-relaxed max-w-2xl animate-in fade-in slide-in-from-left-12 duration-700 delay-200">
+                {heroSlides[currentSlide].description}
               </p>
             </div>
 
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2n02tzF1Yti8ZiwVDhOjnvPpgCKayNZsuxr4vpRF8DY4TLA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" className="flex-1">
-                <Button size="lg" className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold shadow-lg shadow-green-900/50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-900/60">
-                  Build My Level 7 Plan
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </a>
-              <Link to="/login" className="flex-1">
-                <Button size="lg" variant="outline" className="w-full bg-white/10 text-white hover:bg-white/20 border-white/30 backdrop-blur-sm font-semibold transition-all duration-300 hover:scale-105">
-                  I already have an account
-                </Button>
-              </Link>
-            </div>
-
-            <p className="text-sm text-slate-400 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              ✨ Break through the flatline. No credit card required. Join 500+ entrepreneurs scaling systematically.
-            </p>
-          </div>
-
-          {/* Right Column - Visuals */}
-          <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            {/* Estate Carousel */}
-            <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/10 to-pink-500/10" />
-              <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/5">
-                <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-full bg-fuchsia-400 shadow-lg shadow-fuchsia-400/50" />
-                  <span className="h-3 w-3 rounded-full bg-pink-400 shadow-lg shadow-pink-400/50" />
-                  <span className="h-3 w-3 rounded-full bg-purple-400 shadow-lg shadow-purple-400/50" />
-                </div>
-                <div className="text-xs text-slate-300 font-medium">Featured Estates</div>
-              </div>
-              <div className="p-4">
-                <Carousel className="relative" opts={{ loop: true, align: "start" }}>
-                  <CarouselContent>
-                    {estateShots.map((src, i) => (
-                      <CarouselItem key={i}>
-                        <AspectRatio ratio={16/9}>
-                          <img
-                            src={src}
-                            alt={`Estate ${i+1}`}
-                            className="h-full w-full object-cover rounded-xl border border-white/10 shadow-xl"
-                            loading="lazy"
-                          />
-                        </AspectRatio>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="-left-4 top-1/2 -translate-y-1/2 bg-white/20 border-white/30 text-white hover:bg-white/30" />
-                  <CarouselNext className="-right-4 top-1/2 -translate-y-1/2 bg-white/20 border-white/30 text-white hover:bg-white/30" />
-                </Carousel>
-              </div>
+            <div key={`cta-${currentSlide}`} className="flex flex-col sm:flex-row gap-4 animate-in fade-in slide-in-from-top-4 duration-700 delay-300">
+              {heroSlides[currentSlide].link.startsWith("http") ? (
+                <a href={heroSlides[currentSlide].link} target="_blank" rel="noopener noreferrer" className="flex-1 sm:flex-none">
+                  <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-7 text-lg shadow-xl shadow-blue-900/50 transition-all duration-300 hover:scale-105">
+                    {heroSlides[currentSlide].cta}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </a>
+              ) : (
+                <Link to={heroSlides[currentSlide].link} className="flex-1 sm:flex-none">
+                  <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-7 text-lg shadow-xl shadow-blue-900/50 transition-all duration-300 hover:scale-105">
+                    {heroSlides[currentSlide].cta}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
+        </div>
+
+        {/* Carousel Indicators */}
+        <div className="absolute bottom-10 left-6 z-20 flex gap-3">
+          {heroSlides.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleManualSlideChange(idx)}
+              className={cn(
+                "h-1.5 transition-all duration-500 rounded-full",
+                idx === currentSlide ? "w-12 bg-blue-500" : "w-6 bg-white/20 hover:bg-white/40"
+              )}
+            />
+          ))}
         </div>
       </section>
 
@@ -186,10 +230,10 @@ const Landing = () => {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <img src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=60" alt="Modern apartment exterior" className="rounded-2xl h-48 w-full object-cover border border-white/10" loading="lazy" />
-            <img src="https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=60" alt="Cozy living room" className="rounded-2xl h-48 w-full object-cover border border-white/10" loading="lazy" />
-            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=60" alt="Kitchen interior" className="rounded-2xl h-48 w-full object-cover border border-white/10" loading="lazy" />
-            <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=60" alt="Bedroom design" className="rounded-2xl h-48 w-full object-cover border border-white/10" loading="lazy" />
+            <img src="/images/estate/estate_exterior_modern_1768390624272.png" alt="Modern apartment exterior" className="rounded-2xl h-48 w-full object-cover border border-white/10" loading="lazy" />
+            <img src="/images/estate/estate_interior_living_1768390639037.png" alt="Cozy living room" className="rounded-2xl h-48 w-full object-cover border border-white/10" loading="lazy" />
+            <img src="/images/estate/estate_interior_kitchen_modern_1768390652240.png" alt="Kitchen interior" className="rounded-2xl h-48 w-full object-cover border border-white/10" loading="lazy" />
+            <img src="/images/estate/estate_interior_bedroom_luxe_1768390667482.png" alt="Bedroom design" className="rounded-2xl h-48 w-full object-cover border border-white/10" loading="lazy" />
           </div>
         </div>
       </section>
@@ -205,7 +249,7 @@ const Landing = () => {
               Here's what the data actually shows about <span className="font-bold text-red-400">scaling vs. starting</span>
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             <div className="relative overflow-hidden rounded-2xl border border-green-500/30 bg-gradient-to-br from-green-950/40 to-green-900/20 p-8 backdrop-blur-sm shadow-2xl">
               <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent" />
@@ -216,7 +260,7 @@ const Landing = () => {
                 <div className="mt-2 text-xs text-green-300 font-medium">✓ If you're here, celebrate!</div>
               </div>
             </div>
-            
+
             <div className="relative overflow-hidden rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-yellow-950/40 to-yellow-900/20 p-8 backdrop-blur-sm shadow-2xl">
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent" />
               <div className="relative text-center space-y-4">
@@ -226,7 +270,7 @@ const Landing = () => {
                 <div className="mt-2 text-xs text-yellow-300 font-medium">⚠ The real challenge begins</div>
               </div>
             </div>
-            
+
             <div className="relative overflow-hidden rounded-2xl border border-red-500/30 bg-gradient-to-br from-red-950/40 to-red-900/20 p-8 backdrop-blur-sm shadow-2xl">
               <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent" />
               <div className="relative text-center space-y-4">
@@ -244,43 +288,43 @@ const Landing = () => {
               <h3 className="text-2xl md:text-3xl font-bold mb-4">The Entrepreneurial Lifecycle</h3>
               <p className="text-lg text-slate-300">Every founder experiences this emotional rollercoaster</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               <div className="bg-blue-500/10 border border-blue-400/20 rounded-xl p-6">
                 <div className="text-blue-400 font-bold text-lg mb-2">1. Eureka Moment</div>
                 <p className="text-sm text-slate-300">"This is going to be easy!" The idea hits—pure excitement and uninformed optimism.</p>
               </div>
-              
+
               <div className="bg-purple-500/10 border border-purple-400/20 rounded-xl p-6">
                 <div className="text-purple-400 font-bold text-lg mb-2">2. Launch Drudgery</div>
                 <p className="text-sm text-slate-300">"We're all doomed." Reality hits. Feels hopeless, but you push through anyway.</p>
               </div>
-              
+
               <div className="bg-green-500/10 border border-green-400/20 rounded-xl p-6">
                 <div className="text-green-400 font-bold text-lg mb-2">3. Initial Traction</div>
                 <p className="text-sm text-slate-300">"We might have something!" You make your first buck. 80% reach here—celebrate!</p>
               </div>
-              
+
               <div className="bg-yellow-500/10 border border-yellow-400/20 rounded-xl p-6">
                 <div className="text-yellow-400 font-bold text-lg mb-2">4. Early Growth</div>
                 <p className="text-sm text-slate-300">"Finally got it—where's the champagne?" Fun phase. Momentum builds, riches seem imminent.</p>
               </div>
-              
+
               <div className="bg-red-500/10 border border-red-400/20 rounded-xl p-6">
                 <div className="text-red-400 font-bold text-lg mb-2">5. The Flatline</div>
                 <p className="text-sm text-slate-300">"Why isn't this working anymore?" Peak confidence crashes into stagnation. Growth vanishes.</p>
               </div>
-              
+
               <div className="bg-emerald-500/10 border border-emerald-400/20 rounded-xl p-6">
                 <div className="text-emerald-400 font-bold text-lg mb-2">6. Breakthrough</div>
                 <p className="text-sm text-slate-300">"Informed realism." Learn to scale systematically. Put money in your family's account.</p>
               </div>
             </div>
-            
+
             <div className="text-center">
               <div className="bg-gradient-to-r from-red-500/20 to-emerald-500/20 rounded-lg p-6 border border-emerald-400/30">
                 <p className="text-lg font-semibold text-white mb-2">
-                  <span className="text-red-400">The Secret:</span> Most get stuck in the flatline because they don't know how to 
+                  <span className="text-red-400">The Secret:</span> Most get stuck in the flatline because they don't know how to
                   <span className="text-emerald-400 font-bold">scale systematically</span>.
                 </p>
                 <p className="text-slate-300">If you're flatlined, you're not broken—you just need the right roadmap.</p>
@@ -310,7 +354,7 @@ const Landing = () => {
               so they can <span className="text-green-400">scale their companies</span>
             </h3>
             <p className="text-xl text-slate-300 max-w-4xl mx-auto leading-relaxed">
-              Because stronger founders create better teams, healthier families, and thriving economies. 
+              Because stronger founders create better teams, healthier families, and thriving economies.
               You should stay at the helm as long as you want—without burning out or losing control.
             </p>
           </div>
@@ -340,7 +384,7 @@ const Landing = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Your Path to Level 7</h2>
             <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-              Follow our proven 3-step system to build a systematic approach that scales. 
+              Follow our proven 3-step system to build a systematic approach that scales.
               No more guesswork, no more emotional rollercoaster.
             </p>
           </div>
@@ -358,7 +402,7 @@ const Landing = () => {
               {/* Connection line */}
               <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-blue-500/50 to-green-500/50 transform translate-y-0 -translate-x-8 z-0" />
             </div>
-            
+
             <div className="relative">
               <div className="text-center">
                 <div className="relative w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-green-500/30">
@@ -371,7 +415,7 @@ const Landing = () => {
               {/* Connection line */}
               <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-green-500/50 to-purple-500/50 transform translate-y-0 -translate-x-8 z-0" />
             </div>
-            
+
             <div className="text-center">
               <div className="relative w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-500/30">
                 3
@@ -384,29 +428,29 @@ const Landing = () => {
 
           {/* Results showcase */}
           <div className="bg-gradient-to-br from-white/5 to-white/2 rounded-3xl border border-white/10 p-8 md:p-12">
-          <div className="text-center">
-            <h3 className="text-2xl font-bold mb-4">What Breakthrough Looks Like</h3>
-            <p className="text-slate-300">Real outcomes from founders who learned to scale systematically</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-black text-green-400 mb-2">2x</div>
-              <div className="text-sm text-slate-300">Revenue Growth (Minimum Goal)</div>
-              <div className="text-xs text-slate-400 mt-1">Without working more hours</div>
+              <h3 className="text-2xl font-bold mb-4">What Breakthrough Looks Like</h3>
+              <p className="text-slate-300">Real outcomes from founders who learned to scale systematically</p>
             </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-black text-blue-400 mb-2">2x</div>
-              <div className="text-sm text-slate-300">Take-Home Profit</div>
-              <div className="text-xs text-slate-400 mt-1">Money in your family's account</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-black text-purple-400 mb-2">Level 7</div>
-              <div className="text-sm text-slate-300">Business Maturity</div>
-              <div className="text-xs text-slate-400 mt-1">Your "number" + exit readiness</div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-black text-green-400 mb-2">2x</div>
+                <div className="text-sm text-slate-300">Revenue Growth (Minimum Goal)</div>
+                <div className="text-xs text-slate-400 mt-1">Without working more hours</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-black text-blue-400 mb-2">2x</div>
+                <div className="text-sm text-slate-300">Take-Home Profit</div>
+                <div className="text-xs text-slate-400 mt-1">Money in your family's account</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-black text-purple-400 mb-2">Level 7</div>
+                <div className="text-sm text-slate-300">Business Maturity</div>
+                <div className="text-xs text-slate-400 mt-1">Your "number" + exit readiness</div>
+              </div>
             </div>
           </div>
-          </div>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link to="/product">
               <Button size="lg" variant="outline" className="bg-white text-slate-900 hover:bg-slate-100 border-slate-200">
@@ -519,7 +563,7 @@ const Landing = () => {
           <div className="relative px-6 py-16 md:px-12 md:py-20 text-center">
             <h3 className="text-3xl md:text-4xl font-bold mb-6">Ready to Break Through the Flatline?</h3>
             <p className="text-xl text-slate-200/90 max-w-2xl mx-auto mb-10">
-              If you're stuck, burned out, or wondering "what's next?"—you're not broken. 
+              If you're stuck, burned out, or wondering "what's next?"—you're not broken.
               You just need the right roadmap. Scale yourself to scale your company.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">

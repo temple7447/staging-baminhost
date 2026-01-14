@@ -13,8 +13,11 @@ import Product from "./pages/Product";
 import EntrepreneurGuide from "./pages/EntrepreneurGuide";
 import EstateMarketplace from "./pages/EstateMarketplace";
 import PropertyDetails from "./pages/PropertyDetails";
+import VendorProfile from "./pages/VendorProfile";
+import EquipmentDetails from "./pages/EquipmentDetails";
 import { LoginPage } from "@/components/auth/LoginPage";
 import { RegistrationPage } from "@/components/auth/RegistrationPage";
+import { CookieConsent } from "@/components/layout/CookieConsent";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +27,7 @@ const App = () => (
       <AuthProvider>
         <Toaster />
         <Sonner />
+        <CookieConsent />
         <BrowserRouter>
           <Routes>
             {/* Public routes */}
@@ -36,6 +40,8 @@ const App = () => (
             <Route path="/entrepreneur-guide" element={<EntrepreneurGuide />} />
             <Route path="/marketplace/estate" element={<EstateMarketplace />} />
             <Route path="/marketplace/estate/:id" element={<PropertyDetails />} />
+            <Route path="/marketplace/vendor/:id" element={<VendorProfile />} />
+            <Route path="/marketplace/equipment/:id" element={<EquipmentDetails />} />
 
             {/* Authenticated app */}
             <Route path="/app" element={<Index />} />
