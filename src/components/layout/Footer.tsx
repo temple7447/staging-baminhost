@@ -31,7 +31,7 @@ export const Footer = ({ variant = "dark" }: FooterProps) => {
             <div className={`text-sm font-bold mb-4 uppercase tracking-wider ${isLight ? "text-slate-900" : "text-white"}`}>Product</div>
             <ul className={`space-y-3 text-sm ${isLight ? "text-slate-600" : "text-slate-300/80"} font-medium`}>
               <li><Link to="/" className="hover:text-blue-600 transition-colors">Home</Link></li>
-              <li><Link to="/marketplace/estate" className="hover:text-blue-600 transition-colors">Estate Marketplace</Link></li>
+              <li><Link to="/marketplace/estate" className="hover:text-blue-600 transition-colors">BamiHost Marketplace</Link></li>
               <li><Link to="/product" className="hover:text-blue-600 transition-colors">Features</Link></li>
               <li><Link to="/entrepreneur-guide" className="hover:text-blue-600 transition-colors">Entrepreneur Guide</Link></li>
             </ul>
