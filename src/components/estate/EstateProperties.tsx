@@ -46,6 +46,14 @@ export const EstateProperties = () => {
                         </div>
                     ))}
                 </div>
+                <div className="flex justify-center mt-16">
+                    <Link to="/marketplace/estate/all">
+                        <Button variant="outline" className="border-slate-200 text-slate-900 font-bold px-12 py-7 rounded-2xl hover:bg-slate-50 transition-all group">
+                            See more properties
+                            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                    </Link>
+                </div>
             </div>
         </section>
     );
