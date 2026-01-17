@@ -490,6 +490,14 @@ export const estatesApi = createApi({
         { type: 'TenantList', id: 'LIST' },
       ],
     }),
+    deleteEstateUnit: builder.mutation<{ success?: boolean }, string>({
+      query: (unitId) => ({ url: `/api/estates/unit/${unitId}`, method: 'DELETE' }),
+      invalidatesTags: (result, error, unitId) => [
+        { type: 'EstateUnits', id: 'LIST' }, // Broad invalidation since we don't have estateId here easily
+        { type: 'Estate', id: 'LIST' },
+        { type: 'EstateList', id: 'LIST' },
+      ],
+    }),
     initiatePayment: builder.mutation<InitiatePaymentResponse, { type: PaymentType; body: InitiatePaymentBody }>({
       query: ({ type, body }) => ({ url: `/api/payments/${type}`, method: 'POST', body }),
       invalidatesTags: (result, error, { body }) => [
@@ -552,6 +560,7 @@ export const {
   useGetEstateVacantUnitsQuery,
   useClearEstateUnitTenantMutation,
   useUpdateEstateUnitMutation,
+  useDeleteEstateUnitMutation,
   useGetTenantsQuery,
   useGetTenantQuery,
   useUpdateTenantMutation,
