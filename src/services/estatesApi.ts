@@ -207,8 +207,31 @@ export interface EstateUnit {
   _id?: string;
   label: string;
   monthlyPrice: number;
-  meterNumber?: string;
+  serviceChargeMonthly?: number;
+  cautionFee?: number;
+  legalFee?: number;
+  securityDeposit?: number;
+  category?: string;
+  listingType?: string;
   description?: string;
+  availableDate?: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  area?: number;
+  streetAddress?: string;
+  amenities?: {
+    wifi?: boolean;
+    pool?: boolean;
+    gym?: boolean;
+    parking?: boolean;
+    ac?: boolean;
+    security?: boolean;
+    petFriendly?: boolean;
+    balcony?: boolean;
+    laundry?: boolean;
+  };
+  meterNumber?: string;
+  images?: string[];
   features?: EstateUnitFeature[];
 }
 
@@ -334,8 +357,28 @@ export const estatesApi = createApi({
           serviceChargeMonthly?: number;
           cautionFee?: number;
           legalFee?: number;
-          meterNumber?: string;
+          securityDeposit?: number;
+          category?: string;
+          listingType?: string;
           description?: string;
+          availableDate?: string;
+          bedrooms?: number;
+          bathrooms?: number;
+          area?: number;
+          streetAddress?: string;
+          amenities?: {
+            wifi?: boolean;
+            pool?: boolean;
+            gym?: boolean;
+            parking?: boolean;
+            ac?: boolean;
+            security?: boolean;
+            petFriendly?: boolean;
+            balcony?: boolean;
+            laundry?: boolean;
+          };
+          meterNumber?: string;
+          images?: string[];
           features?: { name: string; value: string }[];
         }
       }
@@ -473,6 +516,24 @@ export const estatesApi = createApi({
         method: 'POST',
       }),
     }),
+    // Public List Endpoints
+    getPublicListings: builder.query<PaginatedResponse<EstateUnit>, { page?: number; limit?: number; search?: string } | void>({
+      query: (params = {}) => {
+        const qs = new URLSearchParams();
+        if (params?.page != null) qs.set('page', String(params.page));
+        if (params?.limit != null) qs.set('limit', String(params.limit));
+        if (params?.search) qs.set('search', params.search);
+        return `/api/estates/public/listings${qs.toString() ? `?${qs.toString()}` : ''}`;
+      },
+      providesTags: (result) =>
+        result && Array.isArray(result.data)
+          ? [...result.data.map((u) => ({ type: 'Estate' as const, id: u.id || u._id })), { type: 'Estate', id: 'LIST' }]
+          : [{ type: 'Estate', id: 'LIST' }],
+    }),
+    getPublicListingById: builder.query<{ success: boolean; data: EstateUnit }, string>({
+      query: (id) => `/api/estates/public/listings/${id}`,
+      providesTags: (result, error, id) => [{ type: 'Estate', id }],
+    }),
   }),
 });
 
@@ -502,4 +563,7 @@ export const {
   useVerifyPaymentQuery,
   useShiftTenantDueDateMutation,
   useSendTenantReceiptMutation,
+  // Public
+  useGetPublicListingsQuery,
+  useGetPublicListingByIdQuery,
 } = estatesApi;

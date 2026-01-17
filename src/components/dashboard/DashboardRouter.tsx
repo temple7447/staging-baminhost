@@ -11,6 +11,7 @@ import { CustomerDashboard } from '@/components/dashboard/CustomerDashboard';
 import { WalletDashboard } from '@/components/dashboard/WalletDashboard';
 import { EstateManagement } from '@/components/dashboard/business/EstateManagement';
 import { EstateDetailPage } from '@/components/dashboard/business/EstateDetailPage';
+import { AddPropertyPage } from '@/components/dashboard/business/AddPropertyPage';
 import { TenantDetailPage } from '@/components/dashboard/business/TenantDetailPage';
 import { FillingStationManagement } from '@/components/dashboard/business/FillingStationManagement';
 import { EquipmentManagement } from '@/components/dashboard/business/EquipmentManagement';
@@ -203,6 +204,18 @@ const DashboardRouter: React.FC = () => {
           element={
             <ProtectedRoute
               element={<EstateDetailPage />}
+              requiredPermissions={['view_estate']}
+              feature="Estate Management"
+              showUpgradePrompt={true}
+              viewName="estate"
+            />
+          }
+        />
+        <Route
+          path="/estate/:estateId/add-unit"
+          element={
+            <ProtectedRoute
+              element={<AddPropertyPage />}
               requiredPermissions={['view_estate']}
               feature="Estate Management"
               showUpgradePrompt={true}
