@@ -2,60 +2,44 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { BASE_API_URL } from './api';
 
 export interface Vendor {
-    id: string;
-    _id?: string;
+    _id: string;
+    id?: string; // Keep as optional for compatibility
     name: string;
     email: string;
-    phone?: string;
-    businessType?: string; // Business type name from populated field
-    businessTypeId?: string; // Business type ID
-    businessName?: string;
-    specialization?: string;
     role: 'vendor';
+    assignedEstates: any[];
+    phone?: string;
     isActive: boolean;
-    status: 'approved' | 'pending' | 'suspended';
-    type: 'service' | 'product';
-    cacNumber?: string;
-    registeredAddress?: string;
-    pricingModel?: {
-        type: 'hourly' | 'unit' | 'project';
-        rate: number;
-    };
-    categories?: string[];
-    verificationDocs?: {
-        idUrl?: string;
-        certUrl?: string;
-        isVerified: boolean;
-    };
-    emailVerified?: boolean;
-    createdBy?: {
-        id: string;
+    createdBy: {
+        _id: string;
         name: string;
         email: string;
     };
+    emailVerified: boolean;
+    businessName?: string;
+    specialization?: string;
+    cacNumber?: string;
+    businessAddress?: string;
+    portfolio: string[];
+    assignedBusinesses: any[];
     createdAt: string;
-    updatedAt?: string;
+    updatedAt: string;
+    __v?: number;
+    status?: 'approved' | 'pending' | 'suspended'; // Keep these as they are client-side or future server fields
 }
 
 export interface OnboardVendorPayload {
     name: string;
     email: string;
-    phone?: string;
+    phone: string;
     businessTypeId?: string;
     businessName?: string;
     specialization?: string;
-    type: 'service' | 'product';
     cacNumber?: string;
-    registeredAddress?: string;
-    categories?: string[];
-    pricingModel?: {
-        type: 'hourly' | 'unit' | 'project';
-        rate: number;
-    };
-    verificationDocs?: {
-        idUrl?: string;
-        certUrl?: string;
-    };
+    govId?: string;
+    certification?: string;
+    businessAddress?: string;
+    portfolio?: string[];
     sendCredentials?: boolean;
 }
 
@@ -138,15 +122,29 @@ export const vendorsApi = createApi({
                 { type: 'VendorList', id: 'LIST' },
             ],
         }),
-        deleteVendor: builder.mutation<{ success: boolean; message?: string }, string>({
+        deleteVendor: builder.mutation<{ success: boolean; message: string }, string>({
             query: (id) => ({
                 url: `/api/auth/vendor/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: (result, error, id) => [
-                { type: 'Vendor', id },
-                { type: 'VendorList', id: 'LIST' },
-            ],
+            invalidatesTags: [{ type: 'Vendors', id: 'LIST' }],
+        }),
+        getPublicVendors: builder.query<{ success: boolean; count: number; data: Vendor[] }, string | void>({
+            query: (search) => ({
+                url: `/api/auth/public/vendors${search ? `?search=${search}` : ''}`,
+                method: 'GET',
+            }),
+            providesTags: (result) =>
+                result
+                    ? [...result.data.map(({ _id }) => ({ type: 'Vendors' as const, id: _id })), { type: 'Vendors', id: 'LIST' }]
+                    : [{ type: 'Vendors', id: 'LIST' }],
+        }),
+        getPublicVendor: builder.query<{ success: boolean; data: Vendor }, string>({
+            query: (id) => ({
+                url: `/api/auth/public/vendors/${id}`,
+                method: 'GET',
+            }),
+            providesTags: (result, error, id) => [{ type: 'Vendors', id }],
         }),
     }),
 });
@@ -157,4 +155,6 @@ export const {
     useUpdateVendorMutation,
     useUpdateVendorStatusMutation,
     useDeleteVendorMutation,
+    useGetPublicVendorsQuery,
+    useGetPublicVendorQuery
 } = vendorsApi;

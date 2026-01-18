@@ -57,8 +57,13 @@ export const VendorManagement: React.FC = () => {
     // Filter logic
     const filteredVendors = vendors.filter(v => {
         const matchesSearch = v.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            v.email.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = categoryFilter === 'all' || v.type === categoryFilter;
+            v.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (v.businessName || '').toLowerCase().includes(searchTerm.toLowerCase());
+
+        // Since 'type' is not in the list response, we'll match against specialization or categories if they exist
+        const matchesCategory = categoryFilter === 'all' ||
+            (v.specialization || '').toLowerCase().includes(categoryFilter.toLowerCase());
+
         const matchesStatus = statusFilter === 'all' || v.status === statusFilter;
         return matchesSearch && matchesCategory && matchesStatus;
     });
@@ -207,7 +212,7 @@ export const VendorManagement: React.FC = () => {
                             </TableHeader>
                             <TableBody>
                                 {filteredVendors.map((vendor) => (
-                                    <TableRow key={vendor.id || vendor._id} className="border-slate-50 hover:bg-slate-50/50 transition-colors">
+                                    <TableRow key={vendor._id} className="border-slate-50 hover:bg-slate-50/50 transition-colors">
                                         <TableCell className="py-5 pl-6">
                                             <div className="flex items-center gap-4">
                                                 <div className={cn(
@@ -226,10 +231,10 @@ export const VendorManagement: React.FC = () => {
                                             </div>
                                         </TableCell>
                                         <TableCell className="py-5">
-                                            <span className="text-sm font-semibold text-slate-600 capitalize">{vendor.type || 'N/A'}</span>
+                                            <span className="text-sm font-semibold text-slate-600 capitalize">Vendor</span>
                                         </TableCell>
                                         <TableCell className="py-5">
-                                            <span className="text-sm font-medium text-slate-600">{vendor.categories?.[0] || vendor.specialization || 'General'}</span>
+                                            <span className="text-sm font-medium text-slate-600">{vendor.specialization || 'General'}</span>
                                         </TableCell>
                                         <TableCell className="py-5">
                                             {getStatusBadge(vendor.status || (vendor.isActive ? 'approved' : 'pending'))}

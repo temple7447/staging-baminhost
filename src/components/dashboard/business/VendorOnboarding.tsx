@@ -84,16 +84,12 @@ export const VendorOnboarding: React.FC = () => {
                 email: formData.email,
                 phone: formData.phone,
                 businessName: formData.businessName,
-                type: formData.type,
                 cacNumber: formData.cacNumber,
-                registeredAddress: formData.address,
-                categories: formData.categories,
-                pricingModel: {
-                    type: formData.pricingType,
-                    rate: Number(formData.pricingRate)
-                },
+                businessAddress: formData.address,
                 specialization: formData.description,
+                portfolio: [], // In a real app, this would be the array of uploaded Cloudinary URLs
                 sendCredentials: true
+                // Note: govId and certification URLs would be sent here after file upload integration
             }).unwrap();
 
             toast({
@@ -173,6 +169,17 @@ export const VendorOnboarding: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2 space-y-2">
+                    <Label htmlFor="legalName" className="text-sm font-bold text-slate-700">Contact Person (Full Name)</Label>
+                    <Input
+                        id="legalName"
+                        placeholder="e.g. John Doe"
+                        className="h-12 bg-slate-50/50 rounded-xl"
+                        value={formData.legalName}
+                        onChange={(e) => setFormData({ ...formData, legalName: e.target.value })}
+                        required
+                    />
+                </div>
                 <div className="space-y-2">
                     <Label htmlFor="businessName" className="text-sm font-bold text-slate-700">Display Trading Name</Label>
                     <Input
