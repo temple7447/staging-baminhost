@@ -21,7 +21,8 @@ import {
   Scale,
   CreditCard,
   Briefcase,
-  ShieldCheck
+  ShieldCheck,
+  Handshake
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -210,6 +211,15 @@ const sidebarItems: SidebarItem[] = [
     requiredPermissions: ['view_equipment'],
     isPremium: true,
     path: '/dashboard/equipment'
+  },
+  {
+    id: "vendor-management",
+    label: "Vendor Management",
+    icon: Handshake,
+    category: 'business',
+    requiredPermissions: ['view_estate'],
+    isPremium: true,
+    path: '/dashboard/vendor-management'
   },
   {
     id: "personal-portfolios",

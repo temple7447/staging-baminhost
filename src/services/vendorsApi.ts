@@ -13,6 +13,20 @@ export interface Vendor {
     specialization?: string;
     role: 'vendor';
     isActive: boolean;
+    status: 'approved' | 'pending' | 'suspended';
+    type: 'service' | 'product';
+    cacNumber?: string;
+    registeredAddress?: string;
+    pricingModel?: {
+        type: 'hourly' | 'unit' | 'project';
+        rate: number;
+    };
+    categories?: string[];
+    verificationDocs?: {
+        idUrl?: string;
+        certUrl?: string;
+        isVerified: boolean;
+    };
     emailVerified?: boolean;
     createdBy?: {
         id: string;
@@ -30,6 +44,18 @@ export interface OnboardVendorPayload {
     businessTypeId?: string;
     businessName?: string;
     specialization?: string;
+    type: 'service' | 'product';
+    cacNumber?: string;
+    registeredAddress?: string;
+    categories?: string[];
+    pricingModel?: {
+        type: 'hourly' | 'unit' | 'project';
+        rate: number;
+    };
+    verificationDocs?: {
+        idUrl?: string;
+        certUrl?: string;
+    };
     sendCredentials?: boolean;
 }
 
