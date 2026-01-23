@@ -37,12 +37,25 @@ export const TenantDetailPage = () => {
   const overview = detail?.data?.overview;
   const [updateTenant, { isLoading: updatingTenant }] = useUpdateTenantMutation();
   const [updateUnit, { isLoading: updatingUnit }] = useUpdateEstateUnitMutation();
-  const history = (detail && typeof (detail as { data?: { history?: { id: string; date: string; action: string; notes?: string }[] } }).data?.history !== 'undefined'
-    ? ((detail as { data: { history: { id: string; date: string; action: string; notes?: string }[] } }).data.history)
-    : []) as { id: string; date: string; action: string; notes?: string }[];
-  const transactions = (detail && typeof (detail as { data?: { transactions?: { id: string; date: string; amount: number; type: string; status?: string; description?: string }[] } }).data?.transactions !== 'undefined'
-    ? ((detail as { data: { transactions: { id: string; date: string; amount: number; type: string; status?: string; description?: string }[] } }).data.transactions)
-    : []) as { id: string; date: string; amount: number; type: string; status?: string; description?: string }[];
+  
+  // Map history from API response structure to frontend format
+  const history = (detail?.data?.history || []).map((h: any) => ({
+    id: h.createdAt || String(Math.random()),
+    date: h.createdAt,
+    action: h.event || 'Unknown',
+    notes: h.note || ''
+  }));
+  
+  // Map transactions from API response
+  const transactions = (detail?.data?.transactions || []).map((t: any) => ({
+    id: t._id || t.id || String(Math.random()),
+    date: t.createdAt || t.date,
+    amount: t.amount || 0,
+    type: t.type || 'Unknown',
+    status: t.status,
+    description: t.description || t.note || ''
+  }));
+  
   const historyLoading = isLoading && history.length === 0;
   const txLoading = isLoading && transactions.length === 0;
 
@@ -89,8 +102,7 @@ export const TenantDetailPage = () => {
 
   // Shift due date state
   const [shiftDueDateOpen, setShiftDueDateOpen] = useState(false);
-  const [rentMonths, setRentMonths] = useState('');
-  const [serviceMonths, setServiceMonths] = useState('');
+  const [months, setMonths] = useState('');
   const [shiftDueDate, { isLoading: shiftingDueDate }] = useShiftTenantDueDateMutation();
   const [sendReceipt, { isLoading: sendingReceipt }] = useSendTenantReceiptMutation();
 
@@ -254,8 +266,7 @@ export const TenantDetailPage = () => {
           <Dialog open={shiftDueDateOpen} onOpenChange={(open) => {
             setShiftDueDateOpen(open);
             if (!open) {
-              setRentMonths('');
-              setServiceMonths('');
+              setMonths('');
             }
           }}>
             <DialogTrigger asChild>
@@ -267,36 +278,26 @@ export const TenantDetailPage = () => {
               </DialogHeader>
               <div className="grid gap-4 py-2">
                 <div className="text-sm text-muted-foreground">
-                  Pay for rent and/or service charges for a specified number of months. The due date will shift by the maximum of both values.
+                  Enter the number of months to pay for both rent and service charges. The due date will be shifted forward accordingly.
                 </div>
                 <div className="grid gap-2">
-                  <Label>Rent Months (optional)</Label>
+                  <Label>Number of Months *</Label>
                   <Input
                     type="number"
                     min="1"
                     max="24"
                     placeholder="e.g., 12"
-                    value={rentMonths}
-                    onChange={(e) => setRentMonths(e.target.value)}
+                    value={months}
+                    onChange={(e) => setMonths(e.target.value)}
                   />
+                  <p className="text-xs text-muted-foreground">Applies to both rent and service charges</p>
                 </div>
-                <div className="grid gap-2">
-                  <Label>Service Months (optional)</Label>
-                  <Input
-                    type="number"
-                    min="1"
-                    max="24"
-                    placeholder="e.g., 6"
-                    value={serviceMonths}
-                    onChange={(e) => setServiceMonths(e.target.value)}
-                  />
-                </div>
-                {(rentMonths || serviceMonths) && (
+                {months && (
                   <div className="p-3 bg-muted rounded-md text-sm">
-                    <div className="font-medium mb-1">Due Date Shift Preview:</div>
-                    <div>Due date will be shifted by <span className="font-bold">{Math.max(Number(rentMonths) || 0, Number(serviceMonths) || 0)} months</span></div>
-                    {rentMonths && <div>• Rent: {rentMonths} month{Number(rentMonths) > 1 ? 's' : ''}</div>}
-                    {serviceMonths && <div>• Service: {serviceMonths} month{Number(serviceMonths) > 1 ? 's' : ''}</div>}
+                    <div className="font-medium mb-1">Payment Summary:</div>
+                    <div>• <span className="font-bold">{months} month{Number(months) > 1 ? 's' : ''}</span> of rent</div>
+                    <div>• <span className="font-bold">{months} month{Number(months) > 1 ? 's' : ''}</span> of service charges</div>
+                    <div className="mt-2 text-xs">Due date will shift forward by {months} month{Number(months) > 1 ? 's' : ''}</div>
                   </div>
                 )}
                 <div className="flex justify-end gap-2 pt-2">
@@ -304,36 +305,33 @@ export const TenantDetailPage = () => {
                   <Button
                     onClick={async () => {
                       if (!tenantId) return;
-                      const rent = Number(rentMonths);
-                      const service = Number(serviceMonths);
+                      const monthsNum = Number(months);
 
-                      if (!rentMonths && !serviceMonths) {
+                      if (!months) {
                         toast({
                           title: 'Validation Error',
-                          description: 'Please enter at least one payment duration (rent or service months).',
+                          description: 'Please enter the number of months to pay.',
                           variant: 'destructive'
                         });
                         return;
                       }
 
-                      if ((rentMonths && (!Number.isInteger(rent) || rent < 1 || rent > 24)) ||
-                        (serviceMonths && (!Number.isInteger(service) || service < 1 || service > 24))) {
+                      if (!Number.isInteger(monthsNum) || monthsNum < 1 || monthsNum > 24) {
                         toast({
                           title: 'Validation Error',
-                          description: 'Months must be whole numbers between 1 and 24.',
+                          description: 'Months must be a whole number between 1 and 24.',
                           variant: 'destructive'
                         });
                         return;
                       }
 
                       try {
-                        const payload: any = {};
-                        if (rentMonths) payload.rentMonths = rent;
-                        if (serviceMonths) payload.serviceMonths = service;
-
                         const result = await shiftDueDate({
                           tenantId: tenantId as string,
-                          payload
+                          payload: {
+                            rentMonths: monthsNum,
+                            serviceMonths: monthsNum
+                          }
                         }).unwrap();
 
                         toast({
@@ -341,8 +339,7 @@ export const TenantDetailPage = () => {
                           description: `New due date: ${formatDate(result.data.newDueDate)}. Shifted by ${result.data.totalMonthsShifted} month(s).`
                         });
                         setShiftDueDateOpen(false);
-                        setRentMonths('');
-                        setServiceMonths('');
+                        setMonths('');
                       } catch (e: any) {
                         toast({
                           title: 'Failed to Shift Due Date',
@@ -386,52 +383,209 @@ export const TenantDetailPage = () => {
         </div>
       </div>
 
-      <Card>
+      {/* Enhanced Tenant Overview Header */}
+      <Card className="bg-gradient-to-br from-blue-500 to-blue-700 dark:from-blue-600 dark:to-blue-800 border-0 shadow-lg">
         <CardHeader>
           <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <CardTitle className="flex items-center gap-2 mb-1">
-                <span>{overview?.name || tenant?.tenantName || `${tenant?.firstName || ''} ${tenant?.otherNames || ''} ${tenant?.surname || ''}`.trim() || '—'}</span>
-                {(overview?.typeBadge || tenant?.tenantType) && <Badge variant="secondary">{overview?.typeBadge || tenant?.tenantType}</Badge>}
+            <div className="flex-1 text-white">
+              <CardTitle className="flex items-center gap-3 mb-2 text-2xl">
+                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-lg font-bold">
+                  {(overview?.name || tenant?.tenantName || '')?.charAt(0)?.toUpperCase() || 'T'}
+                </div>
+                <div>
+                  <div>{overview?.name || tenant?.tenantName || 'Unknown Tenant'}</div>
+                  {(overview?.unit || tenant?.unitLabel) && (
+                    <div className="text-sm font-normal text-blue-100 mt-1">
+                      Unit: {overview?.unit || tenant?.unitLabel}
+                    </div>
+                  )}
+                </div>
               </CardTitle>
-              {(overview?.unit || tenant?.unitLabel) && <CardDescription>Unit: {overview?.unit || tenant?.unitLabel}</CardDescription>}
+              <div className="flex gap-2 mt-3">
+                {(overview?.typeBadge || tenant?.tenantType) && (
+                  <Badge variant="secondary" className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+                    {overview?.typeBadge || tenant?.tenantType}
+                  </Badge>
+                )}
+                <Badge 
+                  className={
+                    overview?.status === 'occupied' || tenant?.status === 'occupied'
+                      ? "bg-emerald-500/80 text-white hover:bg-emerald-600"
+                      : "bg-amber-500/80 text-white hover:bg-amber-600"
+                  }
+                >
+                  {overview?.status || tenant?.status || 'Unknown'}
+                </Badge>
+              </div>
             </div>
             <ComplaintSubmission onSubmit={handleComplaintSubmit} />
           </div>
         </CardHeader>
         <CardContent>
-          {!tenant ? (
-            <div className="text-sm text-muted-foreground">Tenant not found.</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div>
-                <div className="text-muted-foreground">ID</div>
-                <div className="font-mono break-all">{tenant.id}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Email</div>
-                <div>{tenant?.email || overview?.email || tenant?.tenantEmail || '—'}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">WhatsApp</div>
-                <div>{tenant?.whatsapp || tenant?.whatsappNumber || overview?.phone || tenant?.tenantPhone || '—'}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Rent</div>
-                <div>{typeof overview?.rent === 'number' ? `₦${overview.rent.toLocaleString()}` : (typeof tenant?.rentAmount === 'number' ? `₦${tenant.rentAmount.toLocaleString()}` : '—')}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Next Due</div>
-                <div>{formatDate((overview as any)?.nextDue || tenant?.nextDueDate)}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Meter</div>
-                <div>{overview?.meter || tenant?.electricMeterNumber || '—'}</div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-white">
+            <div>
+              <div className="text-blue-100 text-xs uppercase tracking-wider mb-1">Email</div>
+              <div className="font-medium">{tenant?.email || overview?.email || tenant?.tenantEmail || '—'}</div>
             </div>
-          )}
+            <div>
+              <div className="text-blue-100 text-xs uppercase tracking-wider mb-1">Phone</div>
+              <div className="font-medium">{tenant?.whatsapp || tenant?.whatsappNumber || overview?.phone || tenant?.tenantPhone || '—'}</div>
+            </div>
+            <div>
+              <div className="text-blue-100 text-xs uppercase tracking-wider mb-1">Electric Meter</div>
+              <div className="font-medium font-mono">{overview?.meter || tenant?.electricMeterNumber || '—'}</div>
+            </div>
+          </div>
         </CardContent>
       </Card>
+
+      {/* Financial Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Monthly Rent</p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-2">
+                  ₦{typeof overview?.rent === 'number' ? overview.rent.toLocaleString() : (typeof tenant?.rentAmount === 'number' ? tenant.rentAmount.toLocaleString() : '0')}
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Paid</p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-2">
+                  ₦{detail?.data?.financialSummary?.totalPaid?.toLocaleString() || '0'}
+                </p>
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                  {detail?.data?.financialSummary?.totalPayments || 0} transactions
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                <svg className="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Next Due Date</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-white mt-2">
+                  {formatDate((overview as any)?.nextDue || tenant?.nextDueDate)}
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                <svg className="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Pending</p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-2">
+                  {detail?.data?.financialSummary?.pendingPayments || 0}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Outstanding</p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Additional Information Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Move-in Date</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-lg font-bold text-slate-900 dark:text-white">
+                  {formatDate(tenant?.entryDate || tenant?.createdAt)}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Entry Date</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Estate</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+                <svg className="w-5 h-5 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-lg font-bold text-slate-900 dark:text-white">
+                  {tenant?.estate?.name || 'N/A'}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Property</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Lease Duration</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
+                <svg className="w-5 h-5 text-pink-600 dark:text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-lg font-bold text-slate-900 dark:text-white">
+                  {tenant?.entryDate && tenant?.nextDueDate 
+                    ? `${Math.ceil((new Date(tenant.nextDueDate).getTime() - new Date(tenant.entryDate).getTime()) / (1000 * 60 * 60 * 24 * 30))} months`
+                    : 'Ongoing'
+                  }
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Time Period</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader>
@@ -525,12 +679,6 @@ export const TenantDetailPage = () => {
                 <div className="text-muted-foreground">Rent (tenant)</div>
                 <div>{typeof (overview?.rent ?? tenant?.rentAmount) === 'number'
                   ? `₦${(overview?.rent ?? tenant?.rentAmount)!.toLocaleString()}`
-                  : '—'}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Unit monthly price</div>
-                <div>{typeof overview?.unitMonthlyPrice === 'number'
-                  ? `₦${overview.unitMonthlyPrice.toLocaleString()}`
                   : '—'}</div>
               </div>
               <div>
