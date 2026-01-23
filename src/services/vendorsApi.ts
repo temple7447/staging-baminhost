@@ -131,8 +131,9 @@ export const vendorsApi = createApi({
         }),
         getPublicVendors: builder.query<{ success: boolean; count: number; data: Vendor[] }, string | void>({
             query: (search) => ({
-                url: `/api/auth/public/vendors${search ? `?search=${search}` : ''}`,
+                url: '/api/auth/public/vendors',
                 method: 'GET',
+                params: search ? { search } : undefined,
             }),
             providesTags: (result) =>
                 result

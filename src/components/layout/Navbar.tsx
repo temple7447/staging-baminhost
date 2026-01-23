@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { Building2, Menu } from "lucide-react";
-import { LanguageSelector } from "./LanguageSelector";
 import { cn } from "@/lib/utils";
 
 interface NavbarProps {
@@ -54,7 +53,6 @@ export const Navbar = ({ variant = "dark" }: NavbarProps) => {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <LanguageSelector variant={variant} />
           <Link to="/login">
             <Button variant="outline" className={isLight ? "border-slate-200 text-slate-900 bg-white hover:bg-slate-50" : "border-white/20 text-white bg-transparent hover:bg-white/10"}>
               Log in
@@ -78,10 +76,6 @@ export const Navbar = ({ variant = "dark" }: NavbarProps) => {
             </SheetTrigger>
             <SheetContent side="right" className={`${isLight ? "bg-white text-slate-900" : "bg-slate-950 text-white"} border-l border-white/10`}>
               <div className="mt-10 space-y-4">
-                <div className="flex items-center justify-between mb-6">
-                    <span className="text-xs font-bold uppercase tracking-widest opacity-50">Language</span>
-                    <LanguageSelector variant={variant} className="bg-white/5 border-white/10" />
-                </div>
                 <Link to="/" className={`block text-sm ${isLight ? "text-slate-600" : "text-slate-200"} hover:text-blue-600`}>Home</Link>
                 <Link to="/marketplace/estate" className={`block text-sm ${isLight ? "text-slate-600" : "text-slate-200"} hover:text-blue-600`}>Estate Marketplace</Link>
                 <Link to="/product" className={`block text-sm ${isLight ? "text-slate-600" : "text-slate-200"} hover:text-blue-600`}>Product</Link>

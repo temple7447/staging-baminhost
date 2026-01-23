@@ -150,17 +150,21 @@ export interface EstateOverviewResponse {
   };
 }
 
-export interface EstateThreeMonthRentResponse {
+export interface FinancialSummary {
+  tenantCount: number;
+  totalMonthlyRent: number;
+  totalQuarterRent: number;
+  currency: string;
+}
+
+export interface QuarterlyTenantData {
+  [month: string]: Tenant[];
+}
+
+export interface QuarterlyTenantResponse {
   success: boolean;
-  data: {
-    year: number;
-    startMonth: number;
-    startDate: string;
-    endDate: string;
-    totalMonthlyRent: number;
-    totalThreeMonthRent: number;
-    tenantCount: number;
-  };
+  data: QuarterlyTenantData;
+  summary: FinancialSummary;
 }
 
 export interface AllEstatesOverviewResponse {
@@ -279,26 +283,21 @@ export const estatesApi = createApi({
   tagTypes: ['Estate', 'EstateList', 'EstateTenants', 'EstateUnits', 'Tenant', 'TenantList'],
   endpoints: (builder) => ({
     getEstates: builder.query<PaginatedResponse<Estate>, EstateListParams | void>({
-      query: (params = {}) => {
-        const qs = new URLSearchParams();
-        if (params.page != null) qs.set('page', String(params.page));
-        if (params.limit != null) qs.set('limit', String(params.limit));
-        if (params.search) qs.set('search', params.search);
-        return `/api/estates${qs.toString() ? `?${qs.toString()}` : ''}`;
-      },
+      query: (params = {}) => ({
+        url: '/api/estates',
+        params,
+      }),
       providesTags: (result) => [{ type: 'EstateList', id: 'LIST' }],
     }),
     getEstate: builder.query<Estate, string>({
       query: (id) => `/api/estates/${id}`,
       providesTags: (result, error, id) => [{ type: 'Estate', id }],
     }),
-    getEstateTenants: builder.query<PaginatedResponse<Tenant> | Tenant[], { estateId: string; page?: number; limit?: number; search?: string }>({
-      query: ({ estateId, page, limit, search }) => {
-        const qs = new URLSearchParams();
-        if (page != null) qs.set('page', String(page));
-        if (limit != null) qs.set('limit', String(limit));
-        if (search) qs.set('search', search);
-        return `/api/estates/${estateId}/tenants${qs.toString() ? `?${qs.toString()}` : ''}`;
+    getEstateTenants: builder.query<PaginatedResponse<Tenant> | QuarterlyTenantResponse, { estateId: string; quarter?: string; year?: number; page?: number; limit?: number; search?: string }>({
+      query: ({ estateId, quarter, ...params }) => {
+        const baseUrl = `/api/estates/${estateId}/tenants`;
+        const url = quarter ? `${baseUrl}/${quarter}` : baseUrl;
+        return { url, params };
       },
       providesTags: (result, error, args) => [{ type: 'EstateTenants', id: args.estateId }],
     }),
@@ -323,18 +322,6 @@ export const estatesApi = createApi({
     getEstateOverview: builder.query<EstateOverviewResponse, string>({
       query: (id) => `/api/estates/${id}/overview`,
       providesTags: (result, error, id) => [{ type: 'Estate', id }],
-    }),
-    getEstateThreeMonthRent: builder.query<
-      EstateThreeMonthRentResponse,
-      { estateId: string; year: number; startMonth: number }
-    >({
-      query: ({ estateId, year, startMonth }) => {
-        const qs = new URLSearchParams();
-        qs.set('year', String(year));
-        qs.set('startMonth', String(startMonth));
-        return `/api/estates/${estateId}/three-month-rent?${qs.toString()}`;
-      },
-      providesTags: (result, error, { estateId }) => [{ type: 'Estate', id: estateId }],
     }),
     getAllEstatesOverview: builder.query<AllEstatesOverviewResponse, void>({
       query: () => '/api/estates/overview/all',
@@ -390,13 +377,10 @@ export const estatesApi = createApi({
     }),
     // Global tenants endpoints
     getTenants: builder.query<PaginatedResponse<Tenant>, { page?: number; limit?: number; search?: string } | void>({
-      query: (params = {}) => {
-        const qs = new URLSearchParams();
-        if (params?.page != null) qs.set('page', String(params.page));
-        if (params?.limit != null) qs.set('limit', String(params.limit));
-        if (params?.search) qs.set('search', params.search);
-        return `/api/tenants${qs.toString() ? `?${qs.toString()}` : ''}`;
-      },
+      query: (params = {}) => ({
+        url: '/api/tenants',
+        params: params || {},
+      }),
       providesTags: (result) =>
         result && Array.isArray(result.data)
           ? [
@@ -407,15 +391,15 @@ export const estatesApi = createApi({
     }),
     getTenant: builder.query<TenantDetailResponse | { success: boolean; data: { tenant: Tenant; overview: TenantOverview } }, string | { id: string; expand?: string; page?: number; limit?: number }>({
       query: (arg) => {
-        const id = typeof arg === 'string' ? arg : arg.id;
-        const qs = new URLSearchParams();
-        if (typeof arg !== 'string') {
-          if (arg.expand) qs.set('expand', arg.expand);
-          if (arg.page != null) qs.set('page', String(arg.page));
-          if (arg.limit != null) qs.set('limit', String(arg.limit));
-        }
-        const query = qs.toString();
-        return `/api/tenants/${id}${query ? `?${query}` : ''}`;
+        const isString = typeof arg === 'string';
+        const id = isString ? arg : arg.id;
+        const params = isString ? undefined : { ...arg };
+        if (params) delete (params as any).id;
+
+        return {
+          url: `/api/tenants/${id}`,
+          params,
+        };
       },
       providesTags: (result, error, arg) => {
         const id = typeof arg === 'string' ? arg : arg.id;
@@ -446,11 +430,15 @@ export const estatesApi = createApi({
     }),
     getTenantTransactions: builder.query<TenantTransactionEntry[], { tenantId: string; page?: number; limit?: number } | string>({
       query: (arg) => {
-        if (typeof arg === 'string') return `/api/tenants/${arg}/transactions`;
-        const qs = new URLSearchParams();
-        if (arg.page != null) qs.set('page', String(arg.page));
-        if (arg.limit != null) qs.set('limit', String(arg.limit));
-        return `/api/tenants/${arg.tenantId}/transactions${qs.toString() ? `?${qs.toString()}` : ''}`;
+        const isString = typeof arg === 'string';
+        const tenantId = isString ? arg : arg.tenantId;
+        const params = isString ? undefined : { ...arg };
+        if (params) delete (params as any).tenantId;
+
+        return {
+          url: `/api/tenants/${tenantId}/transactions`,
+          params,
+        };
       },
       providesTags: (result, error, arg) => {
         const tenantId = typeof arg === 'string' ? arg : arg.tenantId;
@@ -498,8 +486,13 @@ export const estatesApi = createApi({
         { type: 'EstateList', id: 'LIST' },
       ],
     }),
-    initiatePayment: builder.mutation<InitiatePaymentResponse, { type: PaymentType; body: InitiatePaymentBody }>({
-      query: ({ type, body }) => ({ url: `/api/payments/${type}`, method: 'POST', body }),
+    initiatePayment: builder.mutation<InitiatePaymentResponse, { type: PaymentType; body: InitiatePaymentBody; params?: any }>({
+      query: ({ type, body, params }) => ({
+        url: `/api/payments/${type}`,
+        method: 'POST',
+        body,
+        params,
+      }),
       invalidatesTags: (result, error, { body }) => [
         { type: 'Tenant' as const, id: body.tenantId },
       ],
@@ -526,13 +519,10 @@ export const estatesApi = createApi({
     }),
     // Public List Endpoints
     getPublicListings: builder.query<PaginatedResponse<EstateUnit>, { page?: number; limit?: number; search?: string } | void>({
-      query: (params = {}) => {
-        const qs = new URLSearchParams();
-        if (params?.page != null) qs.set('page', String(params.page));
-        if (params?.limit != null) qs.set('limit', String(params.limit));
-        if (params?.search) qs.set('search', params.search);
-        return `/api/estates/public/listings${qs.toString() ? `?${qs.toString()}` : ''}`;
-      },
+      query: (params = {}) => ({
+        url: '/api/estates/public/listings',
+        params: params || {},
+      }),
       providesTags: (result) =>
         result && Array.isArray(result.data)
           ? [...result.data.map((u) => ({ type: 'Estate' as const, id: u.id || u._id })), { type: 'Estate', id: 'LIST' }]
