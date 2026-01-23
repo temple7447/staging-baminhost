@@ -22,7 +22,8 @@ import {
   CreditCard,
   Briefcase,
   ShieldCheck,
-  Handshake
+  Handshake,
+  Combine
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -110,6 +111,15 @@ const sidebarItems: SidebarItem[] = [
     requiredPermissions: ['view_goals'],
     isPremium: true,
     path: '/dashboard/goals'
+  },
+  {
+    id: "accounting",
+    label: "Accounting Management",
+    icon: Combine,
+    category: 'financial',
+    requiredPermissions: ['view_all_data'],
+    isPremium: true,
+    path: '/dashboard/accounting'
   },
   {
     id: "contacts",

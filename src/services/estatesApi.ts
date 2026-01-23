@@ -543,7 +543,6 @@ export const {
   useUpdateEstateMutation,
   useDeleteEstateMutation,
   useGetEstateOverviewQuery,
-  useGetEstateThreeMonthRentQuery,
   useGetAllEstatesOverviewQuery,
   useCreateEstateTenantMutation,
   useCreateEstateUnitMutation,

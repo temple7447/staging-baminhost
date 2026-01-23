@@ -17,6 +17,7 @@ import { FillingStationManagement } from '@/components/dashboard/business/Fillin
 import { EquipmentManagement } from '@/components/dashboard/business/EquipmentManagement';
 import { VendorManagement } from '@/components/dashboard/business/VendorManagement';
 import { VendorOnboarding } from '@/components/dashboard/business/VendorOnboarding';
+import { AccountingManagement } from '@/components/dashboard/business/AccountingManagement';
 import { CRMDashboard } from '@/components/dashboard/CRMDashboard';
 import { LibraryDashboard } from '@/components/dashboard/LibraryDashboardStub';
 import { AssistantDashboard } from '@/components/dashboard/AssistantDashboard';
@@ -90,6 +91,7 @@ const DashboardRouter: React.FC = () => {
     if (pathname.includes('theme-showcase')) return 'theme-showcase';
     if (pathname.includes('people')) return 'people';
     if (pathname.includes('business-types')) return 'business-types';
+    if (pathname.includes('accounting')) return 'accounting';
     if (pathname.includes('subscription')) return 'subscription';
     return 'overview';
   };
@@ -283,6 +285,18 @@ const DashboardRouter: React.FC = () => {
         />
 
         {/* Personal Portfolios */}
+        <Route
+          path="/accounting"
+          element={
+            <ProtectedRoute
+              element={<AccountingManagement />}
+              requiredPermissions={['view_all_data']}
+              feature="Accounting Management"
+              showUpgradePrompt={true}
+              viewName="accounting"
+            />
+          }
+        />
         <Route
           path="/personal-portfolios"
           element={
