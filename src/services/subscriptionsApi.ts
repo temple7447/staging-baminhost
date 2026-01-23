@@ -10,6 +10,8 @@ export interface Subscription {
     icon?: 'Layout (Frontend)' | 'Server (Backend)';
     status: 'Active' | 'Inactive';
     features: string[];
+    startDate?: string;
+    expiresAt?: string;
     createdAt: string;
     updatedAt?: string;
 }
