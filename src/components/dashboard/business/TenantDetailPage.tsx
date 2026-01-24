@@ -152,6 +152,9 @@ export const TenantDetailPage = () => {
 
   const historyMedia = getHistoryMedia();
 
+  // Calculate Total Monthly Commitment
+  const totalMonthlyCommitment = (overview?.rent || 0) + (overview?.serviceCharge || 0);
+
   // Show full page skeleton while main data is loading
   if (isLoading && !tenant) {
     return <TenantDetailSkeleton />;
@@ -440,8 +443,8 @@ export const TenantDetailPage = () => {
       </Card>
 
       {/* Financial Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow border-l-4 border-l-blue-500">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -473,7 +476,58 @@ export const TenantDetailPage = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow">
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow border-l-4 border-l-indigo-500">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Service Charge</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                    ₦{typeof overview?.serviceCharge === 'number' ? overview.serviceCharge.toLocaleString() : (typeof overview?.serviceChargeMonthly === 'number' ? overview.serviceChargeMonthly.toLocaleString() : '0')}
+                  </p>
+                  {overview?.serviceChargeIncreased ? (
+                    <Badge variant="outline" className="text-[10px] bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800/50 py-0 h-4">
+                      Increased
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-[10px] bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50 py-0 h-4">
+                      Standard
+                    </Badge>
+                  )}
+                </div>
+                {overview?.serviceChargeIncreased && overview?.storedServiceCharge && (
+                  <p className="text-[10px] text-slate-400 line-through mt-1">Was ₦{overview.storedServiceCharge.toLocaleString()}</p>
+                )}
+              </div>
+              <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-slate-800 to-slate-900 dark:from-slate-800 dark:to-black border-0 shadow-lg col-span-1 md:col-span-2">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Monthly Commitment</p>
+                <p className="text-3xl font-black text-white mt-2">
+                  ₦{totalMonthlyCommitment.toLocaleString()}
+                </p>
+                <p className="text-[10px] text-slate-400 mt-1">Sum of Rent and Service Charge</p>
+              </div>
+              <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-sm">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow border-l-4 border-l-emerald-500">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -494,7 +548,7 @@ export const TenantDetailPage = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow">
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow border-l-4 border-l-amber-500">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -512,7 +566,7 @@ export const TenantDetailPage = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow">
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow border-l-4 border-l-purple-500">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -700,9 +754,16 @@ export const TenantDetailPage = () => {
               </div>
               <div>
                 <div className="text-muted-foreground">Service charge (monthly)</div>
-                <div>{typeof overview?.serviceChargeMonthly === 'number'
-                  ? `₦${overview.serviceChargeMonthly.toLocaleString()}`
-                  : '—'}</div>
+                <div className="flex items-center gap-2">
+                  <span>{typeof (overview?.serviceCharge ?? overview?.serviceChargeMonthly) === 'number'
+                    ? `₦${(overview?.serviceCharge ?? overview?.serviceChargeMonthly)!.toLocaleString()}`
+                    : '—'}</span>
+                  {overview?.serviceChargeIncreased && (
+                    <Badge variant="outline" className="text-[8px] bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800/50 px-1 h-3">
+                      Up
+                    </Badge>
+                  )}
+                </div>
               </div>
               <div>
                 <div className="text-muted-foreground">Caution fee</div>

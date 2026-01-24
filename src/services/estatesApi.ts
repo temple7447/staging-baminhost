@@ -131,6 +131,9 @@ export interface TenantOverview {
   status?: string;
   rentIncreased?: boolean;
   storedRent?: number;
+  serviceCharge?: number;
+  storedServiceCharge?: number;
+  serviceChargeIncreased?: boolean;
 }
 
 export interface TenantDetailResponse {
