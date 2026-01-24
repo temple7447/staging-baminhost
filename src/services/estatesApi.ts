@@ -49,6 +49,9 @@ export interface Tenant {
   electricMeterNumber?: string;
   status?: 'occupied' | 'vacant' | 'maintenance';
   nextDueDate?: string;
+  entryDate?: string;
+  createdAt?: string;
+  estate?: { _id: string; name: string; id: string };
 }
 
 export interface TenantHistoryEntry {
@@ -126,6 +129,8 @@ export interface TenantOverview {
   type?: 'new' | 'existing' | 'renewal' | 'transfer';
   typeBadge?: string;
   status?: string;
+  rentIncreased?: boolean;
+  storedRent?: number;
 }
 
 export interface TenantDetailResponse {

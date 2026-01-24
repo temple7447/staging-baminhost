@@ -446,9 +446,23 @@ export const TenantDetailPage = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Monthly Rent</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-2">
-                  ₦{typeof overview?.rent === 'number' ? overview.rent.toLocaleString() : (typeof tenant?.rentAmount === 'number' ? tenant.rentAmount.toLocaleString() : '0')}
-                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                    ₦{typeof overview?.rent === 'number' ? overview.rent.toLocaleString() : (typeof tenant?.rentAmount === 'number' ? tenant.rentAmount.toLocaleString() : '0')}
+                  </p>
+                  {overview?.rentIncreased ? (
+                    <Badge variant="outline" className="text-[10px] bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800/50 py-0 h-4">
+                      Increased
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-[10px] bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50 py-0 h-4">
+                      Standard
+                    </Badge>
+                  )}
+                </div>
+                {overview?.rentIncreased && overview?.storedRent && (
+                  <p className="text-[10px] text-slate-400 line-through mt-1">Was ₦{overview.storedRent.toLocaleString()}</p>
+                )}
               </div>
               <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                 <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -564,7 +578,7 @@ export const TenantDetailPage = () => {
 
         <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Lease Duration</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Lease Info</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-3">
@@ -573,14 +587,17 @@ export const TenantDetailPage = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="text-lg font-bold text-slate-900 dark:text-white">
                   {tenant?.entryDate && tenant?.nextDueDate 
                     ? `${Math.ceil((new Date(tenant.nextDueDate).getTime() - new Date(tenant.entryDate).getTime()) / (1000 * 60 * 60 * 24 * 30))} months`
                     : 'Ongoing'
                   }
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Time Period</p>
+                <div className="flex flex-col text-[10px] text-slate-500 dark:text-slate-400 mt-1">
+                  <span>Entry: {formatDate(tenant?.entryDate)}</span>
+                  <span>Expiry: {formatDate(tenant?.nextDueDate)}</span>
+                </div>
               </div>
             </div>
           </CardContent>
