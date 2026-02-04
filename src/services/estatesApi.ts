@@ -98,6 +98,18 @@ export interface InitiatePaymentBody {
   tenantId: string;
   amount: number;
   description?: string;
+  durationMonths?: number;
+}
+
+export interface ManualRecordPaymentBody {
+  tenantId: string;
+  paymentType: string;
+  amount: number;
+  paymentMethod: 'bank_transfer' | 'cash' | 'check';
+  durationMonths?: number;
+  paymentDate: string;
+  description?: string;
+  notes?: string;
 }
 export interface InitiatePaymentResponse {
   success: boolean;
@@ -291,9 +303,9 @@ export const estatesApi = createApi({
   tagTypes: ['Estate', 'EstateList', 'EstateTenants', 'EstateUnits', 'Tenant', 'TenantList'],
   endpoints: (builder) => ({
     getEstates: builder.query<PaginatedResponse<Estate>, EstateListParams | void>({
-      query: (params = {}) => ({
+      query: (params) => ({
         url: '/api/estates',
-        params,
+        params: params || {},
       }),
       providesTags: (result) => [{ type: 'EstateList', id: 'LIST' }],
     }),
@@ -505,6 +517,16 @@ export const estatesApi = createApi({
         { type: 'Tenant' as const, id: body.tenantId },
       ],
     }),
+    manualRecordPayment: builder.mutation<{ success: boolean; message: string; data?: any }, ManualRecordPaymentBody>({
+      query: (body) => ({
+        url: '/api/payments/manual-record',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: (result, error, { tenantId }) => [
+        { type: 'Tenant' as const, id: tenantId },
+      ],
+    }),
     verifyPayment: builder.query<{ success: boolean; message?: string; data?: any }, string>({
       query: (reference) => `/api/payments/verify/${reference}`,
     }),
@@ -523,6 +545,28 @@ export const estatesApi = createApi({
       query: (tenantId) => ({
         url: `/api/payments/tenant/${tenantId}/receipt`,
         method: 'POST',
+      }),
+    }),
+    resendPaymentReceipt: builder.mutation<{ success: boolean; message?: string }, string>({
+      query: (paymentId) => ({
+        url: `/api/payments/${paymentId}/receipt`,
+        method: 'POST',
+      }),
+    }),
+    downloadPaymentReceipt: builder.query<{ blob: Blob; filename: string }, string>({
+      query: (paymentId) => ({
+        url: `/api/payments/${paymentId}/download`,
+        responseHandler: async (response) => {
+          const blob = await response.blob();
+          const contentDisposition = response.headers.get('Content-Disposition');
+          let filename = `receipt-${paymentId}.pdf`;
+          if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+            if (filenameMatch && filenameMatch[1]) filename = filenameMatch[1];
+          }
+          return { blob, filename };
+        },
+        cache: 'no-cache',
       }),
     }),
     // Public List Endpoints
@@ -569,6 +613,9 @@ export const {
   useVerifyPaymentQuery,
   useShiftTenantDueDateMutation,
   useSendTenantReceiptMutation,
+  useResendPaymentReceiptMutation,
+  useLazyDownloadPaymentReceiptQuery,
+  useManualRecordPaymentMutation,
   // Public
   useGetPublicListingsQuery,
   useGetPublicListingByIdQuery,

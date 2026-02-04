@@ -30,8 +30,8 @@ export const DashboardLayout = ({ children, currentView, onViewChange }: Dashboa
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
         />
-        <main className="flex-1 overflow-auto bg-background md:ml-64 transition-all duration-300">
-          <div className="p-4 md:p-6 max-w-7xl mx-auto h-full">
+        <main className="flex-1 overflow-auto bg-background md:ml-64 transition-all duration-300 print:ml-0 print:bg-white">
+          <div className="p-4 md:p-6 max-w-7xl mx-auto h-full print:p-0 print:max-w-none">
             {children}
           </div>
         </main>

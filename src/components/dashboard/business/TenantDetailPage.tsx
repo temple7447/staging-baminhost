@@ -9,11 +9,15 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
-import { useGetTenantQuery, useGetTenantBillingQuery, useInitiatePaymentMutation, useUpdateTenantMutation, useUpdateEstateUnitMutation, useShiftTenantDueDateMutation, useSendTenantReceiptMutation } from '@/services/estatesApi';
+import { ActionTooltip } from '@/components/ui/ActionTooltip';
+import { ComplaintSubmission } from '@/components/ui/ComplaintSubmission';
+import { Receipt, Download, Mail, Loader2 } from 'lucide-react';
+import { useGetTenantQuery, useGetTenantBillingQuery, useInitiatePaymentMutation, useUpdateTenantMutation, useUpdateEstateUnitMutation, useShiftTenantDueDateMutation, useSendTenantReceiptMutation, useManualRecordPaymentMutation, useResendPaymentReceiptMutation, useLazyDownloadPaymentReceiptQuery } from '@/services/estatesApi';
 import { TenantDetailSkeleton, TableSkeleton, PropertyMediaSkeleton } from '@/components/ui/skeletons';
 import { MediaUpload } from '@/components/ui/MediaUpload';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { PropertyMediaDisplay } from '@/components/ui/PropertyMediaDisplay';
-import { ComplaintSubmission } from '@/components/ui/ComplaintSubmission';
 
 const formatDate = (value?: string | null) => {
   if (!value) return '—';
@@ -37,6 +41,8 @@ export const TenantDetailPage = () => {
   const overview = detail?.data?.overview;
   const [updateTenant, { isLoading: updatingTenant }] = useUpdateTenantMutation();
   const [updateUnit, { isLoading: updatingUnit }] = useUpdateEstateUnitMutation();
+  const [triggerDownload, { isFetching: isDownloading }] = useLazyDownloadPaymentReceiptQuery();
+  const [resendEmail, { isLoading: isEmailing }] = useResendPaymentReceiptMutation();
   
   // Map history from API response structure to frontend format
   const history = (detail?.data?.history || []).map((h: any) => ({
@@ -53,7 +59,8 @@ export const TenantDetailPage = () => {
     amount: t.amount || 0,
     type: t.type || 'Unknown',
     status: t.status,
-    description: t.description || t.note || ''
+    description: t.description || t.note || '',
+    reference: t.reference || t.trxref || t._id || t.id
   }));
   
   const historyLoading = isLoading && history.length === 0;
@@ -97,14 +104,52 @@ export const TenantDetailPage = () => {
   const [editServiceCharge, setEditServiceCharge] = useState('');
   const [editCautionFee, setEditCautionFee] = useState('');
   const [editLegalFee, setEditLegalFee] = useState('');
-  const [payType, setPayType] = useState<'deposit' | 'rent' | 'service-charge' | 'security-charge' | 'caution-fee' | 'legal-fee'>('rent');
+  // Online (Paystack) state
+  const [payType, setPayType] = useState<'deposit' | 'rent' | 'service-charge' | 'security-charge' | 'caution-fee' | 'legal-fee' | 'initial'>('rent');
+  const [payMonths, setPayMonths] = useState('1');
   const [initiatePayment, { isLoading: paying }] = useInitiatePaymentMutation();
+
+  // Manual record state
+  const [manualAmount, setManualAmount] = useState('');
+  const [manualMethod, setManualMethod] = useState<'bank_transfer' | 'cash' | 'check'>('bank_transfer');
+  const [manualType, setManualType] = useState('rent');
+  const [manualMonths, setManualMonths] = useState('1');
+  const [manualDate, setManualDate] = useState(new Date().toISOString().split('T')[0]);
+  const [manualDesc, setManualDesc] = useState('');
+  const [manualNotes, setManualNotes] = useState('');
+  const [recordManualPayment, { isLoading: recordingManual }] = useManualRecordPaymentMutation();
 
   // Shift due date state
   const [shiftDueDateOpen, setShiftDueDateOpen] = useState(false);
   const [months, setMonths] = useState('');
   const [shiftDueDate, { isLoading: shiftingDueDate }] = useShiftTenantDueDateMutation();
   const [sendReceipt, { isLoading: sendingReceipt }] = useSendTenantReceiptMutation();
+
+  const handleDownload = async (paymentId: string) => {
+    try {
+      const result = await triggerDownload(paymentId).unwrap();
+      const url = window.URL.createObjectURL(result.blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', result.filename);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast({ title: "Success", description: "Receipt download started." });
+    } catch (error) {
+      toast({ title: "Download Failed", description: "Could not generate PDF receipt.", variant: "destructive" });
+    }
+  };
+
+  const handleEmail = async (paymentId: string) => {
+    try {
+      await resendEmail(paymentId).unwrap();
+      toast({ title: "Email Sent", description: "Receipt has been resent to tenant email." });
+    } catch (error) {
+      toast({ title: "Email Failed", description: "Could not resend email receipt.", variant: "destructive" });
+    }
+  };
 
   // Mock property media state (replace with actual API call)
   const [propertyMedia, setPropertyMedia] = useState<any[]>([]);
@@ -852,61 +897,221 @@ export const TenantDetailPage = () => {
               <CardTitle>Transactions</CardTitle>
               <CardDescription>Payments and charges</CardDescription>
             </div>
-            <Dialog open={payOpen} onOpenChange={setPayOpen}>
+            <Dialog open={payOpen} onOpenChange={(open) => {
+              setPayOpen(open);
+              if (!open) {
+                // Reset manual form
+                setManualAmount('');
+                setPayMonths('1');
+                setManualMonths('1');
+              }
+            }}>
               <DialogTrigger asChild>
                 <Button>Collect Payment</Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                   <DialogTitle>Collect Payment</DialogTitle>
                 </DialogHeader>
-                <div className="grid gap-4 py-2">
-                  <div className="grid gap-2">
-                    <Label>Payment type</Label>
-                    <Select value={payType} onValueChange={(v: any) => setPayType(v)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="rent">Rent</SelectItem>
-                        <SelectItem value="service-charge">Service Charge</SelectItem>
-                        <SelectItem value="security-charge">Security Charge</SelectItem>
-                        <SelectItem value="caution-fee">Caution Fee</SelectItem>
-                        <SelectItem value="legal-fee">Legal Fee</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex justify-end gap-2 pt-2">
-                    <Button variant="ghost" onClick={() => setPayOpen(false)}>Cancel</Button>
-                    <Button
-                      onClick={async () => {
-                        if (!tenantId) return;
-                        const item = getBillingItemForType(payType);
-                        if (!item) {
-                          toast({ title: 'Billing info not available for this payment type', variant: 'destructive' });
-                          return;
-                        }
-                        const amt = item.amount;
-                        try {
-                          const res = await initiatePayment({ type: payType, body: { tenantId, amount: amt, description: item.label } }).unwrap();
-                          toast({ title: 'Payment initiated', description: res.message || 'Redirecting to checkout...' });
-                          if (res?.data?.paymentLink) window.open(res.data.paymentLink, '_blank');
-                          // Navigate to success tracking page using reference so user can verify after completing checkout
-                          if (res?.data?.reference) {
-                            const ref = res.data.reference;
-                            navigate(`/dashboard/payment/success?reference=${encodeURIComponent(ref)}`);
+                <Tabs defaultValue="online" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="online">Online (Paystack)</TabsTrigger>
+                    <TabsTrigger value="manual">Manual (Offline)</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="online" className="space-y-4 py-4">
+                    <div className="grid gap-2">
+                      <Label>Payment type</Label>
+                      <Select value={payType} onValueChange={(v: any) => setPayType(v)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="rent">Rent (Bundles Service Charge)</SelectItem>
+                          <SelectItem value="service-charge">Standalone Service Charge</SelectItem>
+                          <SelectItem value="initial">Initial (Caution, Legal, etc.)</SelectItem>
+                          <SelectItem value="deposit">Security Deposit</SelectItem>
+                          <SelectItem value="security-charge">Security Charge</SelectItem>
+                          <SelectItem value="caution-fee">Caution Fee</SelectItem>
+                          <SelectItem value="legal-fee">Legal Fee</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {payType === 'rent' && (
+                      <div className="grid gap-2">
+                        <Label>Duration (Months)</Label>
+                        <Input 
+                          type="number" 
+                          min="1" 
+                          value={payMonths} 
+                          onChange={(e) => setPayMonths(e.target.value)} 
+                          placeholder="e.g. 6"
+                        />
+                        <p className="text-[10px] text-muted-foreground">Automatically bundles service charge for this period.</p>
+                      </div>
+                    )}
+
+                    <div className="flex justify-end gap-2 pt-2">
+                      <Button variant="ghost" onClick={() => setPayOpen(false)}>Cancel</Button>
+                      <Button
+                        onClick={async () => {
+                          if (!tenantId) return;
+                          
+                          let amt = 0;
+                          let desc = "";
+                          
+                          if (payType === 'rent') {
+                            const months = Number(manualMonths) || 1;
+                            const monthlyRent = overview?.rent || tenant?.rentAmount || 0;
+                            const monthlyService = overview?.serviceCharge || 0;
+                            amt = (monthlyRent + monthlyService) * months;
+                            desc = `${months} months Rent + Service Charge`;
+                          } else {
+                            const item = getBillingItemForType(payType as any);
+                            amt = item?.amount || 0;
+                            desc = item?.label || payType;
                           }
-                          setPayOpen(false);
-                        } catch (e) {
-                          toast({ title: 'Failed to initiate payment', variant: 'destructive' });
-                        }
-                      }}
-                      disabled={paying}
-                    >
-                      {paying ? 'Processing...' : 'Proceed to Pay'}
-                    </Button>
-                  </div>
-                </div>
+
+                          try {
+                            const res = await initiatePayment({ 
+                              type: payType as any, 
+                              body: { 
+                                tenantId, 
+                                amount: amt, 
+                                description: desc,
+                                durationMonths: payType === 'rent' ? Number(payMonths) : undefined
+                              } 
+                            }).unwrap();
+                            toast({ title: 'Payment initiated', description: res.message || 'Redirecting to checkout...' });
+                            if (res?.data?.paymentLink) window.open(res.data.paymentLink, '_blank');
+                            if (res?.data?.reference) {
+                              navigate(`/dashboard/payment/success?reference=${encodeURIComponent(res.data.reference)}`);
+                            }
+                            setPayOpen(false);
+                          } catch (e) {
+                            toast({ title: 'Failed to initiate payment', variant: 'destructive' });
+                          }
+                        }}
+                        disabled={paying}
+                      >
+                        {paying ? 'Processing...' : 'Generate Payment Link'}
+                      </Button>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="manual" className="space-y-4 py-4 max-h-[60vh] overflow-y-auto pr-2">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label>Amount (₦)</Label>
+                        <Input 
+                          type="number" 
+                          placeholder="720000" 
+                          value={manualAmount}
+                          onChange={(e) => setManualAmount(e.target.value)}
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>Method</Label>
+                        <Select value={manualMethod} onValueChange={(v: any) => setManualMethod(v)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                            <SelectItem value="cash">Cash</SelectItem>
+                            <SelectItem value="check">Check</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label>Type</Label>
+                        <Select value={manualType} onValueChange={(v: any) => setManualType(v)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="rent">Rent</SelectItem>
+                            <SelectItem value="service_charge">Service Charge</SelectItem>
+                            <SelectItem value="bundle">Rent + Service Bundle</SelectItem>
+                            <SelectItem value="deposit">Deposit</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>Duration (Months)</Label>
+                        <Input 
+                          type="number" 
+                          value={manualMonths}
+                          onChange={(e) => setManualMonths(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label>Payment Date</Label>
+                      <Input 
+                        type="date" 
+                        value={manualDate}
+                        onChange={(e) => setManualDate(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label>Description</Label>
+                      <Input 
+                        placeholder="Admin manually recorded..." 
+                        value={manualDesc}
+                        onChange={(e) => setManualDesc(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label>Notes</Label>
+                      <Textarea 
+                        placeholder="Reference confirmed..." 
+                        value={manualNotes}
+                        onChange={(e) => setManualNotes(e.target.value)}
+                        className="h-20"
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2">
+                      <Button variant="ghost" onClick={() => setPayOpen(false)}>Cancel</Button>
+                      <Button
+                        onClick={async () => {
+                          if (!tenantId || !manualAmount) {
+                            toast({ title: 'Please fill required fields', variant: 'destructive' });
+                            return;
+                          }
+                          try {
+                            await recordManualPayment({
+                              tenantId,
+                              paymentType: manualType,
+                              amount: Number(manualAmount),
+                              paymentMethod: manualMethod,
+                              durationMonths: Number(manualMonths),
+                              paymentDate: manualDate,
+                              description: manualDesc,
+                              notes: manualNotes
+                            }).unwrap();
+                            toast({ title: 'Payment recorded', description: 'Due date has been updated.' });
+                            setPayOpen(false);
+                          } catch (e) {
+                            toast({ title: 'Failed to record payment', variant: 'destructive' });
+                          }
+                        }}
+                        disabled={recordingManual}
+                      >
+                        {recordingManual ? 'Recording...' : 'Record Payment'}
+                      </Button>
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </DialogContent>
             </Dialog>
           </div>
@@ -928,6 +1133,7 @@ export const TenantDetailPage = () => {
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Amount</TableHead>
                     <TableHead>Description</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -938,6 +1144,43 @@ export const TenantDetailPage = () => {
                       <TableCell>{t.status || '—'}</TableCell>
                       <TableCell className="text-right">₦{t.amount.toLocaleString()}</TableCell>
                       <TableCell>{t.description || '—'}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0"
+                            onClick={() => navigate(`/dashboard/payment/success?reference=${t.reference}`)}
+                            title="View Receipt"
+                          >
+                            <Receipt className="h-4 w-4" />
+                          </Button>
+                          {(t.status === 'completed' || t.status === 'success' || !t.status) && (
+                            <>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleDownload(t.reference || t.id)}
+                                disabled={isDownloading}
+                                title="Download PDF"
+                              >
+                                {isDownloading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-4 w-4" />}
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleEmail(t.reference || t.id)}
+                                disabled={isEmailing}
+                                title="Resend Email"
+                              >
+                                {isEmailing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Mail className="h-4 w-4" />}
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

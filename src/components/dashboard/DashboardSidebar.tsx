@@ -398,7 +398,7 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
         "w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/50 transition-transform duration-300 ease-in-out",
         "fixed left-0 top-16 h-[calc(100vh-4rem)] z-50 shadow-xl",
         "md:top-0 md:h-screen",
-        "overflow-y-auto overscroll-contain scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800",
+        "overflow-y-auto overscroll-contain scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800 print:hidden",
         isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}>
         <div className="p-4 h-full flex flex-col">
