@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
-import { useUpdateTenantMutation, useShiftTenantDueDateMutation, useSendTenantReceiptMutation } from '@/services/estatesApi';
+import { useUpdateTenantMutation, useShiftTenantDueDateMutation, useSendTenantReceiptMutation, useUpdateEstateUnitMutation } from '@/services/estatesApi';
 
 const formatDate = (value?: string | null) => {
   if (!value) return '—';
@@ -31,6 +31,7 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
   const [updateTenant, { isLoading: updatingTenant }] = useUpdateTenantMutation();
   const [shiftDueDate, { isLoading: shiftingDueDate }] = useShiftTenantDueDateMutation();
   const [sendReceipt, { isLoading: sendingReceipt }] = useSendTenantReceiptMutation();
+  const [updateUnit, { isLoading: updatingUnit }] = useUpdateEstateUnitMutation();
 
   // Tenant edit state
   const [editTenantOpen, setEditTenantOpen] = useState(false);
@@ -42,6 +43,13 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
   const [editEntryDate, setEditEntryDate] = useState('');
   const [editNextDue, setEditNextDue] = useState('');
   const [editMeter, setEditMeter] = useState('');
+
+  // Pricing edit state
+  const [editPricingOpen, setEditPricingOpen] = useState(false);
+  const [editMonthlyPrice, setEditMonthlyPrice] = useState('');
+  const [editServiceCharge, setEditServiceCharge] = useState('');
+  const [editCautionFee, setEditCautionFee] = useState('');
+  const [editLegalFee, setEditLegalFee] = useState('');
 
   // Shift due date state
   const [shiftDueDateOpen, setShiftDueDateOpen] = useState(false);
@@ -57,6 +65,16 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
       setEditEntryDate((tenant as any).entryDate || '');
       setEditNextDue(tenant.nextDueDate || (overview as any)?.nextDue || '');
       setEditMeter(overview?.meter || tenant.electricMeterNumber || '');
+    }
+  };
+
+  const handleEditPricingOpen = () => {
+    if (overview || tenant) {
+      const o: any = overview || {};
+      setEditMonthlyPrice(o.unitMonthlyPrice != null ? String(o.unitMonthlyPrice) : '');
+      setEditServiceCharge(o.serviceChargeMonthly != null ? String(o.serviceChargeMonthly) : '');
+      setEditCautionFee(o.cautionFee != null ? String(o.cautionFee) : '');
+      setEditLegalFee(o.legalFee != null ? String(o.legalFee) : '');
     }
   };
 
@@ -244,6 +262,75 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
                   {shiftingDueDate ? 'Processing...' : 'Shift Due Date'}
                 </Button>
               </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={editPricingOpen}
+          onOpenChange={(open) => {
+            setEditPricingOpen(open);
+            if (open) handleEditPricingOpen();
+          }}
+        >
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">Edit Pricing</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Unit Pricing</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2 text-sm">
+              <div className="grid gap-2">
+                <Label>Unit monthly price (₦)</Label>
+                <Input type="number" value={editMonthlyPrice} onChange={(e) => setEditMonthlyPrice(e.target.value)} />
+              </div>
+              <div className="grid gap-2">
+                <Label>Service charge (monthly, ₦)</Label>
+                <Input type="number" value={editServiceCharge} onChange={(e) => setEditServiceCharge(e.target.value)} />
+              </div>
+              <div className="grid gap-2">
+                <Label>Caution fee (₦)</Label>
+                <Input type="number" value={editCautionFee} onChange={(e) => setEditCautionFee(e.target.value)} />
+              </div>
+              <div className="grid gap-2">
+                <Label>Legal fee (₦)</Label>
+                <Input type="number" value={editLegalFee} onChange={(e) => setEditLegalFee(e.target.value)} />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button variant="ghost" onClick={() => setEditPricingOpen(false)}>Cancel</Button>
+              <Button
+                onClick={async () => {
+                  const unitId = (tenant && (tenant as any).unit && (tenant as any).unit._id) || (overview as any)?._id;
+                  if (!unitId) {
+                    toast({ title: 'No unitId available for this tenant', variant: 'destructive' });
+                    return;
+                  }
+                  try {
+                    const price = Number(editMonthlyPrice);
+                    const svc = Number(editServiceCharge);
+                    const caution = Number(editCautionFee);
+                    const legal = Number(editLegalFee);
+                    await updateUnit({
+                      unitId,
+                      body: {
+                        monthlyPrice: Number.isFinite(price) && price > 0 ? price : undefined,
+                        serviceChargeMonthly: Number.isFinite(svc) && svc >= 0 ? svc : undefined,
+                        cautionFee: Number.isFinite(caution) && caution >= 0 ? caution : undefined,
+                        legalFee: Number.isFinite(legal) && legal >= 0 ? legal : undefined,
+                      },
+                    }).unwrap();
+                    toast({ title: 'Unit pricing updated' });
+                    setEditPricingOpen(false);
+                  } catch (e) {
+                    toast({ title: 'Failed to update pricing', variant: 'destructive' });
+                  }
+                }}
+                disabled={updatingUnit}
+              >
+                {updatingUnit ? 'Saving...' : 'Save changes'}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>

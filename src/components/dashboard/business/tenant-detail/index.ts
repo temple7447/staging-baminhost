@@ -4,6 +4,7 @@ export { TenantOverviewCard } from './TenantOverviewCard';
 export { FinancialSummaryCards } from './FinancialSummaryCards';
 export { AdditionalInfoRow } from './AdditionalInfoRow';
 export { PricingBreakdownCard } from './PricingBreakdownCard';
+export { PricingInfoRow } from './PricingInfoRow';
 export { PropertyMediaCard } from './PropertyMediaCard';
 export { TenancyHistoryCard } from './TenancyHistoryCard';
 export { TransactionsCard } from './TransactionsCard';

@@ -5,7 +5,7 @@ import { TenantDetailHeader } from './tenant-detail/TenantDetailHeader';
 import { TenantOverviewCard } from './tenant-detail/TenantOverviewCard';
 import { FinancialSummaryCards } from './tenant-detail/FinancialSummaryCards';
 import { AdditionalInfoRow } from './tenant-detail/AdditionalInfoRow';
-import { PricingBreakdownCard } from './tenant-detail/PricingBreakdownCard';
+import { PricingInfoRow } from './tenant-detail/PricingInfoRow';
 import { PropertyMediaCard } from './tenant-detail/PropertyMediaCard';
 import { TenancyHistoryCard } from './tenant-detail/TenancyHistoryCard';
 import { TransactionsCard } from './tenant-detail/TransactionsCard';
@@ -56,14 +56,14 @@ export const TenantDetailPage = () => {
       {/* Tenant Overview Card */}
       <TenantOverviewCard overview={overview} tenant={tenant} />
 
+      {/* Pricing Info Row */}
+      <PricingInfoRow overview={overview} tenant={tenant} />
+
       {/* Financial Summary Cards */}
       <FinancialSummaryCards overview={overview} tenant={tenant} detail={detail} />
 
       {/* Additional Information Row */}
       <AdditionalInfoRow tenant={tenant} overview={overview} />
-
-      {/* Pricing Breakdown Card */}
-      <PricingBreakdownCard overview={overview} tenant={tenant} detail={detail} />
 
       {/* Property Media Card */}
       <PropertyMediaCard tenantId={tenantId} history={history} />
