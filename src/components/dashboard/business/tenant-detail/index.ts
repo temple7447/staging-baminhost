@@ -1,0 +1,10 @@
+// Index file for tenant-detail components
+export { TenantDetailHeader } from './TenantDetailHeader';
+export { TenantOverviewCard } from './TenantOverviewCard';
+export { FinancialSummaryCards } from './FinancialSummaryCards';
+export { AdditionalInfoRow } from './AdditionalInfoRow';
+export { PricingBreakdownCard } from './PricingBreakdownCard';
+export { PropertyMediaCard } from './PropertyMediaCard';
+export { TenancyHistoryCard } from './TenancyHistoryCard';
+export { TransactionsCard } from './TransactionsCard';
+export { PaymentCollectionDialog } from './PaymentCollectionDialog';
