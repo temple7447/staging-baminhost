@@ -14,11 +14,12 @@ const formatDate = (value?: string | null) => {
 
 interface AdditionalInfoRowProps {
   tenant: any;
+  overview?: any;
 }
 
-export const AdditionalInfoRow = ({ tenant }: AdditionalInfoRowProps) => {
+export const AdditionalInfoRow = ({ tenant, overview }: AdditionalInfoRowProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Move-in Date</CardTitle>
@@ -83,6 +84,27 @@ export const AdditionalInfoRow = ({ tenant }: AdditionalInfoRowProps) => {
                 <span>Entry: {formatDate(tenant?.entryDate)}</span>
                 <span>Expiry: {formatDate(tenant?.nextDueDate)}</span>
               </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 border-l-4 border-l-cyan-500">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Lease Duration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+              <svg className="w-5 h-5 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-slate-900 dark:text-white">
+                {overview?.leaseDurationMonths || 0}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">months</p>
             </div>
           </div>
         </CardContent>

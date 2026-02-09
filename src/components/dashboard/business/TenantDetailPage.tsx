@@ -60,7 +60,7 @@ export const TenantDetailPage = () => {
       <FinancialSummaryCards overview={overview} tenant={tenant} detail={detail} />
 
       {/* Additional Information Row */}
-      <AdditionalInfoRow tenant={tenant} />
+      <AdditionalInfoRow tenant={tenant} overview={overview} />
 
       {/* Pricing Breakdown Card */}
       <PricingBreakdownCard overview={overview} tenant={tenant} detail={detail} />
