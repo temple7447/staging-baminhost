@@ -33,13 +33,13 @@ export const PaymentCollectionDialog = ({
 
   // Online (Paystack) state
   const [payType, setPayType] = useState<'deposit' | 'rent' | 'service-charge' | 'security-charge' | 'caution-fee' | 'legal-fee' | 'initial'>('rent');
-  const [payMonths, setPayMonths] = useState('1');
+  const [payMonths, setPayMonths] = useState('12');
 
   // Manual record state
   const [manualAmount, setManualAmount] = useState('');
   const [manualMethod, setManualMethod] = useState<'bank_transfer' | 'cash' | 'check'>('bank_transfer');
   const [manualType, setManualType] = useState('rent');
-  const [manualMonths, setManualMonths] = useState('1');
+  const [manualMonths, setManualMonths] = useState('12');
   const [manualDate, setManualDate] = useState(new Date().toISOString().split('T')[0]);
   const [manualDesc, setManualDesc] = useState('');
   const [manualNotes, setManualNotes] = useState('');
@@ -67,8 +67,8 @@ export const PaymentCollectionDialog = ({
     if (!newOpen) {
       // Reset forms
       setManualAmount('');
-      setPayMonths('1');
-      setManualMonths('1');
+      setPayMonths('12');
+      setManualMonths('12');
     }
   };
 
@@ -109,13 +109,15 @@ export const PaymentCollectionDialog = ({
             {payType === 'rent' && (
               <div className="grid gap-2">
                 <Label>Duration (Months)</Label>
-                <Input 
-                  type="number" 
-                  min="1" 
-                  value={payMonths} 
-                  onChange={(e) => setPayMonths(e.target.value)} 
-                  placeholder="e.g. 6"
-                />
+                <Select value={payMonths} onValueChange={(v) => setPayMonths(v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select duration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="6">6 months</SelectItem>
+                    <SelectItem value="12">12 months</SelectItem>
+                  </SelectContent>
+                </Select>
                 <p className="text-[10px] text-muted-foreground">Automatically bundles service charge for this period.</p>
               </div>
             )}
@@ -212,11 +214,15 @@ export const PaymentCollectionDialog = ({
               </div>
               <div className="grid gap-2">
                 <Label>Duration (Months)</Label>
-                <Input 
-                  type="number" 
-                  value={manualMonths}
-                  onChange={(e) => setManualMonths(e.target.value)}
-                />
+                <Select value={manualMonths} onValueChange={(v) => setManualMonths(v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select duration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="6">6 months</SelectItem>
+                    <SelectItem value="12">12 months</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

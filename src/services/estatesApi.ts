@@ -45,6 +45,9 @@ export interface Tenant {
   tenantPhone?: string;  // Legacy field  
   whatsappNumber?: string;  // Legacy field
   rentAmount?: number;
+  serviceChargeMonthly?: number;
+  cautionFee?: number;
+  legalFee?: number;
   tenantType?: 'new' | 'existing' | 'renewal' | 'transfer';
   electricMeterNumber?: string;
   status?: 'occupied' | 'vacant' | 'maintenance';

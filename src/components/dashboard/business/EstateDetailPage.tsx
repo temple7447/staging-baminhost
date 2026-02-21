@@ -169,14 +169,14 @@ export const EstateDetailPage = () => {
                 <CardContent>
                   <div className="text-xl font-bold">
                     {(() => {
-                      const r = overviewData.data.occupancy.occupancyRate;
+                      const r = overviewData?.data?.occupancy?.occupancyRate;
                       if (typeof r !== 'number' || Number.isNaN(r)) return '—';
                       const pct = r <= 1 ? Math.round(r * 100) : Math.round(r);
                       return `${pct}%`;
                     })()}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {overviewData.data.occupancy.occupiedUnits}/{overviewData.data.occupancy.totalUnits} occupied, {overviewData.data.occupancy.vacantUnits} vacant
+                    {overviewData?.data?.occupancy?.occupiedUnits ?? 0}/{overviewData?.data?.occupancy?.totalUnits ?? 0} occupied, {overviewData?.data?.occupancy?.vacantUnits ?? 0} vacant
                   </div>
                 </CardContent>
               </Card>
@@ -186,7 +186,7 @@ export const EstateDetailPage = () => {
                   <CardDescription>Due soon</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl font-bold">{overviewData.data.billing.upcomingDueCount}</div>
+                  <div className="text-xl font-bold">{overviewData?.data?.billing?.upcomingDueCount ?? 0}</div>
                   <div className="text-xs text-muted-foreground">tenants with upcoming due</div>
                 </CardContent>
               </Card>
@@ -196,8 +196,8 @@ export const EstateDetailPage = () => {
                   <CardDescription>Revenue & transactions</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl font-bold"> {overviewData.data.billing.last30d.revenue.toLocaleString()}</div>
-                  <div className="text-xs text-muted-foreground">{overviewData.data.billing.last30d.transactions} transactions</div>
+                  <div className="text-xl font-bold"> {overviewData?.data?.billing?.last30d?.revenue?.toLocaleString() ?? '0'}</div>
+                  <div className="text-xs text-muted-foreground">{overviewData?.data?.billing?.last30d?.transactions ?? 0} transactions</div>
                 </CardContent>
               </Card>
               <Card>
@@ -273,6 +273,7 @@ export const EstateDetailPage = () => {
                     <SelectItem value="Q2">Q2 (Apr – Jun)</SelectItem>
                     <SelectItem value="Q3">Q3 (Jul – Sep)</SelectItem>
                     <SelectItem value="Q4">Q4 (Oct – Dec)</SelectItem>
+                    <SelectItem value="6_months">Last 6 Months</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -290,7 +291,11 @@ export const EstateDetailPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
               <div>
                 <div className="text-xs text-muted-foreground">Period</div>
-                <div className="font-semibold">{selectedQuarter === 'all' ? 'All Year' : selectedQuarter} {selectedYear}</div>
+                <div className="font-semibold">
+                  {selectedQuarter === 'all' ? 'All Year' : 
+                   selectedQuarter === '6_months' ? '6 Months' :
+                   selectedQuarter} {selectedYear}
+                </div>
               </div>
               <div>
                 <div className="text-xs text-muted-foreground">Tenant Count</div>
@@ -304,7 +309,9 @@ export const EstateDetailPage = () => {
               </div>
               <div>
                 <div className="text-xs text-muted-foreground">
-                  {selectedQuarter === 'all' ? 'Yearly Rent Total' : 'Quarterly Rent Total'}
+                  {selectedQuarter === 'all' ? 'Yearly Rent Total' : 
+                   selectedQuarter === '6_months' ? '6 Months Total' :
+                   'Quarterly Rent Total'}
                 </div>
                 <div className="font-semibold text-primary">
                   {(tenantsData as any).summary.currency} {((tenantsData as any).summary.totalYearlyRent || (tenantsData as any).summary.totalQuarterRent)?.toLocaleString() || '0'}
@@ -391,13 +398,15 @@ export const EstateDetailPage = () => {
                     </div>
                     <div className="grid gap-2">
                       <Label>Duration (months)</Label>
-                      <Input
-                        type="number"
-                        min={1}
-                        value={durationMonths}
-                        onChange={(e) => setDurationMonths(e.target.value)}
-                        placeholder="e.g. 4"
-                      />
+                      <Select value={durationMonths} onValueChange={(v) => setDurationMonths(v)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select duration" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="6">6 months</SelectItem>
+                          <SelectItem value="12">12 months</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                   <div className="flex justify-end gap-2">
@@ -418,7 +427,7 @@ export const EstateDetailPage = () => {
             <TableSkeleton
               rows={5}
               columns={7}
-              headers={["Unit", "Tenant", "Rent", "Meter", "Status", "Next Due", "WhatsApp"]}
+              headers={["Unit", "Tenant", "Total Tenancy", "Meter", "Status", "Next Due", "WhatsApp"]}
             />
           ) : tenantsError ? (
             <div className="text-sm text-destructive">Failed to load tenants.</div>
@@ -429,7 +438,7 @@ export const EstateDetailPage = () => {
                   <TableRow>
                     <TableHead>Unit</TableHead>
                     <TableHead>Tenant</TableHead>
-                    <TableHead>Rent</TableHead>
+                    <TableHead>Total Tenancy</TableHead>
                     <TableHead>Meter</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Next Due</TableHead>
@@ -446,7 +455,12 @@ export const EstateDetailPage = () => {
                           {t.tenantName || `${t.firstName || ''} ${t.otherNames || ''} ${t.surname || ''}`.trim() || '—'}
                         </button>
                       </TableCell>
-                      <TableCell>{typeof t.rentAmount === 'number' ? `₦${t.rentAmount.toLocaleString()}` : '—'}</TableCell>
+                      <TableCell>
+                        {(() => {
+                          const total = (t.rentAmount || 0) + (t.serviceChargeMonthly || 0) + (t.cautionFee || 0) + (t.legalFee || 0);
+                          return total > 0 ? `₦${total.toLocaleString()}` : '—';
+                        })()}
+                      </TableCell>
                       <TableCell>{t.electricMeterNumber || '—'}</TableCell>
                       <TableCell>{t.status || '—'}</TableCell>
                       <TableCell>{t.nextDueDate ? formatDate(t.nextDueDate as string) : '—'}</TableCell>
