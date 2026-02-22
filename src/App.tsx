@@ -1,9 +1,10 @@
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { ToastProvider } from "@/components/providers/ToastProvider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
@@ -24,37 +25,40 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <CookieConsent />
-        <BrowserRouter>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegistrationPage />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/product" element={<Product />} />
-            <Route path="/entrepreneur-guide" element={<EntrepreneurGuide />} />
-            <Route path="/marketplace/estate" element={<EstateMarketplace />} />
-            <Route path="/marketplace/estate/all" element={<EstateList />} />
-            <Route path="/marketplace/estate/:id" element={<PropertyDetails />} />
-            <Route path="/marketplace/vendor/:id" element={<VendorProfile />} />
-            <Route path="/marketplace/equipment/:id" element={<EquipmentDetails />} />
+    <ThemeProvider defaultTheme="dark" storageKey="bami-hustle-theme">
+      <ToastProvider>
+        <TooltipProvider>
+          <AuthProvider>
+            <Toaster />
+            <CookieConsent />
+            <BrowserRouter>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/" element={<Landing />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegistrationPage />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/projects" element={<Projects />} />
+                <Route path="/product" element={<Product />} />
+                <Route path="/entrepreneur-guide" element={<EntrepreneurGuide />} />
+                <Route path="/marketplace/estate" element={<EstateMarketplace />} />
+                <Route path="/marketplace/estate/all" element={<EstateList />} />
+                <Route path="/marketplace/estate/:id" element={<PropertyDetails />} />
+                <Route path="/marketplace/vendor/:id" element={<VendorProfile />} />
+                <Route path="/marketplace/equipment/:id" element={<EquipmentDetails />} />
 
-            {/* Authenticated app */}
-            <Route path="/app" element={<Index />} />
-            <Route path="/dashboard/*" element={<Index />} />
+                {/* Authenticated app */}
+                <Route path="/app" element={<Index />} />
+                <Route path="/dashboard/*" element={<Index />} />
 
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </AuthProvider>
+        </TooltipProvider>
+      </ToastProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

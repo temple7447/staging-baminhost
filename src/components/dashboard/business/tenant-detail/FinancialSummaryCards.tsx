@@ -48,7 +48,7 @@ export const FinancialSummaryCards = ({ overview, tenant, detail }: FinancialSum
         <CardContent className="pt-4 pb-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Service Charge</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Monthly Service Charge</p>
               <div className="flex items-center gap-2 mt-1">
                 <p className="text-xl font-bold text-slate-900 dark:text-white">
                   ₦{typeof overview?.serviceCharge === 'number' ? overview.serviceCharge.toLocaleString() : (typeof overview?.serviceChargeMonthly === 'number' ? overview.serviceChargeMonthly.toLocaleString() : '0')}

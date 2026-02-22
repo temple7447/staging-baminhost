@@ -39,7 +39,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { toast } from "sonner";
+import { useToast } from "@/components/providers/ToastProvider";
 import { useAuth } from "@/contexts/AuthContext";
 import { BamiHustleLogo } from "@/components/brand";
 
@@ -335,6 +335,7 @@ export const CustomerDashboard = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('wallet');
   const [localCustomerData, setCustomerData] = useState(customerData as any);
   const [loading, setLoading] = useState(false);
+  const { success, error: toastError } = useToast();
 
   // Simulate real-time updates
   useEffect(() => {
@@ -444,12 +445,12 @@ export const CustomerDashboard = () => {
           ]
         }));
 
-        toast.success(`Payment of ${formatNaira(amount)} processed successfully!`);
+        success(`Payment of ${formatNaira(amount)} processed successfully!`);
         setPaymentModalOpen(false);
         setPaymentAmount('');
       }
     } catch (error) {
-      toast.error('Payment processing failed. Please try again.');
+      toastError('Payment processing failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -484,16 +485,16 @@ export const CustomerDashboard = () => {
         )
       }));
 
-      toast.success('Stage acknowledged successfully! Payment released to vendor.');
+      success('Stage acknowledged successfully! Payment released to vendor.');
     } catch (error) {
-      toast.error('Failed to acknowledge stage. Please try again.');
+      toastError('Failed to acknowledge stage. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const downloadStatement = () => {
-    toast.success('Statement download started. Check your downloads folder.');
+    success('Statement download started. Check your downloads folder.');
   };
 
   const creditUtilization = (localCustomerData.customer.totalBalance / localCustomerData.customer.creditLimit) * 100;

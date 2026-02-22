@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
-import { useUpdateTenantMutation, useShiftTenantDueDateMutation, useSendTenantReceiptMutation, useUpdateEstateUnitMutation } from '@/services/estatesApi';
+import { useUpdateTenantMutation, useSendTenantReceiptMutation, useUpdateEstateUnitMutation } from '@/services/estatesApi';
 
 const formatDate = (value?: string | null) => {
   if (!value) return '—';
@@ -29,7 +29,6 @@ interface TenantDetailHeaderProps {
 export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailHeaderProps) => {
   const navigate = useNavigate();
   const [updateTenant, { isLoading: updatingTenant }] = useUpdateTenantMutation();
-  const [shiftDueDate, { isLoading: shiftingDueDate }] = useShiftTenantDueDateMutation();
   const [sendReceipt, { isLoading: sendingReceipt }] = useSendTenantReceiptMutation();
   const [updateUnit, { isLoading: updatingUnit }] = useUpdateEstateUnitMutation();
 
@@ -50,10 +49,6 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
   const [editServiceCharge, setEditServiceCharge] = useState('');
   const [editCautionFee, setEditCautionFee] = useState('');
   const [editLegalFee, setEditLegalFee] = useState('');
-
-  // Shift due date state
-  const [shiftDueDateOpen, setShiftDueDateOpen] = useState(false);
-  const [months, setMonths] = useState('');
 
   const handleEditTenantOpen = () => {
     if (tenant) {
@@ -168,100 +163,6 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
               >
                 {updatingTenant ? 'Saving...' : 'Save changes'}
               </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={shiftDueDateOpen} onOpenChange={(open) => {
-          setShiftDueDateOpen(open);
-          if (!open) {
-            setMonths('');
-          }
-        }}>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm">Shift Date</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Shift Tenant Due Date</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-2">
-              <div className="text-sm text-muted-foreground">
-                Enter the number of months to pay for both rent and service charges. The due date will be shifted forward accordingly.
-              </div>
-              <div className="grid gap-2">
-                <Label>Number of Months *</Label>
-                <Input
-                  type="number"
-                  min="1"
-                  max="24"
-                  placeholder="e.g., 12"
-                  value={months}
-                  onChange={(e) => setMonths(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">Applies to both rent and service charges</p>
-              </div>
-              {months && (
-                <div className="p-3 bg-muted rounded-md text-sm">
-                  <div className="font-medium mb-1">Payment Summary:</div>
-                  <div>• <span className="font-bold">{months} month{Number(months) > 1 ? 's' : ''}</span> of rent</div>
-                  <div>• <span className="font-bold">{months} month{Number(months) > 1 ? 's' : ''}</span> of service charges</div>
-                  <div className="mt-2 text-xs">Due date will shift forward by {months} month{Number(months) > 1 ? 's' : ''}</div>
-                </div>
-              )}
-              <div className="flex justify-end gap-2 pt-2">
-                <Button variant="ghost" onClick={() => setShiftDueDateOpen(false)}>Cancel</Button>
-                <Button
-                  onClick={async () => {
-                    if (!tenantId) return;
-                    const monthsNum = Number(months);
-
-                    if (!months) {
-                      toast({
-                        title: 'Validation Error',
-                        description: 'Please enter the number of months to pay.',
-                        variant: 'destructive'
-                      });
-                      return;
-                    }
-
-                    if (!Number.isInteger(monthsNum) || monthsNum < 1 || monthsNum > 24) {
-                      toast({
-                        title: 'Validation Error',
-                        description: 'Months must be a whole number between 1 and 24.',
-                        variant: 'destructive'
-                      });
-                      return;
-                    }
-
-                    try {
-                      const result = await shiftDueDate({
-                        tenantId: tenantId as string,
-                        payload: {
-                          rentMonths: monthsNum,
-                          serviceMonths: monthsNum
-                        }
-                      }).unwrap();
-
-                      toast({
-                        title: 'Due Date Shifted Successfully',
-                        description: `New due date: ${formatDate(result.data.newDueDate)}. Shifted by ${result.data.totalMonthsShifted} month(s).`
-                      });
-                      setShiftDueDateOpen(false);
-                      setMonths('');
-                    } catch (e: any) {
-                      toast({
-                        title: 'Failed to Shift Due Date',
-                        description: e?.data?.message || 'An error occurred while shifting the due date.',
-                        variant: 'destructive'
-                      });
-                    }
-                  }}
-                  disabled={shiftingDueDate}
-                >
-                  {shiftingDueDate ? 'Processing...' : 'Shift Due Date'}
-                </Button>
-              </div>
             </div>
           </DialogContent>
         </Dialog>

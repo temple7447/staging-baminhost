@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Server, Layout, Plus, Edit, Trash2, Loader2, Package } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
+import { useToast } from "@/components/providers/ToastProvider";
 import {
     useGetSubscriptionsQuery,
     useCreateSubscriptionMutation,
@@ -23,6 +23,7 @@ export const Subscription = () => {
     const [createSubscription, { isLoading: isCreating }] = useCreateSubscriptionMutation();
     const [updateSubscription, { isLoading: isUpdating }] = useUpdateSubscriptionMutation();
     const [deleteSubscription, { isLoading: isDeleting }] = useDeleteSubscriptionMutation();
+    const { success, error: toastError } = useToast();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -74,17 +75,17 @@ export const Subscription = () => {
 
     const handleSubmit = async () => {
         if (!formData.name.trim()) {
-            toast.error("Please enter a subscription name");
+            toastError("Please enter a subscription name");
             return;
         }
         if (!formData.price.trim()) {
-            toast.error("Please enter a price");
+            toastError("Please enter a price");
             return;
         }
 
         const priceNum = parseFloat(formData.price.replace(/[^0-9.]/g, ''));
         if (isNaN(priceNum) || priceNum <= 0) {
-            toast.error("Please enter a valid price");
+            toastError("Please enter a valid price");
             return;
         }
 
@@ -104,7 +105,7 @@ export const Subscription = () => {
                         status: formData.status
                     }
                 }).unwrap();
-                toast.success("Subscription updated successfully");
+                success("Subscription updated successfully");
             } else {
                 await createSubscription({
                     name: formData.name,
@@ -115,20 +116,20 @@ export const Subscription = () => {
                     icon: formData.icon,
                     status: formData.status
                 }).unwrap();
-                toast.success("Subscription added successfully");
+                success("Subscription added successfully");
             }
             handleCloseDialog();
         } catch (error: any) {
-            toast.error(error?.data?.message || "Failed to save subscription");
+            toastError(error?.data?.message || "Failed to save subscription");
         }
     };
 
     const handleDelete = async (id: string) => {
         try {
             await deleteSubscription(id).unwrap();
-            toast.success("Subscription deleted successfully");
+            success("Subscription deleted successfully");
         } catch (error: any) {
-            toast.error(error?.data?.message || "Failed to delete subscription");
+            toastError(error?.data?.message || "Failed to delete subscription");
         }
     };
 

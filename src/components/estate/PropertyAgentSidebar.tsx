@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-import { toast } from "sonner";
+import { useToast } from "@/components/providers/ToastProvider";
 
 interface PropertyAgentSidebarProps {
     agent: {
@@ -18,13 +18,15 @@ interface PropertyAgentSidebarProps {
 }
 
 export const PropertyAgentSidebar: React.FC<PropertyAgentSidebarProps> = ({ agent }) => {
+    const { success } = useToast();
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        toast.success("Message sent successfully! Jonathan will get back to you soon.");
+        success("Message sent successfully! Jonathan will get back to you soon.");
     };
 
     const handleAction = (action: string) => {
-        toast.success(`${action} requested! We've notified the agent.`);
+        success(`${action} requested! We've notified the agent.`);
     };
 
     return (

@@ -14,7 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Palette, Plus } from 'lucide-react';
 import { useCreateCategoryMutation } from '../../services/categoriesApi';
-import { toast } from 'sonner';
+import { useToast } from '@/components/providers/ToastProvider';
 
 interface AddCategoryModalProps {
   open: boolean;
@@ -46,6 +46,7 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [createCategory, { isLoading }] = useCreateCategoryMutation();
+  const { success, error: toastError } = useToast();
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -87,14 +88,14 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
       }).unwrap();
 
       if (result.success) {
-        toast.success('Category created successfully!');
+        success('Category created successfully!');
         setFormData({ name: '', description: '', color: '#17a2b8' });
         setErrors({});
         onOpenChange(false);
       }
     } catch (error: any) {
       const errorMessage = error?.data?.message || 'Failed to create category';
-      toast.error(errorMessage);
+      toastError(errorMessage);
       setErrors({ submit: errorMessage });
     }
   };

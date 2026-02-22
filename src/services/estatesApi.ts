@@ -274,23 +274,6 @@ export interface CreateTenantPayload {
   nextDueDate?: string; // ISO YYYY-MM-DD (optional override if durationMonths is not provided)
 }
 
-export interface ShiftDueDatePayload {
-  rentMonths?: number;
-  serviceMonths?: number;
-}
-
-export interface ShiftDueDateResponse {
-  success: boolean;
-  message?: string;
-  data: {
-    tenant: Tenant;
-    oldDueDate: string;
-    newDueDate: string;
-    rentMonthsPaid?: number;
-    serviceMonthsPaid?: number;
-    totalMonthsShifted: number;
-  };
-}
 
 export const estatesApi = createApi({
   reducerPath: 'estatesApi',
@@ -533,17 +516,6 @@ export const estatesApi = createApi({
     verifyPayment: builder.query<{ success: boolean; message?: string; data?: any }, string>({
       query: (reference) => `/api/payments/verify/${reference}`,
     }),
-    shiftTenantDueDate: builder.mutation<ShiftDueDateResponse, { tenantId: string; payload: ShiftDueDatePayload }>({
-      query: ({ tenantId, payload }) => ({
-        url: `/api/tenants/${tenantId}/shift-due-date`,
-        method: 'POST',
-        body: payload,
-      }),
-      invalidatesTags: (result, error, { tenantId }) => [
-        { type: 'Tenant', id: tenantId },
-        { type: 'TenantList', id: 'LIST' },
-      ],
-    }),
     sendTenantReceipt: builder.mutation<{ success: boolean; message?: string }, string>({
       query: (tenantId) => ({
         url: `/api/payments/tenant/${tenantId}/receipt`,
@@ -614,7 +586,6 @@ export const {
   useGetTenantBillingQuery,
   useInitiatePaymentMutation,
   useVerifyPaymentQuery,
-  useShiftTenantDueDateMutation,
   useSendTenantReceiptMutation,
   useResendPaymentReceiptMutation,
   useLazyDownloadPaymentReceiptQuery,

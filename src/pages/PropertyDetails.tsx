@@ -23,7 +23,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PropertyGallery } from "@/components/estate/PropertyGallery";
 import { PropertyAgentSidebar } from "@/components/estate/PropertyAgentSidebar";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { useToast } from "@/components/providers/ToastProvider";
 import { useGetPublicListingByIdQuery } from "@/services/estatesApi";
 
 const AMENITY_MAP = {
@@ -42,13 +42,14 @@ const PropertyDetails = () => {
     const { id } = useParams<{ id: string }>();
     const { data: response, isLoading, error } = useGetPublicListingByIdQuery(id || "");
     const property = response?.data;
+    const { info } = useToast();
 
     const handleShowAll = () => {
-        toast.info(`Viewing all ${property?.images?.length || 0} photos of this premium property!`);
+        info(`Viewing all ${property?.images?.length || 0} photos of this premium property!`);
     };
 
     const handleExploreArea = () => {
-        toast.info(`Opening neighborhood guide for ${property?.streetAddress || property?.label}...`);
+        info(`Opening neighborhood guide for ${property?.streetAddress || property?.label}...`);
     };
 
     if (isLoading) {

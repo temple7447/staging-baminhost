@@ -12,7 +12,7 @@ import {
   Calendar,
   User
 } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/date-utils';
 
 interface Material {
   _id: string;
@@ -139,7 +139,7 @@ export const MaterialCard: React.FC<MaterialCardProps> = ({
             </div>
             <div className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
-              <span>{format(new Date(material.createdAt), 'MMM d, yyyy')}</span>
+              <span>{formatDate(material.createdAt, 'MMM d, yyyy')}</span>
             </div>
           </div>
 

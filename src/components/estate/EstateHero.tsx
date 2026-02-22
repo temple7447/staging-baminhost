@@ -2,11 +2,13 @@ import { Search, MapPin, BadgeDollarSign, Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
+import { useToast } from "@/components/providers/ToastProvider";
 
 export const EstateHero = () => {
+    const { success } = useToast();
+
     const handleSearch = () => {
-        toast.success("Searching for properties matching your criteria...");
+        success("Searching for properties matching your criteria...");
     };
 
     return (
