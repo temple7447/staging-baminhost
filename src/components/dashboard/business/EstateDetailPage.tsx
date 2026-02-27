@@ -132,6 +132,7 @@ export const EstateDetailPage = () => {
     }
   };
 
+  console.log(JSON.stringify(tenantsData,  null, 2))
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -447,7 +448,7 @@ export const EstateDetailPage = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tenantsData && (Array.isArray(tenantsData.data) ? tenantsData.data : Object.values(tenantsData.data).flat()).map((t) => (
+                  {tenantsData && (Array.isArray(tenantsData.data) ? tenantsData.data : Object.values(tenantsData.data).flat()).map((t:any) => (
                     <TableRow key={(t.id || t._id) as string}>
                       <TableCell>{t.unitLabel || '—'}</TableCell>
                       <TableCell className="font-medium">
@@ -457,7 +458,7 @@ export const EstateDetailPage = () => {
                       </TableCell>
                       <TableCell>
                         {(() => {
-                          const total = (t.rentAmount || 0) + (t.serviceChargeMonthly || 0) + (t.cautionFee || 0) + (t.legalFee || 0);
+                          const total = (t.totalMonthlyFees || 0);
                           return total > 0 ? `₦${total.toLocaleString()}` : '—';
                         })()}
                       </TableCell>
