@@ -71,6 +71,7 @@ const DashboardRouter: React.FC = () => {
     if (pathname.includes('wallet')) return 'wallet';
     if (pathname.includes('portfolio')) return 'portfolio';
     if (pathname.includes('split-tracker')) return 'split-tracker';
+    if (pathname.includes('tenant')) return 'estate';
     if (pathname.includes('estate')) return 'estate';
     if (pathname.includes('filling-station')) return 'filling-station';
     if (pathname.includes('equipment')) return 'equipment';

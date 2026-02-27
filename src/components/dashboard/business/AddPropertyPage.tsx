@@ -129,7 +129,7 @@ export const AddPropertyPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50/50 pb-20">
+        <div className="min-h-screen bg-slate-100 pb-20">
             {/* Top Bar */}
             <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200">
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
@@ -166,7 +166,7 @@ export const AddPropertyPage = () => {
                                 <Input
                                     id="title"
                                     placeholder="e.g. Modern Penthouse in Victoria Island"
-                                    className="h-14 rounded-xl border-slate-100 bg-slate-50/50 focus:bg-white transition-all text-lg font-medium"
+                                    className="h-14 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 focus:border-blue-500 focus:bg-white transition-all text-lg font-medium shadow-sm"
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
                                 />
@@ -176,7 +176,7 @@ export const AddPropertyPage = () => {
                                 <Textarea
                                     id="desc"
                                     placeholder="Describe the property's key features, lifestyle, and unique selling points..."
-                                    className="min-h-[150px] rounded-xl border-slate-100 bg-slate-50/50 focus:bg-white transition-all text-base leading-relaxed"
+                                    className="min-h-[150px] rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 focus:border-blue-500 focus:bg-white transition-all text-base leading-relaxed shadow-sm"
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                 />
@@ -185,10 +185,10 @@ export const AddPropertyPage = () => {
                                 <div className="space-y-2">
                                     <Label className="text-slate-700 font-bold">Category</Label>
                                     <Select value={category} onValueChange={setCategory}>
-                                        <SelectTrigger className="h-14 rounded-xl border-slate-100 bg-slate-50/50">
+                                        <SelectTrigger className="h-14 rounded-xl border-2 border-slate-200 bg-white text-slate-900 shadow-sm">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent className="rounded-xl border-slate-100">
+                                        <SelectContent className="rounded-xl border-slate-200">
                                             <SelectItem value="Apartment">Apartment</SelectItem>
                                             <SelectItem value="Villa">Villa</SelectItem>
                                             <SelectItem value="Penthouse">Penthouse</SelectItem>
@@ -199,10 +199,10 @@ export const AddPropertyPage = () => {
                                 <div className="space-y-2">
                                     <Label className="text-slate-700 font-bold">Listing Type</Label>
                                     <Select value={listingType} onValueChange={setListingType}>
-                                        <SelectTrigger className="h-14 rounded-xl border-slate-100 bg-slate-50/50">
+                                        <SelectTrigger className="h-14 rounded-xl border-2 border-slate-200 bg-white text-slate-900 shadow-sm">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent className="rounded-xl border-slate-100">
+                                        <SelectContent className="rounded-xl border-slate-200">
                                             <SelectItem value="Rent">Rent</SelectItem>
                                             <SelectItem value="Sale">Sale</SelectItem>
                                             <SelectItem value="Lease">Lease</SelectItem>
@@ -225,10 +225,10 @@ export const AddPropertyPage = () => {
                             <div className="space-y-2">
                                 <Label className="text-slate-700 font-bold">Monthly Rent (₦)</Label>
                                 <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">₦</span>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-600">₦</span>
                                     <Input
                                         type="number"
-                                        className="h-14 pl-10 rounded-xl border-slate-100 bg-slate-50/50"
+                                        className="h-14 pl-10 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 focus:border-blue-500 shadow-sm"
                                         placeholder="e.g. 4,500,000"
                                         value={monthlyRent}
                                         onChange={(e) => setMonthlyRent(e.target.value)}
@@ -238,10 +238,10 @@ export const AddPropertyPage = () => {
                             <div className="space-y-2">
                                 <Label className="text-slate-700 font-bold">Service Charge (₦)</Label>
                                 <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">₦</span>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-600">₦</span>
                                     <Input
                                         type="number"
-                                        className="h-14 pl-10 rounded-xl border-slate-100 bg-slate-50/50"
+                                        className="h-14 pl-10 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 focus:border-blue-500 shadow-sm"
                                         placeholder="e.g. 50,000"
                                         value={serviceCharge}
                                         onChange={(e) => setServiceCharge(e.target.value)}
@@ -251,10 +251,10 @@ export const AddPropertyPage = () => {
                             <div className="space-y-2">
                                 <Label className="text-slate-700 font-bold">Caution Fee (₦)</Label>
                                 <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">₦</span>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-600">₦</span>
                                     <Input
                                         type="number"
-                                        className="h-14 pl-10 rounded-xl border-slate-100 bg-slate-50/50"
+                                        className="h-14 pl-10 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 focus:border-blue-500 shadow-sm"
                                         placeholder="e.g. 500,000"
                                         value={cautionFee}
                                         onChange={(e) => setCautionFee(e.target.value)}
@@ -264,10 +264,10 @@ export const AddPropertyPage = () => {
                             <div className="space-y-2">
                                 <Label className="text-slate-700 font-bold">Legal Fee (₦)</Label>
                                 <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">₦</span>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-600">₦</span>
                                     <Input
                                         type="number"
-                                        className="h-14 pl-10 rounded-xl border-slate-100 bg-slate-50/50"
+                                        className="h-14 pl-10 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 focus:border-blue-500 shadow-sm"
                                         placeholder="e.g. 30,000"
                                         value={legalFee}
                                         onChange={(e) => setLegalFee(e.target.value)}
@@ -277,10 +277,10 @@ export const AddPropertyPage = () => {
                             <div className="space-y-2">
                                 <Label className="text-slate-700 font-bold">Security Deposit (₦)</Label>
                                 <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">₦</span>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-600">₦</span>
                                     <Input
                                         type="number"
-                                        className="h-14 pl-10 rounded-xl border-slate-100 bg-slate-50/50"
+                                        className="h-14 pl-10 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 focus:border-blue-500 shadow-sm"
                                         placeholder="e.g. 500,000"
                                         value={securityDeposit}
                                         onChange={(e) => setSecurityDeposit(e.target.value)}
@@ -291,7 +291,7 @@ export const AddPropertyPage = () => {
                                 <Label className="text-slate-700 font-bold">Available Date</Label>
                                 <Input
                                     type="date"
-                                    className="h-14 rounded-xl border-slate-100 bg-slate-50/50"
+                                    className="h-14 rounded-xl border-2 border-slate-200 bg-white text-slate-900 focus:border-blue-500 shadow-sm"
                                     value={availableDate}
                                     onChange={(e) => setAvailableDate(e.target.value)}
                                 />
@@ -311,10 +311,10 @@ export const AddPropertyPage = () => {
                             <div className="space-y-2">
                                 <Label className="text-slate-700 font-bold">Bedrooms</Label>
                                 <div className="relative">
-                                    <Bed className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <Bed className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
                                     <Input
                                         type="number"
-                                        className="h-14 pl-12 rounded-xl border-slate-100 bg-slate-50/50"
+                                        className="h-14 pl-12 rounded-xl border-2 border-slate-200 bg-white text-slate-900 focus:border-blue-500 shadow-sm"
                                         value={bedrooms}
                                         onChange={(e) => setBedrooms(e.target.value)}
                                     />
@@ -323,10 +323,10 @@ export const AddPropertyPage = () => {
                             <div className="space-y-2">
                                 <Label className="text-slate-700 font-bold">Bathrooms</Label>
                                 <div className="relative">
-                                    <Bath className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <Bath className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
                                     <Input
                                         type="number"
-                                        className="h-14 pl-12 rounded-xl border-slate-100 bg-slate-50/50"
+                                        className="h-14 pl-12 rounded-xl border-2 border-slate-200 bg-white text-slate-900 focus:border-blue-500 shadow-sm"
                                         value={bathrooms}
                                         onChange={(e) => setBathrooms(e.target.value)}
                                     />
@@ -335,10 +335,10 @@ export const AddPropertyPage = () => {
                             <div className="space-y-2">
                                 <Label className="text-slate-700 font-bold">Area (sqft)</Label>
                                 <div className="relative">
-                                    <Maximize2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <Maximize2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
                                     <Input
                                         type="number"
-                                        className="h-14 pl-12 rounded-xl border-slate-100 bg-slate-50/50"
+                                        className="h-14 pl-12 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 focus:border-blue-500 shadow-sm"
                                         placeholder="e.g. 1200"
                                         value={area}
                                         onChange={(e) => setArea(e.target.value)}
@@ -349,7 +349,7 @@ export const AddPropertyPage = () => {
                                 <Label className="text-slate-700 font-bold">Meter Number</Label>
                                 <Input
                                     placeholder="e.g. EN-55443322"
-                                    className="h-14 rounded-xl border-slate-100 bg-slate-50/50"
+                                    className="h-14 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 focus:border-blue-500 shadow-sm"
                                     value={meterNumber}
                                     onChange={(e) => setMeterNumber(e.target.value)}
                                 />
@@ -372,15 +372,15 @@ export const AddPropertyPage = () => {
                                         key={item}
                                         onClick={() => toggleAmenity(item)}
                                         className={cn(
-                                            "flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer",
+                                            "flex items-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer",
                                             amenities.includes(item)
-                                                ? "bg-blue-50 border-blue-200 text-blue-700 font-bold"
-                                                : "bg-slate-50/50 border-slate-100 text-slate-600 font-medium hover:bg-slate-50"
+                                                ? "bg-blue-50 border-blue-400 text-blue-700 font-bold"
+                                                : "bg-white border-slate-300 text-slate-700 font-medium hover:bg-slate-50 hover:border-slate-400"
                                         )}
                                     >
                                         <div className={cn(
-                                            "w-5 h-5 rounded-md border flex items-center justify-center transition-colors",
-                                            amenities.includes(item) ? "bg-blue-600 border-blue-600" : "bg-white border-slate-300"
+                                            "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors",
+                                            amenities.includes(item) ? "bg-blue-600 border-blue-600" : "bg-white border-slate-400"
                                         )}>
                                             {amenities.includes(item) && <X className="w-3 h-3 text-white" />}
                                         </div>
@@ -404,7 +404,7 @@ export const AddPropertyPage = () => {
                                 <Label className="text-slate-700 font-bold">Street Address</Label>
                                 <Input
                                     placeholder="e.g. 123 Luxury Lane, Victoria Island"
-                                    className="h-14 rounded-xl border-slate-100 bg-slate-50/50"
+                                    className="h-14 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 focus:border-blue-500 shadow-sm"
                                     value={address}
                                     onChange={(e) => setAddress(e.target.value)}
                                 />

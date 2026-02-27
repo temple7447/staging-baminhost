@@ -92,7 +92,6 @@ export const EstateDetailPage = () => {
   const [clearUnitTenant, { isLoading: clearingUnit }] = useClearEstateUnitTenantMutation();
   const [deleteUnit, { isLoading: deletingUnit }] = useDeleteEstateUnitMutation();
 
-  console.log(estate, estateId, isLoading, "you are here");
   // Show full page skeleton while main estate data is loading
   if (isLoading) {
     return <EstateDetailSkeleton />;
@@ -132,7 +131,6 @@ export const EstateDetailPage = () => {
     }
   };
 
-  console.log(JSON.stringify(tenantsData,  null, 2))
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
