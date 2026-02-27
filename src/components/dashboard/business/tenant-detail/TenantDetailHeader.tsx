@@ -20,6 +20,17 @@ const formatDate = (value?: string | null) => {
   return `${day} ${month}, ${year}`;
 };
 
+// Helper function to convert date to DD/MM/YYYY format for API
+const formatDateToDDMMYYYY = (dateString: string): string => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return dateString;
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
 interface TenantDetailHeaderProps {
   tenantId?: string;
   tenant: any;
@@ -36,6 +47,7 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
   const [editEmail, setEditEmail] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [editType, setEditType] = useState<'new' | 'existing' | 'renewal' | 'transfer'>('new');
+  const [editEntryDate, setEditEntryDate] = useState('');
 
 
 
@@ -45,6 +57,19 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
       setEditEmail(tenant.email || overview?.email || tenant.tenantEmail || '');
       setEditPhone(tenant.whatsapp || tenant.whatsappNumber || overview?.phone || tenant.tenantPhone || '');
       setEditType((tenant.tenantType as any) || 'new');
+      // Format entry date for input field (ISO format: YYYY-MM-DD)
+      const entryDate = (tenant as any).entryDate || '';
+      if (entryDate) {
+        const dateObj = new Date(entryDate);
+        if (!Number.isNaN(dateObj.getTime())) {
+          const isoString = dateObj.toISOString().split('T')[0];
+          setEditEntryDate(isoString);
+        } else {
+          setEditEntryDate(entryDate);
+        }
+      } else {
+        setEditEntryDate('');
+      }
     }
   };
 
@@ -97,6 +122,16 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
                   onChange={(e) => setEditPhone(e.target.value)} 
                 />
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-entry-date">Entry Date</Label>
+                <Input 
+                  id="edit-entry-date"
+                  type="date"
+                  disabled={false}
+                  value={editEntryDate} 
+                  onChange={(e) => setEditEntryDate(e.target.value)} 
+                />
+              </div>
 
 
             </div>
@@ -106,13 +141,20 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
                 onClick={async () => {
                   if (!tenantId) return;
                   try {
-                    await updateTenant({
+                    const payload: any = {
                       tenantId: tenantId as string,
                       tenantName: editName || undefined,
                       tenantEmail: editEmail || undefined,
                       tenantPhone: editPhone || undefined,
                       tenantType: editType,
-                    } as any).unwrap();
+                    };
+                    
+                    // Add entry date if provided, formatted as DD/MM/YYYY
+                    if (editEntryDate) {
+                      payload.entryDate = formatDateToDDMMYYYY(editEntryDate);
+                    }
+                    
+                    await updateTenant(payload).unwrap();
                     toast({ title: 'Tenant updated' });
                     setEditTenantOpen(false);
                   } catch (e) {
