@@ -40,74 +40,76 @@ export const PricingBreakdownCard = ({ overview, tenant, detail }: PricingBreakd
             <CardTitle>Pricing Breakdown</CardTitle>
             <CardDescription>Rent and associated fees</CardDescription>
           </div>
-          <Dialog
-            open={editPricingOpen}
-            onOpenChange={(open) => {
-              setEditPricingOpen(open);
-              if (open) handleEditPricingOpen();
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">Edit Pricing</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Edit Unit Pricing</DialogTitle>
-              </DialogHeader>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2 text-sm">
-                <div className="grid gap-2">
-                  <Label>Unit monthly price (₦)</Label>
-                  <Input type="number" value={editMonthlyPrice} onChange={(e) => setEditMonthlyPrice(e.target.value)} />
+          <div className="flex gap-2">
+            <Dialog
+              open={editPricingOpen}
+              onOpenChange={(open) => {
+                setEditPricingOpen(open);
+                if (open) handleEditPricingOpen();
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">Edit Fees</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Edit Unit Pricing</DialogTitle>
+                </DialogHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2 text-sm">
+                  <div className="grid gap-2">
+                    <Label>Unit monthly price (₦)</Label>
+                    <Input type="number" value={editMonthlyPrice} onChange={(e) => setEditMonthlyPrice(e.target.value)} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Service charge (monthly, ₦)</Label>
+                    <Input type="number" value={editServiceCharge} onChange={(e) => setEditServiceCharge(e.target.value)} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Caution fee (₦)</Label>
+                    <Input type="number" value={editCautionFee} onChange={(e) => setEditCautionFee(e.target.value)} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Legal fee (₦)</Label>
+                    <Input type="number" value={editLegalFee} onChange={(e) => setEditLegalFee(e.target.value)} />
+                  </div>
                 </div>
-                <div className="grid gap-2">
-                  <Label>Service charge (monthly, ₦)</Label>
-                  <Input type="number" value={editServiceCharge} onChange={(e) => setEditServiceCharge(e.target.value)} />
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button variant="ghost" onClick={() => setEditPricingOpen(false)}>Cancel</Button>
+                  <Button
+                    onClick={async () => {
+                      const unitId = (tenant && (tenant as any).unit && (tenant as any).unit._id) || (detail as any)?.data?.unit?._id;
+                      if (!unitId) {
+                        toast({ title: 'No unitId available for this tenant', variant: 'destructive' });
+                        return;
+                      }
+                      try {
+                        const price = Number(editMonthlyPrice);
+                        const svc = Number(editServiceCharge);
+                        const caution = Number(editCautionFee);
+                        const legal = Number(editLegalFee);
+                        await updateUnit({
+                          unitId,
+                          body: {
+                            monthlyPrice: Number.isFinite(price) && price > 0 ? price : undefined,
+                            serviceChargeMonthly: Number.isFinite(svc) && svc >= 0 ? svc : undefined,
+                            cautionFee: Number.isFinite(caution) && caution >= 0 ? caution : undefined,
+                            legalFee: Number.isFinite(legal) && legal >= 0 ? legal : undefined,
+                          },
+                        }).unwrap();
+                        toast({ title: 'Unit pricing updated' });
+                        setEditPricingOpen(false);
+                      } catch (e) {
+                        toast({ title: 'Failed to update pricing', variant: 'destructive' });
+                      }
+                    }}
+                    disabled={updatingUnit}
+                  >
+                    {updatingUnit ? 'Saving...' : 'Save changes'}
+                  </Button>
                 </div>
-                <div className="grid gap-2">
-                  <Label>Caution fee (₦)</Label>
-                  <Input type="number" value={editCautionFee} onChange={(e) => setEditCautionFee(e.target.value)} />
-                </div>
-                <div className="grid gap-2">
-                  <Label>Legal fee (₦)</Label>
-                  <Input type="number" value={editLegalFee} onChange={(e) => setEditLegalFee(e.target.value)} />
-                </div>
-              </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <Button variant="ghost" onClick={() => setEditPricingOpen(false)}>Cancel</Button>
-                <Button
-                  onClick={async () => {
-                    const unitId = (tenant && (tenant as any).unit && (tenant as any).unit._id) || (detail as any)?.data?.unit?._id;
-                    if (!unitId) {
-                      toast({ title: 'No unitId available for this tenant', variant: 'destructive' });
-                      return;
-                    }
-                    try {
-                      const price = Number(editMonthlyPrice);
-                      const svc = Number(editServiceCharge);
-                      const caution = Number(editCautionFee);
-                      const legal = Number(editLegalFee);
-                      await updateUnit({
-                        unitId,
-                        body: {
-                          monthlyPrice: Number.isFinite(price) && price > 0 ? price : undefined,
-                          serviceChargeMonthly: Number.isFinite(svc) && svc >= 0 ? svc : undefined,
-                          cautionFee: Number.isFinite(caution) && caution >= 0 ? caution : undefined,
-                          legalFee: Number.isFinite(legal) && legal >= 0 ? legal : undefined,
-                        },
-                      }).unwrap();
-                      toast({ title: 'Unit pricing updated' });
-                      setEditPricingOpen(false);
-                    } catch (e) {
-                      toast({ title: 'Failed to update pricing', variant: 'destructive' });
-                    }
-                  }}
-                  disabled={updatingUnit}
-                >
-                  {updatingUnit ? 'Saving...' : 'Save changes'}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </CardHeader>
       <CardContent>

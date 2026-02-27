@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
-import { useUpdateTenantMutation } from '@/services/estatesApi';
+import { useUpdateTenantMutation, useUpdateEstateUnitMutation } from '@/services/estatesApi';
 
 const formatDate = (value?: string | null) => {
   if (!value) return '—';
@@ -40,6 +40,7 @@ interface TenantDetailHeaderProps {
 export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailHeaderProps) => {
   const navigate = useNavigate();
   const [updateTenant, { isLoading: updatingTenant }] = useUpdateTenantMutation();
+  const [updateUnit, { isLoading: updatingUnit }] = useUpdateEstateUnitMutation();
 
   // Tenant edit state
   const [editTenantOpen, setEditTenantOpen] = useState(false);
@@ -48,6 +49,13 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
   const [editPhone, setEditPhone] = useState('');
   const [editType, setEditType] = useState<'new' | 'existing' | 'renewal' | 'transfer'>('new');
   const [editEntryDate, setEditEntryDate] = useState('');
+
+  // Edit Fees state
+  const [editFeesOpen, setEditFeesOpen] = useState(false);
+  const [editMonthlyPrice, setEditMonthlyPrice] = useState('');
+  const [editServiceCharge, setEditServiceCharge] = useState('');
+  const [editCautionFee, setEditCautionFee] = useState('');
+  const [editLegalFee, setEditLegalFee] = useState('');
 
 
 
@@ -73,7 +81,41 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
     }
   };
 
+  const handleEditFeesOpen = () => {
+    if (overview) {
+      setEditMonthlyPrice(overview.unitMonthlyPrice != null ? String(overview.unitMonthlyPrice) : '');
+      setEditServiceCharge(overview.serviceChargeMonthly != null ? String(overview.serviceChargeMonthly) : '');
+      setEditCautionFee(overview.cautionFee != null ? String(overview.cautionFee) : '');
+      setEditLegalFee(overview.legalFee != null ? String(overview.legalFee) : '');
+    }
+  };
 
+  const submitEditFees = async () => {
+    const unitId = tenant && (tenant as any).unit && (tenant as any).unit._id;
+    if (!unitId) {
+      toast({ title: 'No unit found for this tenant', variant: 'destructive' });
+      return;
+    }
+    try {
+      const price = Number(editMonthlyPrice);
+      const svc = Number(editServiceCharge);
+      const caution = Number(editCautionFee);
+      const legal = Number(editLegalFee);
+      await updateUnit({
+        unitId,
+        body: {
+          monthlyPrice: Number.isFinite(price) && price > 0 ? price : undefined,
+          serviceChargeMonthly: Number.isFinite(svc) && svc >= 0 ? svc : undefined,
+          cautionFee: Number.isFinite(caution) && caution >= 0 ? caution : undefined,
+          legalFee: Number.isFinite(legal) && legal >= 0 ? legal : undefined,
+        },
+      }).unwrap();
+      toast({ title: 'Unit fees updated successfully' });
+      setEditFeesOpen(false);
+    } catch (e) {
+      toast({ title: 'Failed to update fees', variant: 'destructive' });
+    }
+  };
 
   return (
     <div className="flex items-center justify-between">
@@ -164,6 +206,68 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
                 disabled={updatingTenant}
               >
                 {updatingTenant ? 'Saving...' : 'Save changes'}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={editFeesOpen} onOpenChange={(open) => {
+          setEditFeesOpen(open);
+          if (open) handleEditFeesOpen();
+        }}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">Edit Fees</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Unit Fees</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="header-monthly-price">Monthly Price (Rent)</Label>
+                <Input
+                  id="header-monthly-price"
+                  type="number"
+                  value={editMonthlyPrice}
+                  onChange={(e) => setEditMonthlyPrice(e.target.value)}
+                  placeholder="e.g., 250000"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="header-service-charge">Monthly Service Charge</Label>
+                <Input
+                  id="header-service-charge"
+                  type="number"
+                  value={editServiceCharge}
+                  onChange={(e) => setEditServiceCharge(e.target.value)}
+                  placeholder="e.g., 12600"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="header-caution-fee">Caution Fee (One-time)</Label>
+                <Input
+                  id="header-caution-fee"
+                  type="number"
+                  value={editCautionFee}
+                  onChange={(e) => setEditCautionFee(e.target.value)}
+                  placeholder="e.g., 50000"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="header-legal-fee">Legal Fee (One-time)</Label>
+                <Input
+                  id="header-legal-fee"
+                  type="number"
+                  value={editLegalFee}
+                  onChange={(e) => setEditLegalFee(e.target.value)}
+                  placeholder="e.g., 30000"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setEditFeesOpen(false)}>Cancel</Button>
+              <Button onClick={submitEditFees} disabled={updatingUnit}>
+                {updatingUnit ? 'Saving...' : 'Save Changes'}
               </Button>
             </div>
           </DialogContent>

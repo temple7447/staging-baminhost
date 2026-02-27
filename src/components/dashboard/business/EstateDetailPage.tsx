@@ -18,7 +18,8 @@ import {
   useGetEstateVacantUnitsQuery,
   useDeleteTenantMutation,
   useClearEstateUnitTenantMutation,
-  useDeleteEstateUnitMutation
+  useDeleteEstateUnitMutation,
+  useUpdateEstateUnitMutation
 } from '@/services/estatesApi';
 import { toast } from '@/components/ui/use-toast';
 import { EstateDetailSkeleton, TableSkeleton } from '@/components/ui/skeletons';
@@ -71,6 +72,14 @@ export const EstateDetailPage = () => {
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedQuarter, setSelectedQuarter] = useState('all');
 
+  // Edit Unit Fees state
+  const [editFeesOpen, setEditFeesOpen] = useState(false);
+  const [selectedUnitForFeesEdit, setSelectedUnitForFeesEdit] = useState<any>(null);
+  const [editMonthlyPrice, setEditMonthlyPrice] = useState('');
+  const [editServiceCharge, setEditServiceCharge] = useState('');
+  const [editCautionFee, setEditCautionFee] = useState('');
+  const [editLegalFee, setEditLegalFee] = useState('');
+
   // API hooks
   const { data: estate, isLoading, isError: estateError, error: estateErrObj, refetch: refetchEstate } = useGetEstateQuery(estateId as string, { skip: !estateId });
   const { data: overviewData, isLoading: overviewLoading, isError: overviewError } = useGetEstateOverviewQuery(estateId as string, { skip: !estateId });
@@ -91,6 +100,7 @@ export const EstateDetailPage = () => {
   const [deleteTenant, { isLoading: deletingTenant }] = useDeleteTenantMutation();
   const [clearUnitTenant, { isLoading: clearingUnit }] = useClearEstateUnitTenantMutation();
   const [deleteUnit, { isLoading: deletingUnit }] = useDeleteEstateUnitMutation();
+  const [updateUnit, { isLoading: updatingUnit }] = useUpdateEstateUnitMutation();
 
   // Show full page skeleton while main estate data is loading
   if (isLoading) {
@@ -128,6 +138,37 @@ export const EstateDetailPage = () => {
       setSelectedUnitId(''); setTenantName(''); setTenantEmail(''); setTenantPhone(''); setTenantType('new'); setEntryDate(''); setDurationMonths('');
     } catch (e) {
       toast({ title: 'Failed to add tenant', variant: 'destructive' });
+    }
+  };
+
+  const handleEditFeesOpen = (unit: any) => {
+    setSelectedUnitForFeesEdit(unit);
+    setEditMonthlyPrice(String(unit.monthlyPrice || ''));
+    setEditServiceCharge(String(unit.serviceChargeMonthly || ''));
+    setEditCautionFee(String(unit.cautionFee || ''));
+    setEditLegalFee(String(unit.legalFee || ''));
+    setEditFeesOpen(true);
+  };
+
+  const submitEditFees = async () => {
+    if (!selectedUnitForFeesEdit?.unitId) return;
+    try {
+      const payload: any = {};
+      if (editMonthlyPrice) payload.monthlyPrice = Number(editMonthlyPrice);
+      if (editServiceCharge) payload.serviceChargeMonthly = Number(editServiceCharge);
+      if (editCautionFee) payload.cautionFee = Number(editCautionFee);
+      if (editLegalFee) payload.legalFee = Number(editLegalFee);
+
+      await updateUnit({
+        unitId: selectedUnitForFeesEdit.unitId,
+        body: payload
+      }).unwrap();
+      toast({ title: 'Unit fees updated successfully' });
+      setEditFeesOpen(false);
+      refetchVacant();
+      refetchEstate();
+    } catch (e) {
+      toast({ title: 'Failed to update unit fees', variant: 'destructive' });
     }
   };
 
@@ -567,16 +608,24 @@ export const EstateDetailPage = () => {
                       <TableCell>₦{u.monthlyPrice.toLocaleString()}</TableCell>
                       <TableCell>{u.meterNumber || '—'}</TableCell>
                       <TableCell className="text-right">
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" /> Delete
-                            </Button>
-                          </AlertDialogTrigger>
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditFeesOpen(u)}
+                          >
+                            Edit Fees
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" /> Delete
+                              </Button>
+                            </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
                               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -611,6 +660,7 @@ export const EstateDetailPage = () => {
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -631,6 +681,65 @@ export const EstateDetailPage = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Unit Fees Modal */}
+      <Dialog open={editFeesOpen} onOpenChange={setEditFeesOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Unit Fees — {selectedUnitForFeesEdit?.label}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="edit-monthly-price">Monthly Price (Rent)</Label>
+              <Input
+                id="edit-monthly-price"
+                type="number"
+                value={editMonthlyPrice}
+                onChange={(e) => setEditMonthlyPrice(e.target.value)}
+                placeholder="e.g., 250000"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-service-charge">Monthly Service Charge</Label>
+              <Input
+                id="edit-service-charge"
+                type="number"
+                value={editServiceCharge}
+                onChange={(e) => setEditServiceCharge(e.target.value)}
+                placeholder="e.g., 12600"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-caution-fee">Caution Fee (One-time)</Label>
+              <Input
+                id="edit-caution-fee"
+                type="number"
+                value={editCautionFee}
+                onChange={(e) => setEditCautionFee(e.target.value)}
+                placeholder="e.g., 50000"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-legal-fee">Legal Fee (One-time)</Label>
+              <Input
+                id="edit-legal-fee"
+                type="number"
+                value={editLegalFee}
+                onChange={(e) => setEditLegalFee(e.target.value)}
+                placeholder="e.g., 30000"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setEditFeesOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={submitEditFees} disabled={updatingUnit}>
+              {updatingUnit ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
