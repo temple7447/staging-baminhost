@@ -10,8 +10,8 @@ export const PricingInfoRow = ({ overview, tenant }: PricingInfoRowProps) => {
 
   const rent = overview?.rent ?? tenant?.rentAmount;
   const serviceCharge = overview?.serviceCharge ?? overview?.serviceChargeMonthly;
-  const cautionFee = overview?.cautionFee;
-  const legalFee = overview?.legalFee;
+  const cautionFee = tenant?.unit?.cautionFee;
+  const legalFee = tenant?.unit?.legalFee;
 
   return (
     <div className="flex flex-wrap items-center gap-2">

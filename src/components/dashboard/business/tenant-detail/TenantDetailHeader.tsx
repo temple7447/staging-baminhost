@@ -85,8 +85,8 @@ export const TenantDetailHeader = ({ tenantId, tenant, overview }: TenantDetailH
     if (overview) {
       setEditMonthlyPrice(overview.unitMonthlyPrice != null ? String(overview.unitMonthlyPrice) : '');
       setEditServiceCharge(overview.serviceChargeMonthly != null ? String(overview.serviceChargeMonthly) : '');
-      setEditCautionFee(overview.cautionFee != null ? String(overview.cautionFee) : '');
-      setEditLegalFee(overview.legalFee != null ? String(overview.legalFee) : '');
+      setEditCautionFee(tenant?.unit?.cautionFee != null ? String(tenant?.unit?.cautionFee) : '');
+      setEditLegalFee(overview?.unit?.legalFee != null ? String(overview?.unit?.legalFee) : '');
     }
   };
 
