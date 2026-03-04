@@ -31,15 +31,8 @@ export interface Vendor {
 export interface OnboardVendorPayload {
     name: string;
     email: string;
-    phone: string;
-    businessTypeId?: string;
-    businessName?: string;
-    specialization?: string;
-    cacNumber?: string;
-    govId?: string;
-    certification?: string;
-    businessAddress?: string;
-    portfolio?: string[];
+    phone?: string;
+    position?: string;
     sendCredentials?: boolean;
 }
 
@@ -58,10 +51,23 @@ export interface VendorResponse {
     data: Vendor;
 }
 
+export interface PaginationInfo {
+    currentPage: number;
+    totalPages: number;
+    limit: number;
+}
+
 export interface VendorsListResponse {
     success: boolean;
     count: number;
+    total: number;
+    pagination: PaginationInfo;
     data: Vendor[];
+}
+
+export interface PaginationParams {
+    page?: number;
+    limit?: number;
 }
 
 export interface UpdateVendorStatusPayload {
@@ -82,8 +88,14 @@ export const vendorsApi = createApi({
     }),
     tagTypes: ['Vendor', 'VendorList'],
     endpoints: (builder) => ({
-        getVendors: builder.query<VendorsListResponse, void>({
-            query: () => '/api/auth/vendors',
+        getVendors: builder.query<VendorsListResponse, PaginationParams | void>({
+            query: (params) => {
+                const queryParams = new URLSearchParams();
+                if (params?.page) queryParams.append('page', params.page.toString());
+                if (params?.limit) queryParams.append('limit', params.limit.toString());
+                const queryString = queryParams.toString();
+                return `/api/auth/vendors${queryString ? '?' + queryString : ''}`;
+            },
             providesTags: (result) =>
                 result && Array.isArray(result.data)
                     ? [

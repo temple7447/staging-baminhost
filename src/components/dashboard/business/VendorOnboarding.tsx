@@ -3,10 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useOnboardVendorMutation } from '@/services/vendorsApi';
 import { toast } from '@/components/ui/use-toast';
 import {
-  BusinessTypeStep,
-  BusinessDetailsStep,
-  CatalogPricingStep,
-  VerificationStep,
+  BasicInfoStep,
   OnboardingSidebar,
   OnboardingHeader,
   OnboardingFooter,
@@ -17,49 +14,97 @@ import {
 
 export const VendorOnboarding: React.FC = () => {
   const [onboardVendor] = useOnboardVendorMutation();
-  const { currentStep, goToNextStep, goToPreviousStep, canGoPrevious } = useFormStep(1);
+  const { currentStep, goToPreviousStep, canGoPrevious } = useFormStep(1);
   const { formData, updateField } = useVendorFormData();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const validateForm = (): boolean => {
+    // Name validation
+    if (!formData.name || formData.name.trim().length < 2) {
+      toast({
+        title: "Validation Error",
+        description: "Name must be at least 2 characters long.",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    if (formData.name.length > 50) {
+      toast({
+        title: "Validation Error",
+        description: "Name must not exceed 50 characters.",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email) {
+      toast({
+        title: "Validation Error",
+        description: "Email address is required.",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    if (!emailRegex.test(formData.email)) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a valid email address.",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    // Position validation
+    if (formData.position && formData.position.length > 100) {
+      toast({
+        title: "Validation Error",
+        description: "Position must not exceed 100 characters.",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await onboardVendor({
-        name: formData.legalName,
+        name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        businessName: formData.businessName,
-        cacNumber: formData.cacNumber,
-        businessAddress: formData.address,
-        specialization: formData.description,
-        portfolio: [],
-        sendCredentials: true
+        position: formData.position,
+        sendCredentials: formData.sendCredentials
       }).unwrap();
 
       toast({
-        title: "Registration Submitted!",
-        description: "Applications are typically reviewed within 24-48 hours."
+        title: "Vendor Onboarded Successfully! ✓",
+        description: "The vendor has been added to the system. Business details can be configured in the vendor management dashboard."
       });
+      
       // Navigate after successful submission
       setTimeout(() => {
         window.location.href = '/dashboard/vendor-management';
       }, 1500);
-    } catch (err) {
+    } catch (err: any) {
       toast({
-        title: "Registration Failed",
-        description: "Please check your inputs and try again.",
+        title: "Onboarding Failed",
+        description: err?.data?.message || "Please check your inputs and try again.",
         variant: "destructive"
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const handleNext = () => {
-    if (currentStep < 4) goToNextStep();
-    else handleSubmit();
-  };
-
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-700">
@@ -76,31 +121,9 @@ export const VendorOnboarding: React.FC = () => {
           <Card className="flex-1 border-slate-200/60 shadow-xl shadow-slate-200/40 rounded-3xl overflow-hidden bg-white/50 backdrop-blur-xl">
             <CardContent className="p-8 md:p-12 overflow-y-auto max-h-[calc(100vh-250px)] scrollbar-hide">
               {currentStep === 1 && (
-                <BusinessTypeStep
-                  selectedType={formData.type}
-                  onTypeChange={(type) => updateField('type', type)}
-                />
-              )}
-              {currentStep === 2 && (
-                <BusinessDetailsStep
+                <BasicInfoStep
                   formData={formData}
                   onChange={updateField}
-                />
-              )}
-              {currentStep === 3 && (
-                <CatalogPricingStep
-                  formData={formData}
-                  onCategoryChange={(cats) => updateField('categories', cats)}
-                  onPricingTypeChange={(type) => updateField('pricingType', type)}
-                  onPricingRateChange={(rate) => updateField('pricingRate', rate)}
-                />
-              )}
-              {currentStep === 4 && (
-                <VerificationStep
-                  idFile={formData.idFile}
-                  certFile={formData.certFile}
-                  onIdFileChange={(file) => updateField('idFile', file)}
-                  onCertFileChange={(file) => updateField('certFile', file)}
                 />
               )}
             </CardContent>
@@ -108,10 +131,10 @@ export const VendorOnboarding: React.FC = () => {
             {/* Footer */}
             <OnboardingFooter
               currentStep={currentStep}
-              totalSteps={4}
+              totalSteps={1}
               isSubmitting={isSubmitting}
               onPrevious={goToPreviousStep}
-              onNext={handleNext}
+              onNext={handleSubmit}
               canGoPrevious={canGoPrevious}
             />
           </Card>

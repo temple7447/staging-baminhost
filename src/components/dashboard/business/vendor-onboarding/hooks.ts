@@ -13,7 +13,7 @@ export const useFormStep = (initialStep: Step = 1) => {
   }, []);
 
   const canGoPrevious = currentStep > 1;
-  const canGoNext = currentStep < 4;
+  const canGoNext = currentStep < 1;
 
   return {
     currentStep,
@@ -27,19 +27,11 @@ export const useFormStep = (initialStep: Step = 1) => {
 
 export const useVendorFormData = (initialData?: Partial<VendorFormData>) => {
   const defaultData: VendorFormData = {
-    type: 'service',
-    businessName: '',
-    legalName: '',
-    cacNumber: '',
+    name: '',
     email: '',
     phone: '',
-    address: '',
-    categories: [],
-    pricingType: 'hourly',
-    pricingRate: '',
-    description: '',
-    idFile: null,
-    certFile: null,
+    position: '',
+    sendCredentials: true,
     ...initialData
   };
 

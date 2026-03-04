@@ -1,22 +1,11 @@
-export type Step = 1 | 2 | 3 | 4;
-
-export type VendorType = 'service' | 'product';
-export type PricingType = 'hourly' | 'unit' | 'project';
+export type Step = 1;
 
 export interface VendorFormData {
-  type: VendorType;
-  businessName: string;
-  legalName: string;
-  cacNumber: string;
+  name: string;
   email: string;
   phone: string;
-  address: string;
-  categories: string[];
-  pricingType: PricingType;
-  pricingRate: string;
-  description: string;
-  idFile: File | null;
-  certFile: File | null;
+  position: string;
+  sendCredentials: boolean;
 }
 
 export interface StepConfig {
@@ -34,10 +23,6 @@ export interface OnboardVendorPayload {
   name: string;
   email: string;
   phone: string;
-  businessName: string;
-  cacNumber: string;
-  businessAddress: string;
-  specialization: string;
-  portfolio: string[];
+  position: string;
   sendCredentials: boolean;
 }

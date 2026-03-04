@@ -33,9 +33,6 @@ export const OnboardingFooter: React.FC<OnboardingFooterProps> = ({
         <ChevronLeft className="w-4 h-4" /> Previous
       </Button>
       <div className="flex items-center gap-3">
-        <Button variant="ghost" className="hidden sm:flex font-bold text-slate-400 hover:text-slate-600">
-          Save Draft
-        </Button>
         <Button
           onClick={onNext}
           disabled={isSubmitting}
@@ -49,7 +46,7 @@ export const OnboardingFooter: React.FC<OnboardingFooterProps> = ({
           {isSubmitting ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : isLastStep ? (
-            'Submit Registration'
+            'Onboard Vendor'
           ) : (
             <>Next Step <ChevronRight className="w-4 h-4 ml-2" /></>
           )}
