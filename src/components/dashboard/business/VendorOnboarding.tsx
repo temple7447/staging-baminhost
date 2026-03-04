@@ -93,7 +93,7 @@ export const VendorOnboarding: React.FC = () => {
       
       // Navigate after successful submission
       setTimeout(() => {
-        window.location.href = '/dashboard/vendor-management';
+        window.location.href = '/dashboard/people';
       }, 1500);
     } catch (err: any) {
       toast({

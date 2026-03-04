@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { DEMO_USERS, BUSINESSES } from "@/data/demoData";
+// Demo data removed - using only API data
 import { Building, Users as UsersIcon, UserCog, MoreVertical, UserPlus, Shield, CheckCircle, XCircle, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGetBusinessOwnersQuery, useUpdateBusinessOwnerMutation, useUpdateBusinessOwnerStatusMutation, useDeleteBusinessOwnerMutation, useGetManagersQuery, useUpdateManagerMutation, useUpdateManagerStatusMutation, useDeleteManagerMutation } from "@/services/authApi";
@@ -25,39 +25,22 @@ import { toast } from "@/components/ui/use-toast";
 import type { BusinessOwner, Manager } from "@/types/auth";
 import type { Vendor } from "@/services/vendorsApi";
 
-interface DemoUser {
+interface VendorDisplay {
   id: string;
   name: string;
   email: string;
   role: 'manager' | 'vendor' | string;
-  department?: string;
-  hourlyRate?: number;
-  commissionRate?: number;
-  totalEarnings?: number;
+  isApiVendor?: boolean;
+  isActive?: boolean;
+  businessType?: string;
+  businessName?: string;
+  specialization?: string;
+  phone?: string;
 }
 
-const departmentToBusinessId: Record<string, 'estate' | 'filling_station' | 'equipment'> = {
-  operations: 'estate',
-  legal_security: 'estate',
-  marketing: 'filling_station',
-  sales: 'filling_station',
-  delivery: 'equipment',
-  financial: 'estate',
-  fundraising: 'estate',
-  automation: 'equipment',
-};
 
-function getAssignedBusiness(user: DemoUser) {
-  const defaultBusiness = BUSINESSES[0];
-  if (user.role === 'vendor') {
-    return BUSINESSES.find(b => b.id === 'filling_station') || defaultBusiness;
-  }
-  if (user.role === 'manager') {
-    const mapped = user.department ? departmentToBusinessId[user.department] : undefined;
-    return BUSINESSES.find(b => b.id === mapped) || defaultBusiness;
-  }
-  return defaultBusiness;
-}
+
+// Demo business assignment removed - using only API data
 
 export const AdminPeople = () => {
   const { user } = useAuth();
@@ -85,15 +68,11 @@ export const AdminPeople = () => {
   const [updateManagerStatus, { isLoading: togglingManagerStatus }] = useUpdateManagerStatusMutation();
   const [deleteManager, { isLoading: deletingManager }] = useDeleteManagerMutation();
 
-  // Combine API vendors with demo vendors
+  // Use API vendors only
   const apiVendors = vendorsData?.data ?? [];
-  const demoVendors = useMemo(
-    () => (DEMO_USERS as DemoUser[]).filter((u) => u.role === 'vendor'),
-    []
-  );
   const allVendors = useMemo(() => {
-    // Convert API vendors to match DemoUser interface for display
-    const convertedApiVendors = apiVendors.map((v) => ({
+    // Convert API vendors to match VendorDisplay interface for display
+    const convertedApiVendors = apiVendors.map((v: any) => ({
       id: v.id || v._id || '',
       name: v.name,
       email: v.email,
@@ -105,12 +84,12 @@ export const AdminPeople = () => {
       specialization: v.specialization,
       phone: v.phone,
     }));
-    return [...convertedApiVendors, ...demoVendors];
-  }, [apiVendors, demoVendors]);
+    return convertedApiVendors;
+  }, [apiVendors]);
 
   const [search, setSearch] = useState("");
   const [detailOpen, setDetailOpen] = useState(false);
-  const [selected, setSelected] = useState<DemoUser | null>(null);
+  const [selected, setSelected] = useState<VendorDisplay | null>(null);
 
   // Business Owner Edit State
   const [editOpen, setEditOpen] = useState(false);
@@ -167,7 +146,7 @@ export const AdminPeople = () => {
     (v) => v.name.toLowerCase().includes(search.toLowerCase()) || v.email.toLowerCase().includes(search.toLowerCase())
   );
 
-  const openDetails = (user: DemoUser) => {
+  const openDetails = (user: VendorDisplay) => {
     setSelected(user);
     setDetailOpen(true);
   };
@@ -274,7 +253,7 @@ export const AdminPeople = () => {
     }
   };
 
-  const openVendorEdit = (vendor: Vendor) => {
+  const openVendorEdit = (vendor: any) => {
     setEditingVendor(vendor);
     setEditVendorName(vendor.name);
     setEditVendorEmail(vendor.email);
@@ -400,7 +379,8 @@ export const AdminPeople = () => {
     );
   };
 
-  const assigned = selected ? getAssignedBusiness(selected) : null;
+  // Demo assignment removed
+  const assigned = null;
 
   const defaultTab = isSuperAdmin ? "business-owners" : "managers";
 
@@ -717,85 +697,74 @@ export const AdminPeople = () => {
                           <TableCell className="font-medium">{v.name}</TableCell>
                           <TableCell>{v.email}</TableCell>
                           <TableCell>
-                            {v.businessName || v.businessType || v.commissionRate != null ? (
+                            {v.businessName || v.businessType ? (
                               <div className="text-sm">
                                 {v.businessName && <div>{v.businessName}</div>}
                                 {v.businessType && <div className="text-muted-foreground text-xs">{v.businessType}</div>}
-                                {v.commissionRate != null && <span>{v.commissionRate}%</span>}
                               </div>
                             ) : (
                               '—'
                             )}
                           </TableCell>
                           <TableCell>
-                            {v.isApiVendor ? (
-                              <Badge variant={v.isActive ? "default" : "destructive"} className="flex items-center gap-1 w-fit">
-                                {v.isActive ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
-                                {v.isActive ? "Active" : "Inactive"}
-                              </Badge>
-                            ) : (
-                              <Badge variant="secondary">Demo</Badge>
-                            )}
+                            <Badge variant={v.isActive ? "default" : "destructive"} className="flex items-center gap-1 w-fit">
+                              {v.isActive ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                              {v.isActive ? "Active" : "Inactive"}
+                            </Badge>
                           </TableCell>
                           <TableCell>
-                            {v.isApiVendor ? (
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                    <MoreVertical className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => openVendorEdit(v)}>
-                                    <Pencil className="h-4 w-4 mr-2" />
-                                    Edit
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => openVendorStatusToggle(v)}>
-                                    {v.isActive ? (
-                                      <>
-                                        <XCircle className="h-4 w-4 mr-2" />
-                                        Deactivate
-                                      </>
-                                    ) : (
-                                      <>
-                                        <CheckCircle className="h-4 w-4 mr-2" />
-                                        Activate
-                                      </>
-                                    )}
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
-                                  <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                        <Trash2 className="h-4 w-4 mr-2 text-destructive" />
-                                        <span className="text-destructive">Delete</span>
-                                      </DropdownMenuItem>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                      <AlertDialogHeader>
-                                        <AlertDialogTitle>Delete Vendor?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                          This will permanently delete {v.name}. This action cannot be undone.
-                                        </AlertDialogDescription>
-                                      </AlertDialogHeader>
-                                      <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction
-                                          onClick={() => handleVendorDelete(v.id)}
-                                          className="bg-destructive hover:bg-destructive/90"
-                                        >
-                                          {deletingVendor ? "Deleting..." : "Delete"}
-                                        </AlertDialogAction>
-                                      </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                  </AlertDialog>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            ) : (
-                              <Button size="sm" variant="outline" onClick={() => openDetails(v)}>
-                                View
-                              </Button>
-                            )}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => openVendorEdit(v)}>
+                                  <Pencil className="h-4 w-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => openVendorStatusToggle(v)}>
+                                  {v.isActive ? (
+                                    <>
+                                      <XCircle className="h-4 w-4 mr-2" />
+                                      Deactivate
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCircle className="h-4 w-4 mr-2" />
+                                      Activate
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                      <Trash2 className="h-4 w-4 mr-2 text-destructive" />
+                                      <span className="text-destructive">Delete</span>
+                                    </DropdownMenuItem>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Delete Vendor?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        This will permanently delete {v.name}. This action cannot be undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => handleVendorDelete(v.id)}
+                                        className="bg-destructive hover:bg-destructive/90"
+                                      >
+                                        {deletingVendor ? "Deleting..." : "Delete"}
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -820,47 +789,7 @@ export const AdminPeople = () => {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Building className="h-4 w-4" /> Assigned Business
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-sm">
-                    <div className="font-medium">{assigned.name}</div>
-                    <div className="text-muted-foreground capitalize">{assigned.type.replace('_', ' ')}</div>
-                    <div className="mt-2 grid grid-cols-2 gap-2">
-                      <div>
-                        <div className="text-xs text-muted-foreground">Monthly Revenue</div>
-                        <div className="font-semibold">₦{assigned.monthlyRevenue.toLocaleString()}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs text-muted-foreground">Net Profit</div>
-                        <div className="font-semibold text-green-600">₦{assigned.netProfit.toLocaleString()}</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Performance</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {selected.role === 'manager' && selected.hourlyRate != null && (
-                      <div className="text-xs text-muted-foreground">
-                        Hourly Rate: <span className="font-medium text-foreground">₦{selected.hourlyRate.toLocaleString()}/hr</span>
-                      </div>
-                    )}
-                    {selected.role === 'vendor' && selected.commissionRate != null && (
-                      <div className="text-xs text-muted-foreground">
-                        Commission Rate: <span className="font-medium text-foreground">{selected.commissionRate}%</span>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+              {/* Assigned Business and Performance cards removed - demo data only */}
             </div>
           )}
         </DialogContent>

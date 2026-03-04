@@ -11,7 +11,7 @@ export const OnboardingHeader: React.FC = () => {
       <Button
         variant="ghost"
         className="gap-2 text-slate-500 hover:text-slate-900 font-bold"
-        onClick={() => navigate('/dashboard/vendor-management')}
+        onClick={() => navigate('/dashboard/people')}
       >
         <ChevronLeft className="w-4 h-4" /> Exit
       </Button>

@@ -223,15 +223,6 @@ const sidebarItems: SidebarItem[] = [
     path: '/dashboard/equipment'
   },
   {
-    id: "vendor-management",
-    label: "Vendor Management",
-    icon: Handshake,
-    category: 'business',
-    requiredPermissions: ['view_estate'],
-    isPremium: true,
-    path: '/dashboard/vendor-management'
-  },
-  {
     id: "personal-portfolios",
     label: "Personal Life",
     icon: Crown,

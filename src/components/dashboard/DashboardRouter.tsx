@@ -15,7 +15,6 @@ import { AddPropertyPage } from '@/components/dashboard/business/AddPropertyPage
 import { TenantDetailPage } from '@/components/dashboard/business/TenantDetailPage';
 import { FillingStationManagement } from '@/components/dashboard/business/FillingStationManagement';
 import { EquipmentManagement } from '@/components/dashboard/business/EquipmentManagement';
-import { VendorManagement } from '@/components/dashboard/business/VendorManagement';
 import { VendorOnboarding } from '@/components/dashboard/business/VendorOnboarding';
 import { AccountingManagement } from '@/components/dashboard/business/AccountingManagement';
 import { CRMDashboard } from '@/components/dashboard/CRMDashboard';
@@ -75,7 +74,6 @@ const DashboardRouter: React.FC = () => {
     if (pathname.includes('estate')) return 'estate';
     if (pathname.includes('filling-station')) return 'filling-station';
     if (pathname.includes('equipment')) return 'equipment';
-    if (pathname.includes('vendor-management')) return 'vendor-management';
     if (pathname.includes('vendor-onboarding')) return 'vendor-onboarding';
     if (pathname.includes('personal-portfolios')) return 'personal-portfolios';
     if (pathname.includes('goals')) return 'goals';
@@ -259,19 +257,6 @@ const DashboardRouter: React.FC = () => {
           }
         />
 
-        {/* Vendor Management */}
-        <Route
-          path="/vendor-management"
-          element={
-            <ProtectedRoute
-              element={<VendorManagement />}
-              requiredPermissions={['view_estate']} // Admin level access
-              feature="Vendor Management"
-              showUpgradePrompt={true}
-              viewName="vendor-management"
-            />
-          }
-        />
         <Route
           path="/vendor-onboarding"
           element={

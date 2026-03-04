@@ -194,7 +194,7 @@ export const AccountingManagement = () => {
                       <div className="text-lg font-black text-purple-600 dark:text-purple-400">Multiple</div>
                     </div>
                   </div>
-                  <Button size="sm" onClick={() => navigate('/dashboard/vendor-management')} className="w-full bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 dark:hover:bg-purple-600 hover:text-white text-slate-600 dark:text-slate-300 font-bold rounded-lg transition-all border-none shadow-none">
+                  <Button size="sm" onClick={() => navigate('/dashboard/people')} className="w-full bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 dark:hover:bg-purple-600 hover:text-white text-slate-600 dark:text-slate-300 font-bold rounded-lg transition-all border-none shadow-none">
                     Manage Vendors
                   </Button>
                 </CardContent>
