@@ -566,7 +566,6 @@ export const AdminPeople = () => {
                         <TableHead>Name</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Phone</TableHead>
-                        <TableHead>Assigned Estates</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Last Login</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
@@ -578,15 +577,6 @@ export const AdminPeople = () => {
                           <TableCell className="font-medium">{manager.name}</TableCell>
                           <TableCell>{manager.email}</TableCell>
                           <TableCell>{manager.phone}</TableCell>
-                          <TableCell>
-                            <div className="flex gap-1 flex-wrap">
-                              {manager.assignedEstates.map((estate) => (
-                                <Badge key={estate._id} variant="secondary" className="text-xs">
-                                  {estate.name}
-                                </Badge>
-                              ))}
-                            </div>
-                          </TableCell>
                           <TableCell>
                             <Badge variant={manager.isActive ? "default" : "destructive"} className="flex items-center gap-1 w-fit">
                               {manager.isActive ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
