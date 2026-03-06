@@ -189,7 +189,6 @@ export const {
     useScheduleRemindersMutation,
     useDeleteNotificationsMutation,
     useGetProgressQuery,
-    useGetWalletQuery,
     useGetBig5Query,
     useGetContactsQuery,
     useGetLibraryQuery,

@@ -517,7 +517,7 @@ export const SplitTracker = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
+                <div className="flex justify-between items-center p-4 bg-slate-700 rounded-lg">
                   <div>
                     <div className="font-medium">Ideal Budget: {formatCurrency(idealNeeds)}</div>
                     <div className="text-sm text-muted-foreground">

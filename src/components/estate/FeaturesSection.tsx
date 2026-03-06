@@ -22,13 +22,13 @@ export const FeaturesSection = () => {
     ];
 
     return (
-        <div className="py-20 bg-slate-50/50">
+        <div className="py-20 bg-slate-800/50">
             <div className="container mx-auto px-6">
                 <div className="grid md:grid-cols-3 gap-8">
                     {features.map((feature, idx) => (
                         <Card key={idx} className="border-none shadow-sm hover:shadow-md transition-shadow bg-white rounded-3xl p-4">
                             <CardContent className="pt-8 text-center space-y-6">
-                                <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <div className="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
                                     {feature.icon}
                                 </div>
                                 <div className="space-y-3">

@@ -35,7 +35,7 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ images, onShow
                             <Button
                                 onClick={onShowAll}
                                 variant="outline"
-                                className="bg-white text-slate-900 border-none hover:bg-slate-100 font-bold flex items-center gap-2 rounded-xl"
+                                className="bg-slate-700 text-slate-100 border-none hover:bg-slate-600 font-bold flex items-center gap-2 rounded-xl"
                             >
                                 <Grid className="h-4 w-4" />
                                 Show all photos

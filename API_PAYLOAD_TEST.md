@@ -74,3 +74,128 @@ The frontend still supports displaying tenants with old field structure:
 - Shows `tenantName` if available, falls back to combining `firstName + otherNames + surname`
 - Shows `whatsapp` first, then `whatsappNumber`, then `tenantPhone`
 - Shows `email` first, then `tenantEmail`
+
+---
+
+# Global Wallet Endpoint
+
+## ✅ Done! Global Wallet Summary
+
+A new global wallet endpoint has been added that aggregates all 9 wallets across all estates.
+
+### Endpoint
+```
+GET /api/wallets/global-summary
+```
+
+### Response Structure
+
+```json
+{
+  "success": true,
+  "data": {
+    "growthEngine": {
+      "marketing": {
+        "name": "Growth Engine Marketing",
+        "balance": 0,
+        "percentage": 25
+      },
+      "operations": {
+        "name": "Growth Engine Operations",
+        "balance": 0,
+        "percentage": 15
+      },
+      "savings": {
+        "name": "Growth Engine Savings",
+        "balance": 0,
+        "percentage": 10
+      },
+      "total": 0,
+      "percentage": 50
+    },
+    "fulfillmentEngine": {
+      "marketing": {
+        "name": "Fulfillment Engine Marketing",
+        "balance": 0,
+        "percentage": 15
+      },
+      "operations": {
+        "name": "Fulfillment Engine Operations",
+        "balance": 0,
+        "percentage": 9
+      },
+      "savings": {
+        "name": "Fulfillment Engine Family Savings",
+        "balance": 0,
+        "percentage": 6
+      },
+      "total": 0,
+      "percentage": 30
+    },
+    "innovationEngine": {
+      "marketing": {
+        "name": "Innovation Engine Marketing",
+        "balance": 0,
+        "percentage": 10
+      },
+      "operations": {
+        "name": "Innovation Engine Operations",
+        "balance": 0,
+        "percentage": 6
+      },
+      "savings": {
+        "name": "Innovation Engine Savings",
+        "balance": 0,
+        "percentage": 4
+      },
+      "total": 0,
+      "percentage": 20
+    },
+    "summary": {
+      "totalBalance": 0,
+      "totalReceived": 0,
+      "totalMarketing": 0,
+      "totalOperations": 0,
+      "totalSavings": 0
+    }
+  }
+}
+```
+
+### Wallet Structure Overview
+
+The endpoint returns data organized by 3 engines, each with 3 sub-wallets:
+
+1. **Growth Engine** (50% allocation)
+   - Marketing (25%)
+   - Operations (15%)
+   - Savings (10%)
+
+2. **Fulfillment Engine** (30% allocation)
+   - Marketing (15%)
+   - Operations (9%)
+   - Family Savings (6%)
+
+3. **Innovation Engine** (20% allocation)
+   - Marketing (10%)
+   - Operations (6%)
+   - Savings (4%)
+
+### Summary Fields
+
+- `totalBalance` - Combined balance across all 9 wallets
+- `totalReceived` - Total funds received across all wallets
+- `totalMarketing` - Sum of all marketing allocations
+- `totalOperations` - Sum of all operations allocations
+- `totalSavings` - Sum of all savings allocations
+
+### Usage Example
+
+```bash
+curl -X GET "http://localhost:5000/api/wallets/global-summary" \
+  -H "Authorization: Bearer {{JWT_TOKEN}}"
+```
+
+### Frontend Implementation
+
+This endpoint is consumed by the `WalletDashboard` component to display aggregated wallet data across all estates and initiatives.

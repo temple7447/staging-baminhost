@@ -14,8 +14,18 @@ import {
   ShieldCheck,
   ChevronRight,
   ArrowUpRight,
+  ArrowDownRight,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  CreditCard,
+  FileText,
+  BarChart3,
+  CheckCircle,
+  AlertCircle,
+  TrendingDown,
+  PieChart,
+  Target,
+  Landmark
 } from 'lucide-react';
 import { useGetAllEstatesOverviewQuery } from '@/services/estatesApi';
 import { useGetVendorsQuery } from '@/services/vendorsApi';
@@ -113,17 +123,17 @@ export const AccountingManagement = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-blue-50 dark:bg-blue-600/10 border-blue-200 dark:border-blue-500/20 shadow-sm overflow-hidden group hover:border-blue-400/50 transition-all">
+            <Card className="bg-blue-900 dark:bg-blue-600/10 border-blue-700 dark:border-blue-500/20 shadow-sm overflow-hidden group hover:border-blue-400/50 transition-all">
               <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-2">
-                  Global Net Yield <TrendingUp className="w-3 h-3 text-blue-500" />
+                <CardTitle className="text-xs font-semibold text-blue-100 dark:text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                  Global Net Yield <TrendingUp className="w-3 h-3 text-blue-400" />
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-black text-slate-900 dark:text-white">
+                <div className="text-4xl font-black text-slate-100 dark:text-white">
                   {Math.round((estateData?.units?.occupancyRate || 0) * 100)}%
                 </div>
-                <div className="mt-2 text-xs font-bold text-slate-500 dark:text-slate-500 font-normal">
+                <div className="mt-2 text-xs font-bold text-slate-400 dark:text-slate-500 font-normal">
                   Combined Occupancy Rate
                 </div>
               </CardContent>
@@ -201,6 +211,334 @@ export const AccountingManagement = () => {
               </Card>
             </div>
           </div>
+
+          {/* Financial Statements Section */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-bold text-slate-100 dark:text-white tracking-tight underline decoration-emerald-500/30 underline-offset-8">Financial Statements</h2>
+                <Badge variant="outline" className="bg-slate-800 dark:bg-slate-800 text-slate-300 dark:text-slate-400 font-mono">YTD Summary</Badge>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Income Statement */}
+              <Card className="bg-slate-800 dark:bg-slate-900/30 border-slate-700 dark:border-slate-800 hover:border-emerald-500/50 transition-all">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-emerald-600/20 rounded-xl">
+                      <TrendingUp className="w-6 h-6 text-emerald-400" />
+                    </div>
+                    <CardTitle className="text-md font-bold text-slate-100">Income Statement</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3 border-t border-slate-700 pt-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-400">Total Revenue</span>
+                      <span className="text-emerald-400 font-bold">₦{(estateData?.revenue?.yearToDate?.amount || 0).toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-400">Operating Expenses</span>
+                      <span className="text-red-400 font-bold">₦2,450,000</span>
+                    </div>
+                    <div className="border-t border-slate-700 pt-2 flex justify-between text-sm font-bold">
+                      <span className="text-slate-300">Net Income</span>
+                      <span className="text-emerald-400">₦1,550,000</span>
+                    </div>
+                  </div>
+                  <Button size="sm" className="w-full bg-slate-700 hover:bg-emerald-600 text-slate-100 font-bold">
+                    View Details
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Cash Flow */}
+              <Card className="bg-slate-800 dark:bg-slate-900/30 border-slate-700 dark:border-slate-800 hover:border-blue-500/50 transition-all">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-blue-600/20 rounded-xl">
+                      <CircleDollarSign className="w-6 h-6 text-blue-400" />
+                    </div>
+                    <CardTitle className="text-md font-bold text-slate-100">Cash Flow</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3 border-t border-slate-700 pt-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-400">Operating Cash Flow</span>
+                      <span className="text-blue-400 font-bold">₦3,200,000</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-400">Investing Cash Flow</span>
+                      <span className="text-red-400 font-bold">-₦800,000</span>
+                    </div>
+                    <div className="border-t border-slate-700 pt-2 flex justify-between text-sm font-bold">
+                      <span className="text-slate-300">Net Cash Flow</span>
+                      <span className="text-blue-400">₦2,400,000</span>
+                    </div>
+                  </div>
+                  <Button size="sm" className="w-full bg-slate-700 hover:bg-blue-600 text-slate-100 font-bold">
+                    View Details
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Balance Sheet Summary */}
+              <Card className="bg-slate-800 dark:bg-slate-900/30 border-slate-700 dark:border-slate-800 hover:border-purple-500/50 transition-all">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-purple-600/20 rounded-xl">
+                      <Landmark className="w-6 h-6 text-purple-400" />
+                    </div>
+                    <CardTitle className="text-md font-bold text-slate-100">Balance Sheet</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3 border-t border-slate-700 pt-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-400">Total Assets</span>
+                      <span className="text-purple-400 font-bold">₦15,500,000</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-400">Total Liabilities</span>
+                      <span className="text-red-400 font-bold">₦3,200,000</span>
+                    </div>
+                    <div className="border-t border-slate-700 pt-2 flex justify-between text-sm font-bold">
+                      <span className="text-slate-300">Net Equity</span>
+                      <span className="text-purple-400">₦12,300,000</span>
+                    </div>
+                  </div>
+                  <Button size="sm" className="w-full bg-slate-700 hover:bg-purple-600 text-slate-100 font-bold">
+                    View Details
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Accounts Management Section */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-bold text-slate-100 dark:text-white tracking-tight underline decoration-orange-500/30 underline-offset-8">Accounts Management</h2>
+                <Badge variant="outline" className="bg-slate-800 dark:bg-slate-800 text-slate-300 dark:text-slate-400 font-mono">Active Tracking</Badge>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Accounts Receivable */}
+              <Card className="bg-slate-800 dark:bg-slate-900/30 border-slate-700 dark:border-slate-800">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-orange-600/20 rounded-xl">
+                      <CreditCard className="w-6 h-6 text-orange-400" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-md font-bold text-slate-100">Accounts Receivable</CardTitle>
+                      <Badge className="bg-orange-500/10 text-orange-400 border-none text-[9px] uppercase font-black tracking-widest mt-1">Invoices Due</Badge>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4 border-t border-slate-700 pt-4">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="text-center">
+                      <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Current</div>
+                      <div className="text-lg font-black text-orange-400">₦2.4M</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">30-60D</div>
+                      <div className="text-lg font-black text-yellow-400">₦850K</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">90+ D</div>
+                      <div className="text-lg font-black text-red-400">₦320K</div>
+                    </div>
+                  </div>
+                  <Button size="sm" className="w-full bg-slate-700 hover:bg-orange-600 text-slate-100 font-bold">
+                    Manage Invoices
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Accounts Payable */}
+              <Card className="bg-slate-800 dark:bg-slate-900/30 border-slate-700 dark:border-slate-800">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-red-600/20 rounded-xl">
+                      <AlertCircle className="w-6 h-6 text-red-400" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-md font-bold text-slate-100">Accounts Payable</CardTitle>
+                      <Badge className="bg-red-500/10 text-red-400 border-none text-[9px] uppercase font-black tracking-widest mt-1">Bills Due</Badge>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4 border-t border-slate-700 pt-4">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="text-center">
+                      <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Current</div>
+                      <div className="text-lg font-black text-emerald-400">₦1.2M</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">30-60D</div>
+                      <div className="text-lg font-black text-blue-400">₦450K</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">90+ D</div>
+                      <div className="text-lg font-black text-slate-400">₦0</div>
+                    </div>
+                  </div>
+                  <Button size="sm" className="w-full bg-slate-700 hover:bg-red-600 text-slate-100 font-bold">
+                    Pay Bills
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Financial Analysis Section */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-bold text-slate-100 dark:text-white tracking-tight underline decoration-cyan-500/30 underline-offset-8">Financial Analysis</h2>
+                <Badge variant="outline" className="bg-slate-800 dark:bg-slate-800 text-slate-300 dark:text-slate-400 font-mono">Metrics & Ratios</Badge>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {[
+                { label: 'Profit Margin', value: '42.3%', color: 'text-emerald-400', icon: Target },
+                { label: 'ROI', value: '28.5%', color: 'text-blue-400', icon: BarChart3 },
+                { label: 'Debt Ratio', value: '20.6%', color: 'text-amber-400', icon: TrendingDown },
+                { label: 'Current Ratio', value: '4.84:1', color: 'text-purple-400', icon: PieChart },
+              ].map((metric, i) => {
+                const Icon = metric.icon;
+                return (
+                  <Card key={i} className="bg-slate-800 dark:bg-slate-900/30 border-slate-700 dark:border-slate-800">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">{metric.label}</div>
+                          <div className={`text-2xl font-black ${metric.color}`}>{metric.value}</div>
+                        </div>
+                        <Icon className="w-5 h-5 text-slate-600" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Reconciliation & Audit Section */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-bold text-slate-100 dark:text-white tracking-tight underline decoration-green-500/30 underline-offset-8">Reconciliation & Audit</h2>
+                <Badge variant="outline" className="bg-slate-800 dark:bg-slate-800 text-slate-300 dark:text-slate-400 font-mono">Compliance Check</Badge>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="bg-slate-800 dark:bg-slate-900/30 border-slate-700 dark:border-slate-800">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-green-600/20 rounded-xl">
+                      <CheckCircle className="w-6 h-6 text-green-400" />
+                    </div>
+                    <CardTitle className="text-md font-bold text-slate-100">Bank Reconciliation</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3 border-t border-slate-700 pt-4">
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Book Balance</span>
+                      <span className="text-slate-100 font-bold">₦8,542,300</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Bank Balance</span>
+                      <span className="text-slate-100 font-bold">₦8,542,300</span>
+                    </div>
+                    <div className="border-t border-slate-700 pt-2 flex justify-between font-bold">
+                      <span className="text-emerald-400">Status</span>
+                      <span className="text-emerald-400">Reconciled</span>
+                    </div>
+                  </div>
+                  <Button size="sm" className="w-full bg-slate-700 hover:bg-emerald-600 text-slate-100 font-bold">
+                    View Transactions
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-slate-800 dark:bg-slate-900/30 border-slate-700 dark:border-slate-800">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-indigo-600/20 rounded-xl">
+                      <FileText className="w-6 h-6 text-indigo-400" />
+                    </div>
+                    <CardTitle className="text-md font-bold text-slate-100">Audit Trail</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3 border-t border-slate-700 pt-4">
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Last Audit</span>
+                      <span className="text-slate-100 font-bold">Mar 1, 2026</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Entries Logged</span>
+                      <span className="text-slate-100 font-bold">2,453</span>
+                    </div>
+                    <div className="border-t border-slate-700 pt-2 flex justify-between font-bold">
+                      <span className="text-indigo-400">Status</span>
+                      <span className="text-indigo-400">Active</span>
+                    </div>
+                  </div>
+                  <Button size="sm" className="w-full bg-slate-700 hover:bg-indigo-600 text-slate-100 font-bold">
+                    View Audit Log
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Tax & Compliance Section */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-bold text-slate-100 dark:text-white tracking-tight underline decoration-pink-500/30 underline-offset-8">Tax & Compliance</h2>
+                <Badge variant="outline" className="bg-slate-800 dark:bg-slate-800 text-slate-300 dark:text-slate-400 font-mono">Regulatory</Badge>
+              </div>
+            </div>
+
+            <Card className="bg-slate-800 dark:bg-slate-900/30 border-slate-700 dark:border-slate-800">
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">Tax Summary</div>
+                    <div className="text-2xl font-black text-slate-100 mb-2">₦847,500</div>
+                    <div className="text-xs text-slate-400">YTD Tax Liability</div>
+                  </div>
+                  <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">Compliance Status</div>
+                    <div className="text-2xl font-black text-emerald-400 mb-2">100%</div>
+                    <div className="text-xs text-slate-400">All Filings Current</div>
+                  </div>
+                  <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">Next Filing</div>
+                    <div className="text-sm font-black text-slate-100 mb-2">Q2 2026</div>
+                    <div className="text-xs text-slate-400">In 45 days</div>
+                  </div>
+                  <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">Deductions Available</div>
+                    <div className="text-2xl font-black text-blue-400 mb-2">₦253,000</div>
+                    <div className="text-xs text-slate-400">Current Period</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Right Column - Audit & Pending */}
@@ -216,7 +554,7 @@ export const AccountingManagement = () => {
                   { msg: 'Revenue Synced', sub: 'Last 30 days verified', color: 'bg-blue-500' },
                   { msg: 'Vendor Check', sub: 'All accounts active', color: 'bg-indigo-500' },
                 ].map((item, i) => (
-                  <div key={i} className="p-4 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer text-slate-900 dark:text-white">
+                  <div key={i} className="p-4 flex items-center gap-3 hover:bg-slate-700 dark:hover:bg-slate-700/50 transition-colors cursor-pointer text-slate-100 dark:text-white">
                     <div className={`w-2 h-2 rounded-full ${item.color}`} />
                     <div className="flex-1">
                       <div className="text-sm font-bold">{item.msg}</div>

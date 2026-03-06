@@ -453,7 +453,7 @@ const Landing = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link to="/product">
-              <Button size="lg" variant="outline" className="bg-white text-slate-900 hover:bg-slate-100 border-slate-200">
+              <Button size="lg" variant="outline" className="bg-slate-700 text-slate-100 hover:bg-slate-600 border-slate-600">
                 Learn More About Our Platform
               </Button>
             </Link>

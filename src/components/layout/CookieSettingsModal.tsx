@@ -61,7 +61,7 @@ export const CookieSettingsModal = ({
                         <div className="space-y-1">
                             <div className="flex items-center gap-2">
                                 <span className="font-bold text-sm">Essential Cookies</span>
-                                <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Required</span>
+                                <span className="text-[10px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Required</span>
                             </div>
                             <p className="text-xs text-slate-500 leading-relaxed">
                                 Necessary for the website to function. They provide basic features like security, network management, and accessibility.

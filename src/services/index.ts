@@ -52,7 +52,6 @@ export {
   useScheduleRemindersMutation,
   useDeleteNotificationsMutation,
   useGetProgressQuery,
-  useGetWalletQuery,
   useGetBig5Query,
   useGetContactsQuery,
   useGetLibraryQuery,
@@ -87,3 +86,9 @@ export {
   useUpdateBusinessTypeMutation,
   useDeleteBusinessTypeMutation,
 } from './businessTypesApi';
+
+export {
+  walletApi,
+  useGetGlobalWalletSummaryQuery,
+  useGetWalletQuery,
+} from './walletApi';

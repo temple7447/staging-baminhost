@@ -141,33 +141,33 @@ const PropertyDetails = () => {
 
                         {/* Quick Features */}
                         <div className="flex flex-wrap items-center gap-4 md:gap-8">
-                            <div className="flex items-center gap-4 bg-slate-50 px-6 py-4 rounded-2xl border border-slate-100/50">
-                                <div className="p-2.5 bg-blue-100 rounded-xl">
-                                    <Bed className="h-5 w-5 text-blue-600" />
+                            <div className="flex items-center gap-4 bg-slate-700 px-6 py-4 rounded-2xl border border-slate-600">
+                                <div className="p-2.5 bg-slate-800 rounded-xl">
+                                    <Bed className="h-5 w-5 text-blue-400" />
                                 </div>
                                 <div>
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Bedrooms</p>
-                                    <p className="text-base font-bold text-slate-900">{property.bedrooms || 0} Beds</p>
+                                    <p className="text-base font-bold text-slate-100">{property.bedrooms || 0} Beds</p>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4 bg-slate-50 px-6 py-4 rounded-2xl border border-slate-100/50">
-                                <div className="p-2.5 bg-blue-100 rounded-xl">
-                                    <Bath className="h-5 w-5 text-blue-600" />
+                            <div className="flex items-center gap-4 bg-slate-700 px-6 py-4 rounded-2xl border border-slate-600">
+                                <div className="p-2.5 bg-slate-800 rounded-xl">
+                                    <Bath className="h-5 w-5 text-blue-400" />
                                 </div>
                                 <div>
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Bathrooms</p>
-                                    <p className="text-base font-bold text-slate-900">{property.bathrooms || 0} Baths</p>
+                                    <p className="text-base font-bold text-slate-100">{property.bathrooms || 0} Baths</p>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4 bg-slate-50 px-6 py-4 rounded-2xl border border-slate-100/50">
-                                <div className="p-2.5 bg-blue-100 rounded-xl">
-                                    <Maximize className="h-5 w-5 text-blue-600" />
+                            <div className="flex items-center gap-4 bg-slate-700 px-6 py-4 rounded-2xl border border-slate-600">
+                                <div className="p-2.5 bg-slate-800 rounded-xl">
+                                    <Maximize className="h-5 w-5 text-blue-400" />
                                 </div>
                                 <div>
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Living Area</p>
-                                    <p className="text-base font-bold text-slate-900">
+                                    <p className="text-base font-bold text-slate-100">
                                         {property.area ? `${property.area.toLocaleString()} sqft` : "N/A"}
                                     </p>
                                 </div>
