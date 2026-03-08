@@ -148,8 +148,8 @@ export interface AuthResponse {
 export interface OnboardManagerRequest {
   name: string;
   email: string;
-  phone: string;
-  estateIds: string[];
+  phone?: string;
+  position?: string;
   sendCredentials?: boolean;
 }
 

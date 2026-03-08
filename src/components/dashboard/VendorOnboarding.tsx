@@ -15,32 +15,35 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserPlus, Loader2 } from 'lucide-react';
 import { useOnboardVendorMutation } from '@/services/vendorsApi';
+import { useGetManagersQuery } from '@/services/authApi';
 import { useGetBusinessTypesQuery } from '@/services/businessTypesApi';
 import { toast } from '@/components/ui/use-toast';
 
 export const VendorOnboarding = () => {
     const [open, setOpen] = useState(false);
     const [onboardVendor, { isLoading }] = useOnboardVendorMutation();
+    const { data: managersData, isLoading: loadingManagers } = useGetManagersQuery();
     const { data: businessTypesData, isLoading: loadingBusinessTypes } = useGetBusinessTypesQuery({ activeOnly: true });
 
     // Form state
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [managerId, setManagerId] = useState('');
     const [phone, setPhone] = useState('');
+    const [position, setPosition] = useState('');
     const [businessTypeId, setBusinessTypeId] = useState('');
-    const [businessName, setBusinessName] = useState('');
-    const [specialization, setSpecialization] = useState('');
     const [sendCredentials, setSendCredentials] = useState(true);
 
+    const managers = managersData?.data || [];
     const businessTypes = businessTypesData?.data || [];
 
     const resetForm = () => {
         setName('');
         setEmail('');
+        setManagerId('');
         setPhone('');
+        setPosition('');
         setBusinessTypeId('');
-        setBusinessName('');
-        setSpecialization('');
         setSendCredentials(true);
     };
 
@@ -77,17 +80,26 @@ export const VendorOnboarding = () => {
             return;
         }
 
+        if (!managerId) {
+            toast({
+                title: 'Validation Error',
+                description: 'Please select a manager',
+                variant: 'destructive',
+            });
+            return;
+        }
+
         try {
             const payload: any = {
                 name: name.trim(),
                 email: email.trim(),
+                managerId,
                 sendCredentials,
             };
 
             if (phone.trim()) payload.phone = phone.trim();
+            if (position.trim()) payload.position = position.trim();
             if (businessTypeId) payload.businessTypeId = businessTypeId;
-            if (businessName.trim()) payload.businessName = businessName.trim();
-            if (specialization.trim()) payload.specialization = specialization.trim();
 
             const result = await onboardVendor(payload).unwrap();
 
@@ -131,7 +143,7 @@ export const VendorOnboarding = () => {
                             </Label>
                             <Input
                                 id="name"
-                                placeholder="e.g., John Doe"
+                                placeholder="e.g., John Vendor"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 required
@@ -145,28 +157,46 @@ export const VendorOnboarding = () => {
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="e.g., vendor@example.com"
+                                placeholder="e.g., john.vendor@example.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                             />
                         </div>
 
-                        {/* Optional Fields */}
                         <div className="grid gap-2">
-                            <Label htmlFor="phone">Phone (Optional)</Label>
-                            <Input
-                                id="phone"
-                                type="tel"
-                                placeholder="e.g., 08012345678"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                            />
+                            <Label htmlFor="managerId">
+                                Assign Manager <span className="text-destructive">*</span>
+                            </Label>
+                            {loadingManagers ? (
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Loading managers...
+                                </div>
+                            ) : (
+                                <Select value={managerId} onValueChange={setManagerId}>
+                                    <SelectTrigger id="managerId">
+                                        <SelectValue placeholder="Select manager" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {managers.map((manager: any) => (
+                                            <SelectItem key={manager._id} value={manager._id}>
+                                                {manager.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            )}
+                            {managers.length === 0 && !loadingManagers && (
+                                <p className="text-xs text-muted-foreground">
+                                    No managers available. Create a manager first.
+                                </p>
+                            )}
                         </div>
 
-                        {/* Business Type Dropdown */}
+                        {/* Optional Fields */}
                         <div className="grid gap-2">
-                            <Label htmlFor="businessType">Business Type (Optional)</Label>
+                            <Label htmlFor="businessType">Business Type</Label>
                             {loadingBusinessTypes ? (
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -193,26 +223,25 @@ export const VendorOnboarding = () => {
                             )}
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="businessName">Business Name (Optional)</Label>
-                                <Input
-                                    id="businessName"
-                                    placeholder="e.g., John's Plumbing"
-                                    value={businessName}
-                                    onChange={(e) => setBusinessName(e.target.value)}
-                                />
-                            </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="phone">Phone</Label>
+                            <Input
+                                id="phone"
+                                type="tel"
+                                placeholder="e.g., +1234567890"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                            />
+                        </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="specialization">Specialization (Optional)</Label>
-                                <Input
-                                    id="specialization"
-                                    placeholder="e.g., Residential Plumbing"
-                                    value={specialization}
-                                    onChange={(e) => setSpecialization(e.target.value)}
-                                />
-                            </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="position">Position</Label>
+                            <Input
+                                id="position"
+                                placeholder="e.g., Maintenance Vendor"
+                                value={position}
+                                onChange={(e) => setPosition(e.target.value)}
+                            />
                         </div>
 
                         {/* Send Credentials Checkbox */}

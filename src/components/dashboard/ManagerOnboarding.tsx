@@ -5,23 +5,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useOnboardManagerMutation } from '@/services/authApi';
-import { useGetEstatesQuery } from '@/services/estatesApi';
 import { toast } from '@/components/ui/use-toast';
 import { UserPlus } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 
 export const ManagerOnboarding = () => {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
-    const [selectedEstateIds, setSelectedEstateIds] = useState<string[]>([]);
+    const [position, setPosition] = useState('');
     const [sendCredentials, setSendCredentials] = useState(true);
 
-    const { data: estatesPage, isLoading: estatesLoading } = useGetEstatesQuery({ page: 1, limit: 100 });
     const [onboardManager, { isLoading: onboarding }] = useOnboardManagerMutation();
-
-    const estates = estatesPage?.data ?? [];
 
     const handleSubmit = async () => {
         // Validation
@@ -33,21 +28,13 @@ export const ManagerOnboarding = () => {
             toast({ title: 'Email is required', variant: 'destructive' });
             return;
         }
-        if (!phone.trim()) {
-            toast({ title: 'Phone is required', variant: 'destructive' });
-            return;
-        }
-        if (selectedEstateIds.length === 0) {
-            toast({ title: 'Please select at least one estate', variant: 'destructive' });
-            return;
-        }
 
         try {
             const result = await onboardManager({
                 name: name.trim(),
                 email: email.trim(),
-                phone: phone.trim(),
-                estateIds: selectedEstateIds,
+                ...(phone.trim() && { phone: phone.trim() }),
+                ...(position.trim() && { position: position.trim() }),
                 sendCredentials,
             }).unwrap();
 
@@ -60,7 +47,7 @@ export const ManagerOnboarding = () => {
             setName('');
             setEmail('');
             setPhone('');
-            setSelectedEstateIds([]);
+            setPosition('');
             setSendCredentials(true);
             setOpen(false);
         } catch (error: any) {
@@ -72,13 +59,7 @@ export const ManagerOnboarding = () => {
         }
     };
 
-    const toggleEstate = (estateId: string) => {
-        setSelectedEstateIds((prev) =>
-            prev.includes(estateId)
-                ? prev.filter((id) => id !== estateId)
-                : [...prev, estateId]
-        );
-    };
+
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -99,7 +80,7 @@ export const ManagerOnboarding = () => {
                             <Label htmlFor="name">Full Name *</Label>
                             <Input
                                 id="name"
-                                placeholder="e.g. John Manager"
+                                placeholder="e.g. John Doe"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                             />
@@ -109,71 +90,30 @@ export const ManagerOnboarding = () => {
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="e.g. john.manager@example.com"
+                                placeholder="e.g. john.doe@example.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="phone">Phone *</Label>
+                            <Label htmlFor="phone">Phone</Label>
                             <Input
                                 id="phone"
                                 type="tel"
-                                placeholder="e.g. +234XXXXXXXXXX"
+                                placeholder="e.g. +1234567890"
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
                             />
                         </div>
-                    </div>
-
-                    {/* Estate Selection */}
-                    <div className="grid gap-2">
-                        <Label>Assign Estates *</Label>
-                        <p className="text-sm text-muted-foreground">
-                            Select estates to assign to this manager
-                        </p>
-                        {estatesLoading ? (
-                            <div className="text-sm text-muted-foreground">Loading estates...</div>
-                        ) : estates.length === 0 ? (
-                            <div className="text-sm text-muted-foreground">
-                                No estates available. Create an estate first.
-                            </div>
-                        ) : (
-                            <div className="border rounded-md p-4 max-h-60 overflow-y-auto">
-                                <div className="space-y-3">
-                                    {estates.map((estate) => (
-                                        <div
-                                            key={estate.id}
-                                            className="flex items-center space-x-3 p-2 hover:bg-muted rounded-md cursor-pointer"
-                                            onClick={() => toggleEstate(estate.id)}
-                                        >
-                                            <Checkbox
-                                                checked={selectedEstateIds.includes(estate.id)}
-                                                onCheckedChange={() => toggleEstate(estate.id)}
-                                            />
-                                            <div className="flex-1">
-                                                <div className="font-medium">{estate.name}</div>
-                                                {estate.description && (
-                                                    <div className="text-xs text-muted-foreground">
-                                                        {estate.description}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            {typeof estate.totalUnits === 'number' && (
-                                                <Badge variant="secondary" className="text-xs">
-                                                    {estate.totalUnits} units
-                                                </Badge>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                        {selectedEstateIds.length > 0 && (
-                            <div className="text-sm text-muted-foreground">
-                                {selectedEstateIds.length} estate{selectedEstateIds.length !== 1 ? 's' : ''} selected
-                            </div>
-                        )}
+                        <div className="grid gap-2">
+                            <Label htmlFor="position">Position</Label>
+                            <Input
+                                id="position"
+                                placeholder="e.g. Estate Manager"
+                                value={position}
+                                onChange={(e) => setPosition(e.target.value)}
+                            />
+                        </div>
                     </div>
 
                     {/* Send Credentials Option */}
