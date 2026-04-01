@@ -66,8 +66,8 @@ export const Footer = ({ variant = "dark" }: FooterProps) => {
         <div className={`flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] ${isLight ? "text-slate-400" : "text-slate-300/70"} font-bold tracking-wider uppercase`}>
           <div>© {new Date().getFullYear()} Bami Hustle. All rights reserved.</div>
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-blue-600 transition-colors">Privacy</a>
-            <a href="#" className="hover:text-blue-600 transition-colors">Terms</a>
+            <Link to="/privacy" className="hover:text-blue-600 transition-colors">Privacy</Link>
+            <Link to="/terms" className="hover:text-blue-600 transition-colors">Terms</Link>
             <a href="#" className="hover:text-blue-600 transition-colors">Security</a>
           </div>
         </div>

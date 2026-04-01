@@ -26,6 +26,8 @@ const PropertyDetails = lazy(() => import("./pages/PropertyDetails"));
 const EstateList = lazy(() => import("./pages/EstateList"));
 const VendorProfile = lazy(() => import("./pages/VendorProfile"));
 const EquipmentDetails = lazy(() => import("./pages/EquipmentDetails"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
 
 // Loading skeleton component
 const LoadingFallback = () => (
@@ -100,6 +102,8 @@ const AppContent: React.FC = () => {
                         <Route path="/marketplace/estate/:id" element={<PropertyDetails />} />
                         <Route path="/marketplace/vendor/:id" element={<VendorProfile />} />
                         <Route path="/marketplace/equipment/:id" element={<EquipmentDetails />} />
+                        <Route path="/privacy" element={<Privacy />} />
+                        <Route path="/terms" element={<Terms />} />
 
                         {/* Authenticated app */}
                         <Route path="/app" element={<Index />} />
