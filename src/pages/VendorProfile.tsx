@@ -275,7 +275,7 @@ const VendorProfile = () => {
                                         <CheckCircle2 className="w-5 h-5 mr-2" /> Confirm Booking
                                     </Button>
                                     <p className="text-[10px] text-center text-slate-400 font-medium px-4">
-                                        By confirming, you agree to our <Link to="#" className="text-blue-500 underline">Terms of Service</Link> and payment policies.
+                                        By confirming, you agree to our <Link to="/terms" className="text-blue-500 underline">Terms of Service</Link> and payment policies.
                                     </p>
                                 </div>
 
