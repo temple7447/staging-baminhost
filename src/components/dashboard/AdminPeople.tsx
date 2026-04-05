@@ -12,15 +12,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 // Demo data removed - using only API data
-import { Building, Users as UsersIcon, UserCog, MoreVertical, UserPlus, Shield, CheckCircle, XCircle, Pencil, Trash2 } from "lucide-react";
+import { Building, Users as UsersIcon, UserCog, MoreVertical, UserPlus, Shield, CheckCircle, XCircle, Pencil, Trash2, Mail } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useGetBusinessOwnersQuery, useUpdateBusinessOwnerMutation, useUpdateBusinessOwnerStatusMutation, useDeleteBusinessOwnerMutation, useGetManagersQuery, useUpdateManagerMutation, useUpdateManagerStatusMutation, useDeleteManagerMutation } from "@/services/authApi";
-import { useGetEstatesQuery } from "@/services/estatesApi";
-import { useGetVendorsQuery, useUpdateVendorMutation, useUpdateVendorStatusMutation, useDeleteVendorMutation } from "@/services/vendorsApi";
+import { useGetBusinessOwnersQuery, useUpdateBusinessOwnerMutation, useUpdateBusinessOwnerStatusMutation, useDeleteBusinessOwnerMutation, useResendBusinessOwnerCredentialsMutation, useGetManagersQuery, useUpdateManagerMutation, useUpdateManagerStatusMutation, useDeleteManagerMutation, useResendManagerCredentialsMutation } from "@/services/authApi";
+import { useGetEstatesQuery, type Estate } from "@/services/estatesApi";
+import { useGetVendorsQuery, useUpdateVendorMutation, useUpdateVendorStatusMutation, useDeleteVendorMutation, useResendVendorCredentialsMutation } from "@/services/vendorsApi";
 import { useGetBusinessTypesQuery } from "@/services/businessTypesApi";
 import { BusinessOwnerOnboarding } from "./BusinessOwnerOnboarding";
 import { VendorOnboarding } from "./VendorOnboarding";
 import { ManagerOnboarding } from "./ManagerOnboarding";
+import { BusinessOwnerEditDialog, type UpdateBusinessOwnerData } from "./BusinessOwnerEditDialog";
+import { ManagerEditDialog, type UpdateManagerData } from "./ManagerEditDialog";
+import { VendorEditDialog, type VendorEditData } from "./vendors/VendorEditDialog";
 import { toast } from "@/components/ui/use-toast";
 import type { BusinessOwner, Manager } from "@/types/auth";
 import type { Vendor } from "@/services/vendorsApi";
@@ -54,6 +57,7 @@ export const AdminPeople = () => {
   const [updateBusinessOwner, { isLoading: updating }] = useUpdateBusinessOwnerMutation();
   const [updateBusinessOwnerStatus, { isLoading: togglingStatus }] = useUpdateBusinessOwnerStatusMutation();
   const [deleteBusinessOwner, { isLoading: deleting }] = useDeleteBusinessOwnerMutation();
+  const [resendBusinessOwnerCredentials, { isLoading: resendingBOCredentials }] = useResendBusinessOwnerCredentialsMutation();
 
   // Vendors (from API)
   const { data: vendorsData, isLoading: vendorsLoading } = useGetVendorsQuery();
@@ -61,12 +65,14 @@ export const AdminPeople = () => {
   const [updateVendor, { isLoading: updatingVendor }] = useUpdateVendorMutation();
   const [updateVendorStatus, { isLoading: togglingVendorStatus }] = useUpdateVendorStatusMutation();
   const [deleteVendor, { isLoading: deletingVendor }] = useDeleteVendorMutation();
+  const [resendVendorCredentials, { isLoading: resendingVendorCredentials }] = useResendVendorCredentialsMutation();
 
   // Managers (from API)
   const { data: managersData, isLoading: managersLoading } = useGetManagersQuery();
   const [updateManager, { isLoading: updatingManager }] = useUpdateManagerMutation();
   const [updateManagerStatus, { isLoading: togglingManagerStatus }] = useUpdateManagerStatusMutation();
   const [deleteManager, { isLoading: deletingManager }] = useDeleteManagerMutation();
+  const [resendManagerCredentials, { isLoading: resendingManagerCredentials }] = useResendManagerCredentialsMutation();
 
   // Use API vendors only
   const apiVendors = vendorsData?.data ?? [];
@@ -116,6 +122,10 @@ export const AdminPeople = () => {
   const [editVendorBusinessTypeId, setEditVendorBusinessTypeId] = useState('');
   const [editVendorBusinessName, setEditVendorBusinessName] = useState('');
   const [editVendorSpecialization, setEditVendorSpecialization] = useState('');
+  const [editVendorCacNumber, setEditVendorCacNumber] = useState('');
+  const [editVendorBusinessAddress, setEditVendorBusinessAddress] = useState('');
+  const [editVendorServices, setEditVendorServices] = useState('');
+  const [editVendorOperationalHours, setEditVendorOperationalHours] = useState('');
 
   // Manager Edit State
   const [editManagerOpen, setEditManagerOpen] = useState(false);
@@ -261,6 +271,10 @@ export const AdminPeople = () => {
     setEditVendorBusinessTypeId(vendor.businessTypeId || '');
     setEditVendorBusinessName(vendor.businessName || '');
     setEditVendorSpecialization(vendor.specialization || '');
+    setEditVendorCacNumber(vendor.cacNumber || '');
+    setEditVendorBusinessAddress(vendor.businessAddress || '');
+    setEditVendorServices(vendor.services || '');
+    setEditVendorOperationalHours(vendor.operationalHours || '');
     setEditVendorOpen(true);
   };
 
@@ -276,6 +290,10 @@ export const AdminPeople = () => {
           businessTypeId: editVendorBusinessTypeId || undefined,
           businessName: editVendorBusinessName.trim(),
           specialization: editVendorSpecialization.trim(),
+          cacNumber: editVendorCacNumber.trim(),
+          businessAddress: editVendorBusinessAddress.trim(),
+          services: editVendorServices.trim(),
+          operationalHours: editVendorOperationalHours.trim(),
         },
       }).unwrap();
       toast({ title: 'Vendor updated successfully' });
@@ -377,6 +395,55 @@ export const AdminPeople = () => {
     setEditManagerEstateIds((prev) =>
       prev.includes(estateId) ? prev.filter((id) => id !== estateId) : [...prev, estateId]
     );
+  };
+
+  // Resend Credentials Handlers
+  const handleResendBusinessOwnerCredentials = async (ownerId: string, ownerName: string) => {
+    try {
+      await resendBusinessOwnerCredentials(ownerId).unwrap();
+      toast({
+        title: "Credentials sent",
+        description: `Credentials resent successfully to ${ownerName}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to resend credentials",
+        description: error?.data?.message || "An error occurred",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleResendManagerCredentials = async (managerId: string, managerName: string) => {
+    try {
+      await resendManagerCredentials(managerId).unwrap();
+      toast({
+        title: "Credentials sent",
+        description: `Credentials resent successfully to ${managerName}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to resend credentials",
+        description: error?.data?.message || "An error occurred",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleResendVendorCredentials = async (vendorId: string, vendorName: string) => {
+    try {
+      await resendVendorCredentials(vendorId).unwrap();
+      toast({
+        title: "Credentials sent",
+        description: `Credentials resent successfully to ${vendorName}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to resend credentials",
+        description: error?.data?.message || "An error occurred",
+        variant: "destructive",
+      });
+    }
   };
 
   // Demo assignment removed
@@ -499,6 +566,19 @@ export const AdminPeople = () => {
                                       </>
                                     )}
                                   </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleResendBusinessOwnerCredentials(owner._id, owner.name)} disabled={resendingBOCredentials}>
+                                    {resendingBOCredentials ? (
+                                      <>
+                                        <div className="h-4 w-4 mr-2 animate-spin" />
+                                        Sending...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Mail className="h-4 w-4 mr-2" />
+                                        Resend Credentials
+                                      </>
+                                    )}
+                                  </DropdownMenuItem>
                                   <DropdownMenuSeparator />
                                   <AlertDialog>
                                     <AlertDialogTrigger asChild>
@@ -610,6 +690,19 @@ export const AdminPeople = () => {
                                     <>
                                       <CheckCircle className="h-4 w-4 mr-2" />
                                       Activate
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleResendManagerCredentials(manager._id, manager.name)} disabled={resendingManagerCredentials}>
+                                  {resendingManagerCredentials ? (
+                                    <>
+                                      <div className="h-4 w-4 mr-2 animate-spin" />
+                                      Sending...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Mail className="h-4 w-4 mr-2" />
+                                      Resend Credentials
                                     </>
                                   )}
                                 </DropdownMenuItem>
@@ -727,6 +820,19 @@ export const AdminPeople = () => {
                                     </>
                                   )}
                                 </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleResendVendorCredentials(v.id || v._id, v.name)} disabled={resendingVendorCredentials}>
+                                  {resendingVendorCredentials ? (
+                                    <>
+                                      <div className="h-4 w-4 mr-2 animate-spin" />
+                                      Sending...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Mail className="h-4 w-4 mr-2" />
+                                      Resend Credentials
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
@@ -786,84 +892,25 @@ export const AdminPeople = () => {
       </Dialog>
 
       {/* Edit Business Owner Dialog */}
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Business Owner</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-6 py-4">
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="edit-name">Full Name</Label>
-                <Input
-                  id="edit-name"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-email">Email</Label>
-                <Input
-                  id="edit-email"
-                  type="email"
-                  value={editEmail}
-                  onChange={(e) => setEditEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-phone">Phone</Label>
-                <Input
-                  id="edit-phone"
-                  type="tel"
-                  value={editPhone}
-                  onChange={(e) => setEditPhone(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Estate Selection */}
-            <div className="grid gap-2">
-              <Label>Assigned Estates</Label>
-              <div className="border rounded-md p-4 max-h-60 overflow-y-auto">
-                <div className="space-y-3">
-                  {estates.map((estate) => (
-                    <div
-                      key={estate.id}
-                      className="flex items-center space-x-3 p-2 hover:bg-muted rounded-md cursor-pointer"
-                      onClick={() => toggleEstateSelection(estate.id)}
-                    >
-                      <Checkbox
-                        checked={editEstateIds.includes(estate.id)}
-                        onCheckedChange={() => toggleEstateSelection(estate.id)}
-                      />
-                      <div className="flex-1">
-                        <div className="font-medium">{estate.name}</div>
-                        {estate.description && (
-                          <div className="text-xs text-muted-foreground">{estate.description}</div>
-                        )}
-                      </div>
-                      {typeof estate.totalUnits === 'number' && (
-                        <Badge variant="secondary" className="text-xs">
-                          {estate.totalUnits} units
-                        </Badge>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2 pt-4 border-t">
-              <Button variant="outline" onClick={() => setEditOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleEdit} disabled={updating}>
-                {updating ? 'Saving...' : 'Save Changes'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <BusinessOwnerEditDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        businessOwner={editingOwner}
+        estates={estates}
+        onSave={async (id, data) => {
+          await updateBusinessOwner({
+            id,
+            data: {
+              name: data.name,
+              email: data.email,
+              phone: data.phone,
+              estateIds: data.estateIds,
+            },
+          }).unwrap();
+          toast({ title: "Business owner updated successfully" });
+        }}
+        isLoading={updating}
+      />
 
       {/* Status Toggle Dialog */}
       <AlertDialog open={statusOpen} onOpenChange={setStatusOpen}>
@@ -888,83 +935,37 @@ export const AdminPeople = () => {
       </AlertDialog>
 
       {/* Edit Vendor Dialog */}
-      <Dialog open={editVendorOpen} onOpenChange={setEditVendorOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Vendor</DialogTitle>
-            <DialogDescription>Update vendor information</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="edit-vendor-name">Full Name</Label>
-              <Input
-                id="edit-vendor-name"
-                value={editVendorName}
-                onChange={(e) => setEditVendorName(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-vendor-email">Email</Label>
-              <Input
-                id="edit-vendor-email"
-                type="email"
-                value={editVendorEmail}
-                onChange={(e) => setEditVendorEmail(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-vendor-phone">Phone</Label>
-              <Input
-                id="edit-vendor-phone"
-                type="tel"
-                value={editVendorPhone}
-                onChange={(e) => setEditVendorPhone(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-vendor-business-type">Business Type</Label>
-              <Select value={editVendorBusinessTypeId} onValueChange={setEditVendorBusinessTypeId}>
-                <SelectTrigger id="edit-vendor-business-type">
-                  <SelectValue placeholder="Select business type (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  {businessTypes.map((type) => (
-                    <SelectItem key={type._id} value={type._id}>
-                      {type.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="edit-vendor-business-name">Business Name</Label>
-                <Input
-                  id="edit-vendor-business-name"
-                  value={editVendorBusinessName}
-                  onChange={(e) => setEditVendorBusinessName(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-vendor-specialization">Specialization</Label>
-                <Input
-                  id="edit-vendor-specialization"
-                  value={editVendorSpecialization}
-                  onChange={(e) => setEditVendorSpecialization(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button variant="outline" onClick={() => setEditVendorOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleVendorEdit} disabled={updatingVendor}>
-              {updatingVendor ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <VendorEditDialog
+        open={editVendorOpen}
+        onOpenChange={setEditVendorOpen}
+        vendor={editingVendor}
+        businessTypes={businessTypes}
+        onSave={async (id, data) => {
+          await updateVendor({
+            id,
+            data: {
+              name: data.name,
+              email: data.email,
+              phone: data.phone,
+              businessTypeId: data.businessTypeId,
+              businessName: data.businessName,
+              specialization: data.specialization,
+              bio: data.bio,
+              cacNumber: data.cacNumber,
+              govId: data.govId,
+              certification: data.certification,
+              isVerifiedPro: data.isVerifiedPro,
+              businessAddress: data.businessAddress,
+              location: data.location,
+              operationalHours: data.operationalHours,
+              portfolio: data.portfolio,
+              services: data.services,
+            },
+          }).unwrap();
+          toast({ title: "Vendor updated successfully" });
+        }}
+        isLoading={updatingVendor}
+      />
 
       {/* Vendor Status Toggle Dialog */}
       <AlertDialog open={vendorStatusOpen} onOpenChange={setVendorStatusOpen}>
@@ -989,84 +990,25 @@ export const AdminPeople = () => {
       </AlertDialog>
 
       {/* Edit Manager Dialog */}
-      <Dialog open={editManagerOpen} onOpenChange={setEditManagerOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Manager</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-6 py-4">
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="edit-manager-name">Full Name</Label>
-                <Input
-                  id="edit-manager-name"
-                  value={editManagerName}
-                  onChange={(e) => setEditManagerName(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-manager-email">Email</Label>
-                <Input
-                  id="edit-manager-email"
-                  type="email"
-                  value={editManagerEmail}
-                  onChange={(e) => setEditManagerEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-manager-phone">Phone</Label>
-                <Input
-                  id="edit-manager-phone"
-                  type="tel"
-                  value={editManagerPhone}
-                  onChange={(e) => setEditManagerPhone(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Estate Selection */}
-            <div className="grid gap-2">
-              <Label>Assigned Estates</Label>
-              <div className="border rounded-md p-4 max-h-60 overflow-y-auto">
-                <div className="space-y-3">
-                  {estates.map((estate) => (
-                    <div
-                      key={estate.id}
-                      className="flex items-center space-x-3 p-2 hover:bg-muted rounded-md cursor-pointer"
-                      onClick={() => toggleManagerEstateSelection(estate.id)}
-                    >
-                      <Checkbox
-                        checked={editManagerEstateIds.includes(estate.id)}
-                        onCheckedChange={() => toggleManagerEstateSelection(estate.id)}
-                      />
-                      <div className="flex-1">
-                        <div className="font-medium">{estate.name}</div>
-                        {estate.description && (
-                          <div className="text-xs text-muted-foreground">{estate.description}</div>
-                        )}
-                      </div>
-                      {typeof estate.totalUnits === 'number' && (
-                        <Badge variant="secondary" className="text-xs">
-                          {estate.totalUnits} units
-                        </Badge>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2 pt-4 border-t">
-              <Button variant="outline" onClick={() => setEditManagerOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleManagerEdit} disabled={updatingManager}>
-                {updatingManager ? 'Saving...' : 'Save Changes'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ManagerEditDialog
+        open={editManagerOpen}
+        onOpenChange={setEditManagerOpen}
+        manager={editingManager}
+        estates={estates}
+        onSave={async (id, data) => {
+          await updateManager({
+            id,
+            data: {
+              name: data.name,
+              email: data.email,
+              phone: data.phone,
+              estateIds: data.estateIds,
+            },
+          }).unwrap();
+          toast({ title: "Manager updated successfully" });
+        }}
+        isLoading={updatingManager}
+      />
 
       {/* Manager Status Toggle Dialog */}
       <AlertDialog open={managerStatusOpen} onOpenChange={setManagerStatusOpen}>

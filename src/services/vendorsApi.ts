@@ -3,7 +3,7 @@ import { BASE_API_URL } from './api';
 
 export interface Vendor {
     _id: string;
-    id?: string; // Keep as optional for compatibility
+    id?: string;
     name: string;
     email: string;
     role: 'vendor';
@@ -17,15 +17,38 @@ export interface Vendor {
     };
     emailVerified: boolean;
     businessName?: string;
+    businessTypeId?: string;
     specialization?: string;
+    bio?: string;
     cacNumber?: string;
+    govId?: string;
+    certification?: string;
+    isVerifiedPro?: boolean;
     businessAddress?: string;
-    portfolio: string[];
+    location?: {
+        type?: string;
+        coordinates?: number[];
+        address?: string;
+    };
+    operationalHours?: {
+        monday?: string;
+        tuesday?: string;
+        wednesday?: string;
+        thursday?: string;
+        friday?: string;
+        saturday?: string;
+        sunday?: string;
+    };
+    portfolio?: string[];
+    services?: Array<{
+        name: string;
+        price?: number;
+    }>;
     assignedBusinesses: any[];
     createdAt: string;
     updatedAt: string;
     __v?: number;
-    status?: 'approved' | 'pending' | 'suspended'; // Keep these as they are client-side or future server fields
+    status?: 'approved' | 'pending' | 'suspended';
 }
 
 export interface OnboardVendorPayload {
@@ -38,6 +61,21 @@ export interface OnboardVendorPayload {
     sendCredentials?: boolean;
 }
 
+export interface VendorServiceItem {
+    name: string;
+    price?: number;
+}
+
+export interface VendorOperationalHours {
+    monday?: string;
+    tuesday?: string;
+    wednesday?: string;
+    thursday?: string;
+    friday?: string;
+    saturday?: string;
+    sunday?: string;
+}
+
 export interface UpdateVendorPayload {
     name?: string;
     email?: string;
@@ -45,6 +83,20 @@ export interface UpdateVendorPayload {
     businessTypeId?: string;
     businessName?: string;
     specialization?: string;
+    bio?: string;
+    cacNumber?: string;
+    govId?: string;
+    certification?: string;
+    isVerifiedPro?: boolean;
+    businessAddress?: string;
+    location?: {
+        type?: string;
+        coordinates?: number[];
+        address?: string;
+    };
+    operationalHours?: VendorOperationalHours;
+    portfolio?: string[];
+    services?: VendorServiceItem[];
 }
 
 export interface VendorResponse {
@@ -141,7 +193,14 @@ export const vendorsApi = createApi({
                 url: `/api/auth/vendor/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: [{ type: 'Vendors', id: 'LIST' }],
+            invalidatesTags: [{ type: 'VendorList', id: 'LIST' }],
+        }),
+        resendVendorCredentials: builder.mutation<{ message: string }, string>({
+            query: (id) => ({
+                url: `/api/auth/vendor/${id}/resend-credentials`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['Vendor'],
         }),
         getPublicVendors: builder.query<{ success: boolean; count: number; data: Vendor[] }, string | void>({
             query: (search) => ({
@@ -170,6 +229,7 @@ export const {
     useUpdateVendorMutation,
     useUpdateVendorStatusMutation,
     useDeleteVendorMutation,
+    useResendVendorCredentialsMutation,
     useGetPublicVendorsQuery,
     useGetPublicVendorQuery
 } = vendorsApi;

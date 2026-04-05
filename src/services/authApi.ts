@@ -138,6 +138,27 @@ export const authApi = createApi({
       }),
       invalidatesTags: [{ type: 'Auth', id: 'MANAGER_LIST' }],
     }),
+    resendBusinessOwnerCredentials: builder.mutation<{ message: string }, string>({
+      query: (id) => ({
+        url: `/api/auth/business-owner/${id}/resend-credentials`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Auth'],
+    }),
+    resendManagerCredentials: builder.mutation<{ message: string }, string>({
+      query: (id) => ({
+        url: `/api/auth/manager/${id}/resend-credentials`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Auth'],
+    }),
+    resendVendorCredentials: builder.mutation<{ message: string }, string>({
+      query: (id) => ({
+        url: `/api/auth/vendor/${id}/resend-credentials`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Auth'],
+    }),
     requestOtp: builder.mutation<AuthResponse, RequestOtpRequest>({
       query: (data) => ({
         url: '/api/auth/forgotpassword-otp',
@@ -179,6 +200,9 @@ export const {
   useUpdateManagerMutation,
   useUpdateManagerStatusMutation,
   useDeleteManagerMutation,
+  useResendBusinessOwnerCredentialsMutation,
+  useResendManagerCredentialsMutation,
+  useResendVendorCredentialsMutation,
   useRequestOtpMutation,
   useVerifyOtpMutation,
   useResetPasswordWithOtpMutation
