@@ -2,7 +2,7 @@ export interface Permission {
   id: string;
   name: string;
   description: string;
-  category: 'dashboard' | 'financial' | 'business' | 'management' | 'system';
+  category: 'dashboard' | 'financial' | 'business' | 'management' | 'system' | 'operations';
 }
 
 export interface RoleConfig {
