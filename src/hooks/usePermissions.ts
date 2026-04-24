@@ -69,8 +69,12 @@ export const usePermissions = () => {
       isOwner: userRole === 'super_admin',
       isBusinessOwner: userRole === 'business_owner',
       isBig7: userRole === 'big7',
+      isSuperManager: userRole === 'super_manager',
       isManager: userRole === 'manager',
+      isSuperVendor: userRole === 'super_vendor',
       isVendor: userRole === 'vendor',
+      isTenant: userRole === 'tenant',
+      isUser: userRole === 'user',
       isCustomer: userRole === 'customer',
 
       // Role priority (for UI layering/restrictions)

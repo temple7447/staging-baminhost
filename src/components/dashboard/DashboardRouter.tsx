@@ -8,6 +8,7 @@ import { Big7Dashboard } from '@/components/dashboard/Big7Dashboard';
 import { ManagerDashboard } from '@/components/dashboard/ManagerDashboard';
 import { VendorDashboard } from '@/components/dashboard/VendorDashboard';
 import { CustomerDashboard } from '@/components/dashboard/CustomerDashboard';
+import { TenantDashboard } from '@/components/dashboard/TenantDashboard';
 import { WalletDashboard } from '@/components/dashboard/WalletDashboard';
 import { EstateManagement } from '@/components/dashboard/business/EstateManagement';
 import { EstateDetailPage } from '@/components/dashboard/business/EstateDetailPage';
@@ -49,13 +50,21 @@ const DashboardRouter: React.FC = () => {
       case 'super_admin':
         return <OwnerDashboard />;
       case 'business_owner':
-        return <ManagerDashboard />; // Business owners see manager-level dashboard
+        return <ManagerDashboard />;
       case 'big7':
         return <Big7Dashboard />;
+      case 'super_manager':
+        return <ManagerDashboard />;
       case 'manager':
         return <ManagerDashboard />;
+      case 'super_vendor':
+        return <VendorDashboard />;
       case 'vendor':
         return <VendorDashboard />;
+      case 'tenant':
+        return <TenantDashboard />;
+      case 'user':
+        return <TenantDashboard />;
       case 'customer':
         return <CustomerDashboard />;
       default:

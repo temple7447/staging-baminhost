@@ -161,6 +161,7 @@ const sidebarItems: SidebarItem[] = [
     label: "People",
     icon: Users,
     category: 'system',
+    requiredPermissions: ['view_people', 'manage_users'],
     path: '/dashboard/people'
   },
   {
@@ -168,6 +169,7 @@ const sidebarItems: SidebarItem[] = [
     label: "Business Types",
     icon: Briefcase,
     category: 'system',
+    requiredPermissions: ['view_business_types', 'manage_business_types'],
     path: '/dashboard/business-types'
   },
   {
@@ -253,6 +255,7 @@ const sidebarItems: SidebarItem[] = [
     label: "Subscription",
     icon: CreditCard,
     category: 'system',
+    requiredPermissions: ['view_subscription', 'manage_subscription'],
     path: '/dashboard/subscription'
   }
 ];

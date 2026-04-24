@@ -265,6 +265,55 @@ export const PERMISSIONS: Record<string, Permission> = {
     name: 'View All Data',
     description: 'Access to all system data and records',
     category: 'system'
+  },
+  // Tenant/User permissions
+  'submit_maintenance': {
+    id: 'submit_maintenance',
+    name: 'Submit Maintenance Request',
+    description: 'Submit maintenance requests for the property',
+    category: 'operations'
+  },
+  'view_maintenance': {
+    id: 'view_maintenance',
+    name: 'View Maintenance Requests',
+    description: 'View submitted maintenance requests',
+    category: 'operations'
+  },
+  'manage_visitors': {
+    id: 'manage_visitors',
+    name: 'Manage Visitors',
+    description: 'Generate and manage visitor access codes',
+    category: 'operations'
+  },
+  'view_notices': {
+    id: 'view_notices',
+    name: 'View Notices',
+    description: 'View estate notices and announcements',
+    category: 'operations'
+  },
+  'view_people': {
+    id: 'view_people',
+    name: 'View People',
+    description: 'View people management',
+    category: 'system'
+  },
+  'view_business_types': {
+    id: 'view_business_types',
+    name: 'View Business Types',
+    description: 'View business types management',
+    category: 'system'
+  },
+  'view_subscription': {
+    id: 'view_subscription',
+    name: 'View Subscriptions',
+    description: 'View subscription management',
+    category: 'system'
+  },
+  'manage_accounting': {
+    id: 'manage_accounting',
+    name: 'Manage Accounting',
+    description: 'Access accounting management',
+    category: 'financial'
   }
 };
 
@@ -407,6 +456,43 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
     ]
   },
 
+  super_manager: {
+    id: 'super_manager',
+    name: 'Super Manager',
+    description: 'Senior management with expanded access',
+    priority: 75,
+    permissions: [
+      'view_overview',
+      'view_big5',
+      'view_scalable_impact',
+      'view_wallet',
+      'view_portfolio',
+      'view_split_tracker',
+      'view_goals',
+      'view_contacts',
+      'view_managing_like_a_boss',
+      'view_library',
+      'view_assistant',
+      'view_settings',
+      'view_personal_portfolios',
+      'view_reports',
+      'view_estate',
+      'manage_estate',
+      'view_filling_station',
+      'manage_filling_station',
+      'view_equipment',
+      'manage_equipment',
+      'manage_commissions',
+      'view_payment_history',
+      'view_all_data',
+      'view_strategic_hiring',
+      'view_hiring_triggers',
+      'manage_candidates',
+      'view_hiring_metrics',
+      'conduct_halo_research'
+    ]
+  },
+
   vendor: {
     id: 'vendor',
     name: 'Vendor Partner',
@@ -424,6 +510,25 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
     ]
   },
 
+  super_vendor: {
+    id: 'super_vendor',
+    name: 'Super Vendor',
+    description: 'Senior vendor with expanded access',
+    priority: 55,
+    permissions: [
+      'view_overview',
+      'view_big5',
+      'view_contacts',
+      'view_settings',
+      'upload_work_proof',
+      'track_commissions',
+      'view_payment_history',
+      'make_payments',
+      'view_wallet',
+      'view_reports'
+    ]
+  },
+
   customer: {
     id: 'customer',
     name: 'Customer',
@@ -437,6 +542,38 @@ export const ROLE_CONFIGS: Record<string, RoleConfig> = {
       'track_projects',
       'make_payments',
       'view_payment_history' // Only their own payment history
+    ]
+  },
+
+  tenant: {
+    id: 'tenant',
+    name: 'Tenant',
+    description: 'Rent payment and maintenance management',
+    priority: 25,
+    permissions: [
+      'view_overview',
+      'view_settings',
+      'make_payments',
+      'view_payment_history',
+      'submit_maintenance',
+      'view_maintenance',
+      'manage_visitors',
+      'view_notices'
+    ]
+  },
+
+  user: {
+    id: 'user',
+    name: 'User',
+    description: 'Basic resident access',
+    priority: 15,
+    permissions: [
+      'view_overview',
+      'view_settings',
+      'make_payments',
+      'view_payment_history',
+      'submit_maintenance',
+      'view_maintenance'
     ]
   }
 };
@@ -497,5 +634,11 @@ export const NAVIGATION_PERMISSIONS: Record<string, string[]> = {
   'transactions': ['view_all_data'],
   'theme-showcase': ['view_overview'], // Available to everyone who can view overview
   'admin': ['manage_users', 'manage_system'],
-  'system': ['manage_system', 'view_all_data']
+  'system': ['manage_system', 'view_all_data'],
+  // System Tools
+  'people': ['view_people', 'manage_users'],
+  'business-types': ['view_business_types', 'manage_business_types'],
+  'subscription': ['view_subscription', 'manage_subscription'],
+  // Financial
+  'accounting': ['view_all_data', 'manage_accounting']
 };

@@ -1,8 +1,10 @@
+export type UserRole = 'super_admin' | 'admin' | 'business_owner' | 'super_manager' | 'manager' | 'super_vendor' | 'vendor' | 'tenant' | 'user' | 'big7' | 'customer';
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'super_admin' | 'business_owner' | 'admin' | 'big7' | 'manager' | 'vendor' | 'customer';
+  role: UserRole;
   phone?: string;
   department?: string;
   hourlyRate?: number;

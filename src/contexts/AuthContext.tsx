@@ -1,10 +1,11 @@
 import { ReactNode, createContext, useContext, useState, useEffect } from "react";
+import type { UserRole } from "@/types/auth";
 
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'super_admin' | 'business_owner' | 'admin' | 'big7' | 'manager' | 'vendor' | 'customer';
+  role: UserRole;
   phone?: string;
   department?: string;
   hourlyRate?: number;
