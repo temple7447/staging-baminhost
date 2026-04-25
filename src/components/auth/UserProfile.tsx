@@ -180,7 +180,7 @@ export const UserProfile = () => {
       </div>
 
       {/* Profile Overview */}
-      <Card className="backdrop-blur-sm bg-white/90 shadow-xl border-white/20">
+      <Card className="bg-slate-50 dark:bg-slate-800 shadow-xl border-slate-200 dark:border-slate-700">
         <CardHeader>
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -208,13 +208,13 @@ export const UserProfile = () => {
       </Card>
 
       {/* Role Information */}
-      <Card className="backdrop-blur-sm bg-white/90 shadow-xl border-white/20">
+      <Card className="bg-slate-50 dark:bg-slate-800 shadow-xl border-slate-200 dark:border-slate-700">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Role & Permissions
+<CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
+            {roleDetails.icon && <roleDetails.icon className="h-5 w-5" />}
+            Role Details
           </CardTitle>
-          <CardDescription>Your access level and system permissions</CardDescription>
+          <CardDescription className="text-slate-500 dark:text-slate-400">Your access level and system permissions</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -257,9 +257,9 @@ export const UserProfile = () => {
       </Card>
 
       {/* Settings Tabs */}
-      <Card className="backdrop-blur-sm bg-white/90 shadow-xl border-white/20">
+      <Card className="bg-slate-50 dark:bg-slate-800 shadow-xl border-slate-200 dark:border-slate-700">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
             <Settings className="h-5 w-5" />
             Account Settings
           </CardTitle>

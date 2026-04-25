@@ -150,7 +150,7 @@ export const SettingsPage = () => {
               </Button>
             </div>
 
-            <Card className="backdrop-blur-sm bg-white/90 shadow-xl border-white/20">
+            <Card className="bg-slate-50 dark:bg-slate-800 shadow-xl border-slate-200 dark:border-slate-700">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
                   {activeSettings?.icon && <activeSettings.icon className="h-6 w-6" />}
@@ -212,7 +212,7 @@ export const SettingsPage = () => {
         {/* Sidebar */}
         <div className={`
           settings-sidebar mobile-sidebar
-          w-full md:w-72 lg:w-80 xl:w-96 min-w-0 border-r backdrop-blur-md bg-white/90 p-4 md:p-6 shadow-lg overflow-auto
+          w-full md:w-72 lg:w-80 xl:w-96 min-w-0 border-r bg-slate-50 dark:bg-slate-800 p-4 md:p-6 shadow-lg overflow-auto
           md:relative md:translate-x-0 md:z-auto
           fixed top-0 left-0 z-50 h-full transition-transform duration-300 ease-in-out
           ${showSidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
