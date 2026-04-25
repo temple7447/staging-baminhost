@@ -292,30 +292,32 @@ export const TenantDashboard: React.FC = () => {
         return;
       }
 
+      // Get payment provider name
+      const getProviderName = (method: string) => {
+        switch (method) {
+          case 'wallet': return 'Wallet';
+          case 'paystack': return 'Paystack';
+          case 'flutterwave': return 'Flutterwave';
+          default: return method;
+        }
+      };
+
       toast({ 
         title: "Processing Payment", 
-        description: `Redirecting to ${paymentForm.method === 'paystack' ? 'Paystack' : 'Flutterwave'}...` 
+        description: paymentForm.method === 'wallet' 
+          ? "Processing payment from your wallet..."
+          : `Redirecting to ${getProviderName(paymentForm.method)}...` 
       });
 
-      // Process payment (uncomment when payment gateways are configured)
-      // const response = await processPayment({
-      //   provider: paymentForm.method as 'paystack' | 'flutterwave',
-      //   email: tenantInfo.email,
-      //   amount: paymentForm.amount,
-      //   metadata: {
-      //     tenantId: tenantInfo.id,
-      //     paymentType: paymentForm.type,
-      //     month: paymentForm.month,
-      //     apartmentNumber: tenantInfo.apartmentNumber,
-      //   }
-      // });
-
       // For demo purposes, simulate successful payment
+      // If using wallet, in real app would deduct from wallet balance
       const receiptNumber = `RCP-${Date.now()}`;
       
       toast({ 
         title: "Payment Successful", 
-        description: `Receipt #${receiptNumber} generated` 
+        description: paymentForm.method === 'wallet'
+          ? `Payment of ${formatCurrency(paymentForm.amount)} deducted from wallet. Receipt #${receiptNumber}`
+          : `Receipt #${receiptNumber} generated` 
       });
 
       // Generate receipt
@@ -329,7 +331,7 @@ export const TenantDashboard: React.FC = () => {
         estateName: tenantInfo.estateName,
         amount: paymentForm.amount,
         paymentType: paymentForm.type as any,
-        paymentMethod: paymentForm.method === 'paystack' ? 'Paystack' : 'Flutterwave',
+        paymentMethod: paymentForm.method === 'wallet' ? 'Wallet' : paymentForm.method === 'paystack' ? 'Paystack' : 'Flutterwave',
         reference: receiptNumber,
         status: 'paid',
         month: paymentForm.month,
@@ -1112,28 +1114,42 @@ export const TenantDashboard: React.FC = () => {
             {/* Payment Method Selection */}
             <div>
               <Label>Payment Method</Label>
-              <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="grid grid-cols-3 gap-3 mt-2">
+                <div
+                  onClick={() => setPaymentForm({ ...paymentForm, method: "wallet" })}
+                  className={`p-4 border-2 rounded-lg cursor-pointer transition ${
+                    paymentForm.method === "wallet"
+                      ? "border-green-600 bg-green-50 dark:bg-green-900/30"
+                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
+                  }`}
+                >
+                  <Wallet className={`h-6 w-6 mb-1 ${paymentForm.method === "wallet" ? "text-green-600" : "text-slate-500"}`} />
+                  <div className="font-semibold text-sm text-slate-900 dark:text-white">Wallet</div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Instant pay</p>
+                </div>
                 <div
                   onClick={() => setPaymentForm({ ...paymentForm, method: "paystack" })}
                   className={`p-4 border-2 rounded-lg cursor-pointer transition ${
                     paymentForm.method === "paystack"
-                      ? "border-blue-600 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-blue-600 bg-blue-50 dark:bg-blue-900/30"
+                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
                   }`}
                 >
-                  <div className="font-semibold text-sm">Paystack</div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Card, Bank Transfer</p>
+                  <CreditCard className={`h-6 w-6 mb-1 ${paymentForm.method === "paystack" ? "text-blue-600" : "text-slate-500"}`} />
+                  <div className="font-semibold text-sm text-slate-900 dark:text-white">Paystack</div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Card, Transfer</p>
                 </div>
                 <div
                   onClick={() => setPaymentForm({ ...paymentForm, method: "flutterwave" })}
                   className={`p-4 border-2 rounded-lg cursor-pointer transition ${
                     paymentForm.method === "flutterwave"
-                      ? "border-purple-600 bg-purple-50"
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-purple-600 bg-purple-50 dark:bg-purple-900/30"
+                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
                   }`}
                 >
-                  <div className="font-semibold text-sm">Flutterwave</div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Card, USSD, Mobile</p>
+                  <CreditCard className={`h-6 w-6 mb-1 ${paymentForm.method === "flutterwave" ? "text-purple-600" : "text-slate-500"}`} />
+                  <div className="font-semibold text-sm text-slate-900 dark:text-white">Flutterwave</div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Card, USSD</p>
                 </div>
               </div>
             </div>

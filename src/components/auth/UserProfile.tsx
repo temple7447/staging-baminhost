@@ -335,7 +335,7 @@ export const UserProfile = () => {
             <TabsContent value="security" className="space-y-4">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Change Password</h3>
+                  <h3 className="text-lg font-medium mb-4 text-slate-900 dark:text-white">Change Password</h3>
                   <div className="space-y-4 max-w-md">
                     <div className="space-y-2">
                       <Label htmlFor="current-password">Current Password</Label>
@@ -393,7 +393,7 @@ export const UserProfile = () => {
                 <Separator />
 
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Security Settings</h3>
+                  <h3 className="text-lg font-medium mb-4 text-slate-900 dark:text-white">Security Settings</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
@@ -439,7 +439,7 @@ export const UserProfile = () => {
             <TabsContent value="notifications" className="space-y-4">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Communication Preferences</h3>
+                  <h3 className="text-lg font-medium mb-4 text-slate-900 dark:text-white">Communication Preferences</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
@@ -477,7 +477,7 @@ export const UserProfile = () => {
                 <Separator />
 
                 <div>
-                  <h3 className="text-lg font-medium mb-4">System Notifications</h3>
+                  <h3 className="text-lg font-medium mb-4 text-slate-900 dark:text-white">System Notifications</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
@@ -517,7 +517,7 @@ export const UserProfile = () => {
             <TabsContent value="preferences" className="space-y-4">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Dashboard Preferences</h3>
+                  <h3 className="text-lg font-medium mb-4 text-slate-900 dark:text-white">Dashboard Preferences</h3>
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label>Default Dashboard View</Label>
