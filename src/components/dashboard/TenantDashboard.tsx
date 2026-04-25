@@ -236,7 +236,7 @@ const formatDate = (dateString: string) => {
 };
 
 export const TenantDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user: authUser } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
   const [maintenanceDialogOpen, setMaintenanceDialogOpen] = useState(false);
@@ -254,11 +254,30 @@ export const TenantDashboard: React.FC = () => {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [downloadingReceipt, setDownloadingReceipt] = useState<string | null>(null);
 
-  const tenant = tenantData.tenant;
-  const daysUntilRentDue = Math.ceil((new Date(tenant.nextPaymentDue).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+  // Use demo data or user data
+  const tenant = authUser ? {
+    tenant: {
+      name: authUser.name || "Valued Tenant",
+      apartmentNumber: "Flat 4B",
+      estateName: "Rose Garden Estate",
+      leaseStatus: "active",
+      leaseEndDate: "2026-12-31",
+      monthlyRent: 250000,
+      rentDueDay: 25,
+      outstandingBalance: 0,
+      nextPaymentDue: "2025-05-25"
+    }
+  } : tenantData;
+
+  const tenantInfo = tenant?.tenant || tenant;
+  const displayName = tenantInfo?.name || authUser?.name || "Valued Tenant";
+  const firstName = displayName?.split(" ")[0] || "Valued";
+  const daysUntilRentDue = tenantInfo?.nextPaymentDue 
+    ? Math.ceil((new Date(tenantInfo.nextPaymentDue).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    : 30;
 
   const handlePayRent = () => {
-    setPaymentForm({ type: "rent", amount: tenant.monthlyRent, method: "paystack", month: "Current Month" });
+    setPaymentForm({ type: "rent", amount: tenantInfo.monthlyRent, method: "paystack", month: "Current Month" });
     setPaymentDialogOpen(true);
   };
 
@@ -280,13 +299,13 @@ export const TenantDashboard: React.FC = () => {
       // Process payment (uncomment when payment gateways are configured)
       // const response = await processPayment({
       //   provider: paymentForm.method as 'paystack' | 'flutterwave',
-      //   email: tenant.email,
+      //   email: tenantInfo.email,
       //   amount: paymentForm.amount,
       //   metadata: {
-      //     tenantId: tenant.id,
+      //     tenantId: tenantInfo.id,
       //     paymentType: paymentForm.type,
       //     month: paymentForm.month,
-      //     apartmentNumber: tenant.apartmentNumber,
+      //     apartmentNumber: tenantInfo.apartmentNumber,
       //   }
       // });
 
@@ -302,11 +321,11 @@ export const TenantDashboard: React.FC = () => {
       await generateReceiptPDF({
         receiptNumber,
         date: new Date().toISOString(),
-        tenantName: tenant.name,
-        tenantEmail: tenant.email,
-        tenantPhone: tenant.phone,
-        apartmentNumber: tenant.apartmentNumber,
-        estateName: tenant.estateName,
+        tenantName: tenantInfo.name,
+        tenantEmail: tenantInfo.email,
+        tenantPhone: tenantInfo.phone,
+        apartmentNumber: tenantInfo.apartmentNumber,
+        estateName: tenantInfo.estateName,
         amount: paymentForm.amount,
         paymentType: paymentForm.type as any,
         paymentMethod: paymentForm.method === 'paystack' ? 'Paystack' : 'Flutterwave',
@@ -341,11 +360,11 @@ export const TenantDashboard: React.FC = () => {
       await generateReceiptPDF({
         receiptNumber: `RCP-${paymentId}-${Date.now()}`,
         date: payment.date,
-        tenantName: tenant.name,
-        tenantEmail: tenant.email,
-        tenantPhone: tenant.phone,
-        apartmentNumber: tenant.apartmentNumber,
-        estateName: tenant.estateName,
+        tenantName: tenantInfo.name,
+        tenantEmail: tenantInfo.email,
+        tenantPhone: tenantInfo.phone,
+        apartmentNumber: tenantInfo.apartmentNumber,
+        estateName: tenantInfo.estateName,
         amount: payment.amount,
         paymentType: 'rent',
         paymentMethod: payment.method,
@@ -409,11 +428,11 @@ export const TenantDashboard: React.FC = () => {
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-2xl">Welcome back, {tenant.tenant.name.split(" ")[0]}!</CardTitle>
+                  <CardTitle className="text-2xl">Welcome back, {firstName}!</CardTitle>
                   <CardDescription>Here's your home overview</CardDescription>
                 </div>
-                <Badge className={`${getStatusColor(tenant.leaseStatus)} border`}>
-                  {tenant.leaseStatus === "active" ? "Active Lease" : "Lease Expiring"}
+                <Badge className={`${getStatusColor(tenantInfo.leaseStatus)} border`}>
+                  {tenantInfo.leaseStatus === "active" ? "Active Lease" : "Lease Expiring"}
                 </Badge>
               </div>
             </CardHeader>
@@ -424,15 +443,15 @@ export const TenantDashboard: React.FC = () => {
                     <Building className="h-4 w-4" />
                     <span className="text-sm">Apartment</span>
                   </div>
-                  <p className="text-lg font-semibold">{tenant.apartmentNumber}</p>
-                  <p className="text-sm text-muted-foreground">{tenant.estateName}</p>
+                  <p className="text-lg font-semibold">{tenantInfo.apartmentNumber}</p>
+                  <p className="text-sm text-muted-foreground">{tenantInfo.estateName}</p>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 border">
                   <div className="flex items-center gap-2 text-muted-foreground mb-1">
                     <Key className="h-4 w-4" />
                     <span className="text-sm">Lease Ends</span>
                   </div>
-                  <p className="text-lg font-semibold">{formatDate(tenant.leaseEndDate)}</p>
+                  <p className="text-lg font-semibold">{formatDate(tenantInfo.leaseEndDate)}</p>
                   <p className="text-sm text-muted-foreground">Active</p>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 border">
@@ -440,7 +459,7 @@ export const TenantDashboard: React.FC = () => {
                     <Calendar className="h-4 w-4" />
                     <span className="text-sm">Next Rent Due</span>
                   </div>
-                  <p className="text-lg font-semibold">{formatDate(tenant.nextPaymentDue)}</p>
+                  <p className="text-lg font-semibold">{formatDate(tenantInfo.nextPaymentDue)}</p>
                   <p className="text-sm text-muted-foreground">{daysUntilRentDue} days remaining</p>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 border">
@@ -448,7 +467,7 @@ export const TenantDashboard: React.FC = () => {
                     <DollarSign className="h-4 w-4" />
                     <span className="text-sm">Outstanding</span>
                   </div>
-                  <p className="text-lg font-semibold">{formatCurrency(tenant.outstandingBalance)}</p>
+                  <p className="text-lg font-semibold">{formatCurrency(tenantInfo.outstandingBalance)}</p>
                   <p className="text-sm text-green-600">All paid up!</p>
                 </div>
               </div>
@@ -530,8 +549,8 @@ export const TenantDashboard: React.FC = () => {
                 <CardDescription>Current rent amount</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold">{formatCurrency(tenant.monthlyRent)}</p>
-                <p className="text-sm text-muted-foreground mt-2">Due: {formatDate(tenant.nextPaymentDue)}</p>
+                <p className="text-3xl font-bold">{formatCurrency(tenantInfo.monthlyRent)}</p>
+                <p className="text-sm text-muted-foreground mt-2">Due: {formatDate(tenantInfo.nextPaymentDue)}</p>
                 <Button className="w-full mt-4" onClick={handlePayRent}>Pay Rent</Button>
               </CardContent>
             </Card>
@@ -542,8 +561,8 @@ export const TenantDashboard: React.FC = () => {
                 <CardDescription>Amount due</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold">{formatCurrency(tenant.outstandingBalance)}</p>
-                {tenant.outstandingBalance === 0 && (
+                <p className="text-3xl font-bold">{formatCurrency(tenantInfo.outstandingBalance)}</p>
+                {tenantInfo.outstandingBalance === 0 && (
                   <p className="text-sm text-green-600 mt-2">You're all caught up!</p>
                 )}
               </CardContent>
@@ -556,7 +575,7 @@ export const TenantDashboard: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-bold">{formatCurrency(15000)}</p>
-                <p className="text-sm text-muted-foreground mt-2">Due: {formatDate(tenant.nextPaymentDue)}</p>
+                <p className="text-sm text-muted-foreground mt-2">Due: {formatDate(tenantInfo.nextPaymentDue)}</p>
                 <Button variant="outline" className="w-full mt-4">Pay Service Charge</Button>
               </CardContent>
             </Card>
