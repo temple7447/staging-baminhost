@@ -1,5 +1,18 @@
 /* Settings Page Responsive Utilities */
 
+/* Milky white background for settings cards */
+.settings-card {
+  background-color: #fafafa;
+  border: 1px solid #e5e5e5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .settings-card {
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+  }
+}
+
 /* Line clamp utility for text truncation */
 .line-clamp-1 {
   overflow: hidden;

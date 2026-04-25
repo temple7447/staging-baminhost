@@ -107,7 +107,7 @@ export const UserProfile = () => {
         return {
           title: 'Customer',
           description: 'Service consumption and payment management',
-          color: 'bg-gray-100 text-gray-800',
+          color: 'bg-slate-100 text-slate-800',
           permissions: ['View Account', 'Make Payments', 'Track Projects'],
           workHours: 'N/A',
           allocation: 'Payment plans available'
@@ -116,7 +116,7 @@ export const UserProfile = () => {
         return {
           title: 'User',
           description: 'System user',
-          color: 'bg-gray-100 text-gray-800',
+          color: 'bg-slate-100 text-slate-800',
           permissions: [],
           workHours: 'N/A',
           allocation: 'N/A'
@@ -170,8 +170,8 @@ export const UserProfile = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">User Profile</h1>
-          <p className="text-muted-foreground">Manage your account settings and preferences</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">User Profile</h1>
+          <p className="text-slate-500 dark:text-slate-400">Manage your account settings and preferences</p>
         </div>
         <Button variant="outline" onClick={() => logout()}>
           <LogOut className="h-4 w-4 mr-2" />
@@ -197,11 +197,11 @@ export const UserProfile = () => {
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-bold">{user?.name}</h2>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{user?.name}</h2>
                 <Badge className={roleDetails.color}>{roleDetails.title}</Badge>
               </div>
-              <p className="text-muted-foreground">{roleDetails.description}</p>
-              <p className="text-sm text-muted-foreground mt-1">{user?.email}</p>
+              <p className="text-slate-500 dark:text-slate-400">{roleDetails.description}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{user?.email}</p>
             </div>
           </div>
         </CardHeader>
@@ -223,21 +223,21 @@ export const UserProfile = () => {
                 <Clock className="h-4 w-4" />
                 Work Schedule
               </div>
-              <div className="text-sm text-muted-foreground">{roleDetails.workHours}</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">{roleDetails.workHours}</div>
             </div>
             <div className="space-y-2">
               <div className="text-sm font-medium flex items-center gap-2">
                 <DollarSign className="h-4 w-4" />
                 Allocation
               </div>
-              <div className="text-sm text-muted-foreground">{roleDetails.allocation}</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">{roleDetails.allocation}</div>
             </div>
             <div className="space-y-2">
               <div className="text-sm font-medium flex items-center gap-2">
                 <Building className="h-4 w-4" />
                 Department
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-slate-500 dark:text-slate-400">
                 {user?.department ? user.department.replace('_', ' ').toUpperCase() : 'N/A'}
               </div>
             </div>
@@ -246,7 +246,7 @@ export const UserProfile = () => {
           <Separator className="my-4" />
           
           <div>
-            <div className="text-sm font-medium mb-2">Permissions</div>
+            <div className="text-sm font-medium mb-2 text-slate-900 dark:text-white">Permissions</div>
             <div className="flex flex-wrap gap-2">
               {roleDetails.permissions.map((permission, index) => (
                 <Badge key={index} variant="outline">{permission}</Badge>
@@ -276,7 +276,7 @@ export const UserProfile = () => {
             <TabsContent value="profile" className="space-y-4">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium">Personal Information</h3>
+                  <h3 className="text-lg font-medium text-slate-900 dark:text-white">Personal Information</h3>
                   <Button 
                     variant="outline" 
                     onClick={() => setIsEditing(!isEditing)}
@@ -398,7 +398,7 @@ export const UserProfile = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">Two-Factor Authentication</div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-slate-500 dark:text-slate-400">
                           Add an extra layer of security to your account
                         </div>
                       </div>
@@ -410,7 +410,7 @@ export const UserProfile = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">Login Alerts</div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-slate-500 dark:text-slate-400">
                           Get notified when someone signs into your account
                         </div>
                       </div>
@@ -422,7 +422,7 @@ export const UserProfile = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">Device Tracking</div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-slate-500 dark:text-slate-400">
                           Keep track of devices that access your account
                         </div>
                       </div>
@@ -444,7 +444,7 @@ export const UserProfile = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">Email Notifications</div>
-                        <div className="text-sm text-muted-foreground">Receive updates via email</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400">Receive updates via email</div>
                       </div>
                       <Switch
                         checked={notifications.emailNotifications}
@@ -454,7 +454,7 @@ export const UserProfile = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">WhatsApp Notifications</div>
-                        <div className="text-sm text-muted-foreground">Receive updates via WhatsApp</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400">Receive updates via WhatsApp</div>
                       </div>
                       <Switch
                         checked={notifications.whatsappNotifications}
@@ -464,7 +464,7 @@ export const UserProfile = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">SMS Notifications</div>
-                        <div className="text-sm text-muted-foreground">Receive updates via SMS</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400">Receive updates via SMS</div>
                       </div>
                       <Switch
                         checked={notifications.smsNotifications}
@@ -482,7 +482,7 @@ export const UserProfile = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">Transaction Alerts</div>
-                        <div className="text-sm text-muted-foreground">Get notified of all transactions</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400">Get notified of all transactions</div>
                       </div>
                       <Switch
                         checked={notifications.transactionAlerts}
@@ -492,7 +492,7 @@ export const UserProfile = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">Payment Reminders</div>
-                        <div className="text-sm text-muted-foreground">Reminders for due payments</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400">Reminders for due payments</div>
                       </div>
                       <Switch
                         checked={notifications.paymentReminders}
@@ -502,7 +502,7 @@ export const UserProfile = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">Maintenance Alerts</div>
-                        <div className="text-sm text-muted-foreground">Property and equipment maintenance</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400">Property and equipment maintenance</div>
                       </div>
                       <Switch
                         checked={notifications.maintenanceAlerts}
