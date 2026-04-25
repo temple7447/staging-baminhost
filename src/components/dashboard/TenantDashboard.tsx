@@ -69,7 +69,7 @@ import { useToast } from "@/components/providers/ToastProvider";
 import { useAuth } from "@/contexts/AuthContext";
 import { processPayment } from "@/services/paymentService";
 import { generateReceiptPDF } from "@/utils/receiptGenerator";
-import { useGetDashboardOverviewQuery, useGetMyBillingQuery, useInitiateRentPaymentMutation } from "@/services/estatesApi";
+import { useGetDashboardOverviewQuery, useGetMyBillingQuery, usePayBillingMutation } from "@/services/estatesApi";
 
 const tenantData = {
   tenant: {
@@ -260,7 +260,7 @@ export const TenantDashboard: React.FC = () => {
   // Fetch dashboard overview from API
   const { data: overviewData, isLoading: overviewLoading } = useGetDashboardOverviewQuery();
   const { data: billingData } = useGetMyBillingQuery();
-  const [initiateRentPayment] = useInitiateRentPaymentMutation();
+  const [payBilling, { isLoading: isPaying }] = usePayBillingMutation();
 
   // Get API data
   const apiUser = overviewData?.data?.user;
@@ -327,7 +327,7 @@ export const TenantDashboard: React.FC = () => {
 
       toast("Processing: Payment in progress...");
 
-      // Call the payment API based on type
+      // Payment type to billing code mapping
       const paymentTypeMap: Record<string, string> = {
         'rent': 'rent',
         'service_charge': 'service_charge',
@@ -335,9 +335,10 @@ export const TenantDashboard: React.FC = () => {
         'legal_fee': 'legal_fee',
       };
 
-      const result = await initiateRentPayment({
+      const result = await payBilling({
+        billingCode: paymentTypeMap[paymentForm.type] || paymentForm.type,
         amount: paymentForm.amount,
-        paymentType: paymentTypeMap[paymentForm.type] || 'rent',
+        paymentType: paymentForm.type,
       }).unwrap();
 
       // If there's an authorization URL, open it (Paystack redirect)
