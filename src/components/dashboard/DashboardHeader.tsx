@@ -1,6 +1,5 @@
-import { Bell, Search, Settings, User, LogOut, Menu, X } from "lucide-react";
+import { Bell, Settings, User, LogOut, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface DashboardHeaderProps {
@@ -40,20 +39,7 @@ export const DashboardHeader = ({ onMenuClick, sidebarOpen }: DashboardHeaderPro
         </div>
         
         <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
-          {/* Search - Hidden on Mobile */}
-          <div className="relative hidden lg:block">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input 
-              placeholder="Search transactions, contacts..." 
-              className="w-64 xl:w-80 pl-10"
-            />
-          </div>
-          
-          {/* Search Button for Mobile */}
-          <Button variant="ghost" size="sm" className="lg:hidden p-2">
-            <Search className="w-4 h-4" />
-          </Button>
-          
+          {/* Notifications - hidden on very small screens */}
           <Button variant="ghost" size="sm" className="hidden sm:flex">
             <Bell className="w-4 h-4" />
           </Button>
