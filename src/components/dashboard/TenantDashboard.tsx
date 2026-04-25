@@ -191,15 +191,15 @@ const getStatusColor = (status: string) => {
     case "paid":
     case "completed":
     case "approved":
-      return "bg-green-100 text-green-800 border-green-200";
+      return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border-green-200 dark:border-green-700";
     case "pending":
     case "in_progress":
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      return "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 border-yellow-200 dark:border-yellow-700";
     case "expired":
     case "overdue":
-      return "bg-red-100 text-red-800 border-red-200";
+      return "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border-red-200 dark:border-red-700";
     default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
+      return "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700";
   }
 };
 
@@ -429,8 +429,8 @@ export const TenantDashboard: React.FC = () => {
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-2xl">Welcome back, {firstName}!</CardTitle>
-                  <CardDescription>Here's your home overview</CardDescription>
+                  <CardTitle className="text-2xl text-slate-900 dark:text-white">Welcome back, {firstName}!</CardTitle>
+                  <CardDescription className="text-slate-600 dark:text-slate-400">Here's your home overview</CardDescription>
                 </div>
                 <Badge className={`${getStatusColor(tenantInfo.leaseStatus)} border`}>
                   {tenantInfo.leaseStatus === "active" ? "Active Lease" : "Lease Expiring"}
@@ -439,37 +439,37 @@ export const TenantDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div className="bg-gray-50 rounded-lg p-4 border">
-                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 border">
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
                     <Building className="h-4 w-4" />
                     <span className="text-sm">Apartment</span>
                   </div>
-                  <p className="text-lg font-semibold">{tenantInfo.apartmentNumber}</p>
-                  <p className="text-sm text-muted-foreground">{tenantInfo.estateName}</p>
+                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{tenantInfo.apartmentNumber}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{tenantInfo.estateName}</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4 border">
-                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 border">
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
                     <Key className="h-4 w-4" />
                     <span className="text-sm">Lease Ends</span>
                   </div>
-                  <p className="text-lg font-semibold">{formatDate(tenantInfo.leaseEndDate)}</p>
-                  <p className="text-sm text-muted-foreground">Active</p>
+                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{formatDate(tenantInfo.leaseEndDate)}</p>
+                  <p className="text-sm text-green-600 dark:text-green-400 dark:text-green-400">Active</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4 border">
-                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 border">
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
                     <Calendar className="h-4 w-4" />
                     <span className="text-sm">Next Rent Due</span>
                   </div>
-                  <p className="text-lg font-semibold">{formatDate(tenantInfo.nextPaymentDue)}</p>
-                  <p className="text-sm text-muted-foreground">{daysUntilRentDue} days remaining</p>
+                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{formatDate(tenantInfo.nextPaymentDue)}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{daysUntilRentDue} days remaining</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4 border">
-                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 border">
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
                     <DollarSign className="h-4 w-4" />
                     <span className="text-sm">Outstanding</span>
                   </div>
-                  <p className="text-lg font-semibold">{formatCurrency(tenantInfo.outstandingBalance)}</p>
-                  <p className="text-sm text-green-600">All paid up!</p>
+                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{formatCurrency(tenantInfo.outstandingBalance)}</p>
+                  <p className="text-sm text-green-600 dark:text-green-400 dark:text-green-400">All paid up!</p>
                 </div>
               </div>
 
@@ -497,16 +497,16 @@ export const TenantDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Recent Notices</CardTitle>
+                <CardTitle className="text-lg text-slate-900 dark:text-white">Recent Notices</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {tenantData.notices.slice(0, 3).map((notice) => (
-                  <div key={notice.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                    <Bell className="h-5 w-5 text-blue-600 mt-0.5" />
+                  <div key={notice.id} className="flex items-start gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                    <Bell className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                     <div>
                       <p className="font-medium text-sm">{notice.title}</p>
-                      <p className="text-xs text-muted-foreground line-clamp-2">{notice.content}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{formatDate(notice.date)}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{notice.content}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{formatDate(notice.date)}</p>
                     </div>
                   </div>
                 ))}
@@ -515,13 +515,13 @@ export const TenantDashboard: React.FC = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Maintenance Requests</CardTitle>
+                <CardTitle className="text-lg text-slate-900 dark:text-white">Maintenance Requests</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {tenantData.maintenanceRequests.slice(0, 3).map((request) => {
                   const Icon = getCategoryIcon(request.category);
                   return (
-                    <div key={request.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div key={request.id} className="flex items-start gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
                       <Icon className="h-5 w-5 text-orange-600 mt-0.5" />
                       <div className="flex-1">
                         <p className="font-medium text-sm">{request.title}</p>
@@ -546,37 +546,37 @@ export const TenantDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Monthly Rent</CardTitle>
+                <CardTitle className="text-lg text-slate-900 dark:text-white">Monthly Rent</CardTitle>
                 <CardDescription>Current rent amount</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-bold">{formatCurrency(tenantInfo.monthlyRent)}</p>
-                <p className="text-sm text-muted-foreground mt-2">Due: {formatDate(tenantInfo.nextPaymentDue)}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">Due: {formatDate(tenantInfo.nextPaymentDue)}</p>
                 <Button className="w-full mt-4" onClick={handlePayRent}>Pay Rent</Button>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Outstanding Balance</CardTitle>
+                <CardTitle className="text-lg text-slate-900 dark:text-white">Outstanding Balance</CardTitle>
                 <CardDescription>Amount due</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-bold">{formatCurrency(tenantInfo.outstandingBalance)}</p>
                 {tenantInfo.outstandingBalance === 0 && (
-                  <p className="text-sm text-green-600 mt-2">You're all caught up!</p>
+                  <p className="text-sm text-green-600 dark:text-green-400 mt-2">You're all caught up!</p>
                 )}
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Service Charge</CardTitle>
+                <CardTitle className="text-lg text-slate-900 dark:text-white">Service Charge</CardTitle>
                 <CardDescription>Monthly service charge</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-bold">{formatCurrency(15000)}</p>
-                <p className="text-sm text-muted-foreground mt-2">Due: {formatDate(tenantInfo.nextPaymentDue)}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">Due: {formatDate(tenantInfo.nextPaymentDue)}</p>
                 <Button variant="outline" className="w-full mt-4">Pay Service Charge</Button>
               </CardContent>
             </Card>
@@ -584,15 +584,15 @@ export const TenantDashboard: React.FC = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Payment History</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white">Payment History</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {tenantData.paymentHistory.map((payment) => (
-                  <div key={payment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={payment.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
                     <div className="flex-1">
                       <p className="font-medium">{payment.month}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
                         {formatDate(payment.date)} • {payment.method}
                       </p>
                     </div>
@@ -624,7 +624,7 @@ export const TenantDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Auto-Payment Setup</CardTitle>
+                <CardTitle className="text-slate-900 dark:text-white">Auto-Payment Setup</CardTitle>
                 <CardDescription>Automatically pay rent on due date</CardDescription>
               </div>
               <Button variant="outline">Setup Auto-Pay</Button>
@@ -635,7 +635,7 @@ export const TenantDashboard: React.FC = () => {
         <TabsContent value="maintenance" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Submit Maintenance Request</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white">Submit Maintenance Request</CardTitle>
             </CardHeader>
             <CardContent>
               <Button onClick={handleReportMaintenance}>
@@ -647,7 +647,7 @@ export const TenantDashboard: React.FC = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Your Requests</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white">Your Requests</CardTitle>
               <CardDescription>{tenantData.maintenanceRequests.length} requests</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -663,7 +663,7 @@ export const TenantDashboard: React.FC = () => {
                         <div className="flex items-start justify-between">
                           <div>
                             <p className="font-medium">{request.title}</p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
                               Category: {request.category.replace("_", " ")} •{" "}
                               Submitted: {formatDate(request.createdAt)}
                             </p>
@@ -675,12 +675,12 @@ export const TenantDashboard: React.FC = () => {
                         {request.assignedTo && (
                           <div className="mt-3 pt-3 border-t">
                             <p className="text-sm">
-                              <span className="text-muted-foreground">Assigned Technician: </span>
+                              <span className="text-slate-500 dark:text-slate-400">Assigned Technician: </span>
                               <span className="font-medium">{request.assignedTo}</span>
                             </p>
                             {request.estimatedCompletion && (
                               <p className="text-sm">
-                                <span className="text-muted-foreground">Est. Completion: </span>
+                                <span className="text-slate-500 dark:text-slate-400">Est. Completion: </span>
                                 <span className="font-medium">{formatDate(request.estimatedCompletion)}</span>
                               </p>
                             )}
@@ -698,7 +698,7 @@ export const TenantDashboard: React.FC = () => {
         <TabsContent value="visitors" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Generate Visitor Access</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white">Generate Visitor Access</CardTitle>
               <CardDescription>Create temporary access codes for your visitors</CardDescription>
             </CardHeader>
             <CardContent>
@@ -711,7 +711,7 @@ export const TenantDashboard: React.FC = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Pending Approvals</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white">Pending Approvals</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {tenantData.visitors
@@ -720,7 +720,7 @@ export const TenantDashboard: React.FC = () => {
                   <div key={visitor.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
                       <p className="font-medium">{visitor.name}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
                         {visitor.phone} • {visitor.purpose}
                       </p>
                     </div>
@@ -735,14 +735,14 @@ export const TenantDashboard: React.FC = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Visitor History</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white">Visitor History</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {tenantData.visitors.map((visitor) => (
-                <div key={visitor.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={visitor.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
                   <div>
                     <p className="font-medium">{visitor.name}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
                       Expected: {formatDate(visitor.expectedArrival)} • {visitor.purpose}
                     </p>
                   </div>
@@ -750,7 +750,7 @@ export const TenantDashboard: React.FC = () => {
                     <Badge className={`${getStatusColor(visitor.status)}`}>
                       {visitor.status}
                     </Badge>
-                    <p className="text-xs text-muted-foreground mt-1">{visitor.accessCode}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{visitor.accessCode}</p>
                   </div>
                 </div>
               ))}
@@ -761,7 +761,7 @@ export const TenantDashboard: React.FC = () => {
         <TabsContent value="notices" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Estate Notices & Announcements</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white">Estate Notices & Announcements</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {tenantData.notices.map((notice) => (
@@ -771,14 +771,14 @@ export const TenantDashboard: React.FC = () => {
                       {notice.type === "important" ? (
                         <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
                       ) : notice.type === "event" ? (
-                        <CalendarDays className="h-5 w-5 text-blue-600 mt-0.5" />
+                        <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                       ) : (
-                        <Bell className="h-5 w-5 text-blue-600 mt-0.5" />
+                        <Bell className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                       )}
                       <div>
                         <p className="font-medium">{notice.title}</p>
-                        <p className="text-sm text-muted-foreground">{notice.content}</p>
-                        <p className="text-xs text-muted-foreground mt-2">{formatDate(notice.date)}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{notice.content}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">{formatDate(notice.date)}</p>
                       </div>
                     </div>
                     <Badge variant="outline">{notice.type}</Badge>
@@ -792,16 +792,16 @@ export const TenantDashboard: React.FC = () => {
         <TabsContent value="documents" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Your Documents</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white">Your Documents</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {tenantData.documents.map((doc) => (
-                <div key={doc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-blue-600" />
+                    <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     <div>
                       <p className="font-medium">{doc.name}</p>
-                      <p className="text-xs text-muted-foreground">{formatDate(doc.date)}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">{formatDate(doc.date)}</p>
                     </div>
                   </div>
                   <Button variant="outline" size="sm">
@@ -817,7 +817,7 @@ export const TenantDashboard: React.FC = () => {
         <TabsContent value="complaints" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Submit Complaint</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white">Submit Complaint</CardTitle>
               <CardDescription>Report issues not related to maintenance</CardDescription>
             </CardHeader>
             <CardContent>
@@ -830,7 +830,7 @@ export const TenantDashboard: React.FC = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Complaint History</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white">Complaint History</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {tenantData.complaints.map((complaint) => (
@@ -838,7 +838,7 @@ export const TenantDashboard: React.FC = () => {
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="font-medium">{complaint.title}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
                         {complaint.category} • Submitted: {formatDate(complaint.createdAt)}
                       </p>
                     </div>
@@ -847,7 +847,7 @@ export const TenantDashboard: React.FC = () => {
                   {complaint.response && (
                     <div className="mt-3 pt-3 border-t">
                       <p className="text-sm">
-                        <span className="text-muted-foreground">Response: </span>
+                        <span className="text-slate-500 dark:text-slate-400">Response: </span>
                         {complaint.response}
                       </p>
                     </div>
@@ -859,7 +859,7 @@ export const TenantDashboard: React.FC = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Contact Support</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white">Contact Support</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -884,12 +884,12 @@ export const TenantDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardHeader className="flex flex-row items-center gap-2">
-                <Droplets className="h-5 w-5 text-blue-600" />
-                <CardTitle className="text-lg">Water Bill</CardTitle>
+                <Droplets className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <CardTitle className="text-lg text-slate-900 dark:text-white">Water Bill</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold">{formatCurrency(5000)}</p>
-                <p className="text-sm text-muted-foreground">Due: May 2025</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Due: May 2025</p>
                 <Button className="w-full mt-4" variant="outline">Pay Now</Button>
               </CardContent>
             </Card>
@@ -897,23 +897,23 @@ export const TenantDashboard: React.FC = () => {
             <Card>
               <CardHeader className="flex flex-row items-center gap-2">
                 <Zap className="h-5 w-5 text-yellow-600" />
-                <CardTitle className="text-lg">Electricity</CardTitle>
+                <CardTitle className="text-lg text-slate-900 dark:text-white">Electricity</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold">{formatCurrency(12000)}</p>
-                <p className="text-sm text-muted-foreground">Due: May 2025</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Due: May 2025</p>
                 <Button className="w-full mt-4" variant="outline">Pay Now</Button>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center gap-2">
-                <Trash2 className="h-5 w-5 text-green-600" />
-                <CardTitle className="text-lg">Waste Management</CardTitle>
+                <Trash2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <CardTitle className="text-lg text-slate-900 dark:text-white">Waste Management</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold">{formatCurrency(2000)}</p>
-                <p className="text-sm text-muted-foreground">Due: May 2025</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Due: May 2025</p>
                 <Button className="w-full mt-4" variant="outline">Pay Now</Button>
               </CardContent>
             </Card>
@@ -921,11 +921,11 @@ export const TenantDashboard: React.FC = () => {
             <Card>
               <CardHeader className="flex flex-row items-center gap-2">
                 <Car className="h-5 w-5 text-orange-600" />
-                <CardTitle className="text-lg">Generator Levy</CardTitle>
+                <CardTitle className="text-lg text-slate-900 dark:text-white">Generator Levy</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold">{formatCurrency(8000)}</p>
-                <p className="text-sm text-muted-foreground">Due: May 2025</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Due: May 2025</p>
                 <Button className="w-full mt-4" variant="outline">Pay Now</Button>
               </CardContent>
             </Card>
@@ -933,15 +933,15 @@ export const TenantDashboard: React.FC = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Utility Payment History</CardTitle>
+              <CardTitle className="text-slate-900 dark:text-white">Utility Payment History</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {tenantData.serviceCharges.map((charge) => (
-                  <div key={charge.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={charge.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
                     <div>
                       <p className="font-medium">{charge.type}</p>
-                      <p className="text-sm text-muted-foreground">{charge.month}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{charge.month}</p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold">{formatCurrency(charge.amount)}</p>
@@ -1102,9 +1102,9 @@ export const TenantDashboard: React.FC = () => {
           <div className="space-y-6 py-4">
             {/* Amount Display */}
             <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg border">
-              <p className="text-sm text-muted-foreground mb-1">Amount to Pay</p>
-              <p className="text-3xl font-bold text-green-600">{formatCurrency(paymentForm.amount)}</p>
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Amount to Pay</p>
+              <p className="text-3xl font-bold text-green-600 dark:text-green-400">{formatCurrency(paymentForm.amount)}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
                 Payment Type: <span className="font-semibold">{paymentForm.type.replace(/_/g, ' ').toUpperCase()}</span>
               </p>
             </div>
@@ -1122,7 +1122,7 @@ export const TenantDashboard: React.FC = () => {
                   }`}
                 >
                   <div className="font-semibold text-sm">Paystack</div>
-                  <p className="text-xs text-muted-foreground">Card, Bank Transfer</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Card, Bank Transfer</p>
                 </div>
                 <div
                   onClick={() => setPaymentForm({ ...paymentForm, method: "flutterwave" })}
@@ -1133,7 +1133,7 @@ export const TenantDashboard: React.FC = () => {
                   }`}
                 >
                   <div className="font-semibold text-sm">Flutterwave</div>
-                  <p className="text-xs text-muted-foreground">Card, USSD, Mobile</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Card, USSD, Mobile</p>
                 </div>
               </div>
             </div>
