@@ -502,6 +502,30 @@ export const estatesApi = createApi({
       query: (tenantId) => `/api/tenants/${tenantId}/billing`,
       providesTags: (result, error, tenantId) => [{ type: 'Tenant' as const, id: tenantId }],
     }),
+    getMyBilling: builder.query<TenantBillingResponse, void>({
+      query: () => '/api/tenants/me/billing',
+      providesTags: (result, error) => [{ type: 'Tenant', id: 'ME' }],
+    }),
+    initiateRentPayment: builder.mutation<{ success: boolean; data: { authorizationUrl?: string; reference: string; amount: number } }, { amount: number; paymentType: string }>({
+      query: ({ amount, paymentType }) => ({ url: '/api/payments/rent', method: 'POST', body: { amount, paymentType } }),
+      invalidatesTags: (result, error) => [{ type: 'Tenant', id: 'ME' }],
+    }),
+    initiateServiceChargePayment: builder.mutation<{ success: boolean; data: { authorizationUrl?: string; reference: string; amount: number } }, { amount: number; billingId: string }>({
+      query: ({ amount, billingId }) => ({ url: '/api/payments/service-charge', method: 'POST', body: { amount, billingId } }),
+      invalidatesTags: (result, error) => [{ type: 'Tenant', id: 'ME' }],
+    }),
+    initiateCautionFeePayment: builder.mutation<{ success: boolean; data: { authorizationUrl?: string; reference: string; amount: number } }, { amount: number }>({
+      query: ({ amount }) => ({ url: '/api/payments/caution-fee', method: 'POST', body: { amount } }),
+      invalidatesTags: (result, error) => [{ type: 'Tenant', id: 'ME' }],
+    }),
+    initiateLegalFeePayment: builder.mutation<{ success: boolean; data: { authorizationUrl?: string; reference: string; amount: number } }, { amount: number }>({
+      query: ({ amount }) => ({ url: '/api/payments/legal-fee', method: 'POST', body: { amount } }),
+      invalidatesTags: (result, error) => [{ type: 'Tenant', id: 'ME' }],
+    }),
+    verifyPayment: builder.query<{ success: boolean; data: any }, string>({
+      query: (reference) => `/api/payments/verify/${reference}`,
+      providesTags: (result, error, reference) => [{ type: 'Payment', id: reference }],
+    }),
     // Vacant units for an estate
     getEstateVacantUnits: builder.query<{ success: boolean; data: { unitId: string; label: string; monthlyPrice: number; meterNumber?: string; status?: string; description?: string }[]; total?: number }, string>({
       query: (estateId) => `/api/estates/${estateId}/units/vacant`,
@@ -626,6 +650,12 @@ export const {
   useGetEstateOverviewQuery,
   useGetAllEstatesOverviewQuery,
   useGetDashboardOverviewQuery,
+  useGetMyBillingQuery,
+  useInitiateRentPaymentMutation,
+  useInitiateServiceChargePaymentMutation,
+  useInitiateCautionFeePaymentMutation,
+  useInitiateLegalFeePaymentMutation,
+  useVerifyPaymentQuery,
   useCreateEstateTenantMutation,
   useCreateEstateUnitMutation,
   useGetEstateVacantUnitsQuery,
@@ -640,7 +670,6 @@ export const {
   useGetTenantTransactionsQuery,
   useGetTenantBillingQuery,
   useInitiatePaymentMutation,
-  useVerifyPaymentQuery,
   useSendTenantReceiptMutation,
   useResendPaymentReceiptMutation,
   useLazyDownloadPaymentReceiptQuery,

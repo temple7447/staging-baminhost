@@ -68,7 +68,7 @@ import { useToast } from "@/components/providers/ToastProvider";
 import { useAuth } from "@/contexts/AuthContext";
 import { processPayment } from "@/services/paymentService";
 import { generateReceiptPDF } from "@/utils/receiptGenerator";
-import { useGetDashboardOverviewQuery } from "@/services/estatesApi";
+import { useGetDashboardOverviewQuery, useGetMyBillingQuery, useInitiateRentPaymentMutation } from "@/services/estatesApi";
 
 const tenantData = {
   tenant: {
@@ -258,6 +258,8 @@ export const TenantDashboard: React.FC = () => {
 
   // Fetch dashboard overview from API
   const { data: overviewData, isLoading: overviewLoading } = useGetDashboardOverviewQuery();
+  const { data: billingData } = useGetMyBillingQuery();
+  const [initiateRentPayment] = useInitiateRentPaymentMutation();
 
   // Get API data
   const apiUser = overviewData?.data?.user;
@@ -316,44 +318,31 @@ export const TenantDashboard: React.FC = () => {
         return;
       }
 
-      // Get payment provider name
-      const getProviderName = (method: string) => {
-        switch (method) {
-          case 'wallet': return 'Wallet';
-          case 'paystack': return 'Paystack';
-          default: return method;
-        }
-      };
-
       toast("Processing: Payment in progress...");
 
-      // For demo purposes, simulate successful payment
-      // If using wallet, in real app would deduct from wallet balance
-      const receiptNumber = `RCP-${Date.now()}`;
-      
-      toast("Success: Payment received");
+      // Call the payment API based on type
+      const paymentTypeMap: Record<string, string> = {
+        'rent': 'rent',
+        'service_charge': 'service_charge',
+        'caution_fee': 'caution_fee',
+        'legal_fee': 'legal_fee',
+      };
 
-      // Generate receipt
-      await generateReceiptPDF({
-        receiptNumber,
-        date: new Date().toISOString(),
-        tenantName: tenantInfo.name,
-        tenantEmail: tenantInfo.email,
-        tenantPhone: tenantInfo.phone,
-        apartmentNumber: tenantInfo.apartmentNumber,
-        estateName: tenantInfo.estateName,
+      const result = await initiateRentPayment({
         amount: paymentForm.amount,
-        paymentType: paymentForm.type as any,
-        paymentMethod: paymentForm.method === 'wallet' ? 'Wallet' : 'Paystack',
-        reference: receiptNumber,
-        status: 'paid',
-        month: paymentForm.month,
-      });
+        paymentType: paymentTypeMap[paymentForm.type] || 'rent',
+      }).unwrap();
 
-      setPaymentDialogOpen(false);
-      setPaymentForm({ type: "rent", amount: 0, method: "paystack", month: "" });
-    } catch (error) {
-      toast("Error: Payment failed. Please try again");
+      // If there's an authorization URL, open it (Paystack redirect)
+      if (result.authorizationUrl) {
+        window.location.href = result.authorizationUrl;
+      } else {
+        toast("Success: Payment received");
+        setPaymentDialogOpen(false);
+        setPaymentForm({ type: "rent", amount: 0, method: "paystack", month: "" });
+      }
+    } catch (error: any) {
+      toast(error?.data?.message || "Error: Payment failed. Please try again");
     } finally {
       setIsProcessingPayment(false);
     }
