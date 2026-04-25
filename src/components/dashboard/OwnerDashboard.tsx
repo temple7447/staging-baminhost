@@ -1,168 +1,903 @@
 import { useState } from "react";
-import { NetWorthCard } from "./NetWorthCard";
-import { WalletOverview } from "./WalletOverview";
-import { SplitTracker } from "./SplitTracker";
+import {
+  Building,
+  Users,
+  Home,
+  DollarSign,
+  Wrench,
+  Clock,
+  TrendingUp,
+  TrendingDown,
+  Plus,
+  Search,
+  Filter,
+  MoreHorizontal,
+  Phone,
+  Mail,
+  FileText,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Calendar,
+  ChevronRight,
+  Download,
+  CreditCard,
+  Wallet,
+  Receipt,
+  Edit,
+  Trash2,
+  UserPlus,
+  Key,
+  FileCheck,
+  AlertTriangle,
+  Activity,
+  PieChart,
+  BarChart3,
+  ArrowUpRight,
+  ArrowDownRight,
+  Truck,
+  Zap,
+  Droplets,
+  SprayCan,
+  Lightbulb,
+  CalendarDays
+} from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { NET_WORTH_DATA, WALLET_DATA, BUSINESSES, PERSONAL_PORTFOLIOS } from "@/data/demoData";
-import { Building, Fuel, Truck, Clock, TrendingUp, Crown, ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import "./dashboard-fixes.css";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/providers/ToastProvider";
+import { useAuth } from "@/contexts/AuthContext";
 
-export const OwnerDashboard = () => {
-  const navigate = useNavigate();
-  const netWorthData = NET_WORTH_DATA;
-  const walletData = WALLET_DATA.owner;
-  const businesses = BUSINESSES;
-  const personalPortfolios = PERSONAL_PORTFOLIOS;
-
-  // Calculate monthly income from all sources
-  const totalMonthlyIncome = businesses.reduce((sum, business) => sum + business.monthlyRevenue, 0);
-
-  // Prepare split data for SplitTracker (using wallet allocations)
-  const splitData = {
-    needs: {
-      allocated: walletData.allocations.operations,
-      spent: walletData.allocations.operations * 0.8,
-      budget: walletData.allocations.operations
+// Demo Data
+const ownerData = {
+  owner: {
+    id: "owner_001",
+    name: "Property Owner",
+    email: "owner@estate.com",
+    phone: "+2349012345678"
+  },
+  properties: [
+    {
+      id: "prop_001",
+      name: "Rose Garden Estate",
+      address: "123 Rose Garden Ave, Lagos",
+      totalUnits: 24,
+      occupiedUnits: 20,
+      vacantUnits: 4,
+      monthlyRent: 2400000,
+      outstanding: 150000
     },
-    wants: {
-      allocated: walletData.allocations.withdrawals,
-      spent: walletData.allocations.withdrawals * 0.75,
-      budget: walletData.allocations.withdrawals
-    },
-    savings: {
-      allocated: walletData.allocations.investment,
-      spent: walletData.allocations.investment,
-      budget: walletData.allocations.investment
+    {
+      id: "prop_002",
+      name: "Palm Springs Apartments",
+      address: "45 Palm Drive, Lagos",
+      totalUnits: 12,
+      occupiedUnits: 10,
+      vacantUnits: 2,
+      monthlyRent: 1200000,
+      outstanding: 80000
     }
+  ],
+  tenants: [
+    {
+      id: "tenant_001",
+      name: "John Doe",
+      email: "john.doe@email.com",
+      phone: "+2349012345678",
+      property: "Rose Garden Estate",
+      unit: "Flat 4B",
+      leaseStart: "2024-01-01",
+      leaseEnd: "2026-12-31",
+      rentStatus: "paid",
+      rentAmount: 250000,
+      lastPayment: "2025-04-23"
+    },
+    {
+      id: "tenant_002",
+      name: "Jane Smith",
+      email: "jane.smith@email.com",
+      phone: "+2348012345678",
+      property: "Rose Garden Estate",
+      unit: "Flat 5A",
+      leaseStart: "2024-06-01",
+      leaseEnd: "2025-05-31",
+      rentStatus: "pending",
+      rentAmount: 200000,
+      lastPayment: "2025-03-01"
+    },
+    {
+      id: "tenant_003",
+      name: "Mike Johnson",
+      email: "mike.j@email.com",
+      phone: "+2347012345678",
+      property: "Palm Springs",
+      unit: "Unit 8",
+      leaseStart: "2024-03-01",
+      leaseEnd: "2025-02-28",
+      rentStatus: "paid",
+      rentAmount: 150000,
+      lastPayment: "2025-04-20"
+    },
+    {
+      id: "tenant_004",
+      name: "Sarah Williams",
+      email: "sarah.w@email.com",
+      phone: "+2348011111111",
+      property: "Rose Garden Estate",
+      unit: "Flat 2A",
+      leaseStart: "2025-01-01",
+      leaseEnd: "2025-12-31",
+      rentStatus: "overdue",
+      rentAmount: 300000,
+      lastPayment: "2025-01-15"
+    }
+  ],
+  maintenanceRequests: [
+    {
+      id: "maint_001",
+      tenant: "John Doe",
+      unit: "Flat 4B",
+      issue: "Leaking kitchen faucet",
+      category: "plumbing",
+      status: "pending",
+      createdAt: "2025-04-20",
+      estimatedCost: 15000
+    },
+    {
+      id: "maint_002",
+      tenant: "Jane Smith",
+      unit: "Flat 5A",
+      issue: "AC not cooling",
+      category: "ac_repair",
+      status: "in_progress",
+      createdAt: "2025-04-18",
+      assignedTo: "Mr. Adebayo",
+      estimatedCost: 35000
+    },
+    {
+      id: "maint_003",
+      tenant: "Mike Johnson",
+      unit: "Unit 8",
+      issue: "Broken bedroom lock",
+      category: "security",
+      status: "completed",
+      createdAt: "2025-04-10",
+      completedAt: "2025-04-12",
+      cost: 8000
+    }
+  ],
+  financials: {
+    totalMonthlyIncome: 3600000,
+    collectedThisMonth: 2950000,
+    outstandingBalance: 230000,
+    serviceCharges: 180000,
+    expenses: 450000,
+    profit: 2970000
+  },
+  leases: [
+    {
+      id: "lease_001",
+      tenant: "John Doe",
+      unit: "Flat 4B",
+      property: "Rose Garden Estate",
+      startDate: "2024-01-01",
+      endDate: "2026-12-31",
+      status: "active",
+      monthlyRent: 250000
+    },
+    {
+      id: "lease_002",
+      tenant: "Jane Smith",
+      unit: "Flat 5A",
+      property: "Rose Garden Estate",
+      startDate: "2024-06-01",
+      endDate: "2025-05-31",
+      status: "expiring_soon",
+      monthlyRent: 200000
+    },
+    {
+      id: "lease_003",
+      tenant: "Sarah Williams",
+      unit: "Flat 2A",
+      property: "Rose Garden Estate",
+      startDate: "2025-01-01",
+      endDate: "2025-12-31",
+      status: "active",
+      monthlyRent: 300000
+    }
+  ],
+  recentActivities: [
+    { id: 1, type: "payment", description: "Rent payment received from John Doe", amount: 250000, date: "2025-04-23" },
+    { id: 2, type: "maintenance", description: "New maintenance request from Flat 4B", date: "2025-04-20" },
+    { id: 3, type: "lease", description: "Lease renewed for Unit 8", date: "2025-04-18" },
+    { id: 4, type: "tenant", description: "New tenant moved into Flat 2A", date: "2025-04-15" },
+    { id: 5, type: "payment", description: "Rent payment received from Mike Johnson", amount: 150000, date: "2025-04-20" }
+  ]
+};
+
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0
+  }).format(amount);
+};
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString("en-NG", {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  });
+};
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "paid":
+    case "active":
+    case "completed":
+      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+    case "pending":
+    case "in_progress":
+      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+    case "overdue":
+    case "expired":
+      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+    case "expiring_soon":
+      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+    default:
+      return "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200";
+  }
+};
+
+const getCategoryIcon = (category: string) => {
+  switch (category) {
+    case "plumbing": return Droplets;
+    case "electrical": return Zap;
+    case "ac_repair": return Sprinklers;
+    case "security": return Shield;
+    default: return Wrench;
+  }
+};
+
+function Sprinklers(props: any) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 2v4"/><path d="M16 2v4"/><path d="M8 14h.01"/><path d="M16 14h.01"/><path d="M12 14v4"/><path d="M12 10v.01"/><path d="M12 18v.01"/>
+    </svg>
+  );
+}
+
+export const OwnerDashboard: React.FC = () => {
+  const { user: authUser } = useAuth();
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("overview");
+  const [addTenantDialogOpen, setAddTenantDialogOpen] = useState(false);
+  const [addMaintenanceDialogOpen, setAddMaintenanceDialogOpen] = useState(false);
+  const [selectedProperty, setSelectedProperty] = useState<string>("all");
+
+  // Calculate totals
+  const totalUnits = ownerData.properties.reduce((sum, p) => sum + p.totalUnits, 0);
+  const occupiedUnits = ownerData.properties.reduce((sum, p) => sum + p.occupiedUnits, 0);
+  const vacantUnits = ownerData.properties.reduce((sum, p) => sum + p.vacantUnits, 0);
+  const monthlyIncome = ownerData.properties.reduce((sum, p) => sum + p.monthlyRent, 0);
+  const outstanding = ownerData.properties.reduce((sum, p) => sum + p.outstanding, 0);
+  const pendingMaintenance = ownerData.maintenanceRequests.filter(m => m.status !== "completed").length;
+  const expiringLeases = ownerData.leases.filter(l => l.status === "expiring_soon").length;
+
+  const filteredTenants = selectedProperty === "all" 
+    ? ownerData.tenants 
+    : ownerData.tenants.filter(t => t.property === selectedProperty);
+
+  const handleAddTenant = () => {
+    toast({ title: "Success", description: "Tenant added successfully" });
+    setAddTenantDialogOpen(false);
+  };
+
+  const handleApproveTenant = (tenantId: string) => {
+    toast({ title: "Success", description: "Tenant approved" });
+  };
+
+  const handleRenewLease = (leaseId: string) => {
+    toast({ title: "Success", description: "Lease renewed" });
+  };
+
+  const handleAssignTechnician = (requestId: string) => {
+    toast({ title: "Success", description: "Technician assigned" });
+    setAddMaintenanceDialogOpen(false);
   };
 
   return (
-    <div className="dashboard-wrapper">
-      <div className="dashboard-container space-y-4 sm:space-y-6 max-w-full">
-        {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground truncate">Owner Dashboard</h1>
-            <p className="text-sm sm:text-base text-muted-foreground truncate">Master control of your ₦52.75M portfolio - 1/3rd active time rule</p>
-          </div>
-          <div className="flex gap-2 flex-shrink-0">
-            <Badge variant="outline" className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              <span className="text-xs sm:text-sm">Active: 3/8 hours</span>
-            </Badge>
-          </div>
-        </div>
+    <div className="p-6 space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="flex flex-wrap">
+          <TabsTrigger value="overview">Property Overview</TabsTrigger>
+          <TabsTrigger value="tenants">Tenants</TabsTrigger>
+          <TabsTrigger value="finances">Rent & Finance</TabsTrigger>
+          <TabsTrigger value="leases">Lease Management</TabsTrigger>
+          <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
+        </TabsList>
 
-        {/* Net Worth Overview */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <div className="xl:col-span-1">
-            <NetWorthCard
-              totalNetWorth={netWorthData.total}
-              monthlyChange={netWorthData.monthlyChange}
-              changePercentage={netWorthData.changePercentage}
-            />
+        {/* 1. Property Overview */}
+        <TabsContent value="overview" className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Owner Dashboard</h1>
+              <p className="text-slate-500 dark:text-slate-400">Property management control center</p>
+            </div>
+            <div className="flex gap-2">
+              <Select value={selectedProperty} onValueChange={setSelectedProperty}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Select Property" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Properties</SelectItem>
+                  {ownerData.properties.map(p => (
+                    <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="xl:col-span-2 min-w-0">
-            <WalletOverview walletData={walletData} />
+
+          {/* Overview Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-blue-600 p-2 rounded-lg">
+                    <Building className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Total Units</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{totalUnits}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-green-600 p-2 rounded-lg">
+                    <Users className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Occupied</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{occupiedUnits}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-red-600 p-2 rounded-lg">
+                    <Home className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Vacant</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{vacantUnits}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-purple-600 p-2 rounded-lg">
+                    <DollarSign className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Monthly Income</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{formatCurrency(monthlyIncome)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-orange-600 p-2 rounded-lg">
+                    <AlertCircle className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Outstanding</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{formatCurrency(outstanding)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/30 dark:to-yellow-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-yellow-600 p-2 rounded-lg">
+                    <Wrench className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Pending Repairs</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{pendingMaintenance}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900/30 dark:to-cyan-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-cyan-600 p-2 rounded-lg">
+                    <Calendar className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Expiring Leases</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{expiringLeases}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-indigo-600 p-2 rounded-lg">
+                    <Activity className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Properties</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{ownerData.properties.length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
 
-
-        {/* Personal vs Business Split */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent Activities */}
           <Card>
             <CardHeader>
-              <CardTitle>Business vs Personal Life</CardTitle>
-              <CardDescription>Net worth breakdown</CardDescription>
+              <CardTitle className="text-slate-900 dark:text-white">Recent Activities</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Business Portfolio</span>
-                  <span className="font-semibold">₦{netWorthData.breakdown.business.toLocaleString()}</span>
+            <CardContent className="space-y-3">
+              {ownerData.recentActivities.slice(0, 5).map((activity) => (
+                <div key={activity.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    {activity.type === "payment" ? (
+                      <DollarSign className="h-5 w-5 text-green-600" />
+                    ) : activity.type === "maintenance" ? (
+                      <Wrench className="h-5 w-5 text-orange-600" />
+                    ) : activity.type === "lease" ? (
+                      <FileText className="h-5 w-5 text-blue-600" />
+                    ) : (
+                      <UserPlus className="h-5 w-5 text-purple-600" />
+                    )}
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">{activity.description}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{formatDate(activity.date)}</p>
+                    </div>
+                  </div>
+                  {activity.amount && (
+                    <span className="font-semibold text-green-600">{formatCurrency(activity.amount)}</span>
+                  )}
                 </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${(netWorthData.breakdown.business / netWorthData.total) * 100}%` }}
-                  />
-                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 2. Tenant Management */}
+        <TabsContent value="tenants" className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Tenant Management</h2>
+              <p className="text-slate-500 dark:text-slate-400">Manage all tenants across properties</p>
+            </div>
+            <Button onClick={() => setAddTenantDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+              <UserPlus className="h-4 w-4 mr-2" /> Add Tenant
+            </Button>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Search className="h-4 w-4 text-slate-500" />
+                <Input placeholder="Search tenants..." className="max-w-sm" />
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Personal Life</span>
-                  <span className="font-semibold">₦{netWorthData.breakdown.personal.toLocaleString()}</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div
-                    className="bg-green-600 h-2 rounded-full"
-                    style={{ width: `${(netWorthData.breakdown.personal / netWorthData.total) * 100}%` }}
-                  />
-                </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {filteredTenants.map((tenant) => (
+                  <div key={tenant.id} className="p-4 border rounded-lg bg-slate-50 dark:bg-slate-800">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
+                            {tenant.name.charAt(0)}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-slate-900 dark:text-white">{tenant.name}</p>
+                            <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
+                              <span className="flex items-center gap-1"><Home className="h-3 w-3" /> {tenant.unit}</span>
+                              <span className="flex items-center gap-1"><Building className="h-3 w-3" /> {tenant.property}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="text-sm text-slate-500 dark:text-slate-400">Rent: {formatCurrency(tenant.rentAmount)}/month</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
+                            Lease: {formatDate(tenant.leaseStart)} - {formatDate(tenant.leaseEnd)}
+                          </p>
+                        </div>
+                        <Badge className={getStatusColor(tenant.rentStatus)}>
+                          {tenant.rentStatus}
+                        </Badge>
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="outline" onClick={() => handleApproveTenant(tenant.id)}>Approve</Button>
+                          <Button size="sm" variant="outline" onClick={() => handleRenewLease(tenant.id)}>Renew</Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Monthly Performance</CardTitle>
-              <CardDescription>Business efficiency metrics</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between">
-                <span>Total Monthly Revenue</span>
-                <span className="font-semibold text-green-600">₦{totalMonthlyIncome.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Average ROI</span>
-                <span className="font-semibold">
-                  {(businesses.reduce((sum, b) => sum + b.performance.roi, 0) / businesses.length).toFixed(1)}%
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Growth Rate</span>
-                <span className="font-semibold text-blue-600">
-                  +{(businesses.reduce((sum, b) => sum + b.performance.growthRate, 0) / businesses.length).toFixed(1)}%
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+          {/* Emergency Contacts & KYC */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-slate-900 dark:text-white">Emergency Contacts</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {filteredTenants.map((tenant) => (
+                  <div key={tenant.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">{tenant.name}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{tenant.phone}</p>
+                    </div>
+                    <Button size="sm" variant="outline">
+                      <Phone className="h-4 w-4 mr-1" /> Call
+                    </Button>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
 
-        {/* Hire Like a Boss Call to Action */}
-        <Card className="bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-blue-600/10 border-blue-500/20 shadow-lg mb-6">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-900/40">
-                  <Crown className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-foreground">Hire Like a Boss</h3>
-                  <p className="text-sm text-muted-foreground italic">"You're not paying people to be on your team. You're buying back your own time."</p>
-                </div>
-              </div>
-              <Button
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8"
-                onClick={() => navigate('/dashboard/strategic-hiring-planner')}
-              >
-                Open Hiring Planner <ArrowRight className="ml-2 w-4 h-4" />
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-slate-900 dark:text-white">KYC Documents</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {filteredTenants.slice(0, 3).map((tenant) => (
+                  <div key={tenant.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <FileCheck className="h-5 w-5 text-green-600" />
+                      <div>
+                        <p className="font-medium text-slate-900 dark:text-white">{tenant.name}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">ID, Utility Bill, Passport</p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="text-green-600">Verified</Badge>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* 3. Rent & Financial Management */}
+        <TabsContent value="finances" className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Rent & Financial Management</h2>
+              <p className="text-slate-500 dark:text-slate-400">Track income, expenses, and profits</p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline">
+                <Download className="h-4 w-4 mr-2" /> Download Report
+              </Button>
+              <Button variant="outline">
+                <Receipt className="h-4 w-4 mr-2" /> Generate Invoice
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Split Tracker */}
-        <SplitTracker
-          monthlyIncome={totalMonthlyIncome}
-          splitData={splitData}
-        />
+          {/* Financial Overview */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-sm text-slate-500 dark:text-slate-400">Monthly Income</p>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency(ownerData.financials.totalMonthlyIncome)}</p>
+                <p className="text-xs text-green-600 flex items-center"><ArrowUpRight className="h-3 w-3" /> +12% from last month</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-sm text-slate-500 dark:text-slate-400">Collected This Month</p>
+                <p className="text-2xl font-bold text-blue-600">{formatCurrency(ownerData.financials.collectedThisMonth)}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-sm text-slate-500 dark:text-slate-400">Outstanding</p>
+                <p className="text-2xl font-bold text-orange-600">{formatCurrency(ownerData.financials.outstandingBalance)}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-sm text-slate-500 dark:text-slate-400">Net Profit</p>
+                <p className="text-2xl font-bold text-purple-600">{formatCurrency(ownerData.financials.profit)}</p>
+              </CardContent>
+            </Card>
+          </div>
 
+          {/* Payment Status */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Rent Collection Overview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {filteredTenants.map((tenant) => (
+                  <div key={tenant.id} className="flex items-center justify-between p-4 border rounded-lg bg-slate-50 dark:bg-slate-800">
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">{tenant.name}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{tenant.unit} - {tenant.property}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-slate-900 dark:text-white">{formatCurrency(tenant.rentAmount)}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">Last paid: {tenant.lastPayment ? formatDate(tenant.lastPayment) : 'N/A'}</p>
+                    </div>
+                    <Badge className={getStatusColor(tenant.rentStatus)}>{tenant.rentStatus}</Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-      </div>
+          {/* Expense Tracking */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-slate-900 dark:text-white">Service Charges Collected</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white">{formatCurrency(ownerData.financials.serviceCharges)}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Monthly service charges</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-slate-900 dark:text-white">Monthly Expenses</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold text-red-600">{formatCurrency(ownerData.financials.expenses)}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Maintenance, security, utilities</p>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* 4. Lease Management */}
+        <TabsContent value="leases" className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Lease Management</h2>
+              <p className="text-slate-500 dark:text-slate-400">Digital lease agreements and renewals</p>
+            </div>
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="h-4 w-4 mr-2" /> Create New Lease
+            </Button>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Active Leases</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {ownerData.leases.map((lease) => (
+                  <div key={lease.id} className="p-4 border rounded-lg bg-slate-50 dark:bg-slate-800">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div>
+                        <p className="font-semibold text-slate-900 dark:text-white">{lease.tenant}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{lease.unit} - {lease.property}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          {formatDate(lease.startDate)} - {formatDate(lease.endDate)}
+                        </p>
+                        <p className="font-semibold text-slate-900 dark:text-white">{formatCurrency(lease.monthlyRent)}/month</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={getStatusColor(lease.status)}>{lease.status.replace(/_/g, ' ')}</Badge>
+                        <Button size="sm" variant="outline">
+                          <FileText className="h-4 w-4 mr-1" /> View
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Edit className="h-4 w-4 mr-1" /> Renew
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Expiry Reminders */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Lease Expiry Reminders</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {ownerData.leases.filter(l => l.status === "expiring_soon").map((lease) => (
+                <div key={lease.id} className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                  <div>
+                    <p className="font-medium text-orange-800 dark:text-orange-200">{lease.tenant}</p>
+                    <p className="text-sm text-orange-600 dark:text-orange-300">Expires: {formatDate(lease.endDate)}</p>
+                  </div>
+                  <Button size="sm" className="bg-orange-600 hover:bg-orange-700">
+                    Send Reminder
+                  </Button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 5. Maintenance Management */}
+        <TabsContent value="maintenance" className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Maintenance Management</h2>
+              <p className="text-slate-500 dark:text-slate-400">Track and assign repair requests</p>
+            </div>
+            <Button onClick={() => setAddMaintenanceDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="h-4 w-4 mr-2" /> New Request
+            </Button>
+          </div>
+
+          {/* Maintenance Stats */}
+          <div className="grid grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-sm text-slate-500 dark:text-slate-400">Pending</p>
+                <p className="text-2xl font-bold text-yellow-600">
+                  {ownerData.maintenanceRequests.filter(m => m.status === "pending").length}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-sm text-slate-500 dark:text-slate-400">In Progress</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {ownerData.maintenanceRequests.filter(m => m.status === "in_progress").length}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-sm text-slate-500 dark:text-slate-400">Completed</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {ownerData.maintenanceRequests.filter(m => m.status === "completed").length}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Maintenance Requests */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Maintenance Requests</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {ownerData.maintenanceRequests.map((request) => (
+                <div key={request.id} className="p-4 border rounded-lg bg-slate-50 dark:bg-slate-800">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 rounded-lg ${request.status === "completed" ? "bg-green-100" : request.status === "in_progress" ? "bg-blue-100" : "bg-yellow-100"}`}>
+                        {request.category === "plumbing" ? (
+                          <Droplets className="h-5 w-5 text-blue-600" />
+                        ) : request.category === "electrical" ? (
+                          <Zap className="h-5 w-5 text-yellow-600" />
+                        ) : request.category === "security" ? (
+                          <Key className="h-5 w-5 text-gray-600" />
+                        ) : (
+                          <Wrench className="h-5 w-5 text-orange-600" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium text-slate-900 dark:text-white">{request.issue}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          {request.unit} • {request.tenant} • {formatDate(request.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        {request.estimatedCost && (
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">
+                            Est: {formatCurrency(request.estimatedCost)}
+                          </p>
+                        )}
+                        {request.assignedTo && (
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
+                            Assigned: {request.assignedTo}
+                          </p>
+                        )}
+                      </div>
+                      <Badge className={getStatusColor(request.status)}>{request.status}</Badge>
+                      {request.status !== "completed" && (
+                        <Button size="sm" variant="outline" onClick={() => handleAssignTechnician(request.id)}>
+                          Assign
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Add Tenant Dialog */}
+      <Dialog open={addTenantDialogOpen} onOpenChange={setAddTenantDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Tenant</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>Full Name</Label>
+              <Input placeholder="Enter tenant name" />
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input placeholder="Enter email" type="email" />
+            </div>
+            <div>
+              <Label>Phone</Label>
+              <Input placeholder="Enter phone number" />
+            </div>
+            <div>
+              <Label>Property</Label>
+              <Select>
+                <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
+                <SelectContent>
+                  {ownerData.properties.map(p => (
+                    <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Unit/Apartment</Label>
+              <Input placeholder="Enter unit number" />
+            </div>
+            <div>
+              <Label>Monthly Rent</Label>
+              <Input placeholder="Enter rent amount" type="number" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddTenantDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddTenant}>Add Tenant</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
