@@ -211,7 +211,6 @@ export const UserProfile = () => {
       <Card className="bg-slate-50 dark:bg-slate-800 shadow-xl border-slate-200 dark:border-slate-700">
         <CardHeader>
 <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
-            {roleDetails.icon && <roleDetails.icon className="h-5 w-5" />}
             Role Details
           </CardTitle>
           <CardDescription className="text-slate-500 dark:text-slate-400">Your access level and system permissions</CardDescription>

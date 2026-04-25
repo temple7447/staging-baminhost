@@ -31,7 +31,7 @@ import {
   Zap,
   Trash2,
   Wifi,
-  Generator,
+
   Download,
   Upload,
   Eye,
@@ -288,7 +288,7 @@ export const TenantDashboard: React.FC = () => {
       
       // Validate form
       if (!paymentForm.amount || paymentForm.amount <= 0) {
-        toast({ title: "Error", description: "Please enter a valid amount" });
+        toast("Error: Please enter a valid amount");
         return;
       }
 
@@ -302,23 +302,13 @@ export const TenantDashboard: React.FC = () => {
         }
       };
 
-      toast({ 
-        title: "Processing Payment", 
-        description: paymentForm.method === 'wallet' 
-          ? "Processing payment from your wallet..."
-          : `Redirecting to ${getProviderName(paymentForm.method)}...` 
-      });
+      toast("Processing: Payment in progress...");
 
       // For demo purposes, simulate successful payment
       // If using wallet, in real app would deduct from wallet balance
       const receiptNumber = `RCP-${Date.now()}`;
       
-      toast({ 
-        title: "Payment Successful", 
-        description: paymentForm.method === 'wallet'
-          ? `Payment of ${formatCurrency(paymentForm.amount)} deducted from wallet. Receipt #${receiptNumber}`
-          : `Receipt #${receiptNumber} generated` 
-      });
+      toast("Success: Payment received");
 
       // Generate receipt
       await generateReceiptPDF({
@@ -340,10 +330,7 @@ export const TenantDashboard: React.FC = () => {
       setPaymentDialogOpen(false);
       setPaymentForm({ type: "rent", amount: 0, method: "paystack", month: "" });
     } catch (error) {
-      toast({ 
-        title: "Payment Failed", 
-        description: error instanceof Error ? error.message : "Please try again" 
-      });
+      toast("Error: Payment failed. Please try again");
     } finally {
       setIsProcessingPayment(false);
     }
@@ -356,7 +343,7 @@ export const TenantDashboard: React.FC = () => {
       // Find the payment in history
       const payment = tenantData.paymentHistory.find(p => p.id.toString() === paymentId);
       if (!payment) {
-        toast({ title: "Error", description: "Receipt not found" });
+        toast("Error: Receipt not found");
         return;
       }
 
@@ -376,12 +363,9 @@ export const TenantDashboard: React.FC = () => {
         month: payment.month,
       });
 
-      toast({ title: "Success", description: "Receipt downloaded" });
+      toast("Success: Receipt downloaded");
     } catch (error) {
-      toast({ 
-        title: "Error", 
-        description: error instanceof Error ? error.message : "Failed to download receipt" 
-      });
+      toast("Error: Failed to download receipt");
     } finally {
       setDownloadingReceipt(null);
     }
@@ -392,7 +376,7 @@ export const TenantDashboard: React.FC = () => {
   };
 
   const handleSubmitMaintenance = () => {
-    toast({ title: "Request Submitted", description: "Your maintenance request has been submitted." });
+    toast("Success: Request Submitted");
     setMaintenanceDialogOpen(false);
     setMaintenanceForm({ title: "", category: "", description: "" });
   };
@@ -402,13 +386,13 @@ export const TenantDashboard: React.FC = () => {
   };
 
   const handleSubmitVisitor = () => {
-    toast({ title: "Visitor Pass Generated", description: "Access code sent to visitor's phone." });
+    toast("Success: Visitor Pass Generated");
     setVisitorDialogOpen(false);
     setVisitorForm({ name: "", phone: "", purpose: "" });
   };
 
   const handleSubmitComplaint = () => {
-    toast({ title: "Complaint Submitted", description: "Our team will respond within 24 hours." });
+    toast("Success: Complaint Submitted");
     setComplaintDialogOpen(false);
   };
 
