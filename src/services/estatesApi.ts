@@ -229,54 +229,47 @@ export interface AllEstatesOverviewResponse {
 
 export interface TenantDashboardOverviewResponse {
   success: boolean;
+  message?: string;
   data: {
-    tenant: {
+    role: string;
+    user: {
       id: string;
       name: string;
       email: string;
-      phone: string;
-      apartmentNumber: string;
-      estateName: string;
-      leaseStatus: string;
-      leaseEndDate: string;
-      monthlyRent: number;
-      rentDueDay: number;
-      outstandingBalance: number;
-      nextPaymentDue: string;
+      role: string;
     };
-    overview: {
-      paymentsThisMonth: {
-        amount: number;
-        status: 'paid' | 'pending' | 'overdue';
-        lastPaymentDate?: string;
+    timestamp: string;
+    data: {
+      section: string;
+      apartment: {
+        id: string;
+        tenantName: string;
+        unit: string;
+        unitType: string;
+        estate: string;
+        rentAmount: number;
+        serviceChargeAmount: number;
+        entryDate: string;
+        nextDueDate: string;
+        status: string;
       };
-      serviceCharges: {
-        pending: number;
-        paid: number;
+      billing: {
+        totalPending: number;
+        totalPaid: number;
+        upcomingDue: any[];
+        overdue: any[];
       };
-      maintenanceRequests: {
-        total: number;
-        pending: number;
-        inProgress: number;
-        completed: number;
+      payments: {
+        recentPayments: any[];
+        totalPaid: number;
       };
-      visitors: {
-        total: number;
-        expectedToday: number;
+      wallet: {
+        balance: number;
+        totalEarnings: number;
+        totalSpent: number;
+        currency: string;
       };
-      documents: {
-        total: number;
-        unread: number;
-      };
-      notices: {
-        total: number;
-        unread: number;
-      };
-      complaints: {
-        total: number;
-        pending: number;
-        resolved: number;
-      };
+      notifications: any[];
     };
   };
 }

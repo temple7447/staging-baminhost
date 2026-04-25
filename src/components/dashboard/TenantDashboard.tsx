@@ -259,8 +259,28 @@ export const TenantDashboard: React.FC = () => {
   // Fetch dashboard overview from API
   const { data: overviewData, isLoading: overviewLoading } = useGetDashboardOverviewQuery();
 
+  // Get API data
+  const apiUser = overviewData?.data?.user;
+  const apiApartment = overviewData?.data?.data?.apartment;
+  const apiBilling = overviewData?.data?.data?.billing;
+  const apiPayments = overviewData?.data?.data?.payments;
+
   // Use API data or fallback to demo data
-  const tenantInfo = overviewData?.data?.tenant || {
+  const tenantInfo = apiApartment ? {
+    name: apiApartment.tenantName,
+    apartmentNumber: apiApartment.unit,
+    estateName: apiApartment.estate,
+    leaseStatus: apiApartment.status,
+    leaseEndDate: apiApartment.nextDueDate,
+    monthlyRent: apiApartment.rentAmount,
+    rentDueDay: 25,
+    outstandingBalance: apiBilling?.totalPending || 0,
+    nextPaymentDue: apiApartment.nextDueDate,
+    id: apiApartment.id,
+    email: apiUser?.email || "",
+    phone: authUser?.phone || "",
+    serviceCharge: apiApartment.serviceChargeAmount,
+  } : {
     name: authUser?.name || "Valued Tenant",
     apartmentNumber: "Flat 4B",
     estateName: "Rose Garden Estate",
@@ -274,8 +294,6 @@ export const TenantDashboard: React.FC = () => {
     email: authUser?.email || "",
     phone: authUser?.phone || "",
   };
-
-  const dashboardOverview = overviewData?.data?.overview;
 
   const displayName = tenantInfo?.name || authUser?.name || "Valued Tenant";
   const firstName = displayName?.split(" ")[0] || "Valued";
