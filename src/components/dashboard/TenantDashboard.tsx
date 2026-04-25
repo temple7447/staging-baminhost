@@ -48,7 +48,8 @@ import {
   Search,
   Filter,
   MoreHorizontal,
-  Plus
+  Plus,
+  Car
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -919,7 +920,7 @@ export const TenantDashboard: React.FC = () => {
 
             <Card>
               <CardHeader className="flex flex-row items-center gap-2">
-                <Fuel className="h-5 w-5 text-orange-600" />
+                <Car className="h-5 w-5 text-orange-600" />
                 <CardTitle className="text-lg">Generator Levy</CardTitle>
               </CardHeader>
               <CardContent>
