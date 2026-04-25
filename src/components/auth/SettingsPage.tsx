@@ -156,7 +156,7 @@ export const SettingsPage = () => {
                   {activeSettings?.icon && <activeSettings.icon className="h-6 w-6" />}
                   {activeSettings?.name}
                 </CardTitle>
-                <CardDescription>{activeSettings?.description}</CardDescription>
+                <CardDescription className="text-slate-500 dark:text-slate-400">{activeSettings?.description}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-12">
