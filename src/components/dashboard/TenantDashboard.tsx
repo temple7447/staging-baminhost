@@ -399,13 +399,13 @@ export const TenantDashboard: React.FC = () => {
   return (
     <div className="p-6 space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="flex flex-wrap">
-          <TabsTrigger value="overview">Home Overview</TabsTrigger>
-          <TabsTrigger value="payments">Rent & Payments</TabsTrigger>
-          <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
+        <TabsList className="flex flex-wrap w-full">
+          <TabsTrigger value="overview">Home</TabsTrigger>
+          <TabsTrigger value="payments">Rent</TabsTrigger>
+          <TabsTrigger value="maintenance">Issues</TabsTrigger>
           <TabsTrigger value="visitors">Visitors</TabsTrigger>
           <TabsTrigger value="notices">Notices</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="documents">Docs</TabsTrigger>
           <TabsTrigger value="complaints">Complaints</TabsTrigger>
           <TabsTrigger value="utilities">Utilities</TabsTrigger>
         </TabsList>
@@ -423,9 +423,9 @@ export const TenantDashboard: React.FC = () => {
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 border">
+<CardContent>
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 border">
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
                     <Building className="h-4 w-4" />
                     <span className="text-sm">Apartment</span>
@@ -433,33 +433,33 @@ export const TenantDashboard: React.FC = () => {
                   <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{tenantInfo.apartmentNumber}</p>
                   <p className="text-sm text-slate-600 dark:text-slate-400">{tenantInfo.estateName}</p>
                 </div>
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 border">
+                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 border">
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
                     <Key className="h-4 w-4" />
                     <span className="text-sm">Lease Ends</span>
                   </div>
                   <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{formatDate(tenantInfo.leaseEndDate)}</p>
-                  <p className="text-sm text-green-600 dark:text-green-400 dark:text-green-400">Active</p>
+                  <p className="text-sm text-green-600 dark:text-green-400">Active</p>
                 </div>
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 border">
+                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 border">
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
                     <Calendar className="h-4 w-4" />
                     <span className="text-sm">Next Rent Due</span>
                   </div>
                   <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{formatDate(tenantInfo.nextPaymentDue)}</p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{daysUntilRentDue} days remaining</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{daysUntilRentDue} days</p>
                 </div>
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 border">
+                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 border">
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
                     <DollarSign className="h-4 w-4" />
                     <span className="text-sm">Outstanding</span>
                   </div>
                   <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{formatCurrency(tenantInfo.outstandingBalance)}</p>
-                  <p className="text-sm text-green-600 dark:text-green-400 dark:text-green-400">All paid up!</p>
+                  <p className="text-sm text-green-600 dark:text-green-400">All paid up!</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
                 <Button onClick={handlePayRent} className="h-16 flex flex-col items-center gap-1">
                   <CreditCard className="h-5 w-5" />
                   <span className="text-xs">Pay Rent</span>

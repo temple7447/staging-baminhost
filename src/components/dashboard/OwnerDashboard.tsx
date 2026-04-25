@@ -317,11 +317,11 @@ export const OwnerDashboard: React.FC = () => {
     <div className="p-6 space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex flex-wrap">
-          <TabsTrigger value="overview">Property Overview</TabsTrigger>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="tenants">Tenants</TabsTrigger>
-          <TabsTrigger value="finances">Rent & Finance</TabsTrigger>
-          <TabsTrigger value="leases">Lease Management</TabsTrigger>
-          <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
+          <TabsTrigger value="finances">Finance</TabsTrigger>
+          <TabsTrigger value="leases">Leases</TabsTrigger>
+          <TabsTrigger value="maintenance">Maint.</TabsTrigger>
         </TabsList>
 
         {/* 1. Property Overview */}
