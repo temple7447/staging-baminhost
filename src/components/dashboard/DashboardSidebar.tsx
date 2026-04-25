@@ -263,6 +263,7 @@ const sidebarItems: SidebarItem[] = [
 export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onClose }: DashboardSidebarProps) => {
   const { userRole, hasPermission, canAccessNavigation, rolePriority } = usePermissions();
   const { user, logout } = useAuth();
+  const isTenant = user?.role === 'tenant';
   const navigate = useNavigate();
   const location = useLocation();
   console.log("User Role:", userRole, user);
@@ -455,22 +456,24 @@ export const DashboardSidebar = ({ currentView, onViewChange, isOpen = true, onC
             </Button>
           </div>
 
-          {/* Access Summary */}
-          <div className="mt-6 p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-xl border border-slate-600/30 flex-shrink-0">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-slate-300 font-medium">Available Features</span>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <span className="font-bold text-green-400">{filteredItems.length} / {sidebarItems.length}</span>
+          {/* Access Summary - Hidden for tenants */}
+          {!isTenant && (
+            <div className="mt-6 p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-xl border border-slate-600/30 flex-shrink-0">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-slate-300 font-medium">Available Features</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                  <span className="font-bold text-green-400">{filteredItems.length} / {sidebarItems.length}</span>
+                </div>
+              </div>
+              <div className="mt-2 w-full bg-slate-600 rounded-full h-1.5 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full transition-all duration-300"
+                  style={{ width: `${(filteredItems.length / sidebarItems.length) * 100}%` }}
+                />
               </div>
             </div>
-            <div className="mt-2 w-full bg-slate-600 rounded-full h-1.5 overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full transition-all duration-300"
-                style={{ width: `${(filteredItems.length / sidebarItems.length) * 100}%` }}
-              />
-            </div>
-          </div>
+          )}
         </div>
       </aside>
     </>
