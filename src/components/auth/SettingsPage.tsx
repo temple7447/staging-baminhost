@@ -160,9 +160,9 @@ export const SettingsPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-center py-12">
-                  <Monitor className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <Monitor className="h-16 w-16 text-slate-500 dark:text-slate-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium mb-2">Coming Soon</h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-slate-500 dark:text-slate-400">
                     This settings section is under development and will be available in a future update.
                   </p>
                 </div>
@@ -224,7 +224,7 @@ export const SettingsPage = () => {
                 <Settings className="h-6 w-6" />
                 <h1 className="text-2xl font-bold">Settings</h1>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 Manage your account and system preferences
               </p>
             </div>
@@ -238,7 +238,7 @@ export const SettingsPage = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium truncate">{user?.name}</div>
-                    <div className="text-sm text-muted-foreground truncate">{user?.email}</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400 truncate">{user?.email}</div>
                   </div>
                 </div>
                 <div className="mt-3 space-y-2">
@@ -261,7 +261,7 @@ export const SettingsPage = () => {
 
             {/* Settings Navigation */}
             <div className="space-y-1">
-              <div className="text-sm font-medium text-muted-foreground mb-3">
+              <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">
                 Account Settings
               </div>
               {availableSections.slice(0, 4).map((section) => (
@@ -280,7 +280,7 @@ export const SettingsPage = () => {
                   <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
                   <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
                     <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
-                    <div className="settings-description text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
+                    <div className="settings-description text-xs text-slate-500 dark:text-slate-400 line-clamp-2 break-words">{section.description}</div>
                   </div>
                   <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
                 </Button>
@@ -289,7 +289,7 @@ export const SettingsPage = () => {
 
             {/* Advanced Settings */}
             <div className="space-y-1">
-              <div className="text-sm font-medium text-muted-foreground mb-3">
+              <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">
                 Advanced Settings
               </div>
               {availableSections.slice(4, 7).map((section) => (
@@ -308,7 +308,7 @@ export const SettingsPage = () => {
                   <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
                   <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
                     <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
-                    <div className="settings-description text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
+                    <div className="settings-description text-xs text-slate-500 dark:text-slate-400 line-clamp-2 break-words">{section.description}</div>
                   </div>
                   <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
                 </Button>
@@ -317,7 +317,7 @@ export const SettingsPage = () => {
 
             {/* Support & Legal */}
             <div className="space-y-1">
-              <div className="text-sm font-medium text-muted-foreground mb-3">
+              <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">
                 Support & Legal
               </div>
               {availableSections.slice(7).map((section) => (
@@ -336,7 +336,7 @@ export const SettingsPage = () => {
                   <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
                   <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
                     <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
-                    <div className="settings-description text-xs text-muted-foreground line-clamp-2 break-words">{section.description}</div>
+                    <div className="settings-description text-xs text-slate-500 dark:text-slate-400 line-clamp-2 break-words">{section.description}</div>
                   </div>
                   <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
                 </Button>
