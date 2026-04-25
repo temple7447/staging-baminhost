@@ -227,6 +227,60 @@ export interface AllEstatesOverviewResponse {
   };
 }
 
+export interface TenantDashboardOverviewResponse {
+  success: boolean;
+  data: {
+    tenant: {
+      id: string;
+      name: string;
+      email: string;
+      phone: string;
+      apartmentNumber: string;
+      estateName: string;
+      leaseStatus: string;
+      leaseEndDate: string;
+      monthlyRent: number;
+      rentDueDay: number;
+      outstandingBalance: number;
+      nextPaymentDue: string;
+    };
+    overview: {
+      paymentsThisMonth: {
+        amount: number;
+        status: 'paid' | 'pending' | 'overdue';
+        lastPaymentDate?: string;
+      };
+      serviceCharges: {
+        pending: number;
+        paid: number;
+      };
+      maintenanceRequests: {
+        total: number;
+        pending: number;
+        inProgress: number;
+        completed: number;
+      };
+      visitors: {
+        total: number;
+        expectedToday: number;
+      };
+      documents: {
+        total: number;
+        unread: number;
+      };
+      notices: {
+        total: number;
+        unread: number;
+      };
+      complaints: {
+        total: number;
+        pending: number;
+        resolved: number;
+      };
+    };
+  };
+}
+
 // Units
 export interface EstateUnitFeature { name: string; value: string }
 export interface EstateUnit {
@@ -559,6 +613,13 @@ export const estatesApi = createApi({
       query: (id) => `/api/estates/public/listings/${id}`,
       providesTags: (result, error, id) => [{ type: 'Estate', id }],
     }),
+    getDashboardOverview: builder.query<TenantDashboardOverviewResponse, void>({
+      query: () => '/api/dashboard/overview',
+      providesTags: (result, error) => [
+        { type: 'DashboardOverview', id: 'CURRENT' },
+        { type: 'TenantList', id: 'LIST' },
+      ],
+    }),
   }),
 });
 
@@ -571,6 +632,7 @@ export const {
   useDeleteEstateMutation,
   useGetEstateOverviewQuery,
   useGetAllEstatesOverviewQuery,
+  useGetDashboardOverviewQuery,
   useCreateEstateTenantMutation,
   useCreateEstateUnitMutation,
   useGetEstateVacantUnitsQuery,

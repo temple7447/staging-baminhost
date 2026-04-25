@@ -68,6 +68,7 @@ import { useToast } from "@/components/providers/ToastProvider";
 import { useAuth } from "@/contexts/AuthContext";
 import { processPayment } from "@/services/paymentService";
 import { generateReceiptPDF } from "@/utils/receiptGenerator";
+import { useGetDashboardOverviewQuery } from "@/services/estatesApi";
 
 const tenantData = {
   tenant: {
@@ -255,22 +256,27 @@ export const TenantDashboard: React.FC = () => {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [downloadingReceipt, setDownloadingReceipt] = useState<string | null>(null);
 
-  // Use demo data or user data
-  const tenant = authUser ? {
-    tenant: {
-      name: authUser.name || "Valued Tenant",
-      apartmentNumber: "Flat 4B",
-      estateName: "Rose Garden Estate",
-      leaseStatus: "active",
-      leaseEndDate: "2026-12-31",
-      monthlyRent: 250000,
-      rentDueDay: 25,
-      outstandingBalance: 0,
-      nextPaymentDue: "2025-05-25"
-    }
-  } : tenantData;
+  // Fetch dashboard overview from API
+  const { data: overviewData, isLoading: overviewLoading } = useGetDashboardOverviewQuery();
 
-  const tenantInfo = tenant?.tenant || tenant;
+  // Use API data or fallback to demo data
+  const tenantInfo = overviewData?.data?.tenant || {
+    name: authUser?.name || "Valued Tenant",
+    apartmentNumber: "Flat 4B",
+    estateName: "Rose Garden Estate",
+    leaseStatus: "active",
+    leaseEndDate: "2026-12-31",
+    monthlyRent: 250000,
+    rentDueDay: 25,
+    outstandingBalance: 0,
+    nextPaymentDue: "2025-05-25",
+    id: "",
+    email: authUser?.email || "",
+    phone: authUser?.phone || "",
+  };
+
+  const dashboardOverview = overviewData?.data?.overview;
+
   const displayName = tenantInfo?.name || authUser?.name || "Valued Tenant";
   const firstName = displayName?.split(" ")[0] || "Valued";
   const daysUntilRentDue = tenantInfo?.nextPaymentDue 
