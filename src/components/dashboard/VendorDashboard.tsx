@@ -1,291 +1,614 @@
-import { Upload, CheckCircle, Clock, DollarSign, FileText } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import {
+  Wrench,
+  Clock,
+  DollarSign,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Calendar,
+  CalendarDays,
+  Phone,
+  Mail,
+  MapPin,
+  Search,
+  Filter,
+  MoreHorizontal,
+  Plus,
+  Upload,
+  FileText,
+  Camera,
+  Video,
+  MessageSquare,
+  Send,
+  Download,
+  CreditCard,
+  Building,
+  Home,
+  Users,
+  Zap,
+  Droplets,
+  Lightbulb,
+  Shield,
+  SprayCan,
+  Trash2,
+  Activity,
+  BarChart3,
+  TrendingUp,
+  Star,
+  AlertTriangle,
+  CheckSquare,
+  UserCheck,
+  FileCheck,
+  Briefcase,
+  Truck,
+  Bell,
+  Settings,
+  Eye
+} from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/providers/ToastProvider";
+import { useAuth } from "@/contexts/AuthContext";
 
-// Mock data for Vendor
+// Demo Data
 const vendorData = {
   vendor: {
-    name: "Alice Brown",
-    company: "BuildTech Solutions",
-    totalEarnings: 45800,
-    monthlyEarnings: 8200,
-    completedProjects: 23,
-    activeProjects: 4
+    id: "v001",
+    name: "Mr. Adebayo",
+    company: "Quick Fix Services",
+    service: "Plumbing & Electrical",
+    phone: "+2348012345678",
+    email: "adebayo@quickfix.com",
+    rating: 4.8,
+    completedJobs: 156,
+    totalEarnings: 2450000
   },
-  projects: [
-    { 
-      id: '1', 
-      name: 'Office Renovation Phase 2', 
-      status: 'in_progress', 
-      progress: 75, 
-      value: 15000, 
-      deadline: '2024-02-15',
-      proofRequired: true
+  jobs: [
+    {
+      id: "j001",
+      title: "Fix leaking kitchen faucet",
+      unit: "Flat 4B",
+      property: "Rose Garden Estate",
+      category: "plumbing",
+      priority: "high",
+      status: "assigned",
+      assignedBy: "Estate Manager",
+      scheduledDate: "2025-04-25",
+      expectedCompletion: "2025-04-25",
+      pay: 15000
     },
-    { 
-      id: '2', 
-      name: 'HVAC System Installation', 
-      status: 'pending_approval', 
-      progress: 100, 
-      value: 8500, 
-      deadline: '2024-01-20',
-      proofRequired: true
+    {
+      id: "j002",
+      title: "AC unit not cooling",
+      unit: "Flat 5A",
+      property: "Rose Garden Estate",
+      category: "ac_repair",
+      priority: "medium",
+      status: "in_progress",
+      assignedBy: "Estate Manager",
+      scheduledDate: "2025-04-24",
+      expectedCompletion: "2025-04-26",
+      pay: 35000
     },
-    { 
-      id: '3', 
-      name: 'Security System Upgrade', 
-      status: 'approved', 
-      progress: 100, 
-      value: 12000, 
-      deadline: '2024-01-10',
-      proofRequired: false
-    },
-    { 
-      id: '4', 
-      name: 'Parking Lot Maintenance', 
-      status: 'in_progress', 
-      progress: 30, 
-      value: 6500, 
-      deadline: '2024-02-28',
-      proofRequired: true
+    {
+      id: "j003",
+      title: "Replace broken door lock",
+      unit: "Unit 8",
+      property: "Palm Springs",
+      category: "security",
+      priority: "low",
+      status: "completed",
+      assignedBy: "Estate Manager",
+      scheduledDate: "2025-04-10",
+      completedDate: "2025-04-12",
+      pay: 8000
     }
   ],
+  invoices: [
+    { id: "inv001", job: "Fix leaking kitchen faucet", amount: 15000, status: "pending", date: "2025-04-20" },
+    { id: "inv002", job: "AC repair", amount: 35000, status: "approved", date: "2025-04-18" },
+    { id: "inv003", job: "Door lock replacement", amount: 8000, status: "paid", date: "2025-04-12" }
+  ],
   payments: [
-    { date: '2024-01-15', description: 'Security System - Final Payment', amount: 12000, status: 'paid' },
-    { date: '2024-01-10', description: 'HVAC Installation - Progress Payment', amount: 4250, status: 'paid' },
-    { date: '2024-01-05', description: 'Office Renovation - Milestone 2', amount: 7500, status: 'paid' },
-    { date: '2024-01-20', description: 'HVAC Installation - Final Payment', amount: 4250, status: 'pending' }
+    { id: "p001", description: "Door lock replacement", amount: 8000, date: "2025-04-12", status: "paid" },
+    { id: "p002", description: "Bathroom pipe repair", amount: 12000, date: "2025-04-08", status: "paid" }
+  ],
+  messages: [
+    { id: "m1", from: "Estate Manager", message: "Please prioritize Flat 4B", time: "2 hours ago" },
+    { id: "m2", from: "Tenant - Flat 5A", message: "When will you arrive?", time: "5 hours ago" }
+  ],
+  schedule: [
+    { id: "s1", task: "Fix leaking faucet", time: "10:00 AM", unit: "Flat 4B" },
+    { id: "s2", task: "AC inspection", time: "2:00 PM", unit: "Flat 5A" }
+  ],
+  performance: {
+    completedJobs: 156,
+    responseTime: "2 hours",
+    rating: 4.8,
+    onTimeRate: 95
+  },
+  documents: [
+    { id: "d1", name: "Service Agreement 2024", type: "contract", date: "2024-01-01" },
+    { id: "d2", name: "Insurance Certificate", type: "compliance", date: "2024-01-15" }
   ]
 };
 
-export const VendorDashboard = () => {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", minimumFractionDigits: 0 }).format(amount);
+};
+
+const formatDate = (date: string) => new Date(date).toLocaleDateString("en-NG", { year: "numeric", month: "short", day: "numeric" });
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "completed":
+    case "approved":
+    case "paid":
+      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+    case "in_progress":
+      return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
+    case "assigned":
+    case "pending":
+      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+    case "rejected":
+      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+    default:
+      return "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200";
+  }
+};
+
+const getPriorityColor = (priority: string) => {
+  switch (priority) {
+    case "high":
+      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+    case "medium":
+      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+    case "low":
+      return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
+    default:
+      return "bg-slate-100 text-slate-800";
+  }
+};
+
+export const VendorDashboard: React.FC = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("overview");
+  const [uploadProofDialogOpen, setUploadProofDialogOpen] = useState(false);
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+
+  const pendingJobs = vendorData.jobs.filter(j => j.status === "assigned");
+  const activeJobs = vendorData.jobs.filter(j => j.status === "in_progress" || j.status === "assigned");
+  const completedJobs = vendorData.jobs.filter(j => j.status === "completed");
+  const urgentJobs = vendorData.jobs.filter(j => j.priority === "high" && j.status !== "completed");
+  const pendingPayments = vendorData.invoices.filter(i => i.status === "pending");
+
+  const handleAcceptJob = (jobId: string) => {
+    toast("Success: Job accepted");
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+  const handleRejectJob = (jobId: string) => {
+    toast("Info: Job rejected");
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'in_progress':
-        return <Badge variant="secondary">In Progress</Badge>;
-      case 'pending_approval':
-        return <Badge variant="outline">Pending Approval</Badge>;
-      case 'approved':
-        return <Badge variant="default">Approved</Badge>;
-      case 'paid':
-        return <Badge variant="default">Paid</Badge>;
-      case 'pending':
-        return <Badge variant="secondary">Pending</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
+  const handleStartWork = (jobId: string) => {
+    toast("Success: Work started");
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'approved':
-      case 'paid':
-        return <CheckCircle className="w-4 h-4 text-success" />;
-      case 'pending_approval':
-      case 'pending':
-        return <Clock className="w-4 h-4 text-warning" />;
-      default:
-        return <Clock className="w-4 h-4 text-muted-foreground" />;
-    }
+  const handleCompleteJob = (jobId: string) => {
+    toast("Success: Job marked as completed");
+    setUploadProofDialogOpen(false);
+  };
+
+  const handleUploadProof = (job: any) => {
+    setSelectedJob(job);
+    setUploadProofDialogOpen(true);
+  };
+
+  const handleSubmitInvoice = () => {
+    toast("Success: Invoice submitted");
+    setInvoiceDialogOpen(false);
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Vendor Dashboard</h1>
-          <p className="text-muted-foreground">Project management and proof of work submissions</p>
-        </div>
-        <div className="text-right">
-          <div className="text-sm text-muted-foreground">Active Projects</div>
-          <div className="text-2xl font-bold text-primary">{vendorData.vendor.activeProjects}</div>
-        </div>
-      </div>
+    <div className="p-6 space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="flex flex-wrap">
+          <TabsTrigger value="overview">Work Overview</TabsTrigger>
+          <TabsTrigger value="jobs">Jobs</TabsTrigger>
+          <TabsTrigger value="invoices">Invoices</TabsTrigger>
+          <TabsTrigger value="schedule">Schedule</TabsTrigger>
+          <TabsTrigger value="messages">Messages</TabsTrigger>
+          <TabsTrigger value="performance">Performance</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
+        </TabsList>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="financial-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Earnings</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="financial-amount text-2xl font-bold text-success">
-              {formatCurrency(vendorData.vendor.monthlyEarnings)}
+        {/* 1. Work Overview */}
+        <TabsContent value="overview" className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Vendor Dashboard</h1>
+              <p className="text-slate-500 dark:text-slate-400">{vendorData.vendor.company} - {vendorData.vendor.service}</p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              This month's income
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="financial-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="financial-amount text-2xl font-bold">
-              {formatCurrency(vendorData.vendor.totalEarnings)}
+            <div className="flex gap-2">
+              <Button onClick={() => setInvoiceDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
+                <FileText className="h-4 w-4 mr-2" /> Submit Invoice
+              </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              All-time earnings
-            </p>
-          </CardContent>
-        </Card>
+          </div>
 
-        <Card className="financial-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed Projects</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="financial-amount text-2xl font-bold text-primary">
-              {vendorData.vendor.completedProjects}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Successfully delivered
-            </p>
-          </CardContent>
-        </Card>
+          {/* Overview Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-blue-600 p-2 rounded-lg"><Wrench className="h-5 w-5 text-white" /></div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Active Jobs</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{activeJobs.length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="financial-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="financial-amount text-2xl font-bold text-warning">
-              {vendorData.vendor.activeProjects}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Currently working on
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+            <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-red-600 p-2 rounded-lg"><AlertTriangle className="h-5 w-5 text-white" /></div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Urgent Tasks</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{urgentJobs.length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-      {/* Active Projects */}
-      <Card className="financial-card">
-        <CardHeader className="flex items-center justify-between">
-          <CardTitle>Active Projects</CardTitle>
-          <Button size="sm" className="gap-2">
-            <Upload className="w-4 h-4" />
-            Upload Proof of Work
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {vendorData.projects.map((project) => (
-              <div key={project.id} className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-start space-x-3">
-                    {getStatusIcon(project.status)}
-                    <div>
-                      <h3 className="font-medium text-foreground">{project.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Due: {formatDate(project.deadline)}
+            <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/30 dark:to-yellow-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-yellow-600 p-2 rounded-lg"><Clock className="h-5 w-5 text-white" /></div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Pending Payment</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{formatCurrency(pendingPayments.reduce((sum, i) => sum + i.amount, 0))}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-green-600 p-2 rounded-lg"><CheckCircle className="h-5 w-5 text-white" /></div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Completed</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{completedJobs.length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Today's Schedule */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Today's Schedule</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {vendorData.schedule.map((item) => (
+                <div key={item.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div>
+                    <p className="font-medium text-slate-900 dark:text-white">{item.task}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{item.unit}</p>
+                  </div>
+                  <Badge className="bg-blue-100 text-blue-800">{item.time}</Badge>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 2. Job Assignment */}
+        <TabsContent value="jobs" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Assigned Jobs</CardTitle>
+              <CardDescription>Manage your job assignments</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {vendorData.jobs.map((job) => (
+                <div key={job.id} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge className={getPriorityColor(job.priority)}>{job.priority}</Badge>
+                        <Badge className={getStatusColor(job.status)}>{job.status}</Badge>
+                      </div>
+                      <p className="font-medium text-slate-900 dark:text-white">{job.title}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        {job.unit} - {job.property} • Assigned by {job.assignedBy}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Scheduled: {formatDate(job.scheduledDate)} - Pay: {formatCurrency(job.pay)}
                       </p>
                     </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="text-right">
-                      <div className="financial-amount font-semibold">
-                        {formatCurrency(project.value)}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Project value
-                      </div>
-                    </div>
-                    {getStatusBadge(project.status)}
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Progress</span>
-                    <span className="text-sm text-muted-foreground">{project.progress}%</span>
-                  </div>
-                  <Progress value={project.progress} className="h-2" />
-                </div>
-                
-                {project.proofRequired && project.progress === 100 && project.status === 'pending_approval' && (
-                  <div className="mt-3 p-3 rounded-lg bg-warning/10 border border-warning/20">
-                    <div className="flex items-center space-x-2">
-                      <Upload className="w-4 h-4 text-warning" />
-                      <span className="text-sm font-medium text-warning">
-                        Proof of work required for final approval
-                      </span>
+                    <div className="flex flex-wrap gap-2">
+                      {job.status === "assigned" && (
+                        <>
+                          <Button size="sm" className="bg-green-600" onClick={() => handleAcceptJob(job.id)}>Accept</Button>
+                          <Button size="sm" variant="destructive" onClick={() => handleRejectJob(job.id)}>Reject</Button>
+                        </>
+                      )}
+                      {job.status === "in_progress" && (
+                        <>
+                          <Button size="sm" onClick={() => handleStartWork(job.id)}>Start Work</Button>
+                          <Button size="sm" variant="outline" onClick={() => handleUploadProof(job)}>
+                            <Upload className="h-4 w-4 mr-1" /> Upload Proof
+                          </Button>
+                          <Button size="sm" className="bg-green-600" onClick={() => handleCompleteJob(job.id)}>
+                            <CheckCircle className="h-4 w-4 mr-1" /> Complete
+                          </Button>
+                        </>
+                      )}
+                      {job.status === "completed" && (
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-4 w-4 mr-1" /> View Details
+                        </Button>
+                      )}
                     </div>
                   </div>
-                )}
-                
-                {project.status === 'in_progress' && (
-                  <div className="mt-3 flex space-x-2">
-                    <Button size="sm" variant="outline" className="gap-2">
-                      <FileText className="w-4 h-4" />
-                      Submit Progress Report
-                    </Button>
-                    <Button size="sm" variant="outline" className="gap-2">
-                      <Upload className="w-4 h-4" />
-                      Upload Files
-                    </Button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {/* Payment History */}
-      <Card className="financial-card">
-        <CardHeader>
-          <CardTitle>Recent Payments</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {vendorData.payments.map((payment, index) => (
-              <div key={index} className="flex items-center justify-between p-3 rounded-lg border border-border">
-                <div className="flex items-center space-x-3">
-                  {getStatusIcon(payment.status)}
-                  <div>
-                    <div className="font-medium text-foreground">{payment.description}</div>
-                    <div className="text-sm text-muted-foreground">{formatDate(payment.date)}</div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <div className={`financial-amount font-semibold ${payment.status === 'paid' ? 'text-success' : 'text-warning'}`}>
-                    {formatCurrency(payment.amount)}
-                  </div>
-                  {getStatusBadge(payment.status)}
-                </div>
-              </div>
-            ))}
+        {/* 3. Invoice & Payment */}
+        <TabsContent value="invoices" className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Invoices & Payments</h2>
+              <p className="text-slate-500 dark:text-slate-400">Manage your invoices and payments</p>
+            </div>
+            <Button onClick={() => setInvoiceDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="h-4 w-4 mr-2" /> New Invoice
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-sm text-slate-500 dark:text-slate-400">Total Earned</p>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency(vendorData.vendor.totalEarnings)}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-sm text-slate-500 dark:text-slate-400">Pending Payment</p>
+                <p className="text-2xl font-bold text-yellow-600">
+                  {formatCurrency(pendingPayments.reduce((sum, i) => sum + i.amount, 0))}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-sm text-slate-500 dark:text-slate-400">Approved</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {formatCurrency(vendorData.invoices.filter(i => i.status === "approved").reduce((sum, i) => sum + i.amount, 0))}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Invoices</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {vendorData.invoices.map((invoice) => (
+                <div key={invoice.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div>
+                    <p className="font-medium text-slate-900 dark:text-white">{invoice.job}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{formatDate(invoice.date)}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <p className="font-semibold text-slate-900 dark:text-white">{formatCurrency(invoice.amount)}</p>
+                    <Badge className={getStatusColor(invoice.status)}>{invoice.status}</Badge>
+                    {invoice.status === "approved" && (
+                      <Button size="sm" variant="outline"><Download className="h-4 w-4" /></Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 4. Schedule & Calendar */}
+        <TabsContent value="schedule" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Upcoming Tasks</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {vendorData.schedule.map((item) => (
+                <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg bg-slate-50 dark:bg-slate-800">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-lg">
+                      <CalendarDays className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">{item.task}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{item.unit}</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-blue-100 text-blue-800">{item.time}</Badge>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 5. Communication */}
+        <TabsContent value="messages" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Messages</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {vendorData.messages.map((msg) => (
+                <div key={msg.id} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="font-medium text-slate-900 dark:text-white">{msg.from}</p>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">{msg.time}</span>
+                  </div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{msg.message}</p>
+                </div>
+              ))}
+              <div className="flex gap-2">
+                <Input placeholder="Type a message..." className="flex-1" />
+                <Button><Send className="h-4 w-4" /></Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 6. Performance */}
+        <TabsContent value="performance" className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-4 text-center">
+                <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{vendorData.performance.rating}</p>
+                <p className="text-sm text-slate-500">Rating</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{vendorData.performance.completedJobs}</p>
+                <p className="text-sm text-slate-500">Completed Jobs</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <Clock className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{vendorData.performance.responseTime}</p>
+                <p className="text-sm text-slate-500">Response Time</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <TrendingUp className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{vendorData.performance.onTimeRate}%</p>
+                <p className="text-sm text-slate-500">On-time Rate</p>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* 7. Documents */}
+        <TabsContent value="documents" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Documents & Compliance</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {vendorData.documents.map((doc) => (
+                <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <FileCheck className="h-5 w-5 text-green-600" />
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">{doc.name}</p>
+                      <p className="text-xs text-slate-500">{doc.type} - {formatDate(doc.date)}</p>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="outline"><Download className="h-4 w-4" /></Button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Upload Proof Dialog */}
+      <Dialog open={uploadProofDialogOpen} onOpenChange={setUploadProofDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Upload Work Proof</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>Before Photo</Label>
+              <div className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer">
+                <Camera className="h-8 w-8 mx-auto text-slate-400" />
+                <p className="text-sm text-slate-500 mt-2">Click to upload before photo</p>
+              </div>
+            </div>
+            <div>
+              <Label>After Photo</Label>
+              <div className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer">
+                <Camera className="h-8 w-8 mx-auto text-slate-400" />
+                <p className="text-sm text-slate-500 mt-2">Click to upload after photo</p>
+              </div>
+            </div>
+            <div>
+              <Label>Notes</Label>
+              <Textarea placeholder="Describe the work done..." rows={3} />
+            </div>
+            <div>
+              <Label>Materials Used</Label>
+              <Input placeholder="List any materials used..." />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUploadProofDialogOpen(false)}>Cancel</Button>
+            <Button onClick={() => handleCompleteJob(selectedJob?.id)}>Submit</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invoice Dialog */}
+      <Dialog open={invoiceDialogOpen} onOpenChange={setInvoiceDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Submit Invoice</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>Select Job</Label>
+              <Select>
+                <SelectTrigger><SelectValue placeholder="Select job" /></SelectTrigger>
+                <SelectContent>
+                  {vendorData.jobs.map(job => (
+                    <SelectItem key={job.id} value={job.id}>{job.title}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Amount</Label>
+              <Input placeholder="Enter amount" type="number" />
+            </div>
+            <div>
+              <Label>Description</Label>
+              <Textarea placeholder="Work description..." rows={3} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setInvoiceDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSubmitInvoice}>Submit Invoice</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
