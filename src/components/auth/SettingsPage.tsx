@@ -161,7 +161,7 @@ export const SettingsPage = () => {
               <CardContent>
                 <div className="text-center py-12">
                   <Monitor className="h-16 w-16 text-slate-500 dark:text-slate-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Coming Soon</h3>
+                  <h3 className="text-lg font-medium mb-2 text-slate-900 dark:text-white">Coming Soon</h3>
                   <p className="text-slate-500 dark:text-slate-400">
                     This settings section is under development and will be available in a future update.
                   </p>
@@ -189,7 +189,7 @@ export const SettingsPage = () => {
         <div className="md:hidden flex items-center justify-between p-4 bg-white/90 border-b">
           <div className="flex items-center gap-3">
             <Settings className="h-6 w-6" />
-            <h1 className="text-xl font-bold">Settings</h1>
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white">Settings</h1>
           </div>
           <Button
             variant="ghost"
@@ -222,7 +222,7 @@ export const SettingsPage = () => {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <Settings className="h-6 w-6" />
-                <h1 className="text-2xl font-bold">Settings</h1>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Settings</h1>
               </div>
               <p className="text-sm text-slate-500 dark:text-slate-400">
                 Manage your account and system preferences
@@ -237,7 +237,7 @@ export const SettingsPage = () => {
                     <User className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium truncate">{user?.name}</div>
+                    <div className="font-medium truncate text-slate-900 dark:text-white">{user?.name}</div>
                     <div className="text-sm text-slate-500 dark:text-slate-400 truncate">{user?.email}</div>
                   </div>
                 </div>
@@ -279,7 +279,7 @@ export const SettingsPage = () => {
                 >
                   <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
                   <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
-                    <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
+                    <div className="settings-section-title font-medium text-sm truncate text-slate-900 dark:text-white">{section.name}</div>
                     <div className="settings-description text-xs text-slate-500 dark:text-slate-400 line-clamp-2 break-words">{section.description}</div>
                   </div>
                   <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
@@ -307,7 +307,7 @@ export const SettingsPage = () => {
                 >
                   <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
                   <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
-                    <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
+                    <div className="settings-section-title font-medium text-sm truncate text-slate-900 dark:text-white">{section.name}</div>
                     <div className="settings-description text-xs text-slate-500 dark:text-slate-400 line-clamp-2 break-words">{section.description}</div>
                   </div>
                   <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
@@ -335,7 +335,7 @@ export const SettingsPage = () => {
                 >
                   <section.icon className="h-4 w-4 mr-2 sm:mr-3 flex-shrink-0" />
                   <div className="settings-button-content flex-1 text-left min-w-0 pr-1">
-                    <div className="settings-section-title font-medium text-sm truncate">{section.name}</div>
+                    <div className="settings-section-title font-medium text-sm truncate text-slate-900 dark:text-white">{section.name}</div>
                     <div className="settings-description text-xs text-slate-500 dark:text-slate-400 line-clamp-2 break-words">{section.description}</div>
                   </div>
                   <ChevronRight className="h-4 w-4 ml-1 sm:ml-2 flex-shrink-0" />
