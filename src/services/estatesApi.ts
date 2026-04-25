@@ -85,13 +85,24 @@ export interface TenantBillingItem {
 export interface TenantBillingResponse {
   success: boolean;
   data: {
-    tenant: {
-      id: string;
-      name: string;
+    recurring: {
+      code: string;
+      label: string;
+      amount: number;
+      dueDate: string;
       type: string;
-      unit: string;
-    };
-    items: TenantBillingItem[];
+      category: string;
+      frequency: string;
+    }[];
+    oneTime: {
+      code: string;
+      label: string;
+      amount: number;
+      type: string;
+      category: string;
+      frequency: string;
+    }[];
+    optional: any[];
   };
 }
 

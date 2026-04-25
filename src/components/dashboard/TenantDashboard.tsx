@@ -266,6 +266,12 @@ export const TenantDashboard: React.FC = () => {
   const apiApartment = overviewData?.data?.data?.apartment;
   const apiBilling = overviewData?.data?.data?.billing;
   const apiPayments = overviewData?.data?.data?.payments;
+  const billingItems = billingData?.data;
+
+  // Calculate totals from billing
+  const recurringTotal = billingItems?.recurring?.reduce((sum, item) => sum + item.amount, 0) || 0;
+  const oneTimeTotal = billingItems?.oneTime?.reduce((sum, item) => sum + item.amount, 0) || 0;
+  const totalDue = recurringTotal + oneTimeTotal;
 
   // Use API data or fallback to demo data
   const tenantInfo = apiApartment ? {
@@ -451,12 +457,12 @@ export const TenantDashboard: React.FC = () => {
                     <span className="text-sm">Lease Ends</span>
                   </div>
                   <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{formatDate(tenantInfo.leaseEndDate)}</p>
-                  <p className="text-sm text-green-600 dark:text-green-400">Active</p>
+                  <p className="text-sm text-green-600 dark:text-green-400">{tenantInfo.leaseStatus}</p>
                 </div>
                 <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 border">
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
                     <Calendar className="h-4 w-4" />
-                    <span className="text-sm">Next Rent Due</span>
+                    <span className="text-sm">Next Due</span>
                   </div>
                   <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{formatDate(tenantInfo.nextPaymentDue)}</p>
                   <p className="text-sm text-slate-600 dark:text-slate-400">{daysUntilRentDue} days</p>
@@ -464,10 +470,10 @@ export const TenantDashboard: React.FC = () => {
                 <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 border">
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
                     <DollarSign className="h-4 w-4" />
-                    <span className="text-sm">Outstanding</span>
+                    <span className="text-sm">Total Due</span>
                   </div>
-                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{formatCurrency(tenantInfo.outstandingBalance)}</p>
-                  <p className="text-sm text-green-600 dark:text-green-400">All paid up!</p>
+                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{formatCurrency(totalDue)}</p>
+                  <p className="text-sm text-green-600 dark:text-green-400">{billingItems?.recurring?.length || 0} recurring</p>
                 </div>
               </div>
 
@@ -586,35 +592,27 @@ export const TenantDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {tenantData.paymentHistory.map((payment) => (
-                  <div key={payment.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                    <div className="flex-1">
-                      <p className="font-medium">{payment.month}</p>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
-                        {formatDate(payment.date)} • {payment.method}
-                      </p>
+                {apiPayments?.recentPayments?.length > 0 ? (
+                  apiPayments.recentPayments.map((payment: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                      <div className="flex-1">
+                        <p className="font-medium">{payment.description || payment.type}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          {formatDate(payment.date)} • {payment.method || 'Transfer'}
+                        </p>
+                      </div>
+                      <div className="text-right mr-4">
+                        <p className="font-semibold">{formatCurrency(payment.amount)}</p>
+                        <Badge className={getStatusColor(payment.status)}>{payment.status}</Badge>
+                      </div>
                     </div>
-                    <div className="text-right mr-4">
-                      <p className="font-semibold">{formatCurrency(payment.amount)}</p>
-                      <Badge className={`${getStatusColor(payment.status)}`}>{payment.status}</Badge>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => handleDownloadReceipt(payment.id.toString())}
-                      disabled={downloadingReceipt === payment.id.toString()}
-                    >
-                      {downloadingReceipt === payment.id.toString() ? (
-                        <Loader className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <>
-                          <Download className="h-4 w-4 mr-1" />
-                          Receipt
-                        </>
-                      )}
-                    </Button>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+                    <CreditCard className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p>No payment history yet</p>
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
