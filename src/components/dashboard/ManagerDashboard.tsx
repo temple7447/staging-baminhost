@@ -1,302 +1,650 @@
-import { Users, Target, TrendingUp, Clock } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { useState } from "react";
+import {
+  Building,
+  Users,
+  Home,
+  Wrench,
+  Clock,
+  AlertCircle,
+  Shield,
+  UserCheck,
+  UserPlus,
+  FileText,
+  DollarSign,
+  Calendar,
+  CalendarDays,
+  Phone,
+  Mail,
+  MapPin,
+  Search,
+  Filter,
+  MoreHorizontal,
+  Plus,
+  CheckCircle,
+  XCircle,
+  Truck,
+  Zap,
+  Droplets,
+  Trash2,
+  Activity,
+  BarChart3,
+  Download,
+  Send,
+  Bell,
+  MessageSquare,
+  Eye,
+  Edit,
+  Trash,
+  ChevronRight,
+  BadgeCheck,
+  AlertTriangle,
+  CalendarClock,
+  ClipboardList,
+  UserCog,
+  ClipboardCheck,
+  Megaphone,
+  Lightbulb,
+  Ticket
+} from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Crown, ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/providers/ToastProvider";
+import { useAuth } from "@/contexts/AuthContext";
 
-// Mock data for Manager
+// Demo Data
 const managerData = {
   manager: {
-    name: "Mike Wilson",
-    role: "Senior Manager",
-    teamSize: 12,
-    monthlyTargets: 85000,
-    achieved: 78500
+    id: "mgr_001",
+    name: "Estate Manager",
+    email: "manager@estate.com",
+    phone: "+2349012345678",
+    assignedProperty: "Rose Garden Estate"
   },
-  team: [
-    { name: "Alex Chen", role: "Sales Rep", performance: 95, target: 15000, achieved: 14250 },
-    { name: "Maria Garcia", role: "Account Manager", performance: 88, target: 12000, achieved: 10560 },
-    { name: "James Smith", role: "Business Dev", performance: 102, target: 18000, achieved: 18360 },
-    { name: "Lisa Wang", role: "Sales Rep", performance: 76, target: 14000, achieved: 10640 },
+  property: {
+    name: "Rose Garden Estate",
+    address: "123 Rose Garden Ave, Lagos",
+    totalUnits: 120,
+    occupiedUnits: 105,
+    vacantUnits: 15
+  },
+  tenants: [
+    { id: "t1", name: "John Doe", unit: "Flat 4B", phone: "+2349012345678", status: "active", rentStatus: "paid" },
+    { id: "t2", name: "Jane Smith", unit: "Flat 5A", phone: "+2348012345678", status: "active", rentStatus: "pending" },
+    { id: "t3", name: "Mike Johnson", unit: "Unit 8", phone: "+2347012345678", status: "active", rentStatus: "paid" },
+    { id: "t4", name: "Sarah Williams", unit: "Flat 2A", phone: "+2348011111111", status: "active", rentStatus: "overdue" }
   ],
-  waterfallDistribution: {
-    totalRevenue: 78500,
-    managerShare: 15700, // 20%
-    teamShare: 47100, // 60% 
-    companyShare: 15700 // 20%
-  },
-  roleMetrics: {
-    "Sales Rep": { count: 6, avgPerformance: 87 },
-    "Account Manager": { count: 3, avgPerformance: 91 },
-    "Business Dev": { count: 2, avgPerformance: 94 },
-    "Team Lead": { count: 1, avgPerformance: 89 }
+  maintenanceRequests: [
+    { id: "m1", tenant: "John Doe", unit: "Flat 4B", issue: "Leaking faucet", category: "plumbing", priority: "medium", status: "pending", date: "2025-04-20", estimatedCost: 15000 },
+    { id: "m2", tenant: "Jane Smith", unit: "Flat 5A", issue: "AC not cooling", category: "ac", priority: "high", status: "in_progress", date: "2025-04-18", assignedTo: "Mr. Adebayo" },
+    { id: "m3", tenant: "Mike Johnson", unit: "Unit 8", issue: "Broken lock", category: "security", priority: "low", status: "completed", date: "2025-04-10", completedDate: "2025-04-12", cost: 8000 }
+  ],
+  staff: [
+    { id: "s1", name: "Mr. John", role: "Security", shift: "Morning", status: "on_duty", phone: "+2348011111111" },
+    { id: "s2", name: "Mr. Adebayo", role: "Electrician", shift: "Day", status: "on_duty", phone: "+2348022222222" },
+    { id: "s3", name: "Mrs. Grace", role: "Cleaner", shift: "Morning", status: "off_duty", phone: "+2348033333333" },
+    { id: "s4", name: "Mr. Chidi", role: "Plumber", shift: "Day", status: "on_duty", phone: "+2348044444444" }
+  ],
+  visitors: [
+    { id: "v1", name: "Michael Brown", phone: "+2349000000000", unit: "Flat 4B", purpose: "Family Visit", time: "10:30 AM", status: "approved" },
+    { id: "v2", name: "DHL Delivery", phone: "+2347000000000", unit: "Flat 5A", purpose: "Package", time: "11:00 AM", status: "pending" },
+    { id: "v3", name: "Sarah's Guest", phone: "+2348055555555", unit: "Flat 2A", purpose: "Friend", time: "2:00 PM", status: "approved" }
+  ],
+  complaints: [
+    { id: "c1", tenant: "Sarah Williams", unit: "Flat 2A", type: "noise", description: "Noise from 2B", status: "pending", date: "2025-04-20" },
+    { id: "c2", tenant: "Mike Johnson", unit: "Unit 8", type: "neighbor", description: "Parking issue", status: "resolved", date: "2025-04-15" }
+  ],
+  leases: [
+    { id: "l1", tenant: "John Doe", unit: "Flat 4B", startDate: "2024-01-01", endDate: "2026-12-31", status: "active" },
+    { id: "l2", tenant: "Jane Smith", unit: "Flat 5A", startDate: "2024-06-01", endDate: "2025-05-31", status: "expiring_soon" },
+    { id: "l3", tenant: "Mike Johnson", unit: "Unit 8", startDate: "2024-03-01", endDate: "2025-02-28", status: "active" }
+  ],
+  utilities: [
+    { id: "u1", type: "Water", status: "normal", lastChecked: "2025-04-20" },
+    { id: "u2", type: "Electricity", status: "normal", lastChecked: "2025-04-20" },
+    { id: "u3", type: "Generator", status: "maintenance_due", lastChecked: "2025-04-15" }
+  ],
+  vendors: [
+    { id: "v1", name: "ABC Electric", service: "Electrical", phone: "+2348011111111" },
+    { id: "v2", name: "Quick Fix Plumbing", service: "Plumbing", phone: "+2348022222222" },
+    { id: "v3", name: "Clean Pro Services", service: "Cleaning", phone: "+2348033333333" }
+  ],
+  dailyLogs: [
+    { id: "d1", type: "maintenance", description: "Completed 3 repairs", staff: "Mr. Adebayo", date: "2025-04-20" },
+    { id: "d2", type: "security", description: "No incidents reported", staff: "Mr. John", date: "2025-04-20" },
+    { id: "d3", type: "visitor", description: "15 visitors today", staff: "Security", date: "2025-04-20" }
+  ]
+};
+
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", minimumFractionDigits: 0 }).format(amount);
+};
+
+const formatDate = (date: string) => new Date(date).toLocaleDateString("en-NG", { year: "numeric", month: "short", day: "numeric" });
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "paid":
+    case "active":
+    case "completed":
+    case "approved":
+      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+    case "pending":
+    case "in_progress":
+      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+    case "overdue":
+      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+    case "expiring_soon":
+      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+    default:
+      return "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200";
   }
 };
 
-export const ManagerDashboard = () => {
-  const navigate = useNavigate();
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
+const getPriorityColor = (priority: string) => {
+  switch (priority) {
+    case "high":
+      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+    case "medium":
+      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+    case "low":
+      return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
+    default:
+      return "bg-slate-100 text-slate-800";
+  }
+};
+
+export const ManagerDashboard: React.FC = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("overview");
+  const [addMaintenanceDialogOpen, setAddMaintenanceDialogOpen] = useState(false);
+  const [sendNoticeDialogOpen, setSendNoticeDialogOpen] = useState(false);
+
+  const pendingMaintenance = managerData.maintenanceRequests.filter(m => m.status !== "completed").length;
+  const pendingComplaints = managerData.complaints.filter(c => c.status !== "resolved").length;
+  const todayVisitors = managerData.visitors.length;
+  const paidRent = managerData.tenants.filter(t => t.rentStatus === "paid").length;
+  const pendingRent = managerData.tenants.filter(t => t.rentStatus === "pending" || t.rentStatus === "overdue").length;
+
+  const handleApproveVisitor = (visitorId: string) => {
+    toast({ title: "Visitor Approved", description: "Access code sent" });
   };
 
-  const getPerformanceBadge = (performance: number) => {
-    if (performance >= 100) return "default";
-    if (performance >= 85) return "secondary";
-    if (performance >= 70) return "outline";
-    return "destructive";
+  const handleAssignStaff = (requestId: string) => {
+    toast({ title: "Staff Assigned", description: "Team member notified" });
+    setAddMaintenanceDialogOpen(false);
   };
 
-  const achievementRate = (managerData.manager.achieved / managerData.manager.monthlyTargets) * 100;
+  const handleSendNotice = () => {
+    toast({ title: "Notice Sent", description: "Broadcast sent to all tenants" });
+    setSendNoticeDialogOpen(false);
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Manager Dashboard</h1>
-          <p className="text-muted-foreground">Team performance and waterfall distribution</p>
-        </div>
-        <div className="text-right">
-          <div className="text-sm text-muted-foreground">Team Size</div>
-          <div className="text-2xl font-bold text-primary">{managerData.manager.teamSize}</div>
-        </div>
-      </div>
+    <div className="p-6 space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="flex flex-wrap">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="tenants">Tenants</TabsTrigger>
+          <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
+          <TabsTrigger value="staff">Staff</TabsTrigger>
+          <TabsTrigger value="visitors">Visitors</TabsTrigger>
+          <TabsTrigger value="complaints">Complaints</TabsTrigger>
+          <TabsTrigger value="leases">Leases</TabsTrigger>
+          <TabsTrigger value="utilities">Utilities</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
+        </TabsList>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="financial-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Target</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="financial-amount text-2xl font-bold">
-              {formatCurrency(managerData.manager.monthlyTargets)}
+        {/* 1. Operational Overview */}
+        <TabsContent value="overview" className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Manager Dashboard</h1>
+              <p className="text-slate-500 dark:text-slate-400">{managerData.property.name} - Operational Control</p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Team revenue goal
-            </p>
-          </CardContent>
-        </Card>
+            <div className="flex gap-2">
+              <Button onClick={() => setSendNoticeDialogOpen(true)} variant="outline">
+                <Megaphone className="h-4 w-4 mr-2" /> Send Notice
+              </Button>
+              <Button onClick={() => setAddMaintenanceDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="h-4 w-4 mr-2" /> New Request
+              </Button>
+            </div>
+          </div>
 
-        <Card className="financial-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Achieved</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="financial-amount text-2xl font-bold text-success">
-              {formatCurrency(managerData.manager.achieved)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {achievementRate.toFixed(1)}% of target
-            </p>
-          </CardContent>
-        </Card>
+          {/* Overview Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-blue-600 p-2 rounded-lg"><Building className="h-5 w-5 text-white" /></div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Units Managed</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{managerData.property.totalUnits}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="financial-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Your Share</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="financial-amount text-2xl font-bold text-primary">
-              {formatCurrency(managerData.waterfallDistribution.managerShare)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              20% waterfall distribution
-            </p>
-          </CardContent>
-        </Card>
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-green-600 p-2 rounded-lg"><Home className="h-5 w-5 text-white" /></div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Occupied</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{managerData.property.occupiedUnits}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="financial-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Team Performance</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="financial-amount text-2xl font-bold">
-              {achievementRate.toFixed(0)}%
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Overall team achievement
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+            <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-red-600 p-2 rounded-lg"><Home className="h-5 w-5 text-white" /></div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Vacant</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{managerData.property.vacantUnits}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-      {/* Hire Like a Boss Call to Action */}
-      <Card className="financial-card bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-blue-600/10 border-blue-500/20 shadow-lg">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-900/40">
-                <Crown className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-foreground">Hire Like a Boss</h3>
-                <p className="text-sm text-muted-foreground italic">"You're not paying people to be on your team. You're buying back your own time."</p>
-              </div>
+            <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/30 dark:to-yellow-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-yellow-600 p-2 rounded-lg"><Wrench className="h-5 w-5 text-white" /></div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Pending Requests</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{pendingMaintenance}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-purple-600 p-2 rounded-lg"><UserCheck className="h-5 w-5 text-white" /></div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Staff Active</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{managerData.staff.filter(s => s.status === "on_duty").length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900/30 dark:to-cyan-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-cyan-600 p-2 rounded-lg"><Users className="h-5 w-5 text-white" /></div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Visitors Today</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{todayVisitors}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-green-600 p-2 rounded-lg"><DollarSign className="h-5 w-5 text-white" /></div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Rent Paid</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{paidRent}/{managerData.tenants.length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-red-600 p-2 rounded-lg"><AlertTriangle className="h-5 w-5 text-white" /></div>
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Open Complaints</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{pendingComplaints}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Daily Logs */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Daily Logs</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {managerData.dailyLogs.map((log) => (
+                <div key={log.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    {log.type === "maintenance" ? <Wrench className="h-5 w-5 text-blue-600" /> :
+                     log.type === "security" ? <Shield className="h-5 w-5 text-green-600" /> :
+                     <Users className="h-5 w-5 text-purple-600" />}
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">{log.description}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{log.staff} - {formatDate(log.date)}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 2. Tenant Management */}
+        <TabsContent value="tenants" className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Tenant Management</h2>
+              <p className="text-slate-500 dark:text-slate-400">Manage all tenants</p>
             </div>
-            <Button
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8"
-              onClick={() => navigate('/dashboard/strategic-hiring-planner')}
-            >
-              Open Hiring Planner <ArrowRight className="ml-2 w-4 h-4" />
+            <Button className="bg-blue-600 hover:bg-blue-700"><UserPlus className="h-4 w-4 mr-2" /> Add Tenant</Button>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2"><Search className="h-4 w-4 text-slate-500" /><Input placeholder="Search tenants..." className="max-w-sm" /></div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {managerData.tenants.map((tenant) => (
+                <div key={tenant.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
+                      {tenant.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">{tenant.name}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{tenant.unit}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge className={getStatusColor(tenant.rentStatus)}>{tenant.rentStatus}</Badge>
+                    <Button size="sm" variant="outline"><MessageSquare className="h-4 w-4" /></Button>
+                    <Button size="sm" variant="outline"><Phone className="h-4 w-4" /></Button>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 3. Maintenance & Repairs */}
+        <TabsContent value="maintenance" className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Maintenance & Repairs</h2>
+              <p className="text-slate-500 dark:text-slate-400">Track and manage repairs</p>
+            </div>
+            <Button onClick={() => setAddMaintenanceDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="h-4 w-4 mr-2" /> New Request
             </Button>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Team Performance */}
-      <Card className="financial-card">
-        <CardHeader>
-          <CardTitle>Team Performance Overview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {managerData.team.map((member, index) => (
-              <div key={index} className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors">
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center">
-                    <span className="text-primary-foreground font-medium text-sm">
-                      {member.name.split(' ').map(n => n[0]).join('')}
-                    </span>
+          <Card>
+            <CardContent className="space-y-4">
+              {managerData.maintenanceRequests.map((request) => (
+                <div key={request.id} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 rounded-lg ${request.status === "completed" ? "bg-green-100" : request.status === "in_progress" ? "bg-blue-100" : "bg-yellow-100"}`}>
+                        {request.category === "plumbing" ? <Droplets className="h-5 w-5 text-blue-600" /> :
+                         request.category === "electrical" ? <Zap className="h-5 w-5 text-yellow-600" /> :
+                         <Shield className="h-5 w-5 text-gray-600" />}
+                      </div>
+                      <div>
+                        <p className="font-medium text-slate-900 dark:text-white">{request.issue}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{request.unit} - {request.tenant}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{formatDate(request.date)}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className={getPriorityColor(request.priority)}>{request.priority}</Badge>
+                      <Badge className={getStatusColor(request.status)}>{request.status}</Badge>
+                      {request.status !== "completed" && (
+                        <Button size="sm" variant="outline" onClick={() => handleAssignStaff(request.id)}>Assign</Button>
+                      )}
+                    </div>
                   </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 4. Staff Management */}
+        <TabsContent value="staff" className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Staff Management</h2>
+              <p className="text-slate-500 dark:text-slate-400">Manage estate staff</p>
+            </div>
+            <Button className="bg-blue-600 hover:bg-blue-700"><UserPlus className="h-4 w-4 mr-2" /> Add Staff</Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-slate-900 dark:text-white">On Duty</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {managerData.staff.filter(s => s.status === "on_duty").map((member) => (
+                  <div key={member.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">{member.name}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{member.role} - {member.shift}</p>
+                    </div>
+                    <Badge className="bg-green-100 text-green-800">On Duty</Badge>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-slate-900 dark:text-white">Off Duty</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {managerData.staff.filter(s => s.status === "off_duty").map((member) => (
+                  <div key={member.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">{member.name}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{member.role} - {member.shift}</p>
+                    </div>
+                    <Badge variant="outline">Off Duty</Badge>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* 5. Visitor & Security Control */}
+        <TabsContent value="visitors" className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Visitor & Security</h2>
+              <p className="text-slate-500 dark:text-slate-400">Manage visitor access</p>
+            </div>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Pending Approvals</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {managerData.visitors.filter(v => v.status === "pending").map((visitor) => (
+                <div key={visitor.id} className="flex items-center justify-between p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                   <div>
-                    <div className="font-medium">{member.name}</div>
-                    <div className="text-sm text-muted-foreground">{member.role}</div>
+                    <p className="font-medium text-slate-900 dark:text-white">{visitor.name}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{visitor.unit} - {visitor.purpose}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" className="bg-green-600" onClick={() => handleApproveVisitor(visitor.id)}>Approve</Button>
+                    <Button size="sm" variant="destructive">Reject</Button>
                   </div>
                 </div>
+              ))}
+            </CardContent>
+          </Card>
 
-                <div className="flex items-center space-x-4">
-                  <div className="text-right">
-                    <div className="financial-amount font-semibold">
-                      {formatCurrency(member.achieved)}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Visitor History</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {managerData.visitors.map((visitor) => (
+                <div key={visitor.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div>
+                    <p className="font-medium text-slate-900 dark:text-white">{visitor.name}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{visitor.unit} - {visitor.purpose}</p>
+                  </div>
+                  <Badge className={getStatusColor(visitor.status)}>{visitor.status}</Badge>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 6. Complaints & Support */}
+        <TabsContent value="complaints" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Complaints</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {managerData.complaints.map((complaint) => (
+                <div key={complaint.id} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">{complaint.tenant}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{complaint.description}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">{complaint.unit} - {formatDate(complaint.date)}</p>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      of {formatCurrency(member.target)}
+                    <Badge className={getStatusColor(complaint.status)}>{complaint.status}</Badge>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 7. Lease Monitoring */}
+        <TabsContent value="leases" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Lease Monitoring</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {managerData.leases.map((lease) => (
+                <div key={lease.id} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">{lease.tenant}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{lease.unit}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        {formatDate(lease.startDate)} - {formatDate(lease.endDate)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className={getStatusColor(lease.status)}>{lease.status}</Badge>
+                      {lease.status === "expiring_soon" && (
+                        <Button size="sm" variant="outline">Remind</Button>
+                      )}
                     </div>
                   </div>
-                  <Badge variant={getPerformanceBadge(member.performance)}>
-                    {member.performance}%
-                  </Badge>
                 </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {/* Waterfall Distribution & Role Analysis */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="financial-card">
-          <CardHeader>
-            <CardTitle>Waterfall Distribution</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Revenue sharing: 60% team, 20% manager, 20% company
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Team Share (60%)</span>
-                <span className="financial-amount font-bold text-success">
-                  {formatCurrency(managerData.waterfallDistribution.teamShare)}
-                </span>
-              </div>
-              <Progress value={60} className="h-3" />
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Manager Share (20%)</span>
-                <span className="financial-amount font-bold text-primary">
-                  {formatCurrency(managerData.waterfallDistribution.managerShare)}
-                </span>
-              </div>
-              <Progress value={20} className="h-3" />
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Company Share (20%)</span>
-                <span className="financial-amount font-bold text-muted-foreground">
-                  {formatCurrency(managerData.waterfallDistribution.companyShare)}
-                </span>
-              </div>
-              <Progress value={20} className="h-3" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="financial-card">
-          <CardHeader>
-            <CardTitle>Role Distribution (8 Roles)</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {Object.entries(managerData.roleMetrics).map(([role, metrics]) => (
-              <div key={role} className="flex justify-between items-center p-3 rounded-lg bg-muted/30">
-                <div>
-                  <div className="font-medium">{role}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {metrics.count} member{metrics.count > 1 ? 's' : ''}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <Badge variant="outline">
-                    {metrics.avgPerformance}% avg
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* 1/3rd Rule Implementation */}
-      <Card className="financial-card">
-        <CardHeader>
-          <CardTitle>1/3rd Investment Rule</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            1/3 personal needs, 1/3 business growth, 1/3 future investments
-          </p>
-        </CardHeader>
-        <CardContent>
+        {/* 8. Utilities */}
+        <TabsContent value="utilities" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg bg-gradient-to-br from-primary-light/10 to-primary-light/5 border border-primary-light/20">
-              <div className="text-sm font-medium text-primary">Personal Needs (1/3)</div>
-              <div className="financial-amount text-xl font-bold mt-1">
-                {formatCurrency(managerData.waterfallDistribution.managerShare / 3)}
-              </div>
-              <div className="text-xs text-muted-foreground mt-1">Living expenses & savings</div>
-            </div>
+            {managerData.utilities.map((utility) => (
+              <Card key={utility.id}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">{utility.type}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">Last checked: {formatDate(utility.lastChecked)}</p>
+                    </div>
+                    <Badge className={getStatusColor(utility.status)}>{utility.status}</Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
 
-            <div className="p-4 rounded-lg bg-gradient-to-br from-success-light/10 to-success-light/5 border border-success-light/20">
-              <div className="text-sm font-medium text-success">Business Growth (1/3)</div>
-              <div className="financial-amount text-xl font-bold mt-1">
-                {formatCurrency(managerData.waterfallDistribution.managerShare / 3)}
+        {/* 9. Reports & Logs */}
+        <TabsContent value="reports" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-slate-900 dark:text-white">Reports & Daily Logs</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <Button variant="outline" className="h-20 flex flex-col items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  <span className="text-xs">Daily Report</span>
+                </Button>
+                <Button variant="outline" className="h-20 flex flex-col items-center gap-2">
+                  <ClipboardList className="h-5 w-5" />
+                  <span className="text-xs">Staff Report</span>
+                </Button>
+                <Button variant="outline" className="h-20 flex flex-col items-center gap-2">
+                  <Wrench className="h-5 w-5" />
+                  <span className="text-xs">Maintenance</span>
+                </Button>
+                <Button variant="outline" className="h-20 flex flex-col items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  <span className="text-xs">Security</span>
+                </Button>
               </div>
-              <div className="text-xs text-muted-foreground mt-1">Team development & tools</div>
-            </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
-            <div className="p-4 rounded-lg bg-gradient-to-br from-warning-light/10 to-warning-light/5 border border-warning-light/20">
-              <div className="text-sm font-medium text-warning">Future Investments (1/3)</div>
-              <div className="financial-amount text-xl font-bold mt-1">
-                {formatCurrency(managerData.waterfallDistribution.managerShare / 3)}
-              </div>
-              <div className="text-xs text-muted-foreground mt-1">Long-term growth opportunities</div>
+      {/* Send Notice Dialog */}
+      <Dialog open={sendNoticeDialogOpen} onOpenChange={setSendNoticeDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send Notice</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>Notice Type</Label>
+              <Select>
+                <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="general">General Notice</SelectItem>
+                  <SelectItem value="emergency">Emergency</SelectItem>
+                  <SelectItem value="maintenance">Maintenance</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Message</Label>
+              <Textarea placeholder="Enter your message..." rows={4} />
             </div>
           </div>
-        </CardContent>
-      </Card>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSendNoticeDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSendNotice}>Send</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
