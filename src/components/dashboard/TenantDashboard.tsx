@@ -321,7 +321,6 @@ export const TenantDashboard: React.FC = () => {
         switch (method) {
           case 'wallet': return 'Wallet';
           case 'paystack': return 'Paystack';
-          case 'flutterwave': return 'Flutterwave';
           default: return method;
         }
       };
@@ -345,7 +344,7 @@ export const TenantDashboard: React.FC = () => {
         estateName: tenantInfo.estateName,
         amount: paymentForm.amount,
         paymentType: paymentForm.type as any,
-        paymentMethod: paymentForm.method === 'wallet' ? 'Wallet' : paymentForm.method === 'paystack' ? 'Paystack' : 'Flutterwave',
+        paymentMethod: paymentForm.method === 'wallet' ? 'Wallet' : 'Paystack',
         reference: receiptNumber,
         status: 'paid',
         month: paymentForm.month,
@@ -1146,18 +1145,6 @@ export const TenantDashboard: React.FC = () => {
                   <CreditCard className={`h-6 w-6 mb-1 ${paymentForm.method === "paystack" ? "text-blue-600" : "text-slate-500"}`} />
                   <div className="font-semibold text-sm text-slate-900 dark:text-white">Paystack</div>
                   <p className="text-xs text-slate-500 dark:text-slate-400">Card, Transfer</p>
-                </div>
-                <div
-                  onClick={() => setPaymentForm({ ...paymentForm, method: "flutterwave" })}
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition ${
-                    paymentForm.method === "flutterwave"
-                      ? "border-purple-600 bg-purple-50 dark:bg-purple-900/30"
-                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
-                  }`}
-                >
-                  <CreditCard className={`h-6 w-6 mb-1 ${paymentForm.method === "flutterwave" ? "text-purple-600" : "text-slate-500"}`} />
-                  <div className="font-semibold text-sm text-slate-900 dark:text-white">Flutterwave</div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Card, USSD</p>
                 </div>
               </div>
             </div>
