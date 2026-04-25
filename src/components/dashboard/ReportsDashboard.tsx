@@ -203,11 +203,11 @@ export const ReportsDashboard = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="financial" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="financial">Financial Performance</TabsTrigger>
-              <TabsTrigger value="efficiency">4/20/80 Efficiency</TabsTrigger>
-              <TabsTrigger value="portfolio">50/30/20 Portfolio</TabsTrigger>
-              <TabsTrigger value="time-allocation">Time Allocation</TabsTrigger>
+            <TabsList className="dashboard-tabs-list">
+              <TabsTrigger value="financial">Financial</TabsTrigger>
+              <TabsTrigger value="efficiency">Efficiency</TabsTrigger>
+              <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
+              <TabsTrigger value="time-allocation">Time</TabsTrigger>
             </TabsList>
 
             <TabsContent value="financial" className="space-y-6">

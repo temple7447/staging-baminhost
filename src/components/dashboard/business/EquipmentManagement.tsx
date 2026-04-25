@@ -249,7 +249,7 @@ export const EquipmentManagement = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="fleet-overview" className="space-y-4">
-            <TabsList>
+            <TabsList className="dashboard-tabs-list">
               <TabsTrigger value="fleet-overview">Fleet Overview</TabsTrigger>
               <TabsTrigger value="bookings">Bookings</TabsTrigger>
               <TabsTrigger value="maintenance">Maintenance</TabsTrigger>

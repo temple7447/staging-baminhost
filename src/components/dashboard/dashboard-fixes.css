@@ -105,7 +105,8 @@
   
   /* Make tabs scrollable on mobile */
   .flex.flex-wrap,
-  [role="tablist"] {
+  [role="tablist"],
+  .dashboard-tabs-list {
     display: flex !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
@@ -115,7 +116,8 @@
   }
   
   .flex.flex-wrap::-webkit-scrollbar,
-  [role="tablist"]::-webkit-scrollbar {
+  [role="tablist"]::-webkit-scrollbar,
+  .dashboard-tabs-list::-webkit-scrollbar {
     display: none;
   }
   

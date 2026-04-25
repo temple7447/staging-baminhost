@@ -267,7 +267,7 @@ export const CRMDashboard = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="all-contacts" className="space-y-4">
-            <TabsList>
+            <TabsList className="dashboard-tabs-list">
               <TabsTrigger value="all-contacts">All Contacts</TabsTrigger>
               <TabsTrigger value="vendors">Vendor Network</TabsTrigger>
               <TabsTrigger 

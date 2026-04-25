@@ -314,7 +314,7 @@ export const WalletDashboard = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="recent-transactions" className="space-y-4">
-            <TabsList>
+            <TabsList className="dashboard-tabs-list">
               <TabsTrigger value="recent-transactions">Recent Transactions</TabsTrigger>
               <TabsTrigger value="allocations">Allocation History</TabsTrigger>
               <TabsTrigger value="transfers">Fund Transfers</TabsTrigger>

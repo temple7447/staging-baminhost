@@ -337,11 +337,11 @@ export const AssistantDashboard = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="whatsapp" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="whatsapp">WhatsApp Integration</TabsTrigger>
-              <TabsTrigger value="notifications">Notification Settings</TabsTrigger>
-              <TabsTrigger value="templates">Message Templates</TabsTrigger>
-              <TabsTrigger value="analytics">Communication Analytics</TabsTrigger>
+            <TabsList className="dashboard-tabs-list">
+              <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
+              <TabsTrigger value="notifications">Alerts</TabsTrigger>
+              <TabsTrigger value="templates">Templates</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
 
             <TabsContent value="whatsapp" className="space-y-4">

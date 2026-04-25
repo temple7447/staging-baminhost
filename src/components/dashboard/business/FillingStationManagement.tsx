@@ -240,7 +240,7 @@ export const FillingStationManagement = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="fuel-management" className="space-y-4">
-            <TabsList>
+            <TabsList className="dashboard-tabs-list">
               <TabsTrigger value="fuel-management">Fuel Management</TabsTrigger>
               <TabsTrigger value="revenue-tracking">Revenue Tracking</TabsTrigger>
               <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
