@@ -545,7 +545,6 @@ export const ReportsDashboard = () => {
 
       {/* Transactions */}
       <TransactionsPanel
-        balance={walletData.balance}
         formatCurrency={(amount: number) => `₦${amount.toLocaleString()}`}
         formatDate={(date: string) => new Date(date).toLocaleDateString('en-NG', { year: 'numeric', month: 'short', day: 'numeric' })}
         getStatusColor={(status: string) => {

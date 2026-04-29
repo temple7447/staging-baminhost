@@ -22,14 +22,13 @@ interface Transaction {
 }
 
 interface TransactionsPanelProps {
-  balance: number;
   formatCurrency: (amount: number) => string;
   formatDate: (date: string) => string;
   getStatusColor: (status: string) => string;
   onTransactionComplete?: () => void;
 }
 
-export const TransactionsPanel = ({ balance, formatCurrency, formatDate, getStatusColor, onTransactionComplete }: TransactionsPanelProps) => {
+export const TransactionsPanel = ({ formatCurrency, formatDate, getStatusColor, onTransactionComplete }: TransactionsPanelProps) => {
   const { getToken } = useAuth();
   const { toast } = useToast();
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
@@ -40,6 +39,10 @@ export const TransactionsPanel = ({ balance, formatCurrency, formatDate, getStat
   const [transferForm, setTransferForm] = useState({ amount: "", recipientEmail: "", recipientType: "user" as "user" | "estate", recipientId: "", description: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Wallet balance state
+  const [balance, setBalance] = useState(0);
+  const [walletLoading, setWalletLoading] = useState(false);
+
   // Transaction list state
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
@@ -48,6 +51,25 @@ export const TransactionsPanel = ({ balance, formatCurrency, formatDate, getStat
   const [total, setTotal] = useState(0);
   const [filters, setFilters] = useState({ type: "", status: "", search: "", startDate: "", endDate: "" });
   const [showFilters, setShowFilters] = useState(false);
+
+  const fetchWallet = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
+    setWalletLoading(true);
+    try {
+      const res = await fetch("/api/wallet", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to fetch wallet");
+      setBalance(data.balance ?? 0);
+    } catch {
+      // Silently fail — balance shows 0
+    } finally {
+      setWalletLoading(false);
+    }
+  }, [getToken]);
 
   const fetchTransactions = useCallback(async () => {
     const token = getToken();
@@ -78,11 +100,13 @@ export const TransactionsPanel = ({ balance, formatCurrency, formatDate, getStat
 
   useEffect(() => {
     fetchTransactions();
-  }, [fetchTransactions]);
+    fetchWallet();
+  }, [fetchTransactions, fetchWallet]);
 
   const refreshTransactions = () => {
     setPage(1);
     fetchTransactions();
+    fetchWallet();
     onTransactionComplete?.();
   };
 
@@ -251,7 +275,11 @@ export const TransactionsPanel = ({ balance, formatCurrency, formatDate, getStat
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Available Balance</p>
-                <p className="text-4xl font-bold text-slate-900 dark:text-white">{formatCurrency(balance)}</p>
+                {walletLoading ? (
+                  <div className="h-10 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                ) : (
+                  <p className="text-4xl font-bold text-slate-900 dark:text-white">{formatCurrency(balance)}</p>
+                )}
               </div>
               <div className="flex gap-3">
                 <Button onClick={handleOpenDeposit} className="bg-green-600 hover:bg-green-700">
