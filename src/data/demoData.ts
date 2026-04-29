@@ -735,3 +735,256 @@ export const calculateEfficiency = (activities: any[]) => ({
   managerial: activities.filter(a => a.type === 'managerial').length / activities.length,
   delegatable: activities.filter(a => a.type === 'delegatable').length / activities.length,
 });
+
+// ============================================================
+// Dashboard Demo Data (for dashboards without API endpoints)
+// ============================================================
+
+// --- Tenant Dashboard Demo Data ---
+export const TENANT_DEMO_DATA = {
+  tenant: {
+    id: "tenant_001",
+    name: "John Doe",
+    email: "john.doe@email.com",
+    phone: "+2349012345678",
+    apartmentNumber: "Flat 4B",
+    estateName: "Rose Garden Estate",
+    leaseStatus: "active",
+    leaseEndDate: "2026-12-31",
+    monthlyRent: 250000,
+    rentDueDay: 25,
+    outstandingBalance: 0,
+    nextPaymentDue: "2025-05-25"
+  },
+  paymentHistory: [
+    { id: 1, month: "April 2025", amount: 250000, status: "paid", date: "2025-04-23", method: "Transfer" },
+    { id: 2, month: "March 2025", amount: 250000, status: "paid", date: "2025-03-22", method: "Transfer" },
+    { id: 3, month: "February 2025", amount: 250000, status: "paid", date: "2025-02-24", method: "Bank Deposit" },
+    { id: 4, month: "January 2025", amount: 250000, status: "paid", date: "2025-01-23", method: "Transfer" }
+  ],
+  serviceCharges: [
+    { id: 1, type: "Service Charge", month: "April 2025", amount: 15000, status: "paid", date: "2025-04-10" },
+    { id: 2, type: "Service Charge", month: "March 2025", amount: 15000, status: "paid", date: "2025-03-10" },
+    { id: 3, type: "Water Bill", month: "April 2025", amount: 5000, status: "pending" },
+    { id: 4, type: "Electricity", month: "April 2025", amount: 12000, status: "pending" }
+  ],
+  maintenanceRequests: [
+    { id: 1, title: "Leaking kitchen faucet", category: "plumbing", status: "in_progress", createdAt: "2025-04-15", assignedTo: "Mr. Adebayo", estimatedCompletion: "2025-04-25" },
+    { id: 2, title: "AC not cooling properly", category: "ac_repair", status: "pending", createdAt: "2025-04-20", assignedTo: null, estimatedCompletion: null },
+    { id: 3, title: "Broken bedroom lock", category: "security", status: "completed", createdAt: "2025-03-10", assignedTo: "Mr. Chidi", estimatedCompletion: "2025-03-12" }
+  ],
+  visitors: [
+    { id: 1, name: "Michael Brown", phone: "+2348012345678", purpose: "Family Visit", expectedArrival: "2025-04-25", accessCode: "VST-2025-0425", status: "approved" },
+    { id: 2, name: "Delivery - DHL", phone: "+2347000000000", purpose: "Package Delivery", expectedArrival: "2025-04-24", accessCode: "VST-2025-0424", status: "pending" }
+  ],
+  notices: [
+    { id: 1, title: "Scheduled Water Shutdown", type: "important", date: "2025-04-28", content: "Water supply will be disrupted from 9AM to 5PM for maintenance work." },
+    { id: 2, title: "Estate Security Update", type: "info", date: "2025-04-22", content: "New security protocols effective immediately. Please ensure all visitors register at the gate." },
+    { id: 3, title: "Community Meeting", type: "event", date: "2025-05-01", content: "Monthly estate meeting holding at the clubhouse by 10AM." }
+  ],
+  documents: [
+    { id: 1, name: "Lease Agreement", type: "lease", date: "2024-12-31" },
+    { id: 2, name: "Move-in Checklist", type: "checklist", date: "2024-12-31" },
+    { id: 3, name: "House Rules", type: "policy", date: "2024-12-31" }
+  ],
+  complaints: [
+    { id: 1, title: "Excessive noise from 5B", category: "noise", status: "resolved", createdAt: "2025-03-15", response: "Warning issued to the resident." }
+  ]
+};
+
+// --- Owner Dashboard Demo Data ---
+export const OWNER_DEMO_DATA = {
+  owner: { id: "owner_001", name: "Property Owner", email: "owner@estate.com", phone: "+2349012345678" },
+  properties: [
+    { id: "prop_001", name: "Rose Garden Estate", address: "123 Rose Garden Ave, Lagos", totalUnits: 24, occupiedUnits: 20, vacantUnits: 4, monthlyRent: 2400000, outstanding: 150000 },
+    { id: "prop_002", name: "Palm Springs Apartments", address: "45 Palm Drive, Lagos", totalUnits: 12, occupiedUnits: 10, vacantUnits: 2, monthlyRent: 1200000, outstanding: 80000 }
+  ],
+  tenants: [
+    { id: "tenant_001", name: "John Doe", email: "john.doe@email.com", phone: "+2349012345678", property: "Rose Garden Estate", unit: "Flat 4B", leaseStart: "2024-01-01", leaseEnd: "2026-12-31", rentStatus: "paid", rentAmount: 250000, lastPayment: "2025-04-23" },
+    { id: "tenant_002", name: "Jane Smith", email: "jane.smith@email.com", phone: "+2348012345678", property: "Rose Garden Estate", unit: "Flat 5A", leaseStart: "2024-06-01", leaseEnd: "2025-05-31", rentStatus: "pending", rentAmount: 200000, lastPayment: "2025-03-01" },
+    { id: "tenant_003", name: "Mike Johnson", email: "mike.j@email.com", phone: "+2347012345678", property: "Palm Springs", unit: "Unit 8", leaseStart: "2024-03-01", leaseEnd: "2025-02-28", rentStatus: "paid", rentAmount: 150000, lastPayment: "2025-04-20" },
+    { id: "tenant_004", name: "Sarah Williams", email: "sarah.w@email.com", phone: "+2348011111111", property: "Rose Garden Estate", unit: "Flat 2A", leaseStart: "2025-01-01", leaseEnd: "2025-12-31", rentStatus: "overdue", rentAmount: 300000, lastPayment: "2025-01-15" }
+  ],
+  maintenanceRequests: [
+    { id: "maint_001", tenant: "John Doe", unit: "Flat 4B", issue: "Leaking kitchen faucet", category: "plumbing", status: "pending", createdAt: "2025-04-20", estimatedCost: 15000 },
+    { id: "maint_002", tenant: "Jane Smith", unit: "Flat 5A", issue: "AC not cooling", category: "ac_repair", status: "in_progress", createdAt: "2025-04-18", assignedTo: "Mr. Adebayo", estimatedCost: 35000 },
+    { id: "maint_003", tenant: "Mike Johnson", unit: "Unit 8", issue: "Broken bedroom lock", category: "security", status: "completed", createdAt: "2025-04-10", completedAt: "2025-04-12", cost: 8000 }
+  ],
+  financials: { totalMonthlyIncome: 3600000, collectedThisMonth: 2950000, outstandingBalance: 230000, serviceCharges: 180000, expenses: 450000, profit: 2970000 },
+  leases: [
+    { id: "lease_001", tenant: "John Doe", unit: "Flat 4B", property: "Rose Garden Estate", startDate: "2024-01-01", endDate: "2026-12-31", status: "active", monthlyRent: 250000 },
+    { id: "lease_002", tenant: "Jane Smith", unit: "Flat 5A", property: "Rose Garden Estate", startDate: "2024-06-01", endDate: "2025-05-31", status: "expiring_soon", monthlyRent: 200000 },
+    { id: "lease_003", tenant: "Sarah Williams", unit: "Flat 2A", property: "Rose Garden Estate", startDate: "2025-01-01", endDate: "2025-12-31", status: "active", monthlyRent: 300000 }
+  ],
+  recentActivities: [
+    { id: 1, type: "payment", description: "Rent payment received from John Doe", amount: 250000, date: "2025-04-23" },
+    { id: 2, type: "maintenance", description: "New maintenance request from Flat 4B", date: "2025-04-20" },
+    { id: 3, type: "lease", description: "Lease renewed for Unit 8", date: "2025-04-18" },
+    { id: 4, type: "tenant", description: "New tenant moved into Flat 2A", date: "2025-04-15" },
+    { id: 5, type: "payment", description: "Rent payment received from Mike Johnson", amount: 150000, date: "2025-04-20" }
+  ]
+};
+
+// --- Manager Dashboard Demo Data ---
+export const MANAGER_DEMO_DATA = {
+  manager: { id: "mgr_001", name: "Estate Manager", email: "manager@estate.com", phone: "+2349012345678", assignedProperty: "Rose Garden Estate" },
+  property: { name: "Rose Garden Estate", address: "123 Rose Garden Ave, Lagos", totalUnits: 120, occupiedUnits: 105, vacantUnits: 15 },
+  tenants: [
+    { id: "t1", name: "John Doe", unit: "Flat 4B", phone: "+2349012345678", status: "active", rentStatus: "paid" },
+    { id: "t2", name: "Jane Smith", unit: "Flat 5A", phone: "+2348012345678", status: "active", rentStatus: "pending" },
+    { id: "t3", name: "Mike Johnson", unit: "Unit 8", phone: "+2347012345678", status: "active", rentStatus: "paid" },
+    { id: "t4", name: "Sarah Williams", unit: "Flat 2A", phone: "+2348011111111", status: "active", rentStatus: "overdue" }
+  ],
+  maintenanceRequests: [
+    { id: "m1", tenant: "John Doe", unit: "Flat 4B", issue: "Leaking faucet", category: "plumbing", priority: "medium", status: "pending", date: "2025-04-20", estimatedCost: 15000 },
+    { id: "m2", tenant: "Jane Smith", unit: "Flat 5A", issue: "AC not cooling", category: "ac", priority: "high", status: "in_progress", date: "2025-04-18", assignedTo: "Mr. Adebayo" },
+    { id: "m3", tenant: "Mike Johnson", unit: "Unit 8", issue: "Broken lock", category: "security", priority: "low", status: "completed", date: "2025-04-10", completedDate: "2025-04-12", cost: 8000 }
+  ],
+  staff: [
+    { id: "s1", name: "Mr. John", role: "Security", shift: "Morning", status: "on_duty", phone: "+2348011111111" },
+    { id: "s2", name: "Mr. Adebayo", role: "Electrician", shift: "Day", status: "on_duty", phone: "+2348022222222" },
+    { id: "s3", name: "Mrs. Grace", role: "Cleaner", shift: "Morning", status: "off_duty", phone: "+2348033333333" },
+    { id: "s4", name: "Mr. Chidi", role: "Plumber", shift: "Day", status: "on_duty", phone: "+2348044444444" }
+  ],
+  visitors: [
+    { id: "v1", name: "Michael Brown", phone: "+2349000000000", unit: "Flat 4B", purpose: "Family Visit", time: "10:30 AM", status: "approved" },
+    { id: "v2", name: "DHL Delivery", phone: "+2347000000000", unit: "Flat 5A", purpose: "Package", time: "11:00 AM", status: "pending" },
+    { id: "v3", name: "Sarah's Guest", phone: "+2348055555555", unit: "Flat 2A", purpose: "Friend", time: "2:00 PM", status: "approved" }
+  ],
+  complaints: [
+    { id: "c1", tenant: "Sarah Williams", unit: "Flat 2A", type: "noise", description: "Noise from 2B", status: "pending", date: "2025-04-20" },
+    { id: "c2", tenant: "Mike Johnson", unit: "Unit 8", type: "neighbor", description: "Parking issue", status: "resolved", date: "2025-04-15" }
+  ],
+  leases: [
+    { id: "l1", tenant: "John Doe", unit: "Flat 4B", startDate: "2024-01-01", endDate: "2026-12-31", status: "active" },
+    { id: "l2", tenant: "Jane Smith", unit: "Flat 5A", startDate: "2024-06-01", endDate: "2025-05-31", status: "expiring_soon" },
+    { id: "l3", tenant: "Mike Johnson", unit: "Unit 8", startDate: "2024-03-01", endDate: "2025-02-28", status: "active" }
+  ],
+  utilities: [
+    { id: "u1", type: "Water", status: "normal", lastChecked: "2025-04-20" },
+    { id: "u2", type: "Electricity", status: "normal", lastChecked: "2025-04-20" },
+    { id: "u3", type: "Generator", status: "maintenance_due", lastChecked: "2025-04-15" }
+  ],
+  vendors: [
+    { id: "v1", name: "ABC Electric", service: "Electrical", phone: "+2348011111111" },
+    { id: "v2", name: "Quick Fix Plumbing", service: "Plumbing", phone: "+2348022222222" },
+    { id: "v3", name: "Clean Pro Services", service: "Cleaning", phone: "+2348033333333" }
+  ],
+  dailyLogs: [
+    { id: "d1", type: "maintenance", description: "Completed 3 repairs", staff: "Mr. Adebayo", date: "2025-04-20" },
+    { id: "d2", type: "security", description: "No incidents reported", staff: "Mr. John", date: "2025-04-20" },
+    { id: "d3", type: "visitor", description: "15 visitors today", staff: "Security", date: "2025-04-20" }
+  ]
+};
+
+// --- Vendor Dashboard Demo Data ---
+export const VENDOR_DEMO_DATA = {
+  vendor: { id: "v001", name: "Mr. Adebayo", company: "Quick Fix Services", service: "Plumbing & Electrical", phone: "+2348012345678", email: "adebayo@quickfix.com", rating: 4.8, completedJobs: 156, totalEarnings: 2450000 },
+  jobs: [
+    { id: "j001", title: "Fix leaking kitchen faucet", unit: "Flat 4B", property: "Rose Garden Estate", category: "plumbing", priority: "high", status: "assigned", assignedBy: "Estate Manager", scheduledDate: "2025-04-25", expectedCompletion: "2025-04-25", pay: 15000 },
+    { id: "j002", title: "AC unit not cooling", unit: "Flat 5A", property: "Rose Garden Estate", category: "ac_repair", priority: "medium", status: "in_progress", assignedBy: "Estate Manager", scheduledDate: "2025-04-24", expectedCompletion: "2025-04-26", pay: 35000 },
+    { id: "j003", title: "Replace broken door lock", unit: "Unit 8", property: "Palm Springs", category: "security", priority: "low", status: "completed", assignedBy: "Estate Manager", scheduledDate: "2025-04-10", completedDate: "2025-04-12", pay: 8000 }
+  ],
+  invoices: [
+    { id: "inv001", job: "Fix leaking kitchen faucet", amount: 15000, status: "pending", date: "2025-04-20" },
+    { id: "inv002", job: "AC repair", amount: 35000, status: "approved", date: "2025-04-18" },
+    { id: "inv003", job: "Door lock replacement", amount: 8000, status: "paid", date: "2025-04-12" }
+  ],
+  payments: [
+    { id: "p001", description: "Door lock replacement", amount: 8000, date: "2025-04-12", status: "paid" },
+    { id: "p002", description: "Bathroom pipe repair", amount: 12000, date: "2025-04-08", status: "paid" }
+  ],
+  messages: [
+    { id: "m1", from: "Estate Manager", message: "Please prioritize Flat 4B", time: "2 hours ago" },
+    { id: "m2", from: "Tenant - Flat 5A", message: "When will you arrive?", time: "5 hours ago" }
+  ],
+  schedule: [
+    { id: "s1", task: "Fix leaking faucet", time: "10:00 AM", unit: "Flat 4B" },
+    { id: "s2", task: "AC inspection", time: "2:00 PM", unit: "Flat 5A" }
+  ],
+  performance: { completedJobs: 156, responseTime: "2 hours", rating: 4.8, onTimeRate: 95 },
+  documents: [
+    { id: "d1", name: "Service Agreement 2024", type: "contract", date: "2024-01-01" },
+    { id: "d2", name: "Insurance Certificate", type: "compliance", date: "2024-01-15" }
+  ]
+};
+
+// --- Customer Dashboard Demo Data ---
+export const CUSTOMER_DEMO_DATA = {
+  customer: {
+    id: "cus_123", name: "David Lee", email: "david.lee@email.com", phone: "+234901234567",
+    accountNumber: "ACC-789456", walletBalance: 450000, totalContracts: 3, activeContracts: 2,
+    completedProjects: 8, totalBalance: 580000, currentDue: 72000, creditLimit: 1500000, nextPaymentDate: "2024-02-15"
+  },
+  contracts: [
+    {
+      id: "contract_001", projectName: "Estate Property Maintenance", vendorName: "ABC Construction Ltd", vendorId: "ven_789",
+      totalAmount: 1200000, paymentOption: "installment", upfrontDeposit: 480000, remainingBalance: 720000,
+      interestRate: 0.20, balanceWithInterest: 864000, monthlyPayment: 72000, paymentsRemaining: 8,
+      nextPaymentDue: "2024-02-15", latePenaltyPerDay: 300, cancellationFee: 240000, status: "active",
+      startDate: "2024-01-15", expectedCompletionDate: "2024-04-15", escrowAccount: "OPAY_ESC_001", escrowBalance: 864000,
+      deliveryStages: [
+        { stage: 1, name: "Foundation & Planning", amount: 400000, status: "completed", customerAcknowledged: true, acknowledgedDate: "2024-01-22", paymentReleased: true, paymentReleaseDate: "2024-01-22" },
+        { stage: 2, name: "Structure & Roofing", amount: 400000, status: "in_progress", customerAcknowledged: false, acknowledgedDate: null, paymentReleased: false },
+        { stage: 3, name: "Finishing & Handover", amount: 400000, status: "pending", customerAcknowledged: false, acknowledgedDate: null, paymentReleased: false }
+      ]
+    },
+    {
+      id: "contract_002", projectName: "Equipment Rental - Excavator", vendorName: "Heavy Equipment Rentals", vendorId: "ven_456",
+      totalAmount: 800000, paymentOption: "one_time", upfrontDeposit: 800000, remainingBalance: 0,
+      interestRate: 0, balanceWithInterest: 0, monthlyPayment: 0, paymentsRemaining: 0,
+      nextPaymentDue: null, latePenaltyPerDay: 0, cancellationFee: 160000, status: "active",
+      startDate: "2024-02-01", expectedCompletionDate: "2024-02-28", escrowAccount: "OPAY_ESC_002", escrowBalance: 266666,
+      deliveryStages: [
+        { stage: 1, name: "Equipment Delivery & Setup", amount: 266667, status: "completed", customerAcknowledged: true, acknowledgedDate: "2024-02-01", paymentReleased: true },
+        { stage: 2, name: "Operation & Maintenance", amount: 266667, status: "completed", customerAcknowledged: true, acknowledgedDate: "2024-02-09", paymentReleased: true },
+        { stage: 3, name: "Project Completion & Return", amount: 266666, status: "in_progress", customerAcknowledged: false, acknowledgedDate: null, paymentReleased: false }
+      ]
+    }
+  ],
+  paymentHistory: [
+    { id: "pay_001", contractId: "contract_001", date: "2024-01-15", description: "Estate Maintenance - Upfront Deposit (40%)", amount: 480000, type: "deposit", status: "completed", method: "bank_transfer", penalty: 0 },
+    { id: "pay_002", contractId: "contract_001", date: "2024-01-22", description: "Stage 1 Payment Release to Vendor", amount: 400000, type: "stage_payment", status: "released_to_vendor", method: "escrow_release", penalty: 0 },
+    { id: "pay_003", contractId: "contract_001", date: "2024-02-15", description: "Monthly Installment Payment", amount: 72000, type: "installment", status: "overdue", method: "auto_debit", penalty: 900, daysOverdue: 3 },
+    { id: "pay_004", contractId: "contract_002", date: "2024-02-01", description: "Equipment Rental - Full Payment", amount: 800000, type: "full_payment", status: "completed", method: "wallet_debit", penalty: 0 }
+  ],
+  installmentPlans: [
+    { id: '1', name: 'Equipment Purchase - Phase 1', totalAmount: 15000, paidAmount: 9000, remainingAmount: 6000, monthlyPayment: 1500, nextDue: '2024-02-01', installmentsLeft: 4, status: 'active' },
+    { id: '2', name: 'Service Package - Annual', totalAmount: 12000, paidAmount: 6000, remainingAmount: 6000, monthlyPayment: 1000, nextDue: '2024-02-15', installmentsLeft: 6, status: 'active' },
+    { id: '3', name: 'Consultation Services', totalAmount: 5000, paidAmount: 5000, remainingAmount: 0, monthlyPayment: 833, nextDue: null, installmentsLeft: 0, status: 'completed' }
+  ],
+  penalties: { totalPenalties: 150, activePenalties: 75, paidPenalties: 75 }
+};
+
+// --- Big7 Dashboard Demo Data ---
+export const BIG7_DEMO_DATA = {
+  member: { name: "Sarah Johnson", allocation: 14.28, monthlyProfit: 12500, totalInvestment: 175000, profitShare: 8750 },
+  portfolio: { totalValue: 2450000, monthlyGrowth: 3.2, allocation: { stocks: 45, bonds: 25, realEstate: 20, crypto: 10 } },
+  performance: { ytdReturn: 18.5, monthlyReturn: 2.1, quarterlyReturn: 7.8 }
+};
+
+// --- Assistant Dashboard Demo Data ---
+export const ASSISTANT_DEMO_DATA = {
+  chatHistory: [
+    { id: '1', type: 'user', message: 'What is the current occupancy rate of Balado Estate?', timestamp: '10:30 AM' },
+    { id: '2', type: 'assistant', message: 'Balado Estate currently has 30 out of 32 units occupied, giving you a 93.75% occupancy rate.', timestamp: '10:30 AM' },
+    { id: '3', type: 'user', message: 'Schedule maintenance for the filling station tanks', timestamp: '10:35 AM' },
+    { id: '4', type: 'assistant', message: 'I\'ve scheduled maintenance for all 4 filling station tanks.', timestamp: '10:35 AM' },
+    { id: '5', type: 'user', message: 'Yes, send notifications and calculate this month\'s 50/30/20 split', timestamp: '10:40 AM' },
+    { id: '6', type: 'assistant', message: 'WhatsApp notifications sent to maintenance team.', timestamp: '10:40 AM' }
+  ],
+  activeTasks: [
+    { id: '1', title: 'Send rent reminders to Balado Estate tenants', status: 'in_progress', type: 'automated', estimatedCompletion: '2:00 PM' },
+    { id: '2', title: 'Generate quarterly ROI report', status: 'pending', type: 'manual_approval', estimatedCompletion: '5:00 PM' },
+    { id: '3', title: 'Process vendor commission payments', status: 'completed', type: 'automated', completedAt: '9:30 AM' },
+    { id: '4', title: 'Update fuel tank levels from suppliers', status: 'in_progress', type: 'automated', estimatedCompletion: '1:30 PM' }
+  ],
+  whatsappStatus: { connected: true, lastSync: '2 minutes ago', pendingMessages: 3, todaysSent: 47 },
+  notificationSettings: [
+    { type: 'rent_due', enabled: true, method: 'whatsapp' },
+    { type: 'low_fuel', enabled: true, method: 'both' },
+    { type: 'maintenance_due', enabled: true, method: 'whatsapp' },
+    { type: 'payment_received', enabled: false, method: 'sms' },
+    { type: 'equipment_available', enabled: true, method: 'whatsapp' }
+  ]
+};

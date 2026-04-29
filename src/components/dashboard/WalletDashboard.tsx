@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
-import { WALLET_DATA, RECENT_TRANSACTIONS, calculateSplit } from "@/data/demoData";
+import { calculateSplit } from "@/data/consolidatedDemoData";
 import { useGetGlobalWalletSummaryQuery } from "@/services/walletApi";
 import { WalletCard } from "./WalletCard";
 import { 
@@ -19,7 +19,8 @@ import {
   PiggyBank,
   CreditCard,
   Settings,
-  Loader
+  Loader,
+  AlertCircle
 } from "lucide-react";
 
 export const WalletDashboard = () => {
@@ -27,48 +28,9 @@ export const WalletDashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("monthly");
   const [transactionFilter, setTransactionFilter] = useState("all");
   
-  // Fetch global wallet summary
+  // Fetch global wallet summary from API
   const { data: walletResponse, isLoading: walletLoading, error: walletError } = useGetGlobalWalletSummaryQuery();
   const globalWalletData = walletResponse?.data;
-
-  // Get wallet data based on user role
-  const getWalletData = () => {
-    const role = user?.role || 'super_admin';
-    return WALLET_DATA[role as keyof typeof WALLET_DATA] || WALLET_DATA.owner;
-  };
-
-  const walletData = getWalletData();
-  const transactions = RECENT_TRANSACTIONS;
-
-  // Calculate allocation percentages
-  const totalAllocations = walletData.allocations.investment + 
-                          walletData.allocations.withdrawals + 
-                          walletData.allocations.operations;
-
-  const allocationPercentages = {
-    investment: (walletData.allocations.investment / totalAllocations) * 100,
-    withdrawals: (walletData.allocations.withdrawals / totalAllocations) * 100,
-    operations: (walletData.allocations.operations / totalAllocations) * 100,
-  };
-
-  // Filter transactions
-  const filteredTransactions = transactions.filter(transaction => {
-    if (transactionFilter === 'all') return true;
-    return transaction.type === transactionFilter;
-  });
-
-  const getTransactionIcon = (type: string) => {
-    return type === 'inflow' ? ArrowUpRight : ArrowDownRight;
-  };
-
-  const getTransactionColor = (type: string) => {
-    return type === 'inflow' ? 'text-green-600' : 'text-red-600';
-  };
-
-  // Calculate recursive 50/30/20 split for each allocation
-  const investmentSplit = calculateSplit(walletData.allocations.investment);
-  const withdrawalsSplit = calculateSplit(walletData.allocations.withdrawals);
-  const operationsSplit = calculateSplit(walletData.allocations.operations);
 
   return (
     <div className="space-y-6">
@@ -77,66 +39,13 @@ export const WalletDashboard = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground">Universal Wallet</h1>
           <p className="text-muted-foreground">
-            {user?.role === 'super_admin' ? 'Master' : user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)} Wallet - 50/30/20 Split Management
+            Global wallet management across all 3 engines - 50/30/20 Split Management
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">Transfer Funds</Button>
           <Button>Add Transaction</Button>
         </div>
-      </div>
-
-      {/* Wallet Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Current Balance</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₦{walletData.balance.toLocaleString()}</div>
-            <div className="text-xs text-muted-foreground">
-              {walletData.pendingTransactions} pending transactions
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Inflow</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">₦{walletData.monthlyInflow.toLocaleString()}</div>
-            <div className="text-xs text-muted-foreground">Revenue & income</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Outflow</CardTitle>
-            <TrendingDown className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">₦{walletData.monthlyOutflow.toLocaleString()}</div>
-            <div className="text-xs text-muted-foreground">Expenses & investments</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Net Flow</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${
-              walletData.monthlyInflow - walletData.monthlyOutflow > 0 ? 'text-green-600' : 'text-red-600'
-            }`}>
-              ₦{(walletData.monthlyInflow - walletData.monthlyOutflow).toLocaleString()}
-            </div>
-            <div className="text-xs text-muted-foreground">Monthly net position</div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Global Wallet Summary - 3 Engines */}
@@ -322,61 +231,11 @@ export const WalletDashboard = () => {
             </TabsList>
 
             <TabsContent value="recent-transactions" className="space-y-4">
-              <div className="flex gap-4 mb-4">
-                <Input 
-                  placeholder="Search transactions..." 
-                  className="max-w-sm" 
-                />
-                <select
-                  value={transactionFilter}
-                  onChange={(e) => setTransactionFilter(e.target.value)}
-                  className="px-3 py-2 border border-input rounded-md"
-                >
-                  <option value="all">All Transactions</option>
-                  <option value="inflow">Inflows</option>
-                  <option value="outflow">Outflows</option>
-                </select>
-              </div>
-
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredTransactions.slice(0, 10).map((transaction) => {
-                      const Icon = getTransactionIcon(transaction.type);
-                      return (
-                        <TableRow key={transaction.id}>
-                          <TableCell>{transaction.date}</TableCell>
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2">
-                              <Icon className={`h-4 w-4 ${getTransactionColor(transaction.type)}`} />
-                              {transaction.description}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">{transaction.category}</Badge>
-                          </TableCell>
-                          <TableCell className={`font-semibold ${getTransactionColor(transaction.type)}`}>
-                            {transaction.type === 'inflow' ? '+' : ''}₦{Math.abs(transaction.amount).toLocaleString()}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={transaction.status === 'completed' ? 'default' : 'secondary'}>
-                              {transaction.status}
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+              <div className="text-center py-12">
+                <AlertCircle className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-semibold">Recent Transactions</h3>
+                <p className="text-muted-foreground">Transaction history coming soon - API integration in progress</p>
+                <Button className="mt-4">Refresh Data</Button>
               </div>
             </TabsContent>
 

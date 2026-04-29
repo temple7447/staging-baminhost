@@ -92,3 +92,15 @@ export {
   useGetGlobalWalletSummaryQuery,
   useGetWalletQuery,
 } from './walletApi';
+
+export {
+  walletTransactionApi,
+  useGetWalletBalanceQuery,
+  useCreateTransactionMutation,
+  useGetOwnTransactionsQuery,
+  useGetTransactionsListQuery,
+  useDepositMutation,
+  useWithdrawMutation,
+  useTransferToUserMutation,
+  useTransferToEstateMutation,
+} from './walletTransactionApi';

@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BUSINESSES } from "@/data/demoData";
+import { BUSINESSES } from "@/data/consolidatedDemoData";
 import { Truck, Settings, Calendar, TrendingUp, Wrench, DollarSign } from "lucide-react";
 
 export const EquipmentManagement = () => {

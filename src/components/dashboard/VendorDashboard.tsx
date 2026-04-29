@@ -55,103 +55,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { VENDOR_DEMO_DATA } from "@/data/demoData";
 import { useToast } from "@/components/providers/ToastProvider";
-import { useAuth } from "@/contexts/AuthContext";
-import { TransactionsPanel } from "./TransactionsPanel";
 
-// Demo Data
-const vendorData = {
-  vendor: {
-    id: "v001",
-    name: "Mr. Adebayo",
-    company: "Quick Fix Services",
-    service: "Plumbing & Electrical",
-    phone: "+2348012345678",
-    email: "adebayo@quickfix.com",
-    rating: 4.8,
-    completedJobs: 156,
-    totalEarnings: 2450000
-  },
-  jobs: [
-    {
-      id: "j001",
-      title: "Fix leaking kitchen faucet",
-      unit: "Flat 4B",
-      property: "Rose Garden Estate",
-      category: "plumbing",
-      priority: "high",
-      status: "assigned",
-      assignedBy: "Estate Manager",
-      scheduledDate: "2025-04-25",
-      expectedCompletion: "2025-04-25",
-      pay: 15000
-    },
-    {
-      id: "j002",
-      title: "AC unit not cooling",
-      unit: "Flat 5A",
-      property: "Rose Garden Estate",
-      category: "ac_repair",
-      priority: "medium",
-      status: "in_progress",
-      assignedBy: "Estate Manager",
-      scheduledDate: "2025-04-24",
-      expectedCompletion: "2025-04-26",
-      pay: 35000
-    },
-    {
-      id: "j003",
-      title: "Replace broken door lock",
-      unit: "Unit 8",
-      property: "Palm Springs",
-      category: "security",
-      priority: "low",
-      status: "completed",
-      assignedBy: "Estate Manager",
-      scheduledDate: "2025-04-10",
-      completedDate: "2025-04-12",
-      pay: 8000
-    }
-  ],
-  invoices: [
-    { id: "inv001", job: "Fix leaking kitchen faucet", amount: 15000, status: "pending", date: "2025-04-20" },
-    { id: "inv002", job: "AC repair", amount: 35000, status: "approved", date: "2025-04-18" },
-    { id: "inv003", job: "Door lock replacement", amount: 8000, status: "paid", date: "2025-04-12" }
-  ],
-  payments: [
-    { id: "p001", description: "Door lock replacement", amount: 8000, date: "2025-04-12", status: "paid" },
-    { id: "p002", description: "Bathroom pipe repair", amount: 12000, date: "2025-04-08", status: "paid" }
-  ],
-  messages: [
-    { id: "m1", from: "Estate Manager", message: "Please prioritize Flat 4B", time: "2 hours ago" },
-    { id: "m2", from: "Tenant - Flat 5A", message: "When will you arrive?", time: "5 hours ago" }
-  ],
-  schedule: [
-    { id: "s1", task: "Fix leaking faucet", time: "10:00 AM", unit: "Flat 4B" },
-    { id: "s2", task: "AC inspection", time: "2:00 PM", unit: "Flat 5A" }
-  ],
-  performance: {
-    completedJobs: 156,
-    responseTime: "2 hours",
-    rating: 4.8,
-    onTimeRate: 95
-  },
-  documents: [
-    { id: "d1", name: "Service Agreement 2024", type: "contract", date: "2024-01-01" },
-    { id: "d2", name: "Insurance Certificate", type: "compliance", date: "2024-01-15" }
-  ],
-  wallet: {
-    balance: 85000,
-    currency: "NGN"
-  },
-  transactions: [
-    { id: 1, date: "2025-04-28", description: "Job Payment - Door Lock Replacement", type: "deposit", amount: 8000, status: "paid", reference: "PAY-20250428-001" },
-    { id: 2, date: "2025-04-25", description: "Job Payment - Bathroom Pipe Repair", type: "deposit", amount: 12000, status: "paid", reference: "PAY-20250425-001" },
-    { id: 3, date: "2025-04-20", description: "Materials Purchase", type: "withdraw", amount: 5000, status: "completed", reference: "PAY-20250420-001" },
-    { id: 4, date: "2025-04-15", description: "Wallet Deposit", type: "deposit", amount: 50000, status: "completed", reference: "DEP-20250415-001" },
-    { id: 5, date: "2025-04-10", description: "Transfer to Bank", type: "withdraw", amount: 20000, status: "completed", reference: "TRF-20250410-001" }
-  ]
-};
+const vendorData = VENDOR_DEMO_DATA;
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", minimumFractionDigits: 0 }).format(amount);

@@ -76,134 +76,17 @@ import { useAuth } from "@/contexts/AuthContext";
 import { processPayment } from "@/services/paymentService";
 import { generateReceiptPDF } from "@/utils/receiptGenerator";
 import { useGetDashboardOverviewQuery, useGetMyBillingQuery, usePayBillingMutation } from "@/services/estatesApi";
-
-const tenantData = {
-  tenant: {
-    id: "tenant_001",
-    name: "John Doe",
-    email: "john.doe@email.com",
-    phone: "+2349012345678",
-    apartmentNumber: "Flat 4B",
-    estateName: "Rose Garden Estate",
-    leaseStatus: "active",
-    leaseEndDate: "2026-12-31",
-    monthlyRent: 250000,
-    rentDueDay: 25,
-    outstandingBalance: 0,
-    nextPaymentDue: "2025-05-25"
-  },
-  paymentHistory: [
-    { id: 1, month: "April 2025", amount: 250000, status: "paid", date: "2025-04-23", method: "Transfer" },
-    { id: 2, month: "March 2025", amount: 250000, status: "paid", date: "2025-03-22", method: "Transfer" },
-    { id: 3, month: "February 2025", amount: 250000, status: "paid", date: "2025-02-24", method: "Bank Deposit" },
-    { id: 4, month: "January 2025", amount: 250000, status: "paid", date: "2025-01-23", method: "Transfer" }
-  ],
-  serviceCharges: [
-    { id: 1, type: "Service Charge", month: "April 2025", amount: 15000, status: "paid", date: "2025-04-10" },
-    { id: 2, type: "Service Charge", month: "March 2025", amount: 15000, status: "paid", date: "2025-03-10" },
-    { id: 3, type: "Water Bill", month: "April 2025", amount: 5000, status: "pending" },
-    { id: 4, type: "Electricity", month: "April 2025", amount: 12000, status: "pending" }
-  ],
-  maintenanceRequests: [
-    {
-      id: 1,
-      title: "Leaking kitchen faucet",
-      category: "plumbing",
-      status: "in_progress",
-      createdAt: "2025-04-15",
-      assignedTo: "Mr. Adebayo",
-      estimatedCompletion: "2025-04-25"
-    },
-    {
-      id: 2,
-      title: "AC not cooling properly",
-      category: "ac_repair",
-      status: "pending",
-      createdAt: "2025-04-20",
-      assignedTo: null,
-      estimatedCompletion: null
-    },
-    {
-      id: 3,
-      title: "Broken bedroom lock",
-      category: "security",
-      status: "completed",
-      createdAt: "2025-03-10",
-      assignedTo: "Mr. Chidi",
-      estimatedCompletion: "2025-03-12"
-    }
-  ],
-  visitors: [
-    {
-      id: 1,
-      name: "Michael Brown",
-      phone: "+2348012345678",
-      purpose: "Family Visit",
-      expectedArrival: "2025-04-25",
-      accessCode: "VST-2025-0425",
-      status: "approved"
-    },
-    {
-      id: 2,
-      name: "Delivery - DHL",
-      phone: "+2347000000000",
-      purpose: "Package Delivery",
-      expectedArrival: "2025-04-24",
-      accessCode: "VST-2025-0424",
-      status: "pending"
-    }
-  ],
-  notices: [
-    {
-      id: 1,
-      title: "Scheduled Water Shutdown",
-      type: "important",
-      date: "2025-04-28",
-      content: "Water supply will be disrupted from 9AM to 5PM for maintenance work."
-    },
-    {
-      id: 2,
-      title: "Estate Security Update",
-      type: "info",
-      date: "2025-04-22",
-      content: "New security protocols effective immediately. Please ensure all visitors register at the gate."
-    },
-    {
-      id: 3,
-      title: "Community Meeting",
-      type: "event",
-      date: "2025-05-01",
-      content: "Monthly estate meeting holding at the clubhouse by 10AM."
-    }
-  ],
-  documents: [
-    { id: 1, name: "Lease Agreement", type: "lease", date: "2024-12-31" },
-    { id: 2, name: "Move-in Checklist", type: "checklist", date: "2024-12-31" },
-    { id: 3, name: "House Rules", type: "policy", date: "2024-12-31" }
-  ],
-  complaints: [
-    {
-      id: 1,
-      title: "Excessive noise from 5B",
-      category: "noise",
-      status: "resolved",
-      createdAt: "2025-03-15",
-      response: "Warning issued to the resident."
-    }
-  ],
-  wallet: {
-    balance: 125000,
-    currency: "NGN"
-  },
-  transactions: [
-    { id: 1, date: "2025-04-28", description: "Wallet Deposit", type: "deposit", amount: 50000, status: "completed", reference: "DEP-20250428-001" },
-    { id: 2, date: "2025-04-25", description: "Rent Payment", type: "withdraw", amount: 250000, status: "completed", reference: "PAY-20250425-001" },
-    { id: 3, date: "2025-04-20", description: "Transfer to Savings", type: "transfer", amount: 30000, status: "completed", reference: "TRF-20250420-001" },
-    { id: 4, date: "2025-04-15", description: "Wallet Deposit", type: "deposit", amount: 100000, status: "completed", reference: "DEP-20250415-001" },
-    { id: 5, date: "2025-04-10", description: "Service Charge Payment", type: "withdraw", amount: 15000, status: "completed", reference: "PAY-20250410-001" },
-    { id: 6, date: "2025-04-05", description: "Wallet Deposit", type: "deposit", amount: 75000, status: "completed", reference: "DEP-20250405-001" }
-  ]
-};
+import { TENANT_DEMO_DATA } from "@/data/demoData";
+import {
+  useGetWalletBalanceQuery,
+  useGetOwnTransactionsQuery,
+  useGetTransactionsListQuery,
+  useDepositMutation,
+  useWithdrawMutation,
+  useTransferToUserMutation,
+  useTransferToEstateMutation,
+  useCreateTransactionMutation,
+} from "@/services";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -286,12 +169,29 @@ export const TenantDashboard: React.FC = () => {
   const { data: billingData } = useGetMyBillingQuery();
   const [payBilling, { isLoading: isPaying }] = usePayBillingMutation();
 
+  // Wallet Transaction API Hooks
+  const { data: walletResponse, isLoading: walletLoading, refetch: refetchWallet } = useGetWalletBalanceQuery();
+  const { data: ownTxResponse, isLoading: ownTxLoading } = useGetOwnTransactionsQuery();
+  const { data: transactionListResponse, isLoading: txListLoading } = useGetTransactionsListQuery({ page: 1, limit: 10 });
+  
+  // Mutations
+  const [deposit, { isLoading: isDepositing }] = useDepositMutation();
+  const [withdraw, { isLoading: isWithdrawing }] = useWithdrawMutation();
+  const [transferToUser, { isLoading: isTransferringUser }] = useTransferToUserMutation();
+  const [transferToEstate, { isLoading: isTransferringEstate }] = useTransferToEstateMutation();
+
   // Get API data
   const apiUser = overviewData?.data?.user;
   const apiApartment = overviewData?.data?.data?.apartment;
   const apiBilling = overviewData?.data?.data?.billing;
   const apiPayments = overviewData?.data?.data?.payments;
   const billingItems = billingData?.data;
+
+  // Get Wallet Data from API
+  const walletData = walletResponse?.data;
+  const walletBalance = walletData?.balance || 0;
+  const ownTransactions = ownTxResponse?.data || [];
+  const transactionsList = transactionListResponse?.data || [];
 
   // Calculate totals from billing
   const recurringTotal = billingItems?.recurring?.reduce((sum, item) => sum + item.amount, 0) || 0;
@@ -385,7 +285,7 @@ export const TenantDashboard: React.FC = () => {
       setDownloadingReceipt(paymentId);
       
       // Find the payment in history
-      const payment = tenantData.paymentHistory.find(p => p.id.toString() === paymentId);
+      const payment = TENANT_DEMO_DATA.paymentHistory.find(p => p.id.toString() === paymentId);
       if (!payment) {
         toast("Error: Receipt not found");
         return;
@@ -455,32 +355,55 @@ export const TenantDashboard: React.FC = () => {
     setTransferDialogOpen(true);
   };
 
-  const handleDeposit = () => {
+  const handleDeposit = async () => {
     if (!depositForm.amount || parseFloat(depositForm.amount) <= 0) {
       toast("Error: Please enter a valid amount");
       return;
     }
-    toast(`Success: ₦${parseFloat(depositForm.amount).toLocaleString()} deposited to wallet`);
-    setDepositDialogOpen(false);
-    setDepositForm({ amount: "", method: "bank_transfer" });
+    try {
+      const result = await deposit({
+        amount: parseFloat(depositForm.amount),
+        description: `Wallet deposit via ${depositForm.method}`,
+      }).unwrap();
+      toast(`Success: ₦${parseFloat(depositForm.amount).toLocaleString()} deposited to wallet`);
+      setDepositDialogOpen(false);
+      setDepositForm({ amount: "", method: "bank_transfer" });
+      refetchWallet(); // Refresh wallet balance
+    } catch (error: any) {
+      toast(`Error: ${error?.data?.message || "Deposit failed"}`);
+    }
   };
 
-  const handleWithdraw = () => {
+  const handleWithdraw = async () => {
     if (!withdrawForm.amount || parseFloat(withdrawForm.amount) <= 0) {
       toast("Error: Please enter a valid amount");
       return;
     }
     const amount = parseFloat(withdrawForm.amount);
-    if (amount > tenantData.wallet.balance) {
+    if (amount > walletBalance) {
       toast("Error: Insufficient wallet balance");
       return;
     }
-    toast(`Success: ₦${amount.toLocaleString()} withdrawn from wallet`);
-    setWithdrawDialogOpen(false);
-    setWithdrawForm({ amount: "", description: "" });
+    try {
+      const result = await withdraw({
+        amount,
+        description: withdrawForm.description || "Wallet withdrawal",
+        bankDetails: {
+          accountName: "",
+          accountNumber: "",
+          bankName: "",
+        },
+      }).unwrap();
+      toast(`Success: ₦${amount.toLocaleString()} withdrawal submitted`);
+      setWithdrawDialogOpen(false);
+      setWithdrawForm({ amount: "", description: "" });
+      refetchWallet(); // Refresh wallet balance
+    } catch (error: any) {
+      toast(`Error: ${error?.data?.message || "Withdrawal failed"}`);
+    }
   };
 
-  const handleTransfer = () => {
+  const handleTransfer = async () => {
     if (!transferForm.amount || parseFloat(transferForm.amount) <= 0) {
       toast("Error: Please enter a valid amount");
       return;
@@ -490,13 +413,23 @@ export const TenantDashboard: React.FC = () => {
       return;
     }
     const amount = parseFloat(transferForm.amount);
-    if (amount > tenantData.wallet.balance) {
+    if (amount > walletBalance) {
       toast("Error: Insufficient wallet balance");
       return;
     }
-    toast(`Success: ₦${amount.toLocaleString()} transferred to ${transferForm.recipient}`);
-    setTransferDialogOpen(false);
-    setTransferForm({ amount: "", recipient: "", recipientAccount: "", bank: "", description: "" });
+    try {
+      const result = await transferToUser({
+        amount,
+        recipientEmail: transferForm.recipient,
+        description: transferForm.description || "Transfer to user",
+      }).unwrap();
+      toast(`Success: ₦${amount.toLocaleString()} transferred to ${transferForm.recipient}`);
+      setTransferDialogOpen(false);
+      setTransferForm({ amount: "", recipient: "", recipientAccount: "", bank: "", description: "" });
+      refetchWallet(); // Refresh wallet balance
+    } catch (error: any) {
+      toast(`Error: ${error?.data?.message || "Transfer failed"}`);
+    }
   };
 
   return (
@@ -571,20 +504,24 @@ export const TenantDashboard: React.FC = () => {
                       <Wallet className="h-5 w-5" />
                       <span className="text-sm font-medium">Wallet Balance</span>
                     </div>
-                    <p className="text-3xl font-bold text-slate-900 dark:text-white">{formatCurrency(tenantData.wallet.balance)}</p>
+                    {walletLoading ? (
+                      <p className="text-3xl font-bold text-slate-900 dark:text-white">Loading...</p>
+                    ) : (
+                      <p className="text-3xl font-bold text-slate-900 dark:text-white">{formatCurrency(walletBalance)}</p>
+                    )}
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={handleOpenDeposit} className="bg-green-600 hover:bg-green-700">
+                    <Button size="sm" onClick={handleOpenDeposit} className="bg-green-600 hover:bg-green-700" disabled={isDepositing}>
                       <ArrowDownRight className="h-4 w-4 mr-1" />
-                      Deposit
+                      {isDepositing ? "Depositing..." : "Deposit"}
                     </Button>
-                    <Button size="sm" variant="outline" onClick={handleOpenWithdraw}>
+                    <Button size="sm" variant="outline" onClick={handleOpenWithdraw} disabled={isWithdrawing}>
                       <ArrowUpRight className="h-4 w-4 mr-1" />
-                      Withdraw
+                      {isWithdrawing ? "Withdrawing..." : "Withdraw"}
                     </Button>
-                    <Button size="sm" variant="outline" onClick={handleOpenTransfer}>
+                    <Button size="sm" variant="outline" onClick={handleOpenTransfer} disabled={isTransferringUser}>
                       <Send className="h-4 w-4 mr-1" />
-                      Transfer
+                      {isTransferringUser ? "Transferring..." : "Transfer"}
                     </Button>
                   </div>
                 </div>
@@ -617,7 +554,7 @@ export const TenantDashboard: React.FC = () => {
                 <CardTitle className="text-lg text-slate-900 dark:text-white">Recent Notices</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {tenantData.notices.slice(0, 3).map((notice) => (
+                {TENANT_DEMO_DATA.notices.slice(0, 3).map((notice) => (
                   <div key={notice.id} className="flex items-start gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
                     <Bell className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                     <div>
@@ -635,7 +572,7 @@ export const TenantDashboard: React.FC = () => {
                 <CardTitle className="text-lg text-slate-900 dark:text-white">Maintenance Requests</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {tenantData.maintenanceRequests.slice(0, 3).map((request) => {
+                {TENANT_DEMO_DATA.maintenanceRequests.slice(0, 3).map((request) => {
                   const Icon = getCategoryIcon(request.category);
                   return (
                     <div key={request.id} className="flex items-start gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
@@ -757,10 +694,10 @@ export const TenantDashboard: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-slate-900 dark:text-white">Your Requests</CardTitle>
-              <CardDescription>{tenantData.maintenanceRequests.length} requests</CardDescription>
+              <CardDescription>{TENANT_DEMO_DATA.maintenanceRequests.length} requests</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {tenantData.maintenanceRequests.map((request) => {
+              {TENANT_DEMO_DATA.maintenanceRequests.map((request) => {
                 const Icon = getCategoryIcon(request.category);
                 return (
                   <div key={request.id} className="p-4 border rounded-lg">
@@ -823,7 +760,7 @@ export const TenantDashboard: React.FC = () => {
               <CardTitle className="text-slate-900 dark:text-white">Pending Approvals</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {tenantData.visitors
+              {TENANT_DEMO_DATA.visitors
                 .filter((v) => v.status === "pending")
                 .map((visitor) => (
                   <div key={visitor.id} className="flex items-center justify-between p-4 border rounded-lg">
@@ -847,7 +784,7 @@ export const TenantDashboard: React.FC = () => {
               <CardTitle className="text-slate-900 dark:text-white">Visitor History</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {tenantData.visitors.map((visitor) => (
+              {TENANT_DEMO_DATA.visitors.map((visitor) => (
                 <div key={visitor.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
                   <div>
                     <p className="font-medium">{visitor.name}</p>
@@ -873,7 +810,7 @@ export const TenantDashboard: React.FC = () => {
               <CardTitle className="text-slate-900 dark:text-white">Estate Notices & Announcements</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {tenantData.notices.map((notice) => (
+              {TENANT_DEMO_DATA.notices.map((notice) => (
                 <div key={notice.id} className="p-4 border rounded-lg">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
@@ -904,7 +841,7 @@ export const TenantDashboard: React.FC = () => {
               <CardTitle className="text-slate-900 dark:text-white">Your Documents</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {tenantData.documents.map((doc) => (
+              {TENANT_DEMO_DATA.documents.map((doc) => (
                 <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
                   <div className="flex items-center gap-3">
                     <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -942,7 +879,7 @@ export const TenantDashboard: React.FC = () => {
               <CardTitle className="text-slate-900 dark:text-white">Complaint History</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {tenantData.complaints.map((complaint) => (
+              {TENANT_DEMO_DATA.complaints.map((complaint) => (
                 <div key={complaint.id} className="p-4 border rounded-lg">
                   <div className="flex items-start justify-between">
                     <div>
@@ -1046,7 +983,7 @@ export const TenantDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {tenantData.serviceCharges.map((charge) => (
+                {TENANT_DEMO_DATA.serviceCharges.map((charge) => (
                   <div key={charge.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
                     <div>
                       <p className="font-medium">{charge.type}</p>
@@ -1075,20 +1012,24 @@ export const TenantDashboard: React.FC = () => {
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Available Balance</p>
-                    <p className="text-4xl font-bold text-slate-900 dark:text-white">{formatCurrency(tenantData.wallet.balance)}</p>
+                    {walletLoading ? (
+                      <p className="text-4xl font-bold text-slate-900 dark:text-white">Loading...</p>
+                    ) : (
+                      <p className="text-4xl font-bold text-slate-900 dark:text-white">{formatCurrency(walletBalance)}</p>
+                    )}
                   </div>
                   <div className="flex gap-3">
-                    <Button onClick={handleOpenDeposit} className="bg-green-600 hover:bg-green-700">
+                    <Button onClick={handleOpenDeposit} className="bg-green-600 hover:bg-green-700" disabled={isDepositing}>
                       <ArrowDownRight className="h-4 w-4 mr-2" />
-                      Deposit
+                      {isDepositing ? "Depositing..." : "Deposit"}
                     </Button>
-                    <Button variant="outline" onClick={handleOpenWithdraw}>
+                    <Button variant="outline" onClick={handleOpenWithdraw} disabled={isWithdrawing}>
                       <ArrowUpRight className="h-4 w-4 mr-2" />
-                      Withdraw
+                      {isWithdrawing ? "Withdrawing..." : "Withdraw"}
                     </Button>
-                    <Button variant="outline" onClick={handleOpenTransfer}>
+                    <Button variant="outline" onClick={handleOpenTransfer} disabled={isTransferringUser}>
                       <Send className="h-4 w-4 mr-2" />
-                      Transfer
+                      {isTransferringUser ? "Transferring..." : "Transfer"}
                     </Button>
                   </div>
                 </div>
@@ -1103,44 +1044,54 @@ export const TenantDashboard: React.FC = () => {
               <CardDescription>Recent transactions on your wallet</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {tenantData.transactions.map((transaction) => (
-                  <div key={transaction.id} className="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${
-                        transaction.type === "deposit" ? "bg-green-100 dark:bg-green-900/30" :
-                        transaction.type === "withdraw" ? "bg-red-100 dark:bg-red-900/30" :
-                        "bg-blue-100 dark:bg-blue-900/30"
-                      }`}>
-                        {transaction.type === "deposit" ? (
-                          <ArrowDownRight className="h-5 w-5 text-green-600 dark:text-green-400" />
-                        ) : transaction.type === "withdraw" ? (
-                          <ArrowUpRight className="h-5 w-5 text-red-600 dark:text-red-400" />
-                        ) : (
-                          <Send className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                        )}
+              {txListLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader className="h-6 w-6 animate-spin text-slate-500" />
+                </div>
+              ) : transactionsList.length > 0 ? (
+                <div className="space-y-3">
+                  {transactionsList.map((transaction: any) => (
+                    <div key={transaction._id} className="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${
+                          transaction.type === "deposit" ? "bg-green-100 dark:bg-green-900/30" :
+                          transaction.type === "withdraw" ? "bg-red-100 dark:bg-red-900/30" :
+                          "bg-blue-100 dark:bg-blue-900/30"
+                        }`}>
+                          {transaction.type === "deposit" ? (
+                            <ArrowDownRight className="h-5 w-5 text-green-600 dark:text-green-400" />
+                          ) : transaction.type === "withdraw" ? (
+                            <ArrowUpRight className="h-5 w-5 text-red-600 dark:text-red-400" />
+                          ) : (
+                            <Send className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium text-slate-900 dark:text-white">{transaction.description || transaction.type}</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
+                            {new Date(transaction.createdAt).toLocaleDateString()} • {transaction.reference}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium text-slate-900 dark:text-white">{transaction.description}</p>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
-                          {formatDate(transaction.date)} • {transaction.reference}
+                      <div className="text-right">
+                        <p className={`font-semibold ${
+                          transaction.type === "deposit" ? "text-green-600 dark:text-green-400" :
+                          "text-red-600 dark:text-red-400"
+                        }`}>
+                          {transaction.type === "deposit" ? "+" : "-"}{formatCurrency(transaction.amount)}
                         </p>
+                        <Badge className={`text-xs ${getStatusColor(transaction.status)}`}>
+                          {transaction.status}
+                        </Badge>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className={`font-semibold ${
-                        transaction.type === "deposit" ? "text-green-600 dark:text-green-400" :
-                        "text-red-600 dark:text-red-400"
-                      }`}>
-                        {transaction.type === "deposit" ? "+" : "-"}{formatCurrency(transaction.amount)}
-                      </p>
-                      <Badge className={`text-xs ${getStatusColor(transaction.status)}`}>
-                        {transaction.status}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-slate-500 dark:text-slate-400">No transactions yet</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -1420,7 +1371,7 @@ export const TenantDashboard: React.FC = () => {
           <div className="space-y-4 py-4">
             <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
               <p className="text-sm text-slate-500 dark:text-slate-400">Available Balance</p>
-              <p className="text-2xl font-bold">{formatCurrency(tenantData.wallet.balance)}</p>
+              <p className="text-2xl font-bold">{walletLoading ? "Loading..." : formatCurrency(walletBalance)}</p>
             </div>
             <div>
               <Label>Amount</Label>
@@ -1441,8 +1392,10 @@ export const TenantDashboard: React.FC = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setWithdrawDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleWithdraw}>Withdraw</Button>
+            <Button variant="outline" onClick={() => setWithdrawDialogOpen(false)} disabled={isWithdrawing}>Cancel</Button>
+            <Button onClick={handleWithdraw} disabled={isWithdrawing}>
+              {isWithdrawing ? "Processing..." : "Withdraw"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1457,12 +1410,12 @@ export const TenantDashboard: React.FC = () => {
           <div className="space-y-4 py-4">
             <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
               <p className="text-sm text-slate-500 dark:text-slate-400">Available Balance</p>
-              <p className="text-2xl font-bold">{formatCurrency(tenantData.wallet.balance)}</p>
+              <p className="text-2xl font-bold">{walletLoading ? "Loading..." : formatCurrency(walletBalance)}</p>
             </div>
             <div>
-              <Label>Recipient Name</Label>
+              <Label>Recipient Name/Email</Label>
               <Input
-                placeholder="Enter recipient name"
+                placeholder="Enter recipient email"
                 value={transferForm.recipient}
                 onChange={(e) => setTransferForm({ ...transferForm, recipient: e.target.value })}
               />
@@ -1503,17 +1456,19 @@ export const TenantDashboard: React.FC = () => {
               />
             </div>
             <div>
-              <Label>Description</Label>
+              <Label>Description (optional)</Label>
               <Input
-                placeholder="e.g., Transfer for rent"
+                placeholder="Transfer description"
                 value={transferForm.description}
                 onChange={(e) => setTransferForm({ ...transferForm, description: e.target.value })}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setTransferDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleTransfer}>Transfer</Button>
+            <Button variant="outline" onClick={() => setTransferDialogOpen(false)} disabled={isTransferringUser}>Cancel</Button>
+            <Button onClick={handleTransfer} disabled={isTransferringUser}>
+              {isTransferringUser ? "Processing..." : "Transfer"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

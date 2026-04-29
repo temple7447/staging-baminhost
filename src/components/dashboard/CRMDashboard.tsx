@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CRM_CONTACTS, BUSINESSES } from "@/data/demoData";
+import { CRM_CONTACTS, BUSINESSES } from '@/data/mockData';
 import { ProtectedFeature, ProtectedComponent } from "@/components/auth/ProtectedComponent";
 import { PermissionAwareHeader, FeatureAccessIndicator } from "./PermissionAwareHeader";
 import { usePermissions } from "@/hooks/usePermissions";

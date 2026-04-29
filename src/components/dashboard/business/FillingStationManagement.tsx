@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BUSINESSES } from "@/data/demoData";
+import { BUSINESSES } from "@/data/consolidatedDemoData";
 import { Fuel, Car, Building2, Wrench, TrendingUp, AlertTriangle } from "lucide-react";
 
 export const FillingStationManagement = () => {

@@ -1,4 +1,4 @@
-import { RECENT_TRANSACTIONS } from "@/data/demoData";
+import { RECENT_TRANSACTIONS } from '@/data/mockData';
 import { RecentTransactions } from "./RecentTransactions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign } from "lucide-react";

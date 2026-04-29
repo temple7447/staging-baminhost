@@ -26,6 +26,7 @@ import {
   ArrowUpRight
 } from "lucide-react";
 import { TransactionsPanel } from "./TransactionsPanel";
+import { ASSISTANT_DEMO_DATA } from "@/data/demoData";
 
 export const AssistantDashboard = () => {
   const { user } = useAuth();
@@ -33,104 +34,10 @@ export const AssistantDashboard = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [selectedMode, setSelectedMode] = useState("chat");
 
-  // Demo chat history
-  const chatHistory = [
-    {
-      id: '1',
-      type: 'user',
-      message: 'What is the current occupancy rate of Balado Estate?',
-      timestamp: '10:30 AM',
-    },
-    {
-      id: '2',
-      type: 'assistant',
-      message: 'Balado Estate currently has 30 out of 32 units occupied, giving you a 93.75% occupancy rate. This is excellent performance! The 2 vacant units are Unit 31 and Unit 32.',
-      timestamp: '10:30 AM',
-    },
-    {
-      id: '3',
-      type: 'user',
-      message: 'Schedule maintenance for the filling station tanks',
-      timestamp: '10:35 AM',
-    },
-    {
-      id: '4',
-      type: 'assistant',
-      message: 'I\'ve scheduled maintenance for all 4 filling station tanks:\n\n• Kerosene Tank: Due now (urgent)\n• Premium Tank: Due in 3 days\n• Petrol Tank: Due in 5 days\n• Diesel Tank: Due in 1 week\n\nWould you like me to send WhatsApp notifications to the maintenance team?',
-      timestamp: '10:35 AM',
-    },
-    {
-      id: '5',
-      type: 'user',
-      message: 'Yes, send notifications and calculate this month\'s 50/30/20 split',
-      timestamp: '10:40 AM',
-    },
-    {
-      id: '6',
-      type: 'assistant',
-      message: '✅ WhatsApp notifications sent to maintenance team.\n\nYour current month 50/30/20 split:\n• Investment (50%): ₦1,600,000\n• Withdrawals (30%): ₦960,000\n• Operations (20%): ₦640,000\n\nTotal allocated: ₦3,200,000 from monthly income',
-      timestamp: '10:40 AM',
-    }
-  ];
-
-  // Demo tasks
-  const activeTasks = [
-    {
-      id: '1',
-      title: 'Send rent reminders to Balado Estate tenants',
-      status: 'in_progress',
-      type: 'automated',
-      estimatedCompletion: '2:00 PM',
-    },
-    {
-      id: '2',
-      title: 'Generate quarterly ROI report',
-      status: 'pending',
-      type: 'manual_approval',
-      estimatedCompletion: '5:00 PM',
-    },
-    {
-      id: '3',
-      title: 'Process vendor commission payments',
-      status: 'completed',
-      type: 'automated',
-      completedAt: '9:30 AM',
-    },
-    {
-      id: '4',
-      title: 'Update fuel tank levels from suppliers',
-      status: 'in_progress',
-      type: 'automated',
-      estimatedCompletion: '1:30 PM',
-    }
-  ];
-
-  // Demo WhatsApp integration status
-  const whatsappStatus = {
-    connected: true,
-    lastSync: '2 minutes ago',
-    pendingMessages: 3,
-    todaysSent: 47,
-  };
-
-  // Demo notification settings
-  const notificationSettings = [
-    { type: 'rent_due', enabled: true, method: 'whatsapp' },
-    { type: 'low_fuel', enabled: true, method: 'both' },
-    { type: 'maintenance_due', enabled: true, method: 'whatsapp' },
-    { type: 'payment_received', enabled: false, method: 'sms' },
-    { type: 'equipment_available', enabled: true, method: 'whatsapp' },
-  ];
-
-  const walletData = {
-    balance: 50000,
-    transactions: [
-      { id: 1, date: "2025-04-28", description: "Task Completion Bonus", type: "deposit", amount: 5000, status: "completed", reference: "BNS-20250428-001" },
-      { id: 2, date: "2025-04-25", description: "Transfer to Savings", type: "transfer", amount: 10000, status: "completed", reference: "TRF-20250425-001" },
-      { id: 3, date: "2025-04-20", description: "Monthly Stipend", type: "deposit", amount: 50000, status: "completed", reference: "DEP-20250420-001" },
-      { id: 4, date: "2025-04-15", description: "Withdrawal", type: "withdraw", amount: 5000, status: "completed", reference: "WD-20250415-001" }
-    ]
-  };
+  const chatHistory = ASSISTANT_DEMO_DATA.chatHistory;
+  const activeTasks = ASSISTANT_DEMO_DATA.activeTasks;
+  const whatsappStatus = ASSISTANT_DEMO_DATA.whatsappStatus;
+  const notificationSettings = ASSISTANT_DEMO_DATA.notificationSettings;
 
   const handleSendMessage = () => {
     if (!message.trim()) return;

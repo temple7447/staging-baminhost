@@ -59,83 +59,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { MANAGER_DEMO_DATA } from "@/data/demoData";
 import { useToast } from "@/components/providers/ToastProvider";
-import { useAuth } from "@/contexts/AuthContext";
 
-// Demo Data
-const managerData = {
-  manager: {
-    id: "mgr_001",
-    name: "Estate Manager",
-    email: "manager@estate.com",
-    phone: "+2349012345678",
-    assignedProperty: "Rose Garden Estate"
-  },
-  property: {
-    name: "Rose Garden Estate",
-    address: "123 Rose Garden Ave, Lagos",
-    totalUnits: 120,
-    occupiedUnits: 105,
-    vacantUnits: 15
-  },
-  tenants: [
-    { id: "t1", name: "John Doe", unit: "Flat 4B", phone: "+2349012345678", status: "active", rentStatus: "paid" },
-    { id: "t2", name: "Jane Smith", unit: "Flat 5A", phone: "+2348012345678", status: "active", rentStatus: "pending" },
-    { id: "t3", name: "Mike Johnson", unit: "Unit 8", phone: "+2347012345678", status: "active", rentStatus: "paid" },
-    { id: "t4", name: "Sarah Williams", unit: "Flat 2A", phone: "+2348011111111", status: "active", rentStatus: "overdue" }
-  ],
-  maintenanceRequests: [
-    { id: "m1", tenant: "John Doe", unit: "Flat 4B", issue: "Leaking faucet", category: "plumbing", priority: "medium", status: "pending", date: "2025-04-20", estimatedCost: 15000 },
-    { id: "m2", tenant: "Jane Smith", unit: "Flat 5A", issue: "AC not cooling", category: "ac", priority: "high", status: "in_progress", date: "2025-04-18", assignedTo: "Mr. Adebayo" },
-    { id: "m3", tenant: "Mike Johnson", unit: "Unit 8", issue: "Broken lock", category: "security", priority: "low", status: "completed", date: "2025-04-10", completedDate: "2025-04-12", cost: 8000 }
-  ],
-  staff: [
-    { id: "s1", name: "Mr. John", role: "Security", shift: "Morning", status: "on_duty", phone: "+2348011111111" },
-    { id: "s2", name: "Mr. Adebayo", role: "Electrician", shift: "Day", status: "on_duty", phone: "+2348022222222" },
-    { id: "s3", name: "Mrs. Grace", role: "Cleaner", shift: "Morning", status: "off_duty", phone: "+2348033333333" },
-    { id: "s4", name: "Mr. Chidi", role: "Plumber", shift: "Day", status: "on_duty", phone: "+2348044444444" }
-  ],
-  visitors: [
-    { id: "v1", name: "Michael Brown", phone: "+2349000000000", unit: "Flat 4B", purpose: "Family Visit", time: "10:30 AM", status: "approved" },
-    { id: "v2", name: "DHL Delivery", phone: "+2347000000000", unit: "Flat 5A", purpose: "Package", time: "11:00 AM", status: "pending" },
-    { id: "v3", name: "Sarah's Guest", phone: "+2348055555555", unit: "Flat 2A", purpose: "Friend", time: "2:00 PM", status: "approved" }
-  ],
-  complaints: [
-    { id: "c1", tenant: "Sarah Williams", unit: "Flat 2A", type: "noise", description: "Noise from 2B", status: "pending", date: "2025-04-20" },
-    { id: "c2", tenant: "Mike Johnson", unit: "Unit 8", type: "neighbor", description: "Parking issue", status: "resolved", date: "2025-04-15" }
-  ],
-  leases: [
-    { id: "l1", tenant: "John Doe", unit: "Flat 4B", startDate: "2024-01-01", endDate: "2026-12-31", status: "active" },
-    { id: "l2", tenant: "Jane Smith", unit: "Flat 5A", startDate: "2024-06-01", endDate: "2025-05-31", status: "expiring_soon" },
-    { id: "l3", tenant: "Mike Johnson", unit: "Unit 8", startDate: "2024-03-01", endDate: "2025-02-28", status: "active" }
-  ],
-  utilities: [
-    { id: "u1", type: "Water", status: "normal", lastChecked: "2025-04-20" },
-    { id: "u2", type: "Electricity", status: "normal", lastChecked: "2025-04-20" },
-    { id: "u3", type: "Generator", status: "maintenance_due", lastChecked: "2025-04-15" }
-  ],
-  vendors: [
-    { id: "v1", name: "ABC Electric", service: "Electrical", phone: "+2348011111111" },
-    { id: "v2", name: "Quick Fix Plumbing", service: "Plumbing", phone: "+2348022222222" },
-    { id: "v3", name: "Clean Pro Services", service: "Cleaning", phone: "+2348033333333" }
-  ],
-  dailyLogs: [
-    { id: "d1", type: "maintenance", description: "Completed 3 repairs", staff: "Mr. Adebayo", date: "2025-04-20" },
-    { id: "d2", type: "security", description: "No incidents reported", staff: "Mr. John", date: "2025-04-20" },
-    { id: "d3", type: "visitor", description: "15 visitors today", staff: "Security", date: "2025-04-20" }
-  ],
-  wallet: {
-    balance: 275000,
-    currency: "NGN"
-  },
-  transactions: [
-    { id: 1, date: "2025-04-28", description: "Rent Collection - Flat 4B", type: "deposit", amount: 250000, status: "completed", reference: "DEP-20250428-001" },
-    { id: 2, date: "2025-04-25", description: "Maintenance Payment - Plumber", type: "withdraw", amount: 15000, status: "completed", reference: "PAY-20250425-001" },
-    { id: 3, date: "2025-04-20", description: "Service Charge Collection", type: "deposit", amount: 15000, status: "completed", reference: "DEP-20250420-001" },
-    { id: 4, date: "2025-04-18", description: "Transfer to Owner", type: "transfer", amount: 200000, status: "completed", reference: "TRF-20250418-001" },
-    { id: 5, date: "2025-04-15", description: "Generator Fuel", type: "withdraw", amount: 25000, status: "completed", reference: "PAY-20250415-001" }
-  ]
-};
+const managerData = MANAGER_DEMO_DATA;
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", minimumFractionDigits: 0 }).format(amount);

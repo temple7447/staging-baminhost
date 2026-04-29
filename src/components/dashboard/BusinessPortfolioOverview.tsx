@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BUSINESSES } from "@/data/demoData";
+import { BUSINESSES } from '@/data/mockData';
 import { Building, Fuel, Truck } from "lucide-react";
 
 export const BusinessPortfolioOverview = () => {

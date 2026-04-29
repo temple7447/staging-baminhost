@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { NET_WORTH_DATA, BUSINESSES, WALLET_DATA, RECENT_TRANSACTIONS } from "@/data/demoData";
+import { BUSINESSES } from '@/data/mockData';
 import { useAuth } from "@/contexts/AuthContext";
 import { TransactionsPanel } from "./TransactionsPanel";
 import { 
@@ -29,8 +29,14 @@ export const ReportsDashboard = () => {
   const [selectedMetric, setSelectedMetric] = useState("all");
 
   const businesses = BUSINESSES;
-  const netWorth = NET_WORTH_DATA;
-  const walletData = WALLET_DATA.owner;
+  // Mock wallet data for reporting
+  const walletData = {
+    allocations: {
+      investment: 1600000,
+      withdrawals: 960000,
+      operations: 640000,
+    },
+  };
 
   const reportTransactions = [
     { id: 1, date: "2025-04-28", description: "Estate Rental Income - Balado", type: "deposit" as const, amount: 1440000, status: "completed", reference: "TXN-20250428-001" },

@@ -3,41 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { AdminPeople } from "./AdminPeople";
 import { TransactionsPanel } from "./TransactionsPanel";
+import { BIG7_DEMO_DATA } from "@/data/demoData";
 
-// Mock data for Big 7 member
-const big7Data = {
-  member: {
-    name: "Sarah Johnson",
-    allocation: 14.28, // 1/7th of ownership
-    monthlyProfit: 12500,
-    totalInvestment: 175000,
-    profitShare: 8750
-  },
-  portfolio: {
-    totalValue: 2450000,
-    monthlyGrowth: 3.2,
-    allocation: {
-      stocks: 45,
-      bonds: 25,
-      realEstate: 20,
-      crypto: 10
-    }
-  },
-  performance: {
-    ytdReturn: 18.5,
-    monthlyReturn: 2.1,
-    quarterlyReturn: 7.8
-  },
-  wallet: {
-    balance: 45000,
-    transactions: [
-      { id: 1, date: "2025-04-28", description: "Profit Share - April", type: "deposit", amount: 8750, status: "completed", reference: "PS-20250428-001" },
-      { id: 2, date: "2025-04-25", description: "Transfer to Investment", type: "transfer", amount: 15000, status: "completed", reference: "TRF-20250425-001" },
-      { id: 3, date: "2025-04-20", description: "Wallet Deposit", type: "deposit", amount: 25000, status: "completed", reference: "DEP-20250420-001" },
-      { id: 4, date: "2025-04-15", description: "Withdrawal", type: "withdraw", amount: 10000, status: "completed", reference: "WD-20250415-001" }
-    ]
-  }
-};
+const big7Data = BIG7_DEMO_DATA;
 
 export const Big7Dashboard = () => {
   const formatCurrency = (amount: number) => {
