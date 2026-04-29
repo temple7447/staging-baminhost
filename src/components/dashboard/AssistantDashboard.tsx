@@ -20,8 +20,12 @@ import {
   Clock,
   AlertCircle,
   Lightbulb,
-  Settings
+  Settings,
+  Wallet,
+  ArrowDownRight,
+  ArrowUpRight
 } from "lucide-react";
+import { TransactionsPanel } from "./TransactionsPanel";
 
 export const AssistantDashboard = () => {
   const { user } = useAuth();
@@ -117,6 +121,16 @@ export const AssistantDashboard = () => {
     { type: 'payment_received', enabled: false, method: 'sms' },
     { type: 'equipment_available', enabled: true, method: 'whatsapp' },
   ];
+
+  const walletData = {
+    balance: 50000,
+    transactions: [
+      { id: 1, date: "2025-04-28", description: "Task Completion Bonus", type: "deposit", amount: 5000, status: "completed", reference: "BNS-20250428-001" },
+      { id: 2, date: "2025-04-25", description: "Transfer to Savings", type: "transfer", amount: 10000, status: "completed", reference: "TRF-20250425-001" },
+      { id: 3, date: "2025-04-20", description: "Monthly Stipend", type: "deposit", amount: 50000, status: "completed", reference: "DEP-20250420-001" },
+      { id: 4, date: "2025-04-15", description: "Withdrawal", type: "withdraw", amount: 5000, status: "completed", reference: "WD-20250415-001" }
+    ]
+  };
 
   const handleSendMessage = () => {
     if (!message.trim()) return;
@@ -465,6 +479,25 @@ export const AssistantDashboard = () => {
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Transactions */}
+      <TransactionsPanel
+        balance={walletData.balance}
+        transactions={walletData.transactions}
+        formatCurrency={(amount: number) => `₦${amount.toLocaleString()}`}
+        formatDate={(date: string) => new Date(date).toLocaleDateString('en-NG', { year: 'numeric', month: 'short', day: 'numeric' })}
+        getStatusColor={(status: string) => {
+          switch (status) {
+            case 'completed':
+            case 'paid':
+              return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+            case 'pending':
+              return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+            default:
+              return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200';
+          }
+        }}
+      />
     </div>
   );
 };

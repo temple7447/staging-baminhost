@@ -2,6 +2,7 @@ import { TrendingUp, Users, DollarSign, PieChart } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { AdminPeople } from "./AdminPeople";
+import { TransactionsPanel } from "./TransactionsPanel";
 
 // Mock data for Big 7 member
 const big7Data = {
@@ -26,6 +27,15 @@ const big7Data = {
     ytdReturn: 18.5,
     monthlyReturn: 2.1,
     quarterlyReturn: 7.8
+  },
+  wallet: {
+    balance: 45000,
+    transactions: [
+      { id: 1, date: "2025-04-28", description: "Profit Share - April", type: "deposit", amount: 8750, status: "completed", reference: "PS-20250428-001" },
+      { id: 2, date: "2025-04-25", description: "Transfer to Investment", type: "transfer", amount: 15000, status: "completed", reference: "TRF-20250425-001" },
+      { id: 3, date: "2025-04-20", description: "Wallet Deposit", type: "deposit", amount: 25000, status: "completed", reference: "DEP-20250420-001" },
+      { id: 4, date: "2025-04-15", description: "Withdrawal", type: "withdraw", amount: 10000, status: "completed", reference: "WD-20250415-001" }
+    ]
   }
 };
 
@@ -223,6 +233,23 @@ export const Big7Dashboard = () => {
 
       {/* Managers and Vendors */}
       <AdminPeople />
+
+      {/* Transactions */}
+      <TransactionsPanel
+        balance={big7Data.wallet.balance}
+        transactions={big7Data.wallet.transactions}
+        formatCurrency={(amount: number) => `₦${amount.toLocaleString()}`}
+        formatDate={(date: string) => new Date(date).toLocaleDateString('en-NG', { year: 'numeric', month: 'short', day: 'numeric' })}
+        getStatusColor={(status: string) => {
+          switch (status) {
+            case 'completed':
+            case 'paid':
+              return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+            default:
+              return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200';
+          }
+        }}
+      />
     </div>
   );
 };

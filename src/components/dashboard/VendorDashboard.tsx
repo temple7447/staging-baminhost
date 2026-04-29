@@ -57,6 +57,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/providers/ToastProvider";
 import { useAuth } from "@/contexts/AuthContext";
+import { TransactionsPanel } from "./TransactionsPanel";
 
 // Demo Data
 const vendorData = {
@@ -138,6 +139,17 @@ const vendorData = {
   documents: [
     { id: "d1", name: "Service Agreement 2024", type: "contract", date: "2024-01-01" },
     { id: "d2", name: "Insurance Certificate", type: "compliance", date: "2024-01-15" }
+  ],
+  wallet: {
+    balance: 85000,
+    currency: "NGN"
+  },
+  transactions: [
+    { id: 1, date: "2025-04-28", description: "Job Payment - Door Lock Replacement", type: "deposit", amount: 8000, status: "paid", reference: "PAY-20250428-001" },
+    { id: 2, date: "2025-04-25", description: "Job Payment - Bathroom Pipe Repair", type: "deposit", amount: 12000, status: "paid", reference: "PAY-20250425-001" },
+    { id: 3, date: "2025-04-20", description: "Materials Purchase", type: "withdraw", amount: 5000, status: "completed", reference: "PAY-20250420-001" },
+    { id: 4, date: "2025-04-15", description: "Wallet Deposit", type: "deposit", amount: 50000, status: "completed", reference: "DEP-20250415-001" },
+    { id: 5, date: "2025-04-10", description: "Transfer to Bank", type: "withdraw", amount: 20000, status: "completed", reference: "TRF-20250410-001" }
   ]
 };
 
@@ -230,6 +242,7 @@ export const VendorDashboard: React.FC = () => {
           <TabsTrigger value="messages">Chat</TabsTrigger>
           <TabsTrigger value="performance">Stats</TabsTrigger>
           <TabsTrigger value="documents">Docs</TabsTrigger>
+          <TabsTrigger value="transactions">Transactions</TabsTrigger>
         </TabsList>
 
         {/* 1. Work Overview */}
@@ -536,6 +549,17 @@ export const VendorDashboard: React.FC = () => {
               ))}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Transactions */}
+        <TabsContent value="transactions">
+          <TransactionsPanel
+            balance={vendorData.wallet.balance}
+            transactions={vendorData.transactions}
+            formatCurrency={formatCurrency}
+            formatDate={formatDate}
+            getStatusColor={getStatusColor}
+          />
         </TabsContent>
       </Tabs>
 

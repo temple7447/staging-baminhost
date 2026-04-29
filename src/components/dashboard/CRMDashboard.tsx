@@ -23,6 +23,7 @@ import {
   Lock,
   Crown
 } from "lucide-react";
+import { TransactionsPanel } from "./TransactionsPanel";
 
 export const CRMDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,6 +33,16 @@ export const CRMDashboard = () => {
 
   const contacts = CRM_CONTACTS;
   const businesses = BUSINESSES;
+
+  const walletData = {
+    balance: 25000,
+    transactions: [
+      { id: 1, date: "2025-04-28", description: "Commission Payment - Vendor Referral", type: "deposit", amount: 5000, status: "completed", reference: "COM-20250428-001" },
+      { id: 2, date: "2025-04-25", description: "Commission Payment - Police Contact", type: "deposit", amount: 3500, status: "completed", reference: "COM-20250425-001" },
+      { id: 3, date: "2025-04-20", description: "Transfer to Bank Account", type: "withdraw", amount: 8000, status: "completed", reference: "TRF-20250420-001" },
+      { id: 4, date: "2025-04-15", description: "Commission Payment - Security Vendor", type: "deposit", amount: 4500, status: "completed", reference: "COM-20250415-001" }
+    ]
+  };
 
   // Filter contacts
   const filteredContacts = contacts.filter(contact => {
@@ -478,6 +489,25 @@ export const CRMDashboard = () => {
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Transactions */}
+      <TransactionsPanel
+        balance={walletData.balance}
+        transactions={walletData.transactions}
+        formatCurrency={(amount: number) => `₦${amount.toLocaleString()}`}
+        formatDate={(date: string) => new Date(date).toLocaleDateString('en-NG', { year: 'numeric', month: 'short', day: 'numeric' })}
+        getStatusColor={(status: string) => {
+          switch (status) {
+            case 'completed':
+            case 'paid':
+              return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+            case 'pending':
+              return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+            default:
+              return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200';
+          }
+        }}
+      />
     </div>
   );
 };

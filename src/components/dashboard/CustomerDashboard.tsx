@@ -42,6 +42,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/components/providers/ToastProvider";
 import { useAuth } from "@/contexts/AuthContext";
 import { BamiHustleLogo } from "@/components/brand";
+import { TransactionsPanel } from "./TransactionsPanel";
 
 // Enhanced Customer Demo Data
 const customerData = {
@@ -323,7 +324,14 @@ const customerData = {
     totalPenalties: 150,
     activePenalties: 75,
     paidPenalties: 75
-  }
+  },
+  transactions: [
+    { id: 1, date: "2025-04-28", description: "Contract Deposit - Estate Maintenance", type: "withdraw", amount: 480000, status: "completed", reference: "DEP-20250428-001" },
+    { id: 2, date: "2025-04-25", description: "Wallet Deposit", type: "deposit", amount: 500000, status: "completed", reference: "DEP-20250425-001" },
+    { id: 3, date: "2025-04-20", description: "Stage Payment Release", type: "withdraw", amount: 400000, status: "completed", reference: "PAY-20250420-001" },
+    { id: 4, date: "2025-04-15", description: "Equipment Rental - Full Payment", type: "withdraw", amount: 800000, status: "completed", reference: "PAY-20250415-001" },
+    { id: 5, date: "2025-04-10", description: "Wallet Deposit", type: "deposit", amount: 1000000, status: "completed", reference: "DEP-20250410-001" }
+  ]
 };
 
 export const CustomerDashboard = () => {
@@ -819,6 +827,30 @@ export const CustomerDashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Transactions */}
+      <TransactionsPanel
+        balance={localCustomerData.customer.walletBalance}
+        transactions={localCustomerData.transactions}
+        formatCurrency={(amount: number) => `₦${formatCurrency(amount)}`}
+        formatDate={(dateString: string | null) => {
+          if (!dateString) return 'N/A';
+          const d = new Date(dateString);
+          if (Number.isNaN(d.getTime())) return dateString;
+          return d.toLocaleDateString('en-NG', { year: 'numeric', month: 'short', day: 'numeric' });
+        }}
+        getStatusColor={(status: string) => {
+          switch (status) {
+            case 'completed':
+            case 'paid':
+              return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+            case 'pending':
+              return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+            default:
+              return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200';
+          }
+        }}
+      />
 
       {/* Payment Modal */}
       <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
