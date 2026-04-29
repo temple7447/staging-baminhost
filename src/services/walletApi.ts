@@ -1,7 +1,15 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { BASE_API_URL } from './api';
+import {
+  Wallet,
+  WalletResponse,
+  PaystackInitializeResponse,
+  PaystackVerifyResponse,
+  DepositInitializeRequest,
+  WalletTransactionResponse,
+} from '../types/wallet';
 
-// Types
+// Types for Global Wallet (Multi-Engine)
 export interface WalletSubAllocation {
   name: string;
   balance: number;
@@ -50,8 +58,9 @@ export const walletApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Wallet', 'GlobalWallet'],
+  tagTypes: ['Wallet', 'GlobalWallet', 'PersonalWallet', 'WalletTransactions'],
   endpoints: (builder) => ({
+    // GLOBAL WALLET ENDPOINTS (Multi-Engine)
     // Global wallet summary across all 3 engines
     getGlobalWalletSummary: builder.query<GlobalWalletResponse, void>({
       query: () => '/api/wallets/global-summary',
@@ -62,6 +71,43 @@ export const walletApi = createApi({
       query: (userId) => `/api/wallets/${userId}`,
       providesTags: ['Wallet'],
     }),
+
+    // PERSONAL WALLET ENDPOINTS (Deposits/Transactions)
+    // Get user's personal wallet
+    getPersonalWallet: builder.query<WalletResponse, void>({
+      query: () => '/api/wallet',
+      providesTags: ['PersonalWallet'],
+    }),
+
+    // Initialize Paystack deposit
+    initializePaystackDeposit: builder.mutation<
+      PaystackInitializeResponse,
+      DepositInitializeRequest
+    >({
+      query: (body) => ({
+        url: '/api/wallet/paystack/initialize',
+        method: 'POST',
+        body,
+      }),
+    }),
+
+    // Verify Paystack payment and credit wallet
+    verifyPaystackDeposit: builder.mutation<
+      PaystackVerifyResponse,
+      { reference: string }
+    >({
+      query: ({ reference }) => ({
+        url: `/api/wallet/paystack/verify/${reference}`,
+        method: 'GET',
+      }),
+      invalidatesTags: ['PersonalWallet', 'WalletTransactions'],
+    }),
+
+    // Get wallet transactions
+    getWalletTransactions: builder.query<WalletTransactionResponse, void>({
+      query: () => '/api/wallet/transactions',
+      providesTags: ['WalletTransactions'],
+    }),
   }),
 });
 
@@ -69,4 +115,8 @@ export const walletApi = createApi({
 export const {
   useGetGlobalWalletSummaryQuery,
   useGetWalletQuery,
+  useGetPersonalWalletQuery,
+  useInitializePaystackDepositMutation,
+  useVerifyPaystackDepositMutation,
+  useGetWalletTransactionsQuery,
 } = walletApi;

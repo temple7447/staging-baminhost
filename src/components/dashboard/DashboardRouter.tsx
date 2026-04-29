@@ -10,6 +10,7 @@ import { VendorDashboard } from '@/components/dashboard/VendorDashboard';
 import { CustomerDashboard } from '@/components/dashboard/CustomerDashboard';
 import { TenantDashboard } from '@/components/dashboard/TenantDashboard';
 import { WalletDashboard } from '@/components/dashboard/WalletDashboard';
+import { WalletPage, DepositVerification } from '@/components/wallet';
 import { EstateManagement } from '@/components/dashboard/business/EstateManagement';
 import { EstateDetailPage } from '@/components/dashboard/business/EstateDetailPage';
 import { AddPropertyPage } from '@/components/dashboard/business/AddPropertyPage';
@@ -167,6 +168,48 @@ const DashboardRouter: React.FC = () => {
               requiredPermissions={['view_wallet']}
               feature="Wallet Dashboard"
               showUpgradePrompt={true}
+              viewName="wallet"
+            />
+          }
+        />
+
+        {/* Wallet - Full Page */}
+        <Route
+          path="/wallet/manage"
+          element={
+            <ProtectedRoute
+              element={<WalletPage />}
+              requiredPermissions={['view_wallet']}
+              feature="Wallet Management"
+              showUpgradePrompt={true}
+              viewName="wallet"
+            />
+          }
+        />
+
+        {/* Wallet - Deposit */}
+        <Route
+          path="/wallet/deposit"
+          element={
+            <ProtectedRoute
+              element={<WalletPage />}
+              requiredPermissions={['view_wallet']}
+              feature="Wallet Deposit"
+              showUpgradePrompt={true}
+              viewName="wallet"
+            />
+          }
+        />
+
+        {/* Wallet - Paystack Verification */}
+        <Route
+          path="/wallet/verify"
+          element={
+            <ProtectedRoute
+              element={<DepositVerification />}
+              requiredPermissions={['view_wallet']}
+              feature="Payment Verification"
+              showUpgradePrompt={false}
               viewName="wallet"
             />
           }
