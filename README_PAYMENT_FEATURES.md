@@ -57,15 +57,14 @@ SyntaxError: The requested module does not provide an export named 'Generator'
 ### 💰 Feature #2: Payment Gateway Integration - COMPLETE ✅
 
 **What It Does:**
-- Integrates Paystack payment gateway
-- Integrates Flutterwave payment gateway
+- Integrates Paystack payment gateway (only payment provider)
 - Supports multiple payment methods
 - Secure payment processing
 
 **Files Created:**
-- `src/services/paymentService.ts` (154 lines)
+- `src/services/paymentService.ts` (117 lines)
 
-**Supported Payment Methods:**
+**Supported Payment Methods (Paystack Only):**
 
 **Paystack:**
 - Card payments
@@ -73,18 +72,12 @@ SyntaxError: The requested module does not provide an export named 'Generator'
 - USSD
 - Mobile money
 
-**Flutterwave:**
-- Card payments
-- USSD
-- Mobile money
-- Bank transfers
-
 **How to Use:**
 1. Click "Pay Rent" or "Pay Now" on any bill
 2. Payment dialog opens
-3. Select payment method (Paystack or Flutterwave)
+3. Paystack payment processed
 4. Click "Pay Now"
-5. Redirected to payment provider
+5. Redirected to Paystack
 6. Complete payment
 7. Receipt generated automatically
 
@@ -116,7 +109,6 @@ npm install
 Create `.env.local` file:
 ```env
 VITE_PAYSTACK_PUBLIC_KEY=pk_test_your_key_here
-VITE_FLUTTERWAVE_PUBLIC_KEY=FLWPUBK_TEST_your_key_here
 ```
 
 See `.env.example` for template
@@ -128,13 +120,6 @@ See `.env.example` for template
 2. Sign up / Log in
 3. Go to Dashboard → Settings → Developer
 4. Copy Public Key (pk_test_... for testing)
-5. Paste in `.env.local`
-
-**Flutterwave:**
-1. Go to https://flutterwave.com
-2. Sign up / Log in
-3. Go to Dashboard → Settings → API Keys
-4. Copy Public Key (FLWPUBK_TEST_...)
 5. Paste in `.env.local`
 
 ### Step 4: Run the App
@@ -190,7 +175,6 @@ npm run dev
 | Icon Error Fix | ✅ Complete | TenantDashboard.tsx |
 | PDF Receipts | ✅ Complete | receiptGenerator.ts |
 | Paystack Integration | ✅ Complete | paymentService.ts |
-| Flutterwave Integration | ✅ Complete | paymentService.ts |
 | Payment Dialog UI | ✅ Complete | TenantDashboard.tsx |
 | Receipt Download | ✅ Complete | TenantDashboard.tsx |
 | Payment History | ✅ Complete | TenantDashboard.tsx |
@@ -212,14 +196,14 @@ npm run dev
 ## 🧪 Testing
 
 ### Test Mode
-- Use test keys (pk_test_..., FLWPUBK_TEST_...)
+- Use test keys (pk_test_...)
 - Use test card numbers (see PAYMENT_SETUP_GUIDE.md)
 - No real charges
 
 ### Test Checklist
 - [ ] Icon error is gone
 - [ ] Payment dialog opens
-- [ ] Can select Paystack or Flutterwave
+- [ ] Paystack payment method displayed
 - [ ] Amount displays correctly
 - [ ] Payment button works
 - [ ] Receipt generates
@@ -232,7 +216,7 @@ npm run dev
 ## 📂 Files Changed
 
 ### New Files (3 created):
-1. `src/services/paymentService.ts` - Payment gateway integration
+1. `src/services/paymentService.ts` - Paystack payment gateway integration
 2. `src/utils/receiptGenerator.ts` - PDF receipt generation
 3. `PAYMENT_SETUP_GUIDE.md` - Setup documentation
 4. `IMPLEMENTATION_SUMMARY.md` - Changes summary
@@ -240,7 +224,7 @@ npm run dev
 ### Modified Files (2 updated):
 1. `src/components/dashboard/TenantDashboard.tsx` - Icon fix, payment features
 2. `package.json` - Added dependencies
-3. `.env.example` - Added payment config
+3. `.env.example` - Added Paystack payment config
 
 ---
 
@@ -248,11 +232,10 @@ npm run dev
 
 1. **Get Payment Gateway Keys**
    - Paystack: https://paystack.com
-   - Flutterwave: https://flutterwave.com
 
 2. **Configure Environment**
    - Create `.env.local`
-   - Add API keys
+   - Add Paystack API key
 
 3. **Test in Development**
    - Run `npm run dev`
@@ -277,11 +260,6 @@ npm run dev
 - Docs: https://paystack.com/docs
 - Support: support@paystack.com
 
-### Flutterwave
-- Website: https://flutterwave.com
-- Docs: https://developer.flutterwave.com
-- Support: support@flutterwave.com
-
 ### jsPDF
 - Docs: https://github.com/parallax/jsPDF
 - Examples: https://jspdf.dev
@@ -296,8 +274,7 @@ npm run dev
 🎉 **All requested features implemented**
 - ✅ Fixed Generator icon error
 - ✅ Added PDF receipt generation
-- ✅ Integrated Paystack payment gateway
-- ✅ Integrated Flutterwave payment gateway
+- ✅ Integrated Paystack payment gateway (only payment provider)
 - ✅ Enhanced Tenant Dashboard UI
 - ✅ Added download receipt functionality
 - ✅ Professional error handling
@@ -308,12 +285,11 @@ npm run dev
 ## 🚀 Ready to Go!
 
 Your Tenant Dashboard now has:
-- ✅ **Functional payment processing**
+- ✅ **Functional payment processing (Paystack only)**
 - ✅ **Professional PDF receipts**
-- ✅ **Multiple payment methods**
 - ✅ **Modern, user-friendly UI**
 - ✅ **Complete error handling**
-- ✅ **Secure payment integration**
+- ✅ **Secure Paystack payment integration**
 
 **No more icon errors!** 🎊
 

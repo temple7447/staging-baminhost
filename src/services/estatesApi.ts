@@ -599,9 +599,6 @@ export const estatesApi = createApi({
         { type: 'Tenant' as const, id: tenantId },
       ],
     }),
-    verifyPayment: builder.query<{ success: boolean; message?: string; data?: any }, string>({
-      query: (reference) => `/api/payments/verify/${reference}`,
-    }),
     sendTenantReceipt: builder.mutation<{ success: boolean; message?: string }, string>({
       query: (tenantId) => ({
         url: `/api/payments/tenant/${tenantId}/receipt`,

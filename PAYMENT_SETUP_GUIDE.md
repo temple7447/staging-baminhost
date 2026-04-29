@@ -18,8 +18,7 @@ This guide covers the integration of payment processing and PDF receipt generati
 - Download individual receipts from payment history
 
 ### 2. **Payment Gateway Integration** ✅
-- **Paystack Integration** - Card, Bank Transfer, USSD
-- **Flutterwave Integration** - Card, USSD, Mobile Money
+- **Paystack Integration Only** - Card, Bank Transfer, USSD
 - Easy payment method selection UI
 - Secure payment processing
 
@@ -54,11 +53,8 @@ cp .env.example .env.local
 Then edit `.env.local`:
 
 ```env
-# Paystack Configuration
+# Paystack Configuration (Only Payment Provider)
 VITE_PAYSTACK_PUBLIC_KEY=pk_test_xxxxxxxxxxxxx
-
-# Flutterwave Configuration
-VITE_FLUTTERWAVE_PUBLIC_KEY=FLWPUBK_TEST-xxxxxxxxxxxxx
 ```
 
 ### Step 3: Get Payment Gateway Keys
@@ -70,23 +66,13 @@ VITE_FLUTTERWAVE_PUBLIC_KEY=FLWPUBK_TEST-xxxxxxxxxxxxx
 4. Copy your **Public Key** (pk_test_... for testing, pk_live_... for production)
 5. Paste in `.env.local`
 
-#### **Flutterwave Setup**
-1. Go to https://flutterwave.com
-2. Create an account and sign in
-3. Navigate to **Dashboard → Settings → API Keys**
-4. Copy your **Public Key** (FLWPUBK_TEST_... for testing, FLWPUBK_... for production)
-5. Paste in `.env.local`
-
 ### Step 4: Add Payment Script Tags (Optional)
 
-For production, ensure these scripts are loaded in your `index.html`:
+For production, ensure the Paystack script is loaded in your `index.html`:
 
 ```html
 <!-- Paystack -->
 <script src="https://js.paystack.co/v1/inline.js"></script>
-
-<!-- Flutterwave -->
-<script src="https://checkout.flutterwave.com/v3.js"></script>
 ```
 
 ---
@@ -99,8 +85,8 @@ For production, ensure these scripts are loaded in your `index.html`:
    - Navigate to the Tenant Dashboard
    - Click **"Pay Rent"** or **"Pay Now"** for any utility
 
-2. **Select Payment Method**
-   - Choose between **Paystack** or **Flutterwave**
+2. **Payment Processing**
+   - Paystack is the only payment method
    - Amount is automatically populated
 
 3. **Process Payment**
@@ -143,7 +129,7 @@ Content-Type: application/json
 
 {
   "reference": "payment_reference",
-  "provider": "paystack" | "flutterwave"
+  "provider": "paystack"
 }
 ```
 
@@ -227,16 +213,9 @@ Expiry: 12/25
 CVV: 853
 ```
 
-#### Flutterwave Test Card
-```
-Card Number: 5531 8866 5725 4957
-Expiry: 09/32
-CVV: 564
-```
-
 ### Manual Testing Checklist
 - [ ] Payment dialog opens correctly
-- [ ] Payment method selection works
+- [ ] Paystack payment processes without errors
 - [ ] Amount displays correctly
 - [ ] Payment processes without errors
 - [ ] Receipt generates successfully
@@ -289,7 +268,6 @@ npm run dev
 ## Support & Documentation
 
 - **Paystack Docs:** https://paystack.com/docs
-- **Flutterwave Docs:** https://developer.flutterwave.com
 - **jsPDF Docs:** https://github.com/parallax/jsPDF
 - **html2canvas Docs:** https://html2canvas.hertzen.com
 

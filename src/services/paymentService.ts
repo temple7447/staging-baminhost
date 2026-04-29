@@ -1,9 +1,9 @@
 /**
- * Payment Service - Handles payment gateway integration (Paystack & Flutterwave)
+ * Payment Service - Handles Paystack payment gateway integration only
  */
 
 export interface PaymentConfig {
-  provider: 'paystack' | 'flutterwave';
+  provider: 'paystack';
   email: string;
   amount: number;
   reference?: string;
@@ -78,82 +78,11 @@ export const paystackPayment = async (config: PaymentConfig): Promise<PaymentRes
 };
 
 /**
- * Flutterwave Payment Integration
- */
-export const flutterwavePayment = async (config: PaymentConfig): Promise<PaymentResponse> => {
-  const { email, amount, reference, metadata } = config;
-
-  // Get Flutterwave public key from environment
-  const flutterKey = import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY;
-
-  if (!flutterKey) {
-    throw new Error('Flutterwave public key not configured');
-  }
-
-  // Load Flutterwave script if not already loaded
-  if (!window.FlutterwaveCheckout) {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.flutterwave.com/v3.js';
-    script.async = true;
-    document.body.appendChild(script);
-
-    await new Promise((resolve) => {
-      script.onload = resolve;
-    });
-  }
-
-  return new Promise((resolve, reject) => {
-    window.FlutterwaveCheckout({
-      public_key: flutterKey,
-      tx_ref: reference || `flw_${Date.now()}`,
-      amount: amount,
-      currency: 'NGN',
-      payment_options: 'card,mobilemoney,ussd',
-      customer: {
-        email: email,
-        phonenumber: metadata?.phone,
-        name: metadata?.name,
-      },
-      customizations: {
-        title: 'BamiHustle - Rent Payment',
-        description: metadata?.description || 'Rent payment for your apartment',
-        logo: 'https://bamihustle.com/logo.png',
-      },
-      meta: {
-        tenant_id: metadata?.tenantId,
-        payment_type: metadata?.paymentType || 'rent',
-      },
-      onComplete: (response: any) => {
-        if (response.status === 'successful') {
-          resolve({
-            success: true,
-            reference: response.transaction_id,
-            message: 'Payment successful',
-            status: 'success',
-          });
-        } else {
-          reject(new Error('Payment failed'));
-        }
-      },
-      onClose: () => {
-        reject(new Error('Payment cancelled'));
-      },
-    });
-  });
-};
-
-/**
- * Process payment with selected provider
+ * Process payment - Paystack only
  */
 export const processPayment = async (config: PaymentConfig): Promise<PaymentResponse> => {
   try {
-    if (config.provider === 'paystack') {
-      return await paystackPayment(config);
-    } else if (config.provider === 'flutterwave') {
-      return await flutterwavePayment(config);
-    } else {
-      throw new Error('Unknown payment provider');
-    }
+    return await paystackPayment(config);
   } catch (error) {
     console.error('Payment error:', error);
     throw error;

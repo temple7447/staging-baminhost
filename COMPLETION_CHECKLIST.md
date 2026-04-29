@@ -29,28 +29,21 @@
 
 ### Feature 2: Payment Gateway Integration
 
-#### Paystack
+#### Paystack (Only Payment Provider)
 - ✅ Public key configuration
 - ✅ Payment method support (card, transfer, USSD)
 - ✅ Error handling
 - ✅ Reference generation
 - ✅ Test mode support
 
-#### Flutterwave
-- ✅ Public key configuration
-- ✅ Payment method support (card, USSD, mobile)
-- ✅ Error handling
-- ✅ Reference generation
-- ✅ Test mode support
-
-**File:** `src/services/paymentService.ts` (154 lines)
+**File:** `src/services/paymentService.ts` (117 lines)
 
 ### Feature 3: Enhanced UI Components
 
 #### Payment Dialog
 - ✅ Beautiful gradient design
 - ✅ Amount display
-- ✅ Method selection (Paystack/Flutterwave)
+- ✅ Paystack payment method
 - ✅ Security info
 - ✅ Loading states
 - ✅ Error handling
@@ -86,8 +79,7 @@ html2canvas@^1.4.1
 
 ### Environment Variables
 - ✅ `VITE_PAYSTACK_PUBLIC_KEY` configured
-- ✅ `VITE_FLUTTERWAVE_PUBLIC_KEY` configured
-- ✅ `.env.example` updated with templates
+- ✅ `.env.example` updated with template
 - ✅ Instructions provided
 
 **Next Step:** Create `.env.local` with your API keys
@@ -98,12 +90,11 @@ html2canvas@^1.4.1
 
 ### 1. Payment Service
 - **File:** `src/services/paymentService.ts`
-- **Lines:** 154
+- **Lines:** 117
 - **Exports:**
   - `PaymentConfig` interface
   - `PaymentResponse` interface
   - `paystackPayment()` function
-  - `flutterwavePayment()` function
   - `processPayment()` function
   - `verifyPayment()` function
 
@@ -154,7 +145,6 @@ html2canvas@^1.4.1
 - **File:** `.env.example`
 - **Changes:**
   - ✅ Added `VITE_PAYSTACK_PUBLIC_KEY`
-  - ✅ Added `VITE_FLUTTERWAVE_PUBLIC_KEY`
   - ✅ Added configuration instructions
 
 ---
@@ -205,12 +195,11 @@ html2canvas@^1.4.1
 1. **Payment Dialog**
    - [ ] Opens on "Pay Rent" click
    - [ ] Shows amount correctly
-   - [ ] Can select Paystack
-   - [ ] Can select Flutterwave
+   - [ ] Paystack payment method displayed
    - [ ] Shows loading on pay click
 
 2. **Payment Processing**
-   - [ ] Redirects to payment provider
+   - [ ] Redirects to Paystack
    - [ ] Handles payment success
    - [ ] Handles payment failure
    - [ ] Shows error messages
@@ -246,9 +235,8 @@ html2canvas@^1.4.1
 
 ### Immediate Next Steps
 1. Get Paystack API keys from https://paystack.com
-2. Get Flutterwave API keys from https://flutterwave.com
-3. Add keys to `.env.local`
-4. Test payment flows
+2. Add keys to `.env.local`
+3. Test payment flows
 
 ### Backend Integration
 1. Create `/api/payments/verify` endpoint
@@ -273,7 +261,6 @@ html2canvas@^1.4.1
 
 ### Payment Providers
 - **Paystack:** https://paystack.com/docs
-- **Flutterwave:** https://developer.flutterwave.com
 
 ### PDF Libraries
 - **jsPDF:** https://github.com/parallax/jsPDF
@@ -286,8 +273,7 @@ html2canvas@^1.4.1
 ✅ **Generator icon error FIXED**  
 ✅ **PDF receipt generation ADDED**  
 ✅ **Paystack integration ADDED**  
-✅ **Flutterwave integration ADDED**  
-✅ **Enhanced dashboard UI ADDED**  
+✅ **Enhanced dashboard UI ADDED**
 ✅ **Download receipt feature ADDED**  
 ✅ **Professional documentation PROVIDED**  
 

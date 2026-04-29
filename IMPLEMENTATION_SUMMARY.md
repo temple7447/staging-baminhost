@@ -52,17 +52,15 @@ generateReceiptImage(data: ReceiptData): Promise<void>
 
 ### 2. ✅ Payment Gateway Integration
 **Supported Providers:**
-- Paystack (Card, Bank Transfer, USSD)
-- Flutterwave (Card, USSD, Mobile Money)
+- Paystack (Card, Bank Transfer, USSD) - Only payment provider
 
 **Files Created:**
-- `src/services/paymentService.ts` - Payment gateway integration
+- `src/services/paymentService.ts` - Paystack payment gateway integration
 
 **Key Functions:**
 ```typescript
 processPayment(config: PaymentConfig): Promise<PaymentResponse>
 paystackPayment(config: PaymentConfig): Promise<PaymentResponse>
-flutterwavePayment(config: PaymentConfig): Promise<PaymentResponse>
 verifyPayment(reference: string, provider: string): Promise<any>
 ```
 
@@ -121,11 +119,10 @@ npm install
 **Environment Variables:** `.env.local`
 ```env
 VITE_PAYSTACK_PUBLIC_KEY=pk_test_xxxxx
-VITE_FLUTTERWAVE_PUBLIC_KEY=FLWPUBK_TEST_xxxxx
 ```
 
 **Configuration File:** `.env.example`
-- Updated with payment gateway key placeholders
+- Updated with Paystack payment gateway key placeholder
 - Instructions for obtaining keys
 
 ---
@@ -164,11 +161,11 @@ User clicks "Pay Rent"
      ↓
 Payment dialog opens
      ↓
-Select payment method (Paystack/Flutterwave)
+Paystack payment processed
      ↓
 Click "Pay" button
      ↓
-Process payment via selected provider
+Process payment via Paystack
      ↓
 Generate PDF receipt
      ↓
@@ -251,7 +248,7 @@ Trigger download
 
 ## 🎓 Next Steps for Backend Integration
 
-1. **Create Payment Verification Endpoint**
+1. **Create Paystack Payment Verification Endpoint**
    ```
    POST /api/payments/verify
    ```
@@ -263,7 +260,7 @@ Trigger download
 
 3. **Create Webhook Endpoint** (Optional but recommended)
    ```
-   POST /api/webhooks/payment
+   POST /api/webhooks/paystack
    ```
 
 4. **Create Payment History Endpoint**
@@ -285,11 +282,6 @@ Trigger download
 - Docs: https://paystack.com/docs
 - Email: support@paystack.com
 
-### Flutterwave Support
-- Website: https://flutterwave.com
-- Docs: https://developer.flutterwave.com
-- Email: support@flutterwave.com
-
 ### Setup Guide
 See `PAYMENT_SETUP_GUIDE.md` for detailed setup instructions
 
@@ -300,8 +292,7 @@ See `PAYMENT_SETUP_GUIDE.md` for detailed setup instructions
 **All requested features have been implemented:**
 - ✅ Fixed Generator icon error
 - ✅ Added PDF receipt generation with download
-- ✅ Integrated Paystack payment gateway
-- ✅ Integrated Flutterwave payment gateway
+- ✅ Integrated Paystack payment gateway (only provider)
 - ✅ Enhanced Tenant Dashboard UI
 - ✅ Added error handling and loading states
 - ✅ Professional receipt template

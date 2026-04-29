@@ -73,7 +73,6 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/components/providers/ToastProvider";
 import { useAuth } from "@/contexts/AuthContext";
-import { processPayment } from "@/services/paymentService";
 import { generateReceiptPDF } from "@/utils/receiptGenerator";
 import { useGetDashboardOverviewQuery, useGetMyBillingQuery, usePayBillingMutation } from "@/services/estatesApi";
 import { TENANT_DEMO_DATA } from "@/data/demoData";
@@ -87,6 +86,7 @@ import {
   useTransferToEstateMutation,
   useCreateTransactionMutation,
 } from "@/services";
+import { usePaystackDeposit } from "@/hooks/useWallet";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -155,12 +155,11 @@ export const TenantDashboard: React.FC = () => {
   const [paymentForm, setPaymentForm] = useState({ 
     type: "rent",
     amount: 0,
-    method: "paystack",
     month: ""
   });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [downloadingReceipt, setDownloadingReceipt] = useState<string | null>(null);
-  const [depositForm, setDepositForm] = useState({ amount: "", method: "bank_transfer" });
+  const [depositForm, setDepositForm] = useState({ amount: "" });
   const [withdrawForm, setWithdrawForm] = useState({ amount: "", description: "" });
   const [transferForm, setTransferForm] = useState({ amount: "", recipient: "", recipientAccount: "", bank: "", description: "" });
 
@@ -179,6 +178,9 @@ export const TenantDashboard: React.FC = () => {
   const [withdraw, { isLoading: isWithdrawing }] = useWithdrawMutation();
   const [transferToUser, { isLoading: isTransferringUser }] = useTransferToUserMutation();
   const [transferToEstate, { isLoading: isTransferringEstate }] = useTransferToEstateMutation();
+  
+  // Paystack Deposit Hook
+  const { initializeDeposit, isInitializing } = usePaystackDeposit();
 
   // Get API data
   const apiUser = overviewData?.data?.user;
@@ -235,7 +237,7 @@ export const TenantDashboard: React.FC = () => {
     : 30;
 
   const handlePayRent = () => {
-    setPaymentForm({ type: "rent", amount: tenantInfo.monthlyRent, method: "paystack", month: "Current Month" });
+    setPaymentForm({ type: "rent", amount: tenantInfo.monthlyRent, month: "Current Month" });
     setPaymentDialogOpen(true);
   };
 
@@ -271,7 +273,7 @@ export const TenantDashboard: React.FC = () => {
       } else {
         toast("Success: Payment received");
         setPaymentDialogOpen(false);
-        setPaymentForm({ type: "rent", amount: 0, method: "paystack", month: "" });
+        setPaymentForm({ type: "rent", amount: 0, month: "" });
       }
     } catch (error: any) {
       toast(error?.data?.message || "Error: Payment failed. Please try again");
@@ -341,7 +343,7 @@ export const TenantDashboard: React.FC = () => {
   };
 
   const handleOpenDeposit = () => {
-    setDepositForm({ amount: "", method: "bank_transfer" });
+    setDepositForm({ amount: "" });
     setDepositDialogOpen(true);
   };
 
@@ -361,14 +363,11 @@ export const TenantDashboard: React.FC = () => {
       return;
     }
     try {
-      const result = await deposit({
-        amount: parseFloat(depositForm.amount),
-        description: `Wallet deposit via ${depositForm.method}`,
-      }).unwrap();
-      toast(`Success: ₦${parseFloat(depositForm.amount).toLocaleString()} deposited to wallet`);
+      // Use Paystack for deposit (only payment method)
+      await initializeDeposit(parseFloat(depositForm.amount));
       setDepositDialogOpen(false);
-      setDepositForm({ amount: "", method: "bank_transfer" });
-      refetchWallet(); // Refresh wallet balance
+      setDepositForm({ amount: "" });
+      // Note: The redirect to Paystack happens in the hook
     } catch (error: any) {
       toast(`Error: ${error?.data?.message || "Deposit failed"}`);
     }
@@ -1238,7 +1237,7 @@ export const TenantDashboard: React.FC = () => {
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Make Payment</DialogTitle>
-            <DialogDescription>Select your payment method and complete the transaction</DialogDescription>
+            <DialogDescription>Complete your payment using Paystack</DialogDescription>
           </DialogHeader>
           
           <div className="space-y-6 py-4">
@@ -1251,42 +1250,11 @@ export const TenantDashboard: React.FC = () => {
               </p>
             </div>
 
-            {/* Payment Method Selection */}
-            <div>
-              <Label>Payment Method</Label>
-              <div className="grid grid-cols-3 gap-3 mt-2">
-                <div
-                  onClick={() => setPaymentForm({ ...paymentForm, method: "wallet" })}
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition ${
-                    paymentForm.method === "wallet"
-                      ? "border-green-600 bg-green-50 dark:bg-green-900/30"
-                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
-                  }`}
-                >
-                  <Wallet className={`h-6 w-6 mb-1 ${paymentForm.method === "wallet" ? "text-green-600" : "text-slate-500"}`} />
-                  <div className="font-semibold text-sm text-slate-900 dark:text-white">Wallet</div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Instant pay</p>
-                </div>
-                <div
-                  onClick={() => setPaymentForm({ ...paymentForm, method: "paystack" })}
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition ${
-                    paymentForm.method === "paystack"
-                      ? "border-blue-600 bg-blue-50 dark:bg-blue-900/30"
-                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
-                  }`}
-                >
-                  <CreditCard className={`h-6 w-6 mb-1 ${paymentForm.method === "paystack" ? "text-blue-600" : "text-slate-500"}`} />
-                  <div className="font-semibold text-sm text-slate-900 dark:text-white">Paystack</div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Card, Transfer</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Payment Info */}
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="ml-2">
-                A secure payment window will open after you click "Pay Now". Your payment is protected.
+            {/* Paystack Info */}
+            <Alert className="border-blue-200 bg-blue-50">
+              <AlertCircle className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="ml-2 text-blue-800">
+                You will be redirected to Paystack to complete your payment securely.
               </AlertDescription>
             </Alert>
           </div>
@@ -1325,38 +1293,37 @@ export const TenantDashboard: React.FC = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Deposit to Wallet</DialogTitle>
-            <DialogDescription>Add funds to your wallet balance</DialogDescription>
+            <DialogDescription>Add funds to your wallet using Paystack (Minimum: ₦100)</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <Label>Amount</Label>
+              <Label>Amount (NGN)</Label>
               <Input
                 type="number"
-                placeholder="Enter amount"
+                min="100"
+                placeholder="Enter amount (minimum ₦100)"
                 value={depositForm.amount}
-                onChange={(e) => setDepositForm({ ...depositForm, amount: e.target.value })}
+                onChange={(e) => setDepositForm({ amount: e.target.value })}
               />
+              {depositForm.amount && parseFloat(depositForm.amount) < 100 && (
+                <p className="text-xs text-red-600 mt-1">Minimum deposit is ₦100</p>
+              )}
             </div>
-            <div>
-              <Label>Payment Method</Label>
-              <Select
-                value={depositForm.method}
-                onValueChange={(value) => setDepositForm({ ...depositForm, method: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select method" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                  <SelectItem value="card">Debit/Credit Card</SelectItem>
-                  <SelectItem value="ussd">USSD</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-sm text-blue-800">
+                You will be redirected to Paystack to complete your payment securely.
+              </p>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDepositDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleDeposit}>Deposit</Button>
+            <Button 
+              onClick={handleDeposit}
+              disabled={!depositForm.amount || parseFloat(depositForm.amount) < 100 || isInitializing}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isInitializing ? "Processing..." : `Deposit ₦${depositForm.amount || '0'}`}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

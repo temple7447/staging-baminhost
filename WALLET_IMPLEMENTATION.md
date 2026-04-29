@@ -235,11 +235,13 @@ export function Dashboard() {
 
 Your backend should provide:
 ```
-POST   /api/wallet                           - Get user's wallet
-POST   /api/wallet/paystack/initialize       - Initialize deposit
-GET    /api/wallet/paystack/verify/:reference - Verify & credit wallet
-GET    /api/wallet/transactions              - Get transactions
+GET    /api/wallet                           - Get user's wallet
+POST   /api/wallet/paystack/initialize       - Initialize Paystack deposit (ONLY payment method)
+GET    /api/wallet/paystack/verify/:reference - Verify & credit wallet from Paystack
+GET    /api/wallet/transactions              - Get wallet transaction history
 ```
+
+⚠️ **NOTE:** Paystack is the ONLY supported deposit payment method. All deposits must go through the Paystack integration.
 
 Expected wallet response format:
 ```json

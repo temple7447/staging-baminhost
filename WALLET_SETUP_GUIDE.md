@@ -1,5 +1,11 @@
 # Wallet System - Setup & Configuration
 
+⚠️ **IMPORTANT: Paystack is the ONLY supported payment method for deposits.**
+
+No alternative payment methods (bank transfers, card payments, wallet transfers, etc.) are supported. All deposits must be processed through Paystack.
+
+---
+
 ## Backend Requirements
 
 Your backend API must expose these endpoints:
