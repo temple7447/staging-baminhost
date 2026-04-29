@@ -237,7 +237,6 @@ export const Big7Dashboard = () => {
       {/* Transactions */}
       <TransactionsPanel
         balance={big7Data.wallet.balance}
-        transactions={big7Data.wallet.transactions}
         formatCurrency={(amount: number) => `₦${amount.toLocaleString()}`}
         formatDate={(date: string) => new Date(date).toLocaleDateString('en-NG', { year: 'numeric', month: 'short', day: 'numeric' })}
         getStatusColor={(status: string) => {

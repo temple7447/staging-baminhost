@@ -555,7 +555,6 @@ export const VendorDashboard: React.FC = () => {
         <TabsContent value="transactions">
           <TransactionsPanel
             balance={vendorData.wallet.balance}
-            transactions={vendorData.transactions}
             formatCurrency={formatCurrency}
             formatDate={formatDate}
             getStatusColor={getStatusColor}

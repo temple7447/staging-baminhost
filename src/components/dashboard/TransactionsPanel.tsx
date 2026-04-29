@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ArrowDownRight, ArrowUpRight, Send, Loader2 } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { ArrowDownRight, ArrowUpRight, Send, Loader2, ChevronLeft, ChevronRight, Filter, X, Search } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,35 +13,81 @@ import { useAuth } from "@/contexts/AuthContext";
 interface Transaction {
   id: number | string;
   date: string;
+  createdAt?: string;
   description: string;
-  type: "deposit" | "withdraw" | "transfer";
+  type: "deposit" | "withdraw" | "withdrawal" | "transfer";
   amount: number;
   status: string;
-  reference: string;
+  reference?: string;
 }
 
 interface TransactionsPanelProps {
   balance: number;
-  transactions: Transaction[];
   formatCurrency: (amount: number) => string;
   formatDate: (date: string) => string;
   getStatusColor: (status: string) => string;
   onTransactionComplete?: () => void;
 }
 
-export const TransactionsPanel = ({ balance, transactions, formatCurrency, formatDate, getStatusColor, onTransactionComplete }: TransactionsPanelProps) => {
+export const TransactionsPanel = ({ balance, formatCurrency, formatDate, getStatusColor, onTransactionComplete }: TransactionsPanelProps) => {
   const { getToken } = useAuth();
   const { toast } = useToast();
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [transferDialogOpen, setTransferDialogOpen] = useState(false);
-  const [depositForm, setDepositForm] = useState({ amount: "", method: "bank_transfer" });
+  const [depositForm, setDepositForm] = useState({ amount: "", method: "bank_transfer", description: "" });
   const [withdrawForm, setWithdrawForm] = useState({ amount: "", accountName: "", accountNumber: "", bankName: "" });
-  const [transferForm, setTransferForm] = useState({ amount: "", recipientEmail: "", recipientType: "user" as "user" | "estate", recipientId: "" });
+  const [transferForm, setTransferForm] = useState({ amount: "", recipientEmail: "", recipientType: "user" as "user" | "estate", recipientId: "", description: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Transaction list state
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+  const [total, setTotal] = useState(0);
+  const [filters, setFilters] = useState({ type: "", status: "", search: "", startDate: "", endDate: "" });
+  const [showFilters, setShowFilters] = useState(false);
+
+  const fetchTransactions = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+      if (filters.type) params.append("type", filters.type);
+      if (filters.status) params.append("status", filters.status);
+      if (filters.search) params.append("search", filters.search);
+      if (filters.startDate) params.append("startDate", filters.startDate);
+      if (filters.endDate) params.append("endDate", filters.endDate);
+
+      const res = await fetch(`/api/wallet/transactions/list?${params}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to fetch transactions");
+      setTransactions(data.transactions || data.data || []);
+      setTotal(data.total || 0);
+    } catch (err: any) {
+      toast(err.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [page, limit, filters, getToken, toast]);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
+
+  const refreshTransactions = () => {
+    setPage(1);
+    fetchTransactions();
+    onTransactionComplete?.();
+  };
+
   const handleOpenDeposit = () => {
-    setDepositForm({ amount: "", method: "bank_transfer" });
+    setDepositForm({ amount: "", method: "bank_transfer", description: "" });
     setDepositDialogOpen(true);
   };
 
@@ -51,7 +97,7 @@ export const TransactionsPanel = ({ balance, transactions, formatCurrency, forma
   };
 
   const handleOpenTransfer = () => {
-    setTransferForm({ amount: "", recipientEmail: "", recipientType: "user", recipientId: "" });
+    setTransferForm({ amount: "", recipientEmail: "", recipientType: "user", recipientId: "", description: "" });
     setTransferDialogOpen(true);
   };
 
@@ -70,13 +116,14 @@ export const TransactionsPanel = ({ balance, transactions, formatCurrency, forma
       const res = await fetch("/api/wallet/transaction", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ type: "deposit", amount: parseFloat(depositForm.amount) }),
+        body: JSON.stringify({ type: "deposit", amount: parseFloat(depositForm.amount), ...(depositForm.description ? { description: depositForm.description } : {}) }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Deposit failed");
       toast(`${formatCurrency(parseFloat(depositForm.amount))} deposited to wallet`, "success");
       setDepositDialogOpen(false);
-      onTransactionComplete?.();
+      setDepositForm({ amount: "", method: "bank_transfer", description: "" });
+      refreshTransactions();
     } catch (err: any) {
       toast(err.message, "error");
     } finally {
@@ -122,7 +169,7 @@ export const TransactionsPanel = ({ balance, transactions, formatCurrency, forma
       if (!res.ok) throw new Error(data.message || "Withdrawal failed");
       toast(`${formatCurrency(amount)} withdrawal request submitted`, "success");
       setWithdrawDialogOpen(false);
-      onTransactionComplete?.();
+      refreshTransactions();
     } catch (err: any) {
       toast(err.message, "error");
     } finally {
@@ -160,19 +207,30 @@ export const TransactionsPanel = ({ balance, transactions, formatCurrency, forma
           recipientEmail: transferForm.recipientEmail,
           recipientType: transferForm.recipientType,
           ...(transferForm.recipientType === "estate" && transferForm.recipientId ? { recipientId: transferForm.recipientId } : {}),
+          ...(transferForm.description ? { description: transferForm.description } : {}),
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Transfer failed");
       toast(`${formatCurrency(amount)} transferred to ${transferForm.recipientEmail}`, "success");
       setTransferDialogOpen(false);
-      onTransactionComplete?.();
+      setTransferForm({ amount: "", recipientEmail: "", recipientType: "user", recipientId: "", description: "" });
+      refreshTransactions();
     } catch (err: any) {
       toast(err.message, "error");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const totalPages = Math.ceil(total / limit);
+
+  const clearFilters = () => {
+    setFilters({ type: "", status: "", search: "", startDate: "", endDate: "" });
+    setPage(1);
+  };
+
+  const hasActiveFilters = filters.type || filters.status || filters.search || filters.startDate || filters.endDate;
 
   return (
     <div className="space-y-6">
@@ -216,47 +274,148 @@ export const TransactionsPanel = ({ balance, transactions, formatCurrency, forma
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-slate-900 dark:text-white">Transaction History</CardTitle>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-slate-900 dark:text-white">Transaction History</CardTitle>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)}>
+                <Filter className="h-4 w-4 mr-1" />
+                Filters
+                {hasActiveFilters && <span className="ml-1 w-2 h-2 bg-blue-500 rounded-full" />}
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {transactions.length === 0 ? (
-              <p className="text-center text-slate-500 dark:text-slate-400 py-8">No transactions yet</p>
-            ) : (
-              transactions.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-4 border rounded-lg bg-slate-50 dark:bg-slate-800">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${
-                      transaction.type === "deposit" ? "bg-green-100 dark:bg-green-900/30" :
-                      transaction.type === "withdraw" ? "bg-red-100 dark:bg-red-900/30" :
-                      "bg-blue-100 dark:bg-blue-900/30"
-                    }`}>
-                      {transaction.type === "deposit" ? (
-                        <ArrowDownRight className="h-5 w-5 text-green-600 dark:text-green-400" />
-                      ) : transaction.type === "withdraw" ? (
-                        <ArrowUpRight className="h-5 w-5 text-red-600 dark:text-red-400" />
-                      ) : (
-                        <Send className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium text-slate-900 dark:text-white">{transaction.description}</p>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
-                        {formatDate(transaction.date)} • {transaction.reference}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className={`font-semibold ${
-                      transaction.type === "deposit" ? "text-green-600 dark:text-green-400" :
-                      "text-red-600 dark:text-red-400"
-                    }`}>
-                      {transaction.type === "deposit" ? "+" : "-"}{formatCurrency(transaction.amount)}
-                    </p>
-                    <Badge className={`${getStatusColor(transaction.status)}`}>{transaction.status}</Badge>
-                  </div>
+          {/* Search & Filters */}
+          <div className="space-y-3 mb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by description or reference..."
+                className="pl-10"
+                value={filters.search}
+                onChange={(e) => { setFilters({ ...filters, search: e.target.value }); setPage(1); }}
+              />
+            </div>
+
+            {showFilters && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                <div>
+                  <Label className="text-xs">Type</Label>
+                  <Select value={filters.type} onValueChange={(v) => { setFilters({ ...filters, type: v }); setPage(1); }}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="All types" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">All types</SelectItem>
+                      <SelectItem value="deposit">Deposit</SelectItem>
+                      <SelectItem value="withdrawal">Withdrawal</SelectItem>
+                      <SelectItem value="transfer">Transfer</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              ))
+                <div>
+                  <Label className="text-xs">Status</Label>
+                  <Select value={filters.status} onValueChange={(v) => { setFilters({ ...filters, status: v }); setPage(1); }}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="All status" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">All status</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="failed">Failed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-xs">From Date</Label>
+                  <Input type="date" className="mt-1" value={filters.startDate} onChange={(e) => { setFilters({ ...filters, startDate: e.target.value }); setPage(1); }} />
+                </div>
+                <div>
+                  <Label className="text-xs">To Date</Label>
+                  <Input type="date" className="mt-1" value={filters.endDate} onChange={(e) => { setFilters({ ...filters, endDate: e.target.value }); setPage(1); }} />
+                </div>
+                {hasActiveFilters && (
+                  <div className="sm:col-span-2 md:col-span-4">
+                    <Button variant="ghost" size="sm" onClick={clearFilters}>
+                      <X className="h-3 w-3 mr-1" />
+                      Clear filters
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-3">
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : transactions.length === 0 ? (
+              <p className="text-center text-slate-500 dark:text-slate-400 py-8">No transactions found</p>
+            ) : (
+              <>
+                {transactions.map((transaction) => (
+                  <div key={transaction.id} className="flex items-center justify-between p-4 border rounded-lg bg-slate-50 dark:bg-slate-800">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${
+                        transaction.type === "deposit" ? "bg-green-100 dark:bg-green-900/30" :
+                        transaction.type === "withdraw" || transaction.type === "withdrawal" ? "bg-red-100 dark:bg-red-900/30" :
+                        "bg-blue-100 dark:bg-blue-900/30"
+                      }`}>
+                        {transaction.type === "deposit" ? (
+                          <ArrowDownRight className="h-5 w-5 text-green-600 dark:text-green-400" />
+                        ) : transaction.type === "withdraw" || transaction.type === "withdrawal" ? (
+                          <ArrowUpRight className="h-5 w-5 text-red-600 dark:text-red-400" />
+                        ) : (
+                          <Send className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium text-slate-900 dark:text-white">{transaction.description}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          {formatDate(transaction.date || transaction.createdAt || "")} • {transaction.reference || `#${transaction.id}`}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className={`font-semibold ${
+                        transaction.type === "deposit" ? "text-green-600 dark:text-green-400" :
+                        "text-red-600 dark:text-red-400"
+                      }`}>
+                        {transaction.type === "deposit" ? "+" : "-"}{formatCurrency(transaction.amount)}
+                      </p>
+                      <Badge className={`${getStatusColor(transaction.status)}`}>{transaction.status}</Badge>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between pt-4 border-t">
+                    <p className="text-sm text-muted-foreground">
+                      Showing {((page - 1) * limit) + 1}-{Math.min(page * limit, total)} of {total}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Select value={String(limit)} onValueChange={(v) => { setLimit(Number(v)); setPage(1); }}>
+                        <SelectTrigger className="w-[80px] h-8"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="10">10</SelectItem>
+                          <SelectItem value="20">20</SelectItem>
+                          <SelectItem value="50">50</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <span className="text-sm font-medium">{page} / {totalPages}</span>
+                      <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </CardContent>
@@ -273,6 +432,10 @@ export const TransactionsPanel = ({ balance, transactions, formatCurrency, forma
             <div>
               <Label>Amount</Label>
               <Input type="number" placeholder="Enter amount" value={depositForm.amount} onChange={(e) => setDepositForm({ ...depositForm, amount: e.target.value })} />
+            </div>
+            <div>
+              <Label>Description (optional)</Label>
+              <Input placeholder="e.g., Monthly rent deposit" value={depositForm.description} onChange={(e) => setDepositForm({ ...depositForm, description: e.target.value })} />
             </div>
             <div>
               <Label>Payment Method</Label>
@@ -369,6 +532,10 @@ export const TransactionsPanel = ({ balance, transactions, formatCurrency, forma
             <div>
               <Label>Amount</Label>
               <Input type="number" placeholder="Enter amount" value={transferForm.amount} onChange={(e) => setTransferForm({ ...transferForm, amount: e.target.value })} />
+            </div>
+            <div>
+              <Label>Description (optional)</Label>
+              <Input placeholder="e.g., Payment for services" value={transferForm.description} onChange={(e) => setTransferForm({ ...transferForm, description: e.target.value })} />
             </div>
           </div>
           <DialogFooter>

@@ -831,7 +831,6 @@ export const CustomerDashboard = () => {
       {/* Transactions */}
       <TransactionsPanel
         balance={localCustomerData.customer.walletBalance}
-        transactions={localCustomerData.transactions}
         formatCurrency={(amount: number) => `₦${formatCurrency(amount)}`}
         formatDate={(dateString: string | null) => {
           if (!dateString) return 'N/A';
