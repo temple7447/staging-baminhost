@@ -48,7 +48,6 @@ import {
   Wallet,
   ArrowDownRight,
   ArrowUpRight,
-  Send,
   Landmark
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { NET_WORTH_DATA, BUSINESSES, WALLET_DATA, RECENT_TRANSACTIONS } from "@/data/demoData";
 import { useAuth } from "@/contexts/AuthContext";
+import { TransactionsPanel } from "./TransactionsPanel";
 import { 
   BarChart,
   LineChart,
@@ -30,6 +31,14 @@ export const ReportsDashboard = () => {
   const businesses = BUSINESSES;
   const netWorth = NET_WORTH_DATA;
   const walletData = WALLET_DATA.owner;
+
+  const reportTransactions = [
+    { id: 1, date: "2025-04-28", description: "Estate Rental Income - Balado", type: "deposit" as const, amount: 1440000, status: "completed", reference: "TXN-20250428-001" },
+    { id: 2, date: "2025-04-25", description: "Filling Station Revenue", type: "deposit" as const, amount: 850000, status: "completed", reference: "TXN-20250425-001" },
+    { id: 3, date: "2025-04-20", description: "Owner Withdrawal - Personal", type: "withdraw" as const, amount: 250000, status: "completed", reference: "TXN-20250420-001" },
+    { id: 4, date: "2025-04-15", description: "Operations - Estate Maintenance", type: "withdraw" as const, amount: 85000, status: "completed", reference: "TXN-20250415-001" },
+    { id: 5, date: "2025-04-10", description: "Equipment Rental Income", type: "deposit" as const, amount: 420000, status: "completed", reference: "TXN-20250410-001" }
+  ];
 
   // Calculate quarterly metrics
   const currentQuarter = {
@@ -533,6 +542,25 @@ export const ReportsDashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Transactions */}
+      <TransactionsPanel
+        balance={walletData.balance}
+        transactions={reportTransactions}
+        formatCurrency={(amount: number) => `₦${amount.toLocaleString()}`}
+        formatDate={(date: string) => new Date(date).toLocaleDateString('en-NG', { year: 'numeric', month: 'short', day: 'numeric' })}
+        getStatusColor={(status: string) => {
+          switch (status) {
+            case 'completed':
+            case 'paid':
+              return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+            case 'pending':
+              return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+            default:
+              return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200';
+          }
+        }}
+      />
     </div>
   );
 };
