@@ -1,143 +1,35 @@
 import { useState } from "react";
-import {
-  Home,
-  CreditCard,
-  Calendar,
-  AlertCircle,
-  CheckCircle,
-  Receipt,
-  Clock,
-  DollarSign,
-  FileText,
-  Wrench,
-  Lightbulb,
-  Droplets,
-  Shield,
-  SprayCan,
-  AirVent,
-  Users,
-  UserPlus,
-  Truck,
-  Package,
-  Bell,
-  FileWarning,
-  Building,
-  Key,
-  CalendarDays,
-  Phone,
-  MessageSquare,
-  Headphones,
-  AlertTriangle,
-  Zap,
-  Trash2,
-  Wifi,
-
-  Download,
-  Upload,
-  Eye,
-  ChevronRight,
-  MapPin,
-  Wallet,
-  Activity,
-  TrendingUp,
-  TrendingDown,
-  CheckSquare,
-  X,
-  Camera,
-  Video,
-  Image,
-  Search,
-  Filter,
-  MoreHorizontal,
-  Plus,
-  Car,
-  Loader,
-  ArrowUpRight,
-  ArrowDownRight,
-  Send,
-  ArrowLeftRight,
-  Landmark
-} from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, Loader, Calendar, Receipt, Wallet, CreditCard, Plus } from "lucide-react";
 import { useToast } from "@/components/providers/ToastProvider";
 import { useAuth } from "@/contexts/AuthContext";
-import { generateReceiptPDF } from "@/utils/receiptGenerator";
 import { useGetDashboardOverviewQuery, useGetMyBillingQuery, usePayBillingMutation } from "@/services/estatesApi";
 import { TENANT_DEMO_DATA } from "@/data/demoData";
 import {
   useGetWalletBalanceQuery,
-  useGetOwnTransactionsQuery,
-  useGetTransactionsListQuery,
   useDepositMutation,
   useWithdrawMutation,
   useTransferToUserMutation,
-  useTransferToEstateMutation,
-  useCreateTransactionMutation,
 } from "@/services";
 import { usePaystackDeposit } from "@/hooks/useWallet";
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "active":
-    case "paid":
-    case "completed":
-    case "approved":
-      return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border-green-200 dark:border-green-700";
-    case "pending":
-    case "in_progress":
-      return "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 border-yellow-200 dark:border-yellow-700";
-    case "expired":
-    case "overdue":
-      return "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border-red-200 dark:border-red-700";
-    default:
-      return "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700";
-  }
-};
-
-const getCategoryIcon = (category: string) => {
-  switch (category) {
-    case "plumbing":
-      return Droplets;
-    case "electrical":
-      return Zap;
-    case "ac_repair":
-      return AirVent;
-    case "security":
-      return Shield;
-    case "cleaning":
-      return SprayCan;
-    default:
-      return Wrench;
-  }
-};
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-    minimumFractionDigits: 0
-  }).format(amount);
-};
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("en-NG", {
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  });
-};
+// Import refactored components
+import { OverviewCards } from "./tenant/OverviewCards";
+import { WalletBalanceCard } from "./tenant/WalletBalanceCard";
+import { QuickActions } from "./tenant/QuickActions";
+import { NoticeCard } from "./tenant/NoticeCard";
+import { MaintenanceList } from "./tenant/MaintenanceList";
+import { BillingItemList } from "./tenant/BillingItemList";
+import { PaymentMethodSelector } from "./tenant/PaymentMethodSelector";
+import { PaymentSummary } from "./tenant/PaymentSummary";
+import { VisitorList } from "./tenant/VisitorList";
+import { DocumentList } from "./tenant/DocumentList";
+import { ComplaintList } from "./tenant/ComplaintList";
+import { formatCurrency, formatDate } from "./tenant/utils";
 
 export const TenantDashboard: React.FC = () => {
   const { user: authUser } = useAuth();
@@ -150,18 +42,18 @@ export const TenantDashboard: React.FC = () => {
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [transferDialogOpen, setTransferDialogOpen] = useState(false);
-  const [maintenanceForm, setMaintenanceForm] = useState({ title: "", category: "", description: "" });
-  const [visitorForm, setVisitorForm] = useState({ name: "", phone: "", purpose: "" });
   const [paymentForm, setPaymentForm] = useState({ 
     type: "rent",
     amount: 0,
     month: ""
   });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [downloadingReceipt, setDownloadingReceipt] = useState<string | null>(null);
   const [depositForm, setDepositForm] = useState({ amount: "" });
   const [withdrawForm, setWithdrawForm] = useState({ amount: "", description: "" });
   const [transferForm, setTransferForm] = useState({ amount: "", recipient: "", recipientAccount: "", bank: "", description: "" });
+  const [selectedBillingItems, setSelectedBillingItems] = useState<string[]>([]);
+  const [billingDialogOpen, setBillingDialogOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"wallet" | "paystack">("wallet");
 
   // Fetch dashboard overview from API
   const { data: overviewData, isLoading: overviewLoading } = useGetDashboardOverviewQuery();
@@ -170,14 +62,9 @@ export const TenantDashboard: React.FC = () => {
 
   // Wallet Transaction API Hooks
   const { data: walletResponse, isLoading: walletLoading, refetch: refetchWallet } = useGetWalletBalanceQuery();
-  const { data: ownTxResponse, isLoading: ownTxLoading } = useGetOwnTransactionsQuery();
-  const { data: transactionListResponse, isLoading: txListLoading } = useGetTransactionsListQuery({ page: 1, limit: 10 });
-  
-  // Mutations
   const [deposit, { isLoading: isDepositing }] = useDepositMutation();
   const [withdraw, { isLoading: isWithdrawing }] = useWithdrawMutation();
   const [transferToUser, { isLoading: isTransferringUser }] = useTransferToUserMutation();
-  const [transferToEstate, { isLoading: isTransferringEstate }] = useTransferToEstateMutation();
   
   // Paystack Deposit Hook
   const { initializeDeposit, isInitializing } = usePaystackDeposit();
@@ -186,18 +73,15 @@ export const TenantDashboard: React.FC = () => {
   const apiUser = overviewData?.data?.user;
   const apiApartment = overviewData?.data?.data?.apartment;
   const apiBilling = overviewData?.data?.data?.billing;
-  const apiPayments = overviewData?.data?.data?.payments;
   const billingItems = billingData?.data;
-
+  
   // Get Wallet Data from API
   const walletData = walletResponse?.data;
   const walletBalance = walletData?.balance || 0;
-  const ownTransactions = ownTxResponse?.data || [];
-  const transactionsList = transactionListResponse?.data || [];
 
   // Calculate totals from billing
-  const recurringTotal = billingItems?.recurring?.reduce((sum, item) => sum + item.amount, 0) || 0;
-  const oneTimeTotal = billingItems?.oneTime?.reduce((sum, item) => sum + item.amount, 0) || 0;
+  const recurringTotal = billingItems?.recurring?.reduce((sum: number, item: any) => sum + item.amount, 0) || 0;
+  const oneTimeTotal = billingItems?.oneTime?.reduce((sum: number, item: any) => sum + item.amount, 0) || 0;
   const totalDue = recurringTotal + oneTimeTotal;
 
   // Use API data or fallback to demo data
@@ -245,7 +129,6 @@ export const TenantDashboard: React.FC = () => {
     try {
       setIsProcessingPayment(true);
       
-      // Validate form
       if (!paymentForm.amount || paymentForm.amount <= 0) {
         toast("Error: Please enter a valid amount");
         return;
@@ -253,7 +136,6 @@ export const TenantDashboard: React.FC = () => {
 
       toast("Processing: Payment in progress...");
 
-      // Payment type to billing code mapping
       const paymentTypeMap: Record<string, string> = {
         'rent': 'rent',
         'service_charge': 'service_charge',
@@ -267,7 +149,6 @@ export const TenantDashboard: React.FC = () => {
         paymentType: paymentForm.type,
       }).unwrap();
 
-      // If there's an authorization URL, open it (Paystack redirect)
       if (result.authorizationUrl) {
         window.location.href = result.authorizationUrl;
       } else {
@@ -282,65 +163,89 @@ export const TenantDashboard: React.FC = () => {
     }
   };
 
-  const handleDownloadReceipt = async (paymentId: string) => {
+  const handleSelectBillingItem = (itemCode: string) => {
+    let newSelection = [...selectedBillingItems];
+
+    if (newSelection.includes(itemCode)) {
+      newSelection = newSelection.filter(item => item !== itemCode);
+      if (itemCode === "rent") {
+        newSelection = newSelection.filter(item => item !== "service_charge");
+      }
+    } else {
+      newSelection.push(itemCode);
+      if (itemCode === "rent" && !newSelection.includes("service_charge")) {
+        newSelection.push("service_charge");
+      }
+    }
+
+    setSelectedBillingItems(newSelection);
+  };
+
+  const calculateSelectedTotal = () => {
+    let total = 0;
+    const allItems = [...(billingItems?.recurring || []), ...(billingItems?.oneTime || [])];
+    allItems.forEach((item: any) => {
+      if (selectedBillingItems.includes(item.code)) {
+        total += item.amount;
+      }
+    });
+    return total;
+  };
+
+  const handlePaySelectedBilling = async () => {
     try {
-      setDownloadingReceipt(paymentId);
-      
-      // Find the payment in history
-      const payment = TENANT_DEMO_DATA.paymentHistory.find(p => p.id.toString() === paymentId);
-      if (!payment) {
-        toast("Error: Receipt not found");
+      if (selectedBillingItems.length === 0) {
+        toast("Error: Please select items to pay");
         return;
       }
 
-      await generateReceiptPDF({
-        receiptNumber: `RCP-${paymentId}-${Date.now()}`,
-        date: payment.date,
-        tenantName: tenantInfo.name,
-        tenantEmail: tenantInfo.email,
-        tenantPhone: tenantInfo.phone,
-        apartmentNumber: tenantInfo.apartmentNumber,
-        estateName: tenantInfo.estateName,
-        amount: payment.amount,
-        paymentType: 'rent',
-        paymentMethod: payment.method,
-        reference: `PAY-${paymentId}`,
-        status: payment.status as any,
-        month: payment.month,
-      });
+      const totalAmount = calculateSelectedTotal();
 
-      toast("Success: Receipt downloaded");
-    } catch (error) {
-      toast("Error: Failed to download receipt");
+      if (paymentMethod === "wallet" && totalAmount > walletBalance) {
+        toast(`Error: Insufficient wallet balance. You need ₦${(totalAmount - walletBalance).toLocaleString()} more`);
+        return;
+      }
+
+      setIsProcessingPayment(true);
+      toast("Processing: Payment in progress...");
+
+      if (paymentMethod === "wallet") {
+        // For wallet payments, send itemIds array format
+        const result = await payBilling({
+          itemIds: selectedBillingItems,
+          paymentMethod: "wallet",
+        }).unwrap();
+
+        toast("Success: Payment completed from your wallet");
+        setBillingDialogOpen(false);
+        setSelectedBillingItems([]);
+        refetchWallet();
+      } else {
+        // For Paystack payments, send the original format
+        const result = await payBilling({
+          billingCode: selectedBillingItems[0],
+          amount: totalAmount,
+          paymentType: selectedBillingItems.join(","),
+          paymentMethod: paymentMethod,
+        }).unwrap();
+
+        if (result.authorizationUrl) {
+          window.location.href = result.authorizationUrl;
+        } else {
+          toast("Success: Payment received");
+          setBillingDialogOpen(false);
+          setSelectedBillingItems([]);
+        }
+      }
+    } catch (error: any) {
+      toast(error?.data?.message || "Error: Payment failed. Please try again");
     } finally {
-      setDownloadingReceipt(null);
+      setIsProcessingPayment(false);
     }
   };
 
-  const handleReportMaintenance = () => {
-    setMaintenanceDialogOpen(true);
-  };
-
-  const handleSubmitMaintenance = () => {
-    toast("Success: Request Submitted");
-    setMaintenanceDialogOpen(false);
-    setMaintenanceForm({ title: "", category: "", description: "" });
-  };
-
-  const handleGenerateVisitorPass = () => {
-    setVisitorDialogOpen(true);
-  };
-
-  const handleSubmitVisitor = () => {
-    toast("Success: Visitor Pass Generated");
-    setVisitorDialogOpen(false);
-    setVisitorForm({ name: "", phone: "", purpose: "" });
-  };
-
-  const handleSubmitComplaint = () => {
-    toast("Success: Complaint Submitted");
-    setComplaintDialogOpen(false);
-  };
+  const handleReportMaintenance = () => setMaintenanceDialogOpen(true);
+  const handleGenerateVisitorPass = () => setVisitorDialogOpen(true);
 
   const handleOpenDeposit = () => {
     setDepositForm({ amount: "" });
@@ -363,11 +268,9 @@ export const TenantDashboard: React.FC = () => {
       return;
     }
     try {
-      // Use Paystack for deposit (only payment method)
       await initializeDeposit(parseFloat(depositForm.amount));
       setDepositDialogOpen(false);
       setDepositForm({ amount: "" });
-      // Note: The redirect to Paystack happens in the hook
     } catch (error: any) {
       toast(`Error: ${error?.data?.message || "Deposit failed"}`);
     }
@@ -384,19 +287,15 @@ export const TenantDashboard: React.FC = () => {
       return;
     }
     try {
-      const result = await withdraw({
+      await withdraw({
         amount,
         description: withdrawForm.description || "Wallet withdrawal",
-        bankDetails: {
-          accountName: "",
-          accountNumber: "",
-          bankName: "",
-        },
+        bankDetails: { accountName: "", accountNumber: "", bankName: "" },
       }).unwrap();
       toast(`Success: ₦${amount.toLocaleString()} withdrawal submitted`);
       setWithdrawDialogOpen(false);
       setWithdrawForm({ amount: "", description: "" });
-      refetchWallet(); // Refresh wallet balance
+      refetchWallet();
     } catch (error: any) {
       toast(`Error: ${error?.data?.message || "Withdrawal failed"}`);
     }
@@ -417,7 +316,7 @@ export const TenantDashboard: React.FC = () => {
       return;
     }
     try {
-      const result = await transferToUser({
+      await transferToUser({
         amount,
         recipientEmail: transferForm.recipient,
         description: transferForm.description || "Transfer to user",
@@ -425,18 +324,20 @@ export const TenantDashboard: React.FC = () => {
       toast(`Success: ₦${amount.toLocaleString()} transferred to ${transferForm.recipient}`);
       setTransferDialogOpen(false);
       setTransferForm({ amount: "", recipient: "", recipientAccount: "", bank: "", description: "" });
-      refetchWallet(); // Refresh wallet balance
+      refetchWallet();
     } catch (error: any) {
       toast(`Error: ${error?.data?.message || "Transfer failed"}`);
     }
   };
+
+  const allBillingItems = [...(billingItems?.recurring || []), ...(billingItems?.oneTime || [])];
 
   return (
     <div className="p-6 space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex flex-wrap w-full gap-1 dashboard-tabs-list">
           <TabsTrigger value="overview">Home</TabsTrigger>
-          <TabsTrigger value="payments">Rent</TabsTrigger>
+          <TabsTrigger value="billing">Billing</TabsTrigger>
           <TabsTrigger value="maintenance">Issues</TabsTrigger>
           <TabsTrigger value="visitors">Visitors</TabsTrigger>
           <TabsTrigger value="notices">Notices</TabsTrigger>
@@ -454,226 +355,167 @@ export const TenantDashboard: React.FC = () => {
                   <CardTitle className="text-2xl text-slate-900 dark:text-white">Welcome back, {firstName}!</CardTitle>
                   <CardDescription className="text-slate-600 dark:text-slate-400">Here's your home overview</CardDescription>
                 </div>
-                <Badge className={`${getStatusColor(tenantInfo.leaseStatus)} border`}>
+                <Badge className={`${tenantInfo.leaseStatus === "active" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"} border`}>
                   {tenantInfo.leaseStatus === "active" ? "Active Lease" : "Lease Expiring"}
                 </Badge>
               </div>
             </CardHeader>
-<CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 border">
-                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
-                    <Building className="h-4 w-4" />
-                    <span className="text-sm">Apartment</span>
-                  </div>
-                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{tenantInfo.apartmentNumber}</p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{tenantInfo.estateName}</p>
-                </div>
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 border">
-                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
-                    <Key className="h-4 w-4" />
-                    <span className="text-sm">Lease Ends</span>
-                  </div>
-                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{formatDate(tenantInfo.leaseEndDate)}</p>
-                  <p className="text-sm text-green-600 dark:text-green-400">{tenantInfo.leaseStatus}</p>
-                </div>
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 border">
-                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
-                    <Calendar className="h-4 w-4" />
-                    <span className="text-sm">Next Due</span>
-                  </div>
-                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{formatDate(tenantInfo.nextPaymentDue)}</p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{daysUntilRentDue} days</p>
-                </div>
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 border">
-                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
-                    <DollarSign className="h-4 w-4" />
-                    <span className="text-sm">Total Due</span>
-                  </div>
-                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{formatCurrency(totalDue)}</p>
-                  <p className="text-sm text-green-600 dark:text-green-400">{billingItems?.recurring?.length || 0} recurring</p>
-                </div>
-              </div>
+            <CardContent>
+              <OverviewCards 
+                tenantInfo={tenantInfo}
+                daysUntilRentDue={daysUntilRentDue}
+                totalDue={totalDue}
+                recurringCount={billingItems?.recurring?.length || 0}
+              />
+              
+              <WalletBalanceCard 
+                balance={walletBalance}
+                isLoading={walletLoading}
+                onDeposit={handleOpenDeposit}
+                onWithdraw={handleOpenWithdraw}
+                onTransfer={handleOpenTransfer}
+                isDepositing={isDepositing}
+                isWithdrawing={isWithdrawing}
+                isTransferring={isTransferringUser}
+              />
 
-              {/* Wallet Balance */}
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg p-4 border mb-6">
-                <div className="flex items-center justify-between flex-wrap gap-4">
-                  <div>
-                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-1">
-                      <Wallet className="h-5 w-5" />
-                      <span className="text-sm font-medium">Wallet Balance</span>
-                    </div>
-                    {walletLoading ? (
-                      <p className="text-3xl font-bold text-slate-900 dark:text-white">Loading...</p>
-                    ) : (
-                      <p className="text-3xl font-bold text-slate-900 dark:text-white">{formatCurrency(walletBalance)}</p>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={handleOpenDeposit} className="bg-green-600 hover:bg-green-700" disabled={isDepositing}>
-                      <ArrowDownRight className="h-4 w-4 mr-1" />
-                      {isDepositing ? "Depositing..." : "Deposit"}
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={handleOpenWithdraw} disabled={isWithdrawing}>
-                      <ArrowUpRight className="h-4 w-4 mr-1" />
-                      {isWithdrawing ? "Withdrawing..." : "Withdraw"}
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={handleOpenTransfer} disabled={isTransferringUser}>
-                      <Send className="h-4 w-4 mr-1" />
-                      {isTransferringUser ? "Transferring..." : "Transfer"}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                <Button onClick={handlePayRent} className="h-16 flex flex-col items-center gap-1">
-                  <CreditCard className="h-5 w-5" />
-                  <span className="text-xs">Pay Rent</span>
-                </Button>
-                <Button onClick={handleReportMaintenance} variant="outline" className="h-16 flex flex-col items-center gap-1">
-                  <Wrench className="h-5 w-5" />
-                  <span className="text-xs">Report Issue</span>
-                </Button>
-                <Button variant="outline" className="h-16 flex flex-col items-center gap-1">
-                  <Phone className="h-5 w-5" />
-                  <span className="text-xs">Contact Landlord</span>
-                </Button>
-                <Button onClick={handleGenerateVisitorPass} variant="outline" className="h-16 flex flex-col items-center gap-1">
-                  <UserPlus className="h-5 w-5" />
-                  <span className="text-xs">Visitor Pass</span>
-                </Button>
-              </div>
+              <QuickActions 
+                onPayRent={handlePayRent}
+                onReportMaintenance={handleReportMaintenance}
+                onGenerateVisitorPass={handleGenerateVisitorPass}
+              />
             </CardContent>
           </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg text-slate-900 dark:text-white">Recent Notices</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {TENANT_DEMO_DATA.notices.slice(0, 3).map((notice) => (
-                  <div key={notice.id} className="flex items-start gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                    <Bell className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-sm">{notice.title}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{notice.content}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{formatDate(notice.date)}</p>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
+            <NoticeCard notices={TENANT_DEMO_DATA.notices.slice(0, 3)} />
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg text-slate-900 dark:text-white">Maintenance Requests</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {TENANT_DEMO_DATA.maintenanceRequests.slice(0, 3).map((request) => {
-                  const Icon = getCategoryIcon(request.category);
-                  return (
-                    <div key={request.id} className="flex items-start gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                      <Icon className="h-5 w-5 text-orange-600 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="font-medium text-sm">{request.title}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="text-xs">
-                            {request.category.replace("_", " ")}
-                          </Badge>
-                          <Badge className={`text-xs ${getStatusColor(request.status)}`}>
-                            {request.status.replace("_", " ")}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+              <CardContent>
+                <MaintenanceList requests={TENANT_DEMO_DATA.maintenanceRequests.slice(0, 3)} />
               </CardContent>
             </Card>
           </div>
         </TabsContent>
 
-        <TabsContent value="payments" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg text-slate-900 dark:text-white">Monthly Rent</CardTitle>
-                <CardDescription>Current rent amount</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">{formatCurrency(tenantInfo.monthlyRent)}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">Due: {formatDate(tenantInfo.nextPaymentDue)}</p>
-                <Button className="w-full mt-4" onClick={handlePayRent}>Pay Rent</Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg text-slate-900 dark:text-white">Outstanding Balance</CardTitle>
-                <CardDescription>Amount due</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">{formatCurrency(tenantInfo.outstandingBalance)}</p>
-                {tenantInfo.outstandingBalance === 0 && (
-                  <p className="text-sm text-green-600 dark:text-green-400 mt-2">You're all caught up!</p>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg text-slate-900 dark:text-white">Service Charge</CardTitle>
-                <CardDescription>Monthly service charge</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">{formatCurrency(15000)}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">Due: {formatDate(tenantInfo.nextPaymentDue)}</p>
-                <Button variant="outline" className="w-full mt-4">Pay Service Charge</Button>
-              </CardContent>
-            </Card>
-          </div>
-
+        <TabsContent value="billing" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-slate-900 dark:text-white">Payment History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {apiPayments?.recentPayments?.length > 0 ? (
-                  apiPayments.recentPayments.map((payment: any, index: number) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                      <div className="flex-1">
-                        <p className="font-medium">{payment.description || payment.type}</p>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
-                          {formatDate(payment.date)} • {payment.method || 'Transfer'}
-                        </p>
-                      </div>
-                      <div className="text-right mr-4">
-                        <p className="font-semibold">{formatCurrency(payment.amount)}</p>
-                        <Badge className={getStatusColor(payment.status)}>{payment.status}</Badge>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-slate-500 dark:text-slate-400">
-                    <CreditCard className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p>No payment history yet</p>
-                  </div>
-                )}
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg text-slate-900 dark:text-white">Your Billing Items</CardTitle>
+                  <CardDescription>Select and pay for the services you use</CardDescription>
+                </div>
+                <Badge className="bg-blue-100 text-blue-800">Total Due: {formatCurrency(totalDue)}</Badge>
               </div>
-            </CardContent>
-          </Card>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Recurring Items */}
+              {billingItems?.recurring && billingItems.recurring.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                    Monthly Recurring Charges
+                  </h3>
+                  <BillingItemList 
+                    items={billingItems.recurring}
+                    selectedItems={selectedBillingItems}
+                    onToggleItem={handleSelectBillingItem}
+                    disabledItem="rent"
+                  />
+                </div>
+              )}
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="text-slate-900 dark:text-white">Auto-Payment Setup</CardTitle>
-                <CardDescription>Automatically pay rent on due date</CardDescription>
-              </div>
-              <Button variant="outline">Setup Auto-Pay</Button>
-            </CardHeader>
+              {/* One-Time Items */}
+              {billingItems?.oneTime && billingItems.oneTime.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                    <Receipt className="h-5 w-5 text-green-600" />
+                    One-Time Charges
+                  </h3>
+                  <BillingItemList 
+                    items={billingItems.oneTime}
+                    selectedItems={selectedBillingItems}
+                    onToggleItem={handleSelectBillingItem}
+                  />
+                </div>
+              )}
+
+              {/* Payment Summary & Method */}
+              {selectedBillingItems.length > 0 && (
+                <div className="space-y-4">
+                  <PaymentMethodSelector 
+                    paymentMethod={paymentMethod}
+                    onMethodChange={setPaymentMethod}
+                    walletBalance={walletBalance}
+                  />
+
+                  {paymentMethod === "wallet" && calculateSelectedTotal() > walletBalance && (
+                    <Alert className="border-red-200 bg-red-50">
+                      <AlertCircle className="h-4 w-4 text-red-600" />
+                      <AlertDescription className="ml-2 text-red-800">
+                        Insufficient wallet balance. You need ₦{((calculateSelectedTotal() - walletBalance)).toLocaleString()} more.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  <PaymentSummary 
+                    selectedItems={selectedBillingItems}
+                    allItems={allBillingItems}
+                    totalAmount={calculateSelectedTotal()}
+                  />
+
+                  <Button
+                    onClick={handlePaySelectedBilling}
+                    disabled={
+                      selectedBillingItems.length === 0 ||
+                      isProcessingPayment ||
+                      (paymentMethod === "wallet" && calculateSelectedTotal() > walletBalance)
+                    }
+                    className="w-full bg-green-600 hover:bg-green-700 h-12"
+                  >
+                    {isProcessingPayment ? (
+                      <>
+                        <Loader className="h-4 w-4 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        {paymentMethod === "wallet" ? (
+                          <>
+                            <Wallet className="h-5 w-5 mr-2" />
+                            Pay {formatCurrency(calculateSelectedTotal())} from Wallet
+                          </>
+                        ) : (
+                          <>
+                            <CreditCard className="h-5 w-5 mr-2" />
+                            Pay {formatCurrency(calculateSelectedTotal())} with Paystack
+                          </>
+                        )}
+                      </>
+                    )}
+                  </Button>
+
+                  {selectedBillingItems.includes("rent") && selectedBillingItems.includes("service_charge") && (
+                    <Alert className="border-blue-200 bg-blue-50">
+                      <AlertCircle className="h-4 w-4 text-blue-600" />
+                      <AlertDescription className="ml-2 text-blue-800">
+                        Service Charge is automatically included with your rent payment as per your lease agreement.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              )}
+
+              {selectedBillingItems.length === 0 && (
+                <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+                  <Receipt className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p>Select items above to proceed with payment</p>
+                </div>
+              )}
+            </CardContent>
           </Card>
         </TabsContent>
 
@@ -695,47 +537,8 @@ export const TenantDashboard: React.FC = () => {
               <CardTitle className="text-slate-900 dark:text-white">Your Requests</CardTitle>
               <CardDescription>{TENANT_DEMO_DATA.maintenanceRequests.length} requests</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {TENANT_DEMO_DATA.maintenanceRequests.map((request) => {
-                const Icon = getCategoryIcon(request.category);
-                return (
-                  <div key={request.id} className="p-4 border rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="bg-orange-100 p-2 rounded-lg">
-                        <Icon className="h-5 w-5 text-orange-600" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className="font-medium">{request.title}</p>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">
-                              Category: {request.category.replace("_", " ")} •{" "}
-                              Submitted: {formatDate(request.createdAt)}
-                            </p>
-                          </div>
-                          <Badge className={`${getStatusColor(request.status)}`}>
-                            {request.status.replace("_", " ")}
-                          </Badge>
-                        </div>
-                        {request.assignedTo && (
-                          <div className="mt-3 pt-3 border-t">
-                            <p className="text-sm">
-                              <span className="text-slate-500 dark:text-slate-400">Assigned Technician: </span>
-                              <span className="font-medium">{request.assignedTo}</span>
-                            </p>
-                            {request.estimatedCompletion && (
-                              <p className="text-sm">
-                                <span className="text-slate-500 dark:text-slate-400">Est. Completion: </span>
-                                <span className="font-medium">{formatDate(request.estimatedCompletion)}</span>
-                              </p>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+            <CardContent>
+              <MaintenanceList requests={TENANT_DEMO_DATA.maintenanceRequests} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -758,23 +561,11 @@ export const TenantDashboard: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-slate-900 dark:text-white">Pending Approvals</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {TENANT_DEMO_DATA.visitors
-                .filter((v) => v.status === "pending")
-                .map((visitor) => (
-                  <div key={visitor.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <p className="font-medium">{visitor.name}</p>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
-                        {visitor.phone} • {visitor.purpose}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm">Approve</Button>
-                      <Button size="sm" variant="outline">Reject</Button>
-                    </div>
-                  </div>
-                ))}
+            <CardContent>
+              <VisitorList 
+                visitors={TENANT_DEMO_DATA.visitors}
+                showPendingActions={true}
+              />
             </CardContent>
           </Card>
 
@@ -782,56 +573,14 @@ export const TenantDashboard: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-slate-900 dark:text-white">Visitor History</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {TENANT_DEMO_DATA.visitors.map((visitor) => (
-                <div key={visitor.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                  <div>
-                    <p className="font-medium">{visitor.name}</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                      Expected: {formatDate(visitor.expectedArrival)} • {visitor.purpose}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <Badge className={`${getStatusColor(visitor.status)}`}>
-                      {visitor.status}
-                    </Badge>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{visitor.accessCode}</p>
-                  </div>
-                </div>
-              ))}
+            <CardContent>
+              <VisitorList visitors={TENANT_DEMO_DATA.visitors} />
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="notices" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-slate-900 dark:text-white">Estate Notices & Announcements</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {TENANT_DEMO_DATA.notices.map((notice) => (
-                <div key={notice.id} className="p-4 border rounded-lg">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3">
-                      {notice.type === "important" ? (
-                        <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
-                      ) : notice.type === "event" ? (
-                        <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                      ) : (
-                        <Bell className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                      )}
-                      <div>
-                        <p className="font-medium">{notice.title}</p>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">{notice.content}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">{formatDate(notice.date)}</p>
-                      </div>
-                    </div>
-                    <Badge variant="outline">{notice.type}</Badge>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          <NoticeCard notices={TENANT_DEMO_DATA.notices} />
         </TabsContent>
 
         <TabsContent value="documents" className="space-y-6">
@@ -839,22 +588,8 @@ export const TenantDashboard: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-slate-900 dark:text-white">Your Documents</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {TENANT_DEMO_DATA.documents.map((doc) => (
-                <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    <div>
-                      <p className="font-medium">{doc.name}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{formatDate(doc.date)}</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-1" />
-                    Download
-                  </Button>
-                </div>
-              ))}
+            <CardContent>
+              <DocumentList documents={TENANT_DEMO_DATA.documents} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -877,568 +612,12 @@ export const TenantDashboard: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-slate-900 dark:text-white">Complaint History</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {TENANT_DEMO_DATA.complaints.map((complaint) => (
-                <div key={complaint.id} className="p-4 border rounded-lg">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="font-medium">{complaint.title}</p>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
-                        {complaint.category} • Submitted: {formatDate(complaint.createdAt)}
-                      </p>
-                    </div>
-                    <Badge className={`${getStatusColor(complaint.status)}`}>{complaint.status}</Badge>
-                  </div>
-                  {complaint.response && (
-                    <div className="mt-3 pt-3 border-t">
-                      <p className="text-sm">
-                        <span className="text-slate-500 dark:text-slate-400">Response: </span>
-                        {complaint.response}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-slate-900 dark:text-white">Contact Support</CardTitle>
-            </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <Button variant="outline" className="h-16 flex flex-col items-center gap-1">
-                  <MessageSquare className="h-5 w-5" />
-                  <span className="text-xs">Chat Support</span>
-                </Button>
-                <Button variant="outline" className="h-16 flex flex-col items-center gap-1">
-                  <Phone className="h-5 w-5" />
-                  <span className="text-xs">Call Manager</span>
-                </Button>
-                <Button variant="outline" className="h-16 flex flex-col items-center gap-1">
-                  <Headphones className="h-5 w-5" />
-                  <span className="text-xs">Emergency</span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="utilities" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-2">
-                <Droplets className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <CardTitle className="text-lg text-slate-900 dark:text-white">Water Bill</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold">{formatCurrency(5000)}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Due: May 2025</p>
-                <Button className="w-full mt-4" variant="outline">Pay Now</Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-2">
-                <Zap className="h-5 w-5 text-yellow-600" />
-                <CardTitle className="text-lg text-slate-900 dark:text-white">Electricity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold">{formatCurrency(12000)}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Due: May 2025</p>
-                <Button className="w-full mt-4" variant="outline">Pay Now</Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-2">
-                <Trash2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-                <CardTitle className="text-lg text-slate-900 dark:text-white">Waste Management</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold">{formatCurrency(2000)}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Due: May 2025</p>
-                <Button className="w-full mt-4" variant="outline">Pay Now</Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-2">
-                <Car className="h-5 w-5 text-orange-600" />
-                <CardTitle className="text-lg text-slate-900 dark:text-white">Generator Levy</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold">{formatCurrency(8000)}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Due: May 2025</p>
-                <Button className="w-full mt-4" variant="outline">Pay Now</Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-slate-900 dark:text-white">Utility Payment History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {TENANT_DEMO_DATA.serviceCharges.map((charge) => (
-                  <div key={charge.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                    <div>
-                      <p className="font-medium">{charge.type}</p>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">{charge.month}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold">{formatCurrency(charge.amount)}</p>
-                      <Badge className={`${getStatusColor(charge.status)}`}>{charge.status}</Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="transactions" className="space-y-6">
-          {/* Wallet Balance Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-slate-900 dark:text-white">My Wallet</CardTitle>
-              <CardDescription>Manage your wallet balance and transactions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg p-6 border">
-                <div className="flex items-center justify-between flex-wrap gap-4">
-                  <div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Available Balance</p>
-                    {walletLoading ? (
-                      <p className="text-4xl font-bold text-slate-900 dark:text-white">Loading...</p>
-                    ) : (
-                      <p className="text-4xl font-bold text-slate-900 dark:text-white">{formatCurrency(walletBalance)}</p>
-                    )}
-                  </div>
-                  <div className="flex gap-3">
-                    <Button onClick={handleOpenDeposit} className="bg-green-600 hover:bg-green-700" disabled={isDepositing}>
-                      <ArrowDownRight className="h-4 w-4 mr-2" />
-                      {isDepositing ? "Depositing..." : "Deposit"}
-                    </Button>
-                    <Button variant="outline" onClick={handleOpenWithdraw} disabled={isWithdrawing}>
-                      <ArrowUpRight className="h-4 w-4 mr-2" />
-                      {isWithdrawing ? "Withdrawing..." : "Withdraw"}
-                    </Button>
-                    <Button variant="outline" onClick={handleOpenTransfer} disabled={isTransferringUser}>
-                      <Send className="h-4 w-4 mr-2" />
-                      {isTransferringUser ? "Transferring..." : "Transfer"}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Transaction History */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-slate-900 dark:text-white">Transaction History</CardTitle>
-              <CardDescription>Recent transactions on your wallet</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {txListLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader className="h-6 w-6 animate-spin text-slate-500" />
-                </div>
-              ) : transactionsList.length > 0 ? (
-                <div className="space-y-3">
-                  {transactionsList.map((transaction: any) => (
-                    <div key={transaction._id} className="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${
-                          transaction.type === "deposit" ? "bg-green-100 dark:bg-green-900/30" :
-                          transaction.type === "withdraw" ? "bg-red-100 dark:bg-red-900/30" :
-                          "bg-blue-100 dark:bg-blue-900/30"
-                        }`}>
-                          {transaction.type === "deposit" ? (
-                            <ArrowDownRight className="h-5 w-5 text-green-600 dark:text-green-400" />
-                          ) : transaction.type === "withdraw" ? (
-                            <ArrowUpRight className="h-5 w-5 text-red-600 dark:text-red-400" />
-                          ) : (
-                            <Send className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium text-slate-900 dark:text-white">{transaction.description || transaction.type}</p>
-                          <p className="text-sm text-slate-500 dark:text-slate-400">
-                            {new Date(transaction.createdAt).toLocaleDateString()} • {transaction.reference}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className={`font-semibold ${
-                          transaction.type === "deposit" ? "text-green-600 dark:text-green-400" :
-                          "text-red-600 dark:text-red-400"
-                        }`}>
-                          {transaction.type === "deposit" ? "+" : "-"}{formatCurrency(transaction.amount)}
-                        </p>
-                        <Badge className={`text-xs ${getStatusColor(transaction.status)}`}>
-                          {transaction.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-slate-500 dark:text-slate-400">No transactions yet</p>
-                </div>
-              )}
+              <ComplaintList complaints={TENANT_DEMO_DATA.complaints} />
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
-
-      <Dialog open={maintenanceDialogOpen} onOpenChange={setMaintenanceDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Submit Maintenance Request</DialogTitle>
-            <DialogDescription>Describe the issue you need fixed</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label>Issue Title</Label>
-              <Input
-                placeholder="e.g., Leaking faucet in kitchen"
-                value={maintenanceForm.title}
-                onChange={(e) => setMaintenanceForm({ ...maintenanceForm, title: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Category</Label>
-              <Select
-                value={maintenanceForm.category}
-                onValueChange={(value) => setMaintenanceForm({ ...maintenanceForm, category: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="plumbing">Plumbing</SelectItem>
-                  <SelectItem value="electrical">Electrical</SelectItem>
-                  <SelectItem value="ac_repair">AC Repair</SelectItem>
-                  <SelectItem value="security">Security</SelectItem>
-                  <SelectItem value="cleaning">Cleaning</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Description</Label>
-              <Textarea
-                placeholder="Describe the issue in detail..."
-                value={maintenanceForm.description}
-                onChange={(e) => setMaintenanceForm({ ...maintenanceForm, description: e.target.value })}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setMaintenanceDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSubmitMaintenance}>Submit Request</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={visitorDialogOpen} onOpenChange={setVisitorDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Generate Visitor Pass</DialogTitle>
-            <DialogDescription>Create a temporary access code for your visitor</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label>Visitor Name</Label>
-              <Input
-                placeholder="Enter visitor name"
-                value={visitorForm.name}
-                onChange={(e) => setVisitorForm({ ...visitorForm, name: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Phone Number</Label>
-              <Input
-                placeholder="Enter phone number"
-                value={visitorForm.phone}
-                onChange={(e) => setVisitorForm({ ...visitorForm, phone: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Purpose of Visit</Label>
-              <Select
-                value={visitorForm.purpose}
-                onValueChange={(value) => setVisitorForm({ ...visitorForm, purpose: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select purpose" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Family Visit">Family Visit</SelectItem>
-                  <SelectItem value="Friend Visit">Friend Visit</SelectItem>
-                  <SelectItem value="Package Delivery">Package Delivery</SelectItem>
-                  <SelectItem value="Business">Business</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setVisitorDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSubmitVisitor}>Generate Pass</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={complaintDialogOpen} onOpenChange={setComplaintDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Submit Complaint</DialogTitle>
-            <DialogDescription>We're sorry you're experiencing issues</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label>Complaint Title</Label>
-              <Input placeholder="e.g., Noise disturbance" />
-            </div>
-            <div>
-              <Label>Category</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="noise">Noise</SelectItem>
-                  <SelectItem value="neighbor">Neighbor Issue</SelectItem>
-                  <SelectItem value="security">Security</SelectItem>
-                  <SelectItem value="management">Management</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Description</Label>
-              <Textarea placeholder="Describe the issue in detail..." />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setComplaintDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSubmitComplaint}>Submit Complaint</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Make Payment</DialogTitle>
-            <DialogDescription>Complete your payment using Paystack</DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-6 py-4">
-            {/* Amount Display */}
-            <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg border">
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Amount to Pay</p>
-              <p className="text-3xl font-bold text-green-600 dark:text-green-400">{formatCurrency(paymentForm.amount)}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                Payment Type: <span className="font-semibold">{paymentForm.type.replace(/_/g, ' ').toUpperCase()}</span>
-              </p>
-            </div>
-
-            {/* Paystack Info */}
-            <Alert className="border-blue-200 bg-blue-50">
-              <AlertCircle className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="ml-2 text-blue-800">
-                You will be redirected to Paystack to complete your payment securely.
-              </AlertDescription>
-            </Alert>
-          </div>
-
-          <DialogFooter className="gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setPaymentDialogOpen(false)}
-              disabled={isProcessingPayment}
-            >
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleProcessPayment}
-              disabled={isProcessingPayment || paymentForm.amount <= 0}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              {isProcessingPayment ? (
-                <>
-                  <Loader className="h-4 w-4 mr-2 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Pay {formatCurrency(paymentForm.amount)}
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Deposit Dialog */}
-      <Dialog open={depositDialogOpen} onOpenChange={setDepositDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Deposit to Wallet</DialogTitle>
-            <DialogDescription>Add funds to your wallet using Paystack (Minimum: ₦100)</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label>Amount (NGN)</Label>
-              <Input
-                type="number"
-                min="100"
-                placeholder="Enter amount (minimum ₦100)"
-                value={depositForm.amount}
-                onChange={(e) => setDepositForm({ amount: e.target.value })}
-              />
-              {depositForm.amount && parseFloat(depositForm.amount) < 100 && (
-                <p className="text-xs text-red-600 mt-1">Minimum deposit is ₦100</p>
-              )}
-            </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-sm text-blue-800">
-                You will be redirected to Paystack to complete your payment securely.
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDepositDialogOpen(false)}>Cancel</Button>
-            <Button 
-              onClick={handleDeposit}
-              disabled={!depositForm.amount || parseFloat(depositForm.amount) < 100 || isInitializing}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              {isInitializing ? "Processing..." : `Deposit ₦${depositForm.amount || '0'}`}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Withdraw Dialog */}
-      <Dialog open={withdrawDialogOpen} onOpenChange={setWithdrawDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Withdraw from Wallet</DialogTitle>
-            <DialogDescription>Withdraw funds to your bank account</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
-              <p className="text-sm text-slate-500 dark:text-slate-400">Available Balance</p>
-              <p className="text-2xl font-bold">{walletLoading ? "Loading..." : formatCurrency(walletBalance)}</p>
-            </div>
-            <div>
-              <Label>Amount</Label>
-              <Input
-                type="number"
-                placeholder="Enter amount"
-                value={withdrawForm.amount}
-                onChange={(e) => setWithdrawForm({ ...withdrawForm, amount: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Description</Label>
-              <Input
-                placeholder="e.g., Withdrawal to bank account"
-                value={withdrawForm.description}
-                onChange={(e) => setWithdrawForm({ ...withdrawForm, description: e.target.value })}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setWithdrawDialogOpen(false)} disabled={isWithdrawing}>Cancel</Button>
-            <Button onClick={handleWithdraw} disabled={isWithdrawing}>
-              {isWithdrawing ? "Processing..." : "Withdraw"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Transfer Dialog */}
-      <Dialog open={transferDialogOpen} onOpenChange={setTransferDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Transfer Funds</DialogTitle>
-            <DialogDescription>Send money to another user</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
-              <p className="text-sm text-slate-500 dark:text-slate-400">Available Balance</p>
-              <p className="text-2xl font-bold">{walletLoading ? "Loading..." : formatCurrency(walletBalance)}</p>
-            </div>
-            <div>
-              <Label>Recipient Name/Email</Label>
-              <Input
-                placeholder="Enter recipient email"
-                value={transferForm.recipient}
-                onChange={(e) => setTransferForm({ ...transferForm, recipient: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Account Number</Label>
-              <Input
-                placeholder="Enter account number"
-                value={transferForm.recipientAccount}
-                onChange={(e) => setTransferForm({ ...transferForm, recipientAccount: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Bank</Label>
-              <Select
-                value={transferForm.bank}
-                onValueChange={(value) => setTransferForm({ ...transferForm, bank: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select bank" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="gtb">GTBank</SelectItem>
-                  <SelectItem value="first">First Bank</SelectItem>
-                  <SelectItem value="uba">UBA</SelectItem>
-                  <SelectItem value="zenith">Zenith Bank</SelectItem>
-                  <SelectItem value="access">Access Bank</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Amount</Label>
-              <Input
-                type="number"
-                placeholder="Enter amount"
-                value={transferForm.amount}
-                onChange={(e) => setTransferForm({ ...transferForm, amount: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Description (optional)</Label>
-              <Input
-                placeholder="Transfer description"
-                value={transferForm.description}
-                onChange={(e) => setTransferForm({ ...transferForm, description: e.target.value })}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setTransferDialogOpen(false)} disabled={isTransferringUser}>Cancel</Button>
-            <Button onClick={handleTransfer} disabled={isTransferringUser}>
-              {isTransferringUser ? "Processing..." : "Transfer"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

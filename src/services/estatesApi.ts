@@ -537,8 +537,15 @@ export const estatesApi = createApi({
       query: (reference) => `/api/payments/verify/${reference}`,
       providesTags: (result, error, reference) => [{ type: 'Payment', id: reference }],
     }),
-    payBilling: builder.mutation<{ success: boolean; data: { authorizationUrl?: string; reference: string; amount: number } }, { billingCode: string; amount: number; paymentType: string }>({
-      query: ({ billingCode, amount, paymentType }) => ({ url: '/api/tenants/me/billing/pay', method: 'POST', body: { billingCode, amount, paymentType } }),
+    payBilling: builder.mutation<
+      { success: boolean; data: { authorizationUrl?: string; reference: string; amount: number } },
+      { billingCode?: string; amount?: number; paymentType?: string; itemIds?: string[]; paymentMethod?: string }
+    >({
+      query: (body) => ({ 
+        url: '/api/tenants/me/billing/pay', 
+        method: 'POST', 
+        body 
+      }),
       invalidatesTags: (result, error) => [{ type: 'Tenant', id: 'ME' }],
     }),
     // Vacant units for an estate
