@@ -814,9 +814,13 @@ export const estatesApi = createApi({
         { type: 'EstateList', id: 'LIST' },
       ],
     }),
-    deleteEstate: builder.mutation<{ success?: boolean }, string>({
-      query: (id) => ({ url: `/api/estates/${id}`, method: 'DELETE' }),
-      invalidatesTags: (result, error, id) => [
+    deleteEstate: builder.mutation<{ success?: boolean }, { id: string; otpId: string; otpCode: string }>({
+      query: ({ id, otpId, otpCode }) => ({
+        url: `/api/estates/${id}`,
+        method: 'DELETE',
+        params: { otpId, otpCode },
+      }),
+      invalidatesTags: (result, error, { id }) => [
         { type: 'Estate', id },
         { type: 'EstateList', id: 'LIST' },
       ],
@@ -955,9 +959,13 @@ export const estatesApi = createApi({
         { type: 'TenantList', id: 'LIST' },
       ],
     }),
-    deleteTenant: builder.mutation<{ success?: boolean }, string>({
-      query: (tenantId) => ({ url: `/api/tenants/${tenantId}`, method: 'DELETE' }),
-      invalidatesTags: (result, error, tenantId) => [
+    deleteTenant: builder.mutation<{ success?: boolean }, { tenantId: string; otpId: string; otpCode: string }>({
+      query: ({ tenantId, otpId, otpCode }) => ({
+        url: `/api/tenants/${tenantId}`,
+        method: 'DELETE',
+        params: { otpId, otpCode },
+      }),
+      invalidatesTags: (result, error, { tenantId }) => [
         { type: 'Tenant', id: tenantId },
         { type: 'TenantList', id: 'LIST' },
       ],
@@ -1114,9 +1122,13 @@ export const estatesApi = createApi({
         { type: 'TenantList', id: 'LIST' },
       ],
     }),
-    deleteEstateUnit: builder.mutation<{ success?: boolean }, string>({
-      query: (unitId) => ({ url: `/api/estates/unit/${unitId}`, method: 'DELETE' }),
-      invalidatesTags: (result, error, unitId) => [
+    deleteEstateUnit: builder.mutation<{ success?: boolean }, { unitId: string; otpId: string; otpCode: string }>({
+      query: ({ unitId, otpId, otpCode }) => ({
+        url: `/api/estates/unit/${unitId}`,
+        method: 'DELETE',
+        params: { otpId, otpCode },
+      }),
+      invalidatesTags: (result, error, { unitId }) => [
         { type: 'EstateUnits', id: 'LIST' }, // Broad invalidation since we don't have estateId here easily
         { type: 'Estate', id: 'LIST' },
         { type: 'EstateList', id: 'LIST' },

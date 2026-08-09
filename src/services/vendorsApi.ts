@@ -148,10 +148,11 @@ export const vendorsApi = createApi({
                 { type: 'VendorList', id: 'LIST' },
             ],
         }),
-        deleteVendor: builder.mutation<{ success: boolean; message: string }, string>({
-            query: (id) => ({
+        deleteVendor: builder.mutation<{ success: boolean; message: string }, { id: string; otpId: string; otpCode: string }>({
+            query: ({ id, otpId, otpCode }) => ({
                 url: `/api/auth/vendor/${id}`,
                 method: 'DELETE',
+                params: { otpId, otpCode },
             }),
             invalidatesTags: [{ type: 'VendorList', id: 'LIST' }],
         }),

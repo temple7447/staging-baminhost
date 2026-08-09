@@ -16,6 +16,7 @@ import { MoreVertical, Wand2, HelpCircle, Plus, X, ArrowUp, ArrowDown, FileText 
 import { EstateManagementSkeleton } from "@/components/ui/skeletons";
 import { EstateOverviewCards } from "./EstateOverviewCards";
 import { EstateSetupWizard } from "./EstateSetupWizard";
+import { DeleteConfirmOtp } from "../shared/DeleteConfirmOtp";
 import { GuidedTour, hasSeenTour, type TourStep } from "@/components/ui/guided-tour";
 
 
@@ -72,6 +73,7 @@ export const EstateManagement = () => {
   const [isCreatingEstate, setIsCreatingEstate] = useState(false);
   const [newlyCreatedEstate, setNewlyCreatedEstate] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteOtpTarget, setDeleteOtpTarget] = useState<{ id: string; name: string } | null>(null);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [createEstate] = useCreateEstateMutation();
   const [deleteEstate] = useDeleteEstateMutation();
@@ -137,13 +139,13 @@ export const EstateManagement = () => {
     }
   };
 
-  const handleDeleteEstate = async (estateId: string) => {
+  const handleDeleteEstate = async (estateId: string, otpId: string, otpCode: string) => {
     try {
       setDeletingId(estateId);
-      await deleteEstate(estateId).unwrap();
+      await deleteEstate({ id: estateId, otpId, otpCode }).unwrap();
       toast({ title: 'Estate deleted' });
-    } catch (e) {
-      toast({ title: 'Failed to delete estate', variant: 'destructive' });
+    } catch (e: any) {
+      throw new Error(e?.data?.detail || 'Failed to delete estate');
     } finally {
       setDeletingId(null);
     }
@@ -493,7 +495,7 @@ export const EstateManagement = () => {
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleDeleteEstate(est.id)}>Confirm</AlertDialogAction>
+                                  <AlertDialogAction onClick={() => setDeleteOtpTarget({ id: est.id, name: est.name })}>Confirm</AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
                             </AlertDialog>
@@ -535,6 +537,17 @@ export const EstateManagement = () => {
       </Card>
 
       <EstateSetupWizard open={wizardOpen} onOpenChange={setWizardOpen} />
+
+      {deleteOtpTarget && (
+        <DeleteConfirmOtp
+          open={!!deleteOtpTarget}
+          onOpenChange={(v) => !v && setDeleteOtpTarget(null)}
+          resourceType="estate"
+          resourceId={deleteOtpTarget.id}
+          resourceLabel={deleteOtpTarget.name}
+          onConfirm={(otpId, otpCode) => handleDeleteEstate(deleteOtpTarget.id, otpId, otpCode)}
+        />
+      )}
 
       {/* Guided tour — auto-runs once, replayable via "Take a tour" */}
       <GuidedTour steps={ESTATE_TOUR_STEPS} storageKey="tour:estate-management:v1" startSignal={tourSignal} onSeenChange={() => setTourSeen(true)} />

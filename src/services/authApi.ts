@@ -83,10 +83,11 @@ export const authApi = createApi({
         { type: 'Auth', id: 'LIST' },
       ],
     }),
-    deleteBusinessOwner: builder.mutation<DeleteBusinessOwnerResponse, string>({
-      query: (id) => ({
+    deleteBusinessOwner: builder.mutation<DeleteBusinessOwnerResponse, { id: string; otpId: string; otpCode: string }>({
+      query: ({ id, otpId, otpCode }) => ({
         url: `/api/auth/business-owner/${id}`,
         method: 'DELETE',
+        params: { otpId, otpCode },
       }),
       invalidatesTags: [{ type: 'Auth', id: 'LIST' }],
     }),
@@ -131,10 +132,11 @@ export const authApi = createApi({
         { type: 'Auth', id: 'MANAGER_LIST' },
       ],
     }),
-    deleteManager: builder.mutation<DeleteManagerResponse, string>({
-      query: (id) => ({
+    deleteManager: builder.mutation<DeleteManagerResponse, { id: string; otpId: string; otpCode: string }>({
+      query: ({ id, otpId, otpCode }) => ({
         url: `/api/auth/manager/${id}`,
         method: 'DELETE',
+        params: { otpId, otpCode },
       }),
       invalidatesTags: [{ type: 'Auth', id: 'MANAGER_LIST' }],
     }),

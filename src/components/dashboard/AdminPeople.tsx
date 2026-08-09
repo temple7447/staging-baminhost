@@ -27,6 +27,7 @@ import { VendorEditDialog, type VendorEditData } from "./vendors/VendorEditDialo
 import { toast } from "@/components/ui/use-toast";
 import type { BusinessOwner, Manager } from "@/types/auth";
 import type { Vendor } from "@/services/vendorsApi";
+import { DeleteConfirmOtp } from "./shared/DeleteConfirmOtp";
 
 interface VendorDisplay {
   id: string;
@@ -56,7 +57,7 @@ export const AdminPeople = () => {
   const { data: estatesPage } = useGetEstatesQuery({ page: 1, limit: 100 });
   const [updateBusinessOwner, { isLoading: updating }] = useUpdateBusinessOwnerMutation();
   const [updateBusinessOwnerStatus, { isLoading: togglingStatus }] = useUpdateBusinessOwnerStatusMutation();
-  const [deleteBusinessOwner, { isLoading: deleting }] = useDeleteBusinessOwnerMutation();
+  const [deleteBusinessOwner] = useDeleteBusinessOwnerMutation();
   const [resendBusinessOwnerCredentials, { isLoading: resendingBOCredentials }] = useResendBusinessOwnerCredentialsMutation();
 
   // Vendors (from API)
@@ -64,15 +65,19 @@ export const AdminPeople = () => {
   const { data: businessTypesData } = useGetBusinessTypesQuery({ activeOnly: true });
   const [updateVendor, { isLoading: updatingVendor }] = useUpdateVendorMutation();
   const [updateVendorStatus, { isLoading: togglingVendorStatus }] = useUpdateVendorStatusMutation();
-  const [deleteVendor, { isLoading: deletingVendor }] = useDeleteVendorMutation();
+  const [deleteVendor] = useDeleteVendorMutation();
   const [resendVendorCredentials, { isLoading: resendingVendorCredentials }] = useResendVendorCredentialsMutation();
 
   // Managers (from API)
   const { data: managersData, isLoading: managersLoading } = useGetManagersQuery();
   const [updateManager, { isLoading: updatingManager }] = useUpdateManagerMutation();
   const [updateManagerStatus, { isLoading: togglingManagerStatus }] = useUpdateManagerStatusMutation();
-  const [deleteManager, { isLoading: deletingManager }] = useDeleteManagerMutation();
+  const [deleteManager] = useDeleteManagerMutation();
   const [resendManagerCredentials, { isLoading: resendingManagerCredentials }] = useResendManagerCredentialsMutation();
+
+  const [deleteOwnerOtpTarget, setDeleteOwnerOtpTarget] = useState<{ id: string; name: string } | null>(null);
+  const [deleteVendorOtpTarget, setDeleteVendorOtpTarget] = useState<{ id: string; name: string } | null>(null);
+  const [deleteManagerOtpTarget, setDeleteManagerOtpTarget] = useState<{ id: string; name: string } | null>(null);
 
   // Use API vendors only
   const apiVendors = vendorsData?.data ?? [];
@@ -208,16 +213,12 @@ export const AdminPeople = () => {
     }
   };
 
-  const handleDelete = async (ownerId: string) => {
+  const handleDelete = async (ownerId: string, otpId: string, otpCode: string) => {
     try {
-      await deleteBusinessOwner(ownerId).unwrap();
+      await deleteBusinessOwner({ id: ownerId, otpId, otpCode }).unwrap();
       toast({ title: "Business owner deleted successfully" });
     } catch (error: any) {
-      toast({
-        title: "Failed to delete business owner",
-        description: error?.data?.message || "An error occurred",
-        variant: "destructive",
-      });
+      throw new Error(error?.data?.detail || "Failed to delete business owner");
     }
   };
 
@@ -258,16 +259,12 @@ export const AdminPeople = () => {
     setEditVendorOpen(true);
   };
 
-  const handleVendorDelete = async (vendorId: string) => {
+  const handleVendorDelete = async (vendorId: string, otpId: string, otpCode: string) => {
     try {
-      await deleteVendor(vendorId).unwrap();
+      await deleteVendor({ id: vendorId, otpId, otpCode }).unwrap();
       toast({ title: 'Vendor deleted successfully' });
     } catch (error: any) {
-      toast({
-        title: 'Failed to delete vendor',
-        description: error?.data?.message || 'An error occurred',
-        variant: 'destructive',
-      });
+      throw new Error(error?.data?.detail || 'Failed to delete vendor');
     }
   };
 
@@ -329,16 +326,12 @@ export const AdminPeople = () => {
     }
   };
 
-  const handleManagerDelete = async (managerId: string) => {
+  const handleManagerDelete = async (managerId: string, otpId: string, otpCode: string) => {
     try {
-      await deleteManager(managerId).unwrap();
+      await deleteManager({ id: managerId, otpId, otpCode }).unwrap();
       toast({ title: 'Manager deleted successfully' });
     } catch (error: any) {
-      toast({
-        title: 'Failed to delete manager',
-        description: error?.data?.message || 'An error occurred',
-        variant: 'destructive',
-      });
+      throw new Error(error?.data?.detail || 'Failed to delete manager');
     }
   };
 
@@ -549,10 +542,10 @@ export const AdminPeople = () => {
                                       <AlertDialogFooter>
                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                                         <AlertDialogAction
-                                          onClick={() => handleDelete(owner._id)}
+                                          onClick={() => setDeleteOwnerOtpTarget({ id: owner._id, name: owner.name })}
                                           className="bg-destructive hover:bg-destructive/90"
                                         >
-                                          {deleting ? "Deleting..." : "Delete"}
+                                          Delete
                                         </AlertDialogAction>
                                       </AlertDialogFooter>
                                     </AlertDialogContent>
@@ -676,10 +669,10 @@ export const AdminPeople = () => {
                                     <AlertDialogFooter>
                                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                                       <AlertDialogAction
-                                        onClick={() => handleManagerDelete(manager._id)}
+                                        onClick={() => setDeleteManagerOtpTarget({ id: manager._id, name: manager.name })}
                                         className="bg-destructive hover:bg-destructive/90"
                                       >
-                                        {deletingManager ? "Deleting..." : "Delete"}
+                                        Delete
                                       </AlertDialogAction>
                                     </AlertDialogFooter>
                                   </AlertDialogContent>
@@ -802,10 +795,10 @@ export const AdminPeople = () => {
                                     <AlertDialogFooter>
                                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                                       <AlertDialogAction
-                                        onClick={() => handleVendorDelete(v.id)}
+                                        onClick={() => setDeleteVendorOtpTarget({ id: v.id, name: v.name })}
                                         className="bg-destructive hover:bg-destructive/90"
                                       >
-                                        {deletingVendor ? "Deleting..." : "Delete"}
+                                        Delete
                                       </AlertDialogAction>
                                     </AlertDialogFooter>
                                   </AlertDialogContent>
@@ -979,6 +972,37 @@ export const AdminPeople = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {deleteOwnerOtpTarget && (
+        <DeleteConfirmOtp
+          open={!!deleteOwnerOtpTarget}
+          onOpenChange={(v) => !v && setDeleteOwnerOtpTarget(null)}
+          resourceType="business_owner"
+          resourceId={deleteOwnerOtpTarget.id}
+          resourceLabel={deleteOwnerOtpTarget.name}
+          onConfirm={(otpId, otpCode) => handleDelete(deleteOwnerOtpTarget.id, otpId, otpCode)}
+        />
+      )}
+      {deleteManagerOtpTarget && (
+        <DeleteConfirmOtp
+          open={!!deleteManagerOtpTarget}
+          onOpenChange={(v) => !v && setDeleteManagerOtpTarget(null)}
+          resourceType="manager"
+          resourceId={deleteManagerOtpTarget.id}
+          resourceLabel={deleteManagerOtpTarget.name}
+          onConfirm={(otpId, otpCode) => handleManagerDelete(deleteManagerOtpTarget.id, otpId, otpCode)}
+        />
+      )}
+      {deleteVendorOtpTarget && (
+        <DeleteConfirmOtp
+          open={!!deleteVendorOtpTarget}
+          onOpenChange={(v) => !v && setDeleteVendorOtpTarget(null)}
+          resourceType="vendor"
+          resourceId={deleteVendorOtpTarget.id}
+          resourceLabel={deleteVendorOtpTarget.name}
+          onConfirm={(otpId, otpCode) => handleVendorDelete(deleteVendorOtpTarget.id, otpId, otpCode)}
+        />
+      )}
     </div>
   );
 };

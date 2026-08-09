@@ -36,6 +36,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { formatDate } from '@/utils/propertyUtils';
+import { DeleteConfirmOtp } from '../shared/DeleteConfirmOtp';
 import { GuidedTour, hasSeenTour, type TourStep } from '@/components/ui/guided-tour';
 
 const ESTATE_DETAIL_TOUR_STEPS: TourStep[] = [
@@ -134,7 +135,8 @@ export const EstateDetailPage = () => {
   const [createTenant, { isLoading: creating }] = useCreateEstateTenantMutation();
   const [deleteTenant, { isLoading: deletingTenant }] = useDeleteTenantMutation();
   const [clearUnitTenant, { isLoading: clearingUnit }] = useClearEstateUnitTenantMutation();
-  const [deleteUnit, { isLoading: deletingUnit }] = useDeleteEstateUnitMutation();
+  const [deleteUnit] = useDeleteEstateUnitMutation();
+  const [deleteUnitOtpTarget, setDeleteUnitOtpTarget] = useState<{ id: string; label: string } | null>(null);
   const [updateUnit, { isLoading: updatingUnit }] = useUpdateEstateUnitMutation();
 
   // Show full page skeleton while main estate data is loading
@@ -768,26 +770,10 @@ export const EstateDetailPage = () => {
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction
-                                onClick={async () => {
-                                  try {
-                                    await deleteUnit(u.unitId).unwrap();
-                                    toast({ title: 'Unit deleted successfully' });
-                                    refetchVacant();
-                                    refetchEstate();
-                                  } catch (err) {
-                                    toast({
-                                      title: 'Failed to delete unit',
-                                      variant: 'destructive'
-                                    });
-                                  }
-                                }}
+                                onClick={() => setDeleteUnitOtpTarget({ id: u.unitId, label: u.label })}
                                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                               >
-                                {deletingUnit ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  'Delete Unit'
-                                )}
+                                Delete Unit
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
@@ -877,6 +863,26 @@ export const EstateDetailPage = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {deleteUnitOtpTarget && (
+        <DeleteConfirmOtp
+          open={!!deleteUnitOtpTarget}
+          onOpenChange={(v) => !v && setDeleteUnitOtpTarget(null)}
+          resourceType="unit"
+          resourceId={deleteUnitOtpTarget.id}
+          resourceLabel={deleteUnitOtpTarget.label}
+          onConfirm={async (otpId, otpCode) => {
+            try {
+              await deleteUnit({ unitId: deleteUnitOtpTarget.id, otpId, otpCode }).unwrap();
+              toast({ title: 'Unit deleted successfully' });
+              refetchVacant();
+              refetchEstate();
+            } catch (e: any) {
+              throw new Error(e?.data?.detail || 'Failed to delete unit');
+            }
+          }}
+        />
+      )}
 
       {/* Guided tour — auto-runs once, replayable via "Take a tour" */}
       <GuidedTour steps={ESTATE_DETAIL_TOUR_STEPS} storageKey="tour:estate-detail:v1" startSignal={tourSignal} onSeenChange={() => setTourSeen(true)} />
