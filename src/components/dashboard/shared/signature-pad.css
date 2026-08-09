@@ -31,6 +31,7 @@
 }
 
 .sig-pad__tools{display:flex; justify-content:space-between; align-items:center; margin-top:8px; flex-wrap:wrap; gap:8px;}
+.sig-pad__tools-buttons{display:flex; gap:8px; flex-wrap:wrap;}
 .sig-pad__tools button{
   font-size:11px; text-transform:uppercase; letter-spacing:.04em;
   background:none; border:1px solid var(--sig-muted); color:var(--sig-muted);
@@ -39,3 +40,4 @@
 .sig-pad__tools button:hover{border-color:var(--sig-ink); color:var(--sig-ink);}
 
 .sig-pad__note{font-size:12px; color:var(--sig-muted); margin-top:5px; font-style:italic;}
+.sig-pad__note--error{color:#b3261e; font-style:normal;}
